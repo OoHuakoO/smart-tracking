@@ -1,3 +1,3 @@
 export interface Navigation {
-  navigate: (scene: string) => void;
+    navigate: (scene: string) => void;
 }
