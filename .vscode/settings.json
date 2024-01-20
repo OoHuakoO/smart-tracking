@@ -6,6 +6,7 @@
     "typescript",
     "typescriptreact"
   ],
+  "eslint.format.enable": true,
   "typescript.validate.enable": true,
   "typescript.tsdk": "./node_modules/typescript/lib",
   "javascript.validate.enable": true,
