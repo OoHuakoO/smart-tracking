@@ -1,16 +1,16 @@
-import React, {FC, memo} from 'react';
-import {SafeAreaView} from 'react-native';
+import React, { FC, memo } from 'react';
+import { SafeAreaView } from 'react-native';
 
-import {Navigation} from '@src/typings/navigattion';
+import { Navigation } from '@src/typings/navigattion';
 
 interface SettingScreenProps {
-  navigation: Navigation;
+    navigation: Navigation;
 }
 
 const SettingScreen: FC<SettingScreenProps> = () => {
-  // const {navigation} = props;
+    // const {navigation} = props;
 
-  return <SafeAreaView />;
+    return <SafeAreaView />;
 };
 
 // const styles = StyleSheet.create({
