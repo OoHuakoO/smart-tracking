@@ -1,14 +1,14 @@
 import React from 'react';
 import 'react-native-gesture-handler';
-import {Provider} from 'react-native-paper';
+import { Provider as PaperProvider } from 'react-native-paper';
 import App from './src';
-import {theme} from './src/theme';
+import { theme } from './src/theme';
 function Main() {
-  return (
-    <Provider theme={theme}>
-      <App />
-    </Provider>
-  );
+    return (
+        <PaperProvider theme={theme}>
+            <App />
+        </PaperProvider>
+    );
 }
 
 export default Main;
