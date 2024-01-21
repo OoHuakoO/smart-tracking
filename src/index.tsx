@@ -1,24 +1,53 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import LoginScreen from './screens/login';
-import SettingScreen from './screens/setting';
+
+import PrivateStack from '@src/stack/private';
+import { authState, useRecoilState } from '@src/store';
+import React, { useCallback, useEffect } from 'react';
+import PublicStack from './stack/public';
+
 const Stack = createStackNavigator();
-function MyStack() {
-    return (
-        <Stack.Navigator>
-            {/* <Stack.Screen name="LoginScreen" component={LoginScreen} /> */}
-            {/* <Stack.Screen component={HomeScreen} /> */}
-            <Stack.Screen name="Settings" component={SettingScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-        </Stack.Navigator>
-    );
-}
 
 export default function App() {
+    const [token, setToken] = useRecoilState<string>(authState);
+
+    const getUserToken = useCallback(async () => {
+        try {
+            const tokenValue = await AsyncStorage.getItem('Token');
+            if (tokenValue !== null) {
+                setToken(tokenValue);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }, [setToken]);
+
+    useEffect(() => {
+        getUserToken();
+    }, [getUserToken]);
+
     return (
         <NavigationContainer>
-            <MyStack />
+            <Stack.Navigator>
+                {token !== '' ? (
+                    <Stack.Screen
+                        options={{
+                            headerShown: false
+                        }}
+                        name="PrivateStack"
+                        component={PrivateStack}
+                    />
+                ) : (
+                    <Stack.Screen
+                        options={{
+                            headerShown: false
+                        }}
+                        name="PublicStack"
+                        component={PublicStack}
+                    />
+                )}
+            </Stack.Navigator>
         </NavigationContainer>
     );
 }

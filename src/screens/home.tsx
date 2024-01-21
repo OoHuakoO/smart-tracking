@@ -1,8 +1,7 @@
-import React, { FC, memo } from 'react';
-import { SafeAreaView } from 'react-native';
-
 import { Navigation } from '@src/typings/navigattion';
-
+import React, { FC } from 'react';
+import { SafeAreaView } from 'react-native';
+import { Text } from 'react-native-paper';
 interface HomeScreenProps {
     navigation: Navigation;
 }
@@ -10,7 +9,11 @@ interface HomeScreenProps {
 const HomeScreen: FC<HomeScreenProps> = () => {
     // const {navigation} = props;
 
-    return <SafeAreaView />;
+    return (
+        <SafeAreaView>
+            <Text variant="headlineLarge">Home</Text>
+        </SafeAreaView>
+    );
 };
 
 // const styles = StyleSheet.create({
@@ -32,4 +35,4 @@ const HomeScreen: FC<HomeScreenProps> = () => {
 //   },
 // });
 
-export default memo(HomeScreen);
+export default HomeScreen;

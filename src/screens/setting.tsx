@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
@@ -155,4 +155,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default memo(SettingScreen);
+export default SettingScreen;
