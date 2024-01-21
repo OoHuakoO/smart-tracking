@@ -1,24 +1,29 @@
 import React, { FC, memo, useState } from 'react';
 
+import DialogWithIcon from '@src/components/core/dialog';
+import InputText from '@src/components/core/inputText';
 import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
 import { Navigation } from '@src/typings/navigattion';
-import {
-    Alert,
-    Button,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    TextInput,
-    View
-} from 'react-native';
-import { Text } from 'react-native-paper';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Button, Text } from 'react-native-paper';
 
 interface SettingScreenProps {
     navigation: Navigation;
 }
 
+type ButtonVisibility = {
+    [key: string]: boolean | undefined;
+};
+
 const SettingScreen: FC<SettingScreenProps> = () => {
+    const [visible, setVisible] = React.useState<ButtonVisibility>({});
+
+    const _toggleDialog = (name: string) => () =>
+        setVisible({ ...visible, [name]: !visible[name] });
+
+    const _getVisible = (name: string) => !!visible[name];
+
     const [settingValues, setSettingValues] = useState({
         input1: '',
         input2: '',
@@ -46,11 +51,10 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                 <Text variant="headlineLarge" style={styles.textHeader}>
                     Document
                 </Text>
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 1"
-                    value={settingValues.input1}
-                    onChangeText={(text) => handleInputChange('input1', text)}
+                    value={settingValues.input6}
+                    onChangeText={(text) => handleInputChange('input6', text)}
                 />
             </View>
             <View>
@@ -72,46 +76,55 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                         />
                     </View>
                 </View>
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 2"
-                    value={settingValues.input2}
-                    onChangeText={(text) => handleInputChange('input2', text)}
+                    value={settingValues.input6}
+                    onChangeText={(text) => handleInputChange('input6', text)}
                 />
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 3"
-                    value={settingValues.input3}
-                    onChangeText={(text) => handleInputChange('input3', text)}
+                    value={settingValues.input6}
+                    onChangeText={(text) => handleInputChange('input6', text)}
                 />
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 4"
-                    value={settingValues.input4}
-                    onChangeText={(text) => handleInputChange('input4', text)}
+                    value={settingValues.input6}
+                    onChangeText={(text) => handleInputChange('input6', text)}
                 />
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 5"
-                    value={settingValues.input5}
-                    onChangeText={(text) => handleInputChange('input5', text)}
+                    value={settingValues.input6}
+                    onChangeText={(text) => handleInputChange('input6', text)}
                 />
-                <TextInput
-                    style={styles.input}
+                <InputText
                     placeholder="Setting 6"
                     value={settingValues.input6}
                     onChangeText={(text) => handleInputChange('input6', text)}
                 />
             </View>
-            <View style={styles.button}>
+            <View style={styles.row}>
                 <Button
-                    title="Cancel"
-                    onPress={() =>
-                        Alert.alert('Do you want to save this actions.')
-                    }
-                />
-                <Button title="Save" onPress={handleSaveSettings} />
+                    mode="contained-tonal"
+                    onPress={_toggleDialog('dialog6')}
+                >
+                    Close
+                </Button>
+                <Button
+                    mode="contained-tonal"
+                    style={styles.button}
+                    onPress={() => {
+                        handleSaveSettings;
+                    }}
+                >
+                    Save
+                </Button>
             </View>
+            <DialogWithIcon
+                visible={_getVisible('dialog6')}
+                close={_toggleDialog('dialog6')}
+                titleText="testt jaa"
+                contentText="test hiiii"
+            />
         </ScrollView>
     );
 };
@@ -128,15 +141,6 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16
     },
-    input: {
-        height: 70,
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 12,
-        paddingHorizontal: 10,
-        width: '100%',
-        borderRadius: 20
-    },
     modeSection: {
         display: 'flex',
         flexDirection: 'row',
@@ -148,10 +152,13 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row'
     },
-    button: {
-        display: 'flex',
+    row: {
         flexDirection: 'row',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    button: {
+        margin: 4
     }
 });
 

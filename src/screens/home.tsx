@@ -1,7 +1,9 @@
 import React, { FC, memo } from 'react';
 import { SafeAreaView } from 'react-native';
 
+import ImageSlider from '@src/components/core/imagesSlider';
 import { Navigation } from '@src/typings/navigattion';
+import { Paragraph } from 'react-native-paper';
 
 interface HomeScreenProps {
     navigation: Navigation;
@@ -10,7 +12,12 @@ interface HomeScreenProps {
 const HomeScreen: FC<HomeScreenProps> = () => {
     // const {navigation} = props;
 
-    return <SafeAreaView />;
+    return (
+        <SafeAreaView>
+            <Paragraph>Test</Paragraph>
+            <ImageSlider />
+        </SafeAreaView>
+    );
 };
 
 // const styles = StyleSheet.create({

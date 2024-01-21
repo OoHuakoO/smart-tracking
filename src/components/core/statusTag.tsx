@@ -6,9 +6,9 @@ const StatusTag = ({ status }) => {
 
     // Set different colors based on the status
     if (status === 'Online') {
-        tagColor = '#21CA50'; // yellow
+        tagColor = '#21CA50'; // Green
     } else if (status === 'Offline') {
-        tagColor = '#47ABE9'; // red
+        tagColor = '#47ABE9'; // blue
     }
 
     return (
