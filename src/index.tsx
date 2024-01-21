@@ -15,7 +15,7 @@ export default function App() {
     const getUserToken = useCallback(async () => {
         try {
             const tokenValue = await AsyncStorage.getItem('Token');
-            if (tokenValue !== null) {
+            if (tokenValue !== null && tokenValue !== '') {
                 setToken(tokenValue);
             }
         } catch (err) {

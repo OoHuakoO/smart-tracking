@@ -1,8 +1,10 @@
 import React, { useCallback, useState } from 'react';
 import { SafeAreaView, TouchableOpacity } from 'react-native';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '@src/components/core/button';
 import TextInput from '@src/components/core/textInput';
+import { Login } from '@src/services/login';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
 import { StyleSheet } from 'react-native';
@@ -13,10 +15,21 @@ const LoginScreen = () => {
     const [password, setPassword] = useState({ value: '', error: '' });
     const setToken = useSetRecoilState<string>(authState);
 
-    const handleLogin = useCallback(() => {
-        // handle fetch api login get token and save store
-        setToken('token');
-    }, [setToken]);
+    const handleLogin = useCallback(async () => {
+        try {
+            const response = await Login({
+                login: email?.value,
+                password: password?.value
+            });
+            setToken(response?.result?.session_id || '');
+            await AsyncStorage.setItem(
+                'Token',
+                response?.result?.session_id || ''
+            );
+        } catch (err) {
+            console.log(err);
+        }
+    }, [email?.value, password?.value, setToken]);
 
     return (
         <SafeAreaView>
