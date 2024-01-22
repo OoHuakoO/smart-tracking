@@ -1,13 +1,12 @@
 import React, { FC } from 'react';
 import { SafeAreaView } from 'react-native';
 
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ImageSlider from '@src/components/core/imagesSlider';
-import { Navigation } from '@src/typings/navigattion';
+import { PrivateStackParamsList } from '@src/typings/navigation';
 import { Paragraph } from 'react-native-paper';
 
-interface HomeScreenProps {
-    navigation: Navigation;
-}
+type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const HomeScreen: FC<HomeScreenProps> = () => {
     // const {navigation} = props;

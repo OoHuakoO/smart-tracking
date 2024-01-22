@@ -1,9 +1,10 @@
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '@src/screens/login';
 import SettingScreen from '@src/screens/setting';
+import { PublicStackParamsList } from '@src/typings/navigation';
 import React from 'react';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator<PublicStackParamsList>();
 const PublicStack = () => {
     return (
         <Stack.Navigator initialRouteName="Login">

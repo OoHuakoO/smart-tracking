@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 
 import PrivateStack from '@src/stack/private';
+import PublicStack from '@src/stack/public';
 import { authState, useRecoilState } from '@src/store';
 import React, { useCallback, useEffect } from 'react';
-import PublicStack from './stack/public';
+import { RootStackParamsList } from './typings/navigation';
 
-const Stack = createStackNavigator();
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function App() {
     const [token, setToken] = useRecoilState<string>(authState);

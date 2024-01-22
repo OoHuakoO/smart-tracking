@@ -4,21 +4,23 @@ import DialogWithIcon from '@src/components/core/dialog';
 import InputText from '@src/components/core/inputText';
 import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
-import { Navigation } from '@src/typings/navigattion';
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PublicStackParamsList } from '@src/typings/navigation';
 import { ScrollView, StatusBar, StyleSheet, Switch, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface SettingScreenProps {
-    navigation: Navigation;
-}
+type SettingScreenProps = NativeStackScreenProps<
+    PublicStackParamsList,
+    'Setting'
+>;
 
 type ButtonVisibility = {
     [key: string]: boolean | undefined;
 };
 
 const SettingScreen: FC<SettingScreenProps> = () => {
-    //Dialog
     const [visible, setVisible] = React.useState<ButtonVisibility>({});
 
     const _toggleDialog = (name: string) => () =>
@@ -36,18 +38,14 @@ const SettingScreen: FC<SettingScreenProps> = () => {
         input6: ''
     });
 
-    const [isEdited, setIsEdited] = useState<boolean>(false);
-
     const handleInputChange = (name, value) => {
         setSettingValues((prevValues) => ({ ...prevValues, [name]: value }));
-        setIsEdited(true);
     };
 
     //Save Button
     const handleSaveSettings = () => {
         // Add your logic to save the settings (e.g., send to server, store in AsyncStorage)
         console.log('Saving settings:', settingValues);
-        setIsEdited(false);
     };
 
     //Switch
@@ -127,25 +125,19 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                         }
                     />
                 </View>
-                {isEdited && (
-                    <View style={styles.row}>
-                        <Button
-                            mode="contained-tonal"
-                            onPress={_toggleDialog('dialog6')}
-                        >
-                            Close
-                        </Button>
-                        <Button
-                            mode="contained-tonal"
-                            style={styles.button}
-                            onPress={() => {
-                                handleSaveSettings;
-                            }}
-                        >
-                            Save
-                        </Button>
-                    </View>
-                )}
+
+                <View style={styles.row}>
+                    <Button
+                        mode="contained-tonal"
+                        style={styles.button}
+                        onPress={() => {
+                            handleSaveSettings;
+                        }}
+                    >
+                        Save
+                    </Button>
+                </View>
+
                 <DialogWithIcon
                     visible={_getVisible('dialog6')}
                     close={_toggleDialog('dialog6')}

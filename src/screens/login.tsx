@@ -1,22 +1,26 @@
-import React, { useCallback, useState } from 'react';
-import { SafeAreaView, View } from 'react-native';
+import React, { FC, useCallback, useState } from 'react';
+import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
 import Button from '@src/components/core/button';
 import InputText from '@src/components/core/inputText';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import { Login } from '@src/services/login';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
 import { LoginParams } from '@src/typings/login';
+import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Portal, Text } from 'react-native-paper';
 
-const LoginScreen = () => {
+type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
+
+const LoginScreen: FC<LoginScreenProps> = (props) => {
+    const { navigation } = props;
     const setToken = useSetRecoilState<string>(authState);
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -49,6 +53,10 @@ const LoginScreen = () => {
 
     const handleCloseDialog = () => {
         setVisibleDialog(false);
+    };
+
+    const handlePressSetting = () => {
+        navigation.replace('Setting');
     };
 
     return (
@@ -105,7 +113,13 @@ const LoginScreen = () => {
                 </Text>
                 <Text>Line Support : va_rbs (08.30 น. - 17.30 น.)</Text>
             </View>
-            <ActionButton />
+            <TouchableOpacity
+                activeOpacity={0.5}
+                style={styles.settingButton}
+                onPress={handlePressSetting}
+            >
+                <ActionButton />
+            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -118,7 +132,8 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: 40
+        marginBottom: 40,
+        fontFamily: 'DMSans'
     },
     sectionLogin: {
         padding: 16
@@ -129,6 +144,12 @@ const styles = StyleSheet.create({
     textLogin: {
         marginTop: 25,
         alignItems: 'center'
+    },
+    settingButton: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0
     }
 });
 
