@@ -1,18 +1,26 @@
 import { theme } from '@src/theme';
-import React, { memo } from 'react';
+import React, { ComponentProps, forwardRef, memo } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
-type Props = React.ComponentProps<typeof TextInput> & {
+type InputTextProps = ComponentProps<typeof TextInput> & {
     errorText?: string;
     placeholder?: string;
 };
 
-const InputText = ({ errorText, placeholder }: Props) => (
-    <View style={styles.container}>
-        <TextInput style={styles.input} placeholder={placeholder} />
-        {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
-    </View>
-);
+const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
+    const { placeholder, errorText } = props;
+    return (
+        <View style={styles.container}>
+            <TextInput
+                style={styles.input}
+                placeholder={placeholder}
+                {...props}
+                ref={ref}
+            />
+            {errorText ? <Text style={styles.error}>{errorText}</Text> : null}
+        </View>
+    );
+});
 
 const styles = StyleSheet.create({
     container: {

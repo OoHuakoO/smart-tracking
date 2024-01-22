@@ -24,7 +24,7 @@ export default function App() {
     }, [setToken]);
 
     useEffect(() => {
-        getUserToken();
+        // getUserToken();
     }, [getUserToken]);
 
     return (

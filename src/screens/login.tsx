@@ -6,69 +6,97 @@ import Button from '@src/components/core/button';
 import InputText from '@src/components/core/inputText';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AlertDialog from '@src/components/core/alertDialog';
 import { Login } from '@src/services/login';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
+import { LoginParams } from '@src/typings/login';
+import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Portal, Text } from 'react-native-paper';
 
 const LoginScreen = () => {
-    const [email, setEmail] = useState({ value: '', error: '' });
-    const [password, setPassword] = useState({ value: '', error: '' });
     const setToken = useSetRecoilState<string>(authState);
+    const form = useForm<LoginParams>({});
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [textDialog, setTextDialog] = useState<string>('');
 
-    const handleLogin = useCallback(async () => {
-        try {
-            const response = await Login({
-                login: email?.value,
-                password: password?.value
-            });
-            setToken(response?.result?.session_id || '');
-            await AsyncStorage.setItem(
-                'Token',
-                response?.result?.session_id || ''
-            );
-        } catch (err) {
-            console.log(err);
-        }
-    }, [email?.value, password?.value, setToken]);
+    const handleLogin = useCallback(
+        async (data: LoginParams) => {
+            try {
+                const response = await Login({
+                    login: data?.login,
+                    password: data?.password
+                });
+                if (response?.error) {
+                    setVisibleDialog(true);
+                    setTextDialog('Email Or Password Incorrect');
+                    return;
+                }
+                setToken(response?.result?.session_id || '');
+                await AsyncStorage.setItem(
+                    'Token',
+                    response?.result?.session_id || ''
+                );
+            } catch (err) {
+                setVisibleDialog(true);
+                setTextDialog('Network Error');
+            }
+        },
+        [setToken]
+    );
+
+    const handleCloseDialog = () => {
+        setVisibleDialog(false);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <Text variant="headlineLarge" style={styles.textSmartTrack}>
                 Smart Tracking
             </Text>
+            <Portal>
+                <AlertDialog
+                    text={textDialog}
+                    visible={visibleDialog}
+                    handleClose={handleCloseDialog}
+                />
+            </Portal>
             <View style={styles.sectionLogin}>
-                <InputText
-                    placeholder="Email"
-                    returnKeyType="next"
-                    errorText={email.error}
-                    value={email.value}
-                    autoCapitalize="none"
-                    textContentType="emailAddress"
-                    keyboardType="email-address"
-                    onChangeText={(text) =>
-                        setEmail({ value: text, error: '' })
-                    }
+                <Controller
+                    name="login"
+                    defaultValue=""
+                    control={form?.control}
+                    render={({ field }) => (
+                        <InputText
+                            {...field}
+                            placeholder="Email"
+                            returnKeyType="next"
+                            autoCapitalize="none"
+                            textContentType="emailAddress"
+                            keyboardType="email-address"
+                            onChangeText={(value) => field?.onChange(value)}
+                        />
+                    )}
                 />
-                <InputText
-                    placeholder="Password"
-                    returnKeyType="done"
-                    errorText={password.error}
-                    value={password.value}
-                    secureTextEntry
-                    onChangeText={(text) =>
-                        setPassword({ value: text, error: '' })
-                    }
+                <Controller
+                    name="password"
+                    defaultValue=""
+                    control={form?.control}
+                    render={({ field }) => (
+                        <InputText
+                            {...field}
+                            placeholder="Password"
+                            returnKeyType="done"
+                            secureTextEntry
+                            onChangeText={(value) => field?.onChange(value)}
+                        />
+                    )}
                 />
-                <Button
-                    mode="contained"
-                    onPress={() => {
-                        handleLogin();
-                    }}
-                >
-                    Login
-                </Button>
+                <TouchableOpacity onPress={form?.handleSubmit(handleLogin)}>
+                    <Button mode="contained">Login</Button>
+                </TouchableOpacity>
             </View>
             <View style={styles.textLogin}>
                 <Text>
