@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 import { SafeAreaView } from 'react-native';
 
 import ImageSlider from '@src/components/core/imagesSlider';
@@ -39,4 +39,4 @@ const HomeScreen: FC<HomeScreenProps> = () => {
 //   },
 // });
 
-export default memo(HomeScreen);
+export default HomeScreen;

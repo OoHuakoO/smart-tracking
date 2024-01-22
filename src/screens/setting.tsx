@@ -1,4 +1,4 @@
-import React, { FC, memo, useState } from 'react';
+import React, { FC, useState } from 'react';
 
 import DialogWithIcon from '@src/components/core/dialog';
 import InputText from '@src/components/core/inputText';
@@ -194,4 +194,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default memo(SettingScreen);
+export default SettingScreen;

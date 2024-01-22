@@ -1,3 +1,6 @@
 export interface Navigation {
-    navigate: (scene: string) => void;
+    navigate: (
+        name: string,
+        params?: { screen?: string; params?: any }
+    ) => void;
 }
