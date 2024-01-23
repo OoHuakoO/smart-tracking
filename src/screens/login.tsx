@@ -66,9 +66,11 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             </Text>
             <Portal>
                 <AlertDialog
-                    text={textDialog}
+                    titleText={'Warning'}
+                    textContent={textDialog}
                     visible={visibleDialog}
                     handleClose={handleCloseDialog}
+                    children={''}
                 />
             </Portal>
             <View style={styles.sectionLogin}>
@@ -118,7 +120,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 style={styles.settingButton}
                 onPress={handlePressSetting}
             >
-                <ActionButton />
+                <ActionButton icon={'cog'} />
             </TouchableOpacity>
         </SafeAreaView>
     );
@@ -133,7 +135,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '700',
         marginBottom: 40,
-        fontFamily: 'DMSans'
+        fontFamily: 'DMSans',
+        marginTop: 40
     },
     sectionLogin: {
         padding: 16

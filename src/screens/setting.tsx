@@ -143,6 +143,7 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                     close={_toggleDialog('dialog6')}
                     titleText="testt jaa"
                     contentText="test hiiii"
+                    children={''}
                 />
             </ScrollView>
         </SafeAreaView>
