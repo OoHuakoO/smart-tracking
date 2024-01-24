@@ -1,6 +1,15 @@
 import React, { FC } from 'react';
-import { Image, SafeAreaView, StatusBar, View } from 'react-native';
+import { SafeAreaView, StatusBar, View } from 'react-native';
 
+import {
+    faBoxesStacked,
+    faDownload,
+    faFile,
+    faFlag,
+    faLocationDot,
+    faUpload
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ImageSlider from '@src/components/core/imagesSlider';
 import { theme } from '@src/theme';
@@ -32,10 +41,53 @@ const HomeScreen: FC<HomeScreenProps> = () => {
                     Menu
                 </Text>
             </View>
-            <Image
-                style={{ width: 100, height: 100 }}
-                source={require('./assets/images/download.svg')}
-            />
+            <View style={styles.menu}>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faFile}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faLocationDot}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faBoxesStacked}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+            </View>
+
+            <View style={styles.menu}>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faFlag}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faUpload}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+                <View style={styles.containerMenu}>
+                    <FontAwesomeIcon
+                        icon={faDownload}
+                        size={45}
+                        style={styles.iconStyle}
+                    />
+                </View>
+            </View>
         </SafeAreaView>
     );
 };
@@ -56,6 +108,24 @@ const styles = StyleSheet.create({
     textMenu: {
         marginTop: 15,
         fontWeight: 'bold'
+    },
+    containerMenu: {
+        width: 75,
+        height: 85,
+        backgroundColor: theme.colors.primary,
+        borderRadius: 20,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    iconStyle: {
+        color: '#FFFFFF'
+    },
+    menu: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 25,
+        margin: 15
     }
 });
 
