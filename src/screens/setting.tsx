@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect } from 'react';
 
 import InputText from '@src/components/core/inputText';
-import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +12,6 @@ import {
     ScrollView,
     StatusBar,
     StyleSheet,
-    Switch,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -70,7 +68,7 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Odoo Config
                     </Text>
-                    <View style={styles.modeSection}>
+                    {/* <View style={styles.modeSection}>
                         <View style={styles.statusTag}>
                             <Text variant="bodyLarge">Mode</Text>
                             <StatusTag status={'Online'} />
@@ -98,7 +96,7 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                                 )}
                             />
                         </View>
-                    </View>
+                    </View> */}
                     <Controller
                         name="server"
                         defaultValue=""

@@ -1,3 +1,4 @@
+import { theme } from '@src/theme';
 import React, { ComponentProps, FC } from 'react';
 import { StyleSheet } from 'react-native';
 import { FAB } from 'react-native-paper';
@@ -11,9 +12,9 @@ const ActionButton: FC<FabProps> = (props) => {
     const { size, icon } = props;
     return (
         <FAB
+            color={theme.colors.textWhitePrimary}
             style={styles.fab}
             icon={icon}
-            onPress={() => console.log('Pressed')}
             size={size}
         />
     );
