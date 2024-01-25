@@ -23,10 +23,6 @@ const BackButton: FC<BackButtonProps> = (props) => {
 const styles = StyleSheet.create({
     container: {
         marginRight: 20
-    },
-    image: {
-        width: 24,
-        height: 24
     }
 });
 
