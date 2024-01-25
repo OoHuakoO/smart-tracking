@@ -1,93 +1,54 @@
-import React, { FC } from 'react';
-import { SafeAreaView, StatusBar, View } from 'react-native';
+import React, { FC, useState } from 'react';
+import { SafeAreaView, StatusBar, Switch, View } from 'react-native';
 
-import {
-    faBoxesStacked,
-    faDownload,
-    faFile,
-    faFlag,
-    faLocationDot,
-    faUpload
-} from '@fortawesome/free-solid-svg-icons';
+import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ImageSlider from '@src/components/core/imagesSlider';
+import ShortcutMenu from '@src/components/core/shortcutMenu';
+import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { StyleSheet } from 'react-native';
-import { IconButton, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const HomeScreen: FC<HomeScreenProps> = () => {
     // const { navigation } = props;
 
+    const [isEnabled, setIsEnabled] = useState(false);
+    const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.modeSectionWrap}>
+                <View>
+                    <View style={styles.modeSection}>
+                        <StatusTag status={'Online'} />
+                        <Switch
+                            trackColor={{
+                                false: '#767577',
+                                true: '#81b0ff'
+                            }}
+                            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={toggleSwitch}
+                            value={isEnabled}
+                        />
+                    </View>
+                </View>
+                <View>
+                    <FontAwesomeIcon icon={faRightFromBracket} />
+                </View>
+            </View>
             <View>
-                <IconButton
-                    icon="camera"
-                    iconColor={theme.colors.textBody}
-                    size={20}
-                    onPress={() => console.log('Pressed')}
-                />
                 <Text variant="displayMedium" style={styles.textHeader}>
                     Welcome
                 </Text>
             </View>
             <ImageSlider />
-            <View>
-                <Text variant="headlineSmall" style={styles.textMenu}>
-                    Menu
-                </Text>
-            </View>
-            <View style={styles.menu}>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faFile}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faLocationDot}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faBoxesStacked}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-            </View>
-
-            <View style={styles.menu}>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faFlag}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faUpload}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={faDownload}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
-            </View>
+            <ShortcutMenu />
         </SafeAreaView>
     );
 };
@@ -109,23 +70,16 @@ const styles = StyleSheet.create({
         marginTop: 15,
         fontWeight: 'bold'
     },
-    containerMenu: {
-        width: 75,
-        height: 85,
-        backgroundColor: theme.colors.primary,
-        borderRadius: 20,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    iconStyle: {
-        color: '#FFFFFF'
-    },
-    menu: {
+    modeSectionWrap: {
         display: 'flex',
         flexDirection: 'row',
-        gap: 25,
-        margin: 15
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10
+    },
+    modeSection: {
+        display: 'flex',
+        flexDirection: 'row'
     }
 });
 
