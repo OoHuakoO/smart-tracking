@@ -1,11 +1,17 @@
 import { theme } from '@src/theme';
-import React, { ComponentProps, forwardRef, memo } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { forwardRef, memo } from 'react';
+import {
+    StyleSheet,
+    Text,
+    TextInput,
+    TextInputProps,
+    View
+} from 'react-native';
 
-type InputTextProps = ComponentProps<typeof TextInput> & {
+interface InputTextProps extends TextInputProps {
     errorText?: string;
     placeholder?: string;
-};
+}
 
 const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
     const { placeholder, errorText } = props;

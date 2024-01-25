@@ -37,7 +37,6 @@ const SettingScreen: FC<SettingScreenProps> = () => {
     const handleInitSetting = useCallback(async () => {
         const settings = await AsyncStorage.getItem('Settings');
         const jsonSettings: SettingParams = JSON.parse(settings);
-        form?.setValue('online', jsonSettings?.online);
         form?.setValue('server', jsonSettings?.server);
         form?.setValue('port', jsonSettings?.port);
         form?.setValue('login', jsonSettings?.login);

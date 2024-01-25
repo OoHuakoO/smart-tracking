@@ -1,13 +1,20 @@
-import React, { ComponentProps, FC } from 'react';
+import React, { FC } from 'react';
 import { StyleSheet } from 'react-native';
-import { Button, Dialog, MD3Colors, Portal, Text } from 'react-native-paper';
+import {
+    Button,
+    Dialog,
+    DialogProps,
+    MD3Colors,
+    Portal,
+    Text
+} from 'react-native-paper';
 
-type DialogWithIconProps = ComponentProps<typeof Dialog> & {
+interface DialogWithIconProps extends DialogProps {
     visible: boolean;
     close: () => void;
     titleText?: string;
     contentText?: string;
-};
+}
 
 const DialogWithIcon: FC<DialogWithIconProps> = (props) => {
     const { visible, close, titleText, contentText } = props;

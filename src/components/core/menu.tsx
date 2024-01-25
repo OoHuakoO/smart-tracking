@@ -1,15 +1,15 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { theme } from '@src/theme';
-import React, { ComponentProps, FC } from 'react';
+import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-type MenuProps = ComponentProps<typeof FontAwesomeIcon> & {
+interface MenuProps {
     icon: IconProp;
     menuName: string;
     menuPage: () => void;
-};
+}
 
 const Menu: FC<MenuProps> = (props) => {
     const { icon, menuName, menuPage } = props;

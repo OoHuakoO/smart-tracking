@@ -1,14 +1,15 @@
 import { theme } from '@src/theme';
-import React, { ComponentProps, FC } from 'react';
+import React, { FC } from 'react';
 import { StyleSheet } from 'react-native';
 import { FAB } from 'react-native-paper';
 
-type FabProps = ComponentProps<typeof FAB> & {
-    size?: string;
+type FABSize = 'small' | 'medium' | 'large';
+interface ActionButtonProps {
+    size?: FABSize;
     icon: string;
-};
+}
 
-const ActionButton: FC<FabProps> = (props) => {
+const ActionButton: FC<ActionButtonProps> = (props) => {
     const { size, icon } = props;
     return (
         <FAB
