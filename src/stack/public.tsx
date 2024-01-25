@@ -15,7 +15,7 @@ const PublicStack = () => {
         () => (
             <BackButton
                 size={20}
-                color={theme.colors.textWhitePrimary}
+                color={theme.colors.white}
                 handlePress={() => {
                     navigation.navigate('Login');
                 }}
@@ -33,7 +33,7 @@ const PublicStack = () => {
                     headerStyle: {
                         backgroundColor: theme.colors.primary
                     },
-                    headerTintColor: '#fff',
+                    headerTintColor: theme.colors.white,
                     headerTitleStyle: {
                         fontWeight: 'bold'
                     },

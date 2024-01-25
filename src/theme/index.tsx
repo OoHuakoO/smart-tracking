@@ -11,6 +11,6 @@ export const theme = {
         error: '#f13a59',
         textPrimary: '#404040',
         textBody: '#828282',
-        textWhitePrimary: '#F0F0F0'
+        white: '#FFFFFF'
     }
 };
