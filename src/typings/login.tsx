@@ -3,6 +3,15 @@ export interface LoginParams {
     password: string;
 }
 
+export interface SettingParams {
+    server: string;
+    port: string;
+    login: string;
+    password: string;
+    db: string;
+    online: boolean;
+}
+
 export interface LoginResponse {
     jsonrpc: string;
     id: string;

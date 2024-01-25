@@ -1,13 +1,22 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 
-import DialogWithIcon from '@src/components/core/dialog';
 import InputText from '@src/components/core/inputText';
 import StatusTag from '@src/components/core/statusTag';
 import { theme } from '@src/theme';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
-import { ScrollView, StatusBar, StyleSheet, Switch, View } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import {
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Switch,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,46 +25,36 @@ type SettingScreenProps = NativeStackScreenProps<
     'Setting'
 >;
 
-type ButtonVisibility = {
-    [key: string]: boolean | undefined;
-};
-
 const SettingScreen: FC<SettingScreenProps> = () => {
-    const [visible, setVisible] = React.useState<ButtonVisibility>({});
+    const form = useForm<SettingParams>({});
 
-    const _toggleDialog = (name: string) => () =>
-        setVisible({ ...visible, [name]: !visible[name] });
+    const handleSaveSettings = useCallback(async (data: SettingParams) => {
+        try {
+            await AsyncStorage.setItem('Settings', JSON.stringify(data));
+        } catch (err) {
+            console.log(err);
+        }
+    }, []);
 
-    const _getVisible = (name: string) => !!visible[name];
+    const handleInitSetting = useCallback(async () => {
+        const settings = await AsyncStorage.getItem('Settings');
+        const jsonSettings: SettingParams = JSON.parse(settings);
+        form?.setValue('online', jsonSettings?.online);
+        form?.setValue('server', jsonSettings?.server);
+        form?.setValue('port', jsonSettings?.port);
+        form?.setValue('login', jsonSettings?.login);
+        form?.setValue('password', jsonSettings?.password);
+        form?.setValue('db', jsonSettings?.db);
+    }, [form]);
 
-    //Input
-    const [settingValues, setSettingValues] = useState({
-        input1: '',
-        input2: '',
-        input3: '',
-        input4: '',
-        input5: '',
-        input6: ''
-    });
-
-    const handleInputChange = (name, value) => {
-        setSettingValues((prevValues) => ({ ...prevValues, [name]: value }));
-    };
-
-    //Save Button
-    const handleSaveSettings = () => {
-        // Add your logic to save the settings (e.g., send to server, store in AsyncStorage)
-        console.log('Saving settings:', settingValues);
-    };
-
-    //Switch
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+    useEffect(() => {
+        handleInitSetting();
+    }, [handleInitSetting]);
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
-                <View>
+                {/* <View>
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Document
                     </Text>
@@ -66,7 +65,7 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                             handleInputChange('input6', text)
                         }
                     />
-                </View>
+                </View> */}
                 <View>
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Odoo Config
@@ -77,74 +76,100 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                             <StatusTag status={'Online'} />
                         </View>
                         <View>
-                            <Switch
-                                trackColor={{
-                                    false: '#767577',
-                                    true: '#81b0ff'
-                                }}
-                                thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                                ios_backgroundColor="#3e3e3e"
-                                onValueChange={toggleSwitch}
-                                value={isEnabled}
+                            <Controller
+                                name="online"
+                                defaultValue={false}
+                                control={form?.control}
+                                render={({ field }) => (
+                                    <Switch
+                                        {...field}
+                                        trackColor={{
+                                            false: '#767577',
+                                            true: '#81b0ff'
+                                        }}
+                                        thumbColor={
+                                            field?.value ? '#f5dd4b' : '#f4f3f4'
+                                        }
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={(value) =>
+                                            field?.onChange(value)
+                                        }
+                                    />
+                                )}
                             />
                         </View>
                     </View>
-                    <InputText
-                        placeholder="Setting 2"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
+                    <Controller
+                        name="server"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="Server"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
                     />
-                    <InputText
-                        placeholder="Setting 3"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
+                    <Controller
+                        name="port"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="Port"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
                     />
-                    <InputText
-                        placeholder="Setting 4"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
+                    <Controller
+                        name="login"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="User"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
                     />
-                    <InputText
-                        placeholder="Setting 5"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
+                    <Controller
+                        name="password"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="Password"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
                     />
-                    <InputText
-                        placeholder="Setting 6"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
+                    <Controller
+                        name="db"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="Database"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
                     />
                 </View>
 
                 <View style={styles.row}>
-                    <Button
-                        mode="contained-tonal"
-                        style={styles.button}
-                        onPress={() => {
-                            handleSaveSettings;
-                        }}
+                    <TouchableOpacity
+                        onPress={form?.handleSubmit(handleSaveSettings)}
                     >
-                        Save
-                    </Button>
+                        <Button mode="contained-tonal" style={styles.button}>
+                            Save
+                        </Button>
+                    </TouchableOpacity>
                 </View>
-
-                <DialogWithIcon
-                    visible={_getVisible('dialog6')}
-                    close={_toggleDialog('dialog6')}
-                    titleText="testt jaa"
-                    contentText="test hiiii"
-                    children={''}
-                />
             </ScrollView>
         </SafeAreaView>
     );
@@ -156,7 +181,6 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight
     },
     scrollView: {
-        // backgroundColor: 'pink',
         marginHorizontal: 20
     },
     textHeader: {
