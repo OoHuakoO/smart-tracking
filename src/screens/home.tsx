@@ -1,46 +1,112 @@
-import React, { FC, useState } from 'react';
-import { SafeAreaView, StatusBar, Switch, View } from 'react-native';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import {
+    SafeAreaView,
+    StatusBar,
+    Switch,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
+import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
+import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Portal, Text } from 'react-native-paper';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const HomeScreen: FC<HomeScreenProps> = () => {
     // const { navigation } = props;
+    const form = useForm<SettingParams>({});
+    const setToken = useSetRecoilState<string>(authState);
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [textDialog, setTextDialog] = useState<string>('');
 
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+    const handleInitOnline = useCallback(async () => {
+        const online = await AsyncStorage.getItem('Online');
+        if (!online) {
+            await AsyncStorage.setItem('Online', JSON.stringify(true));
+            return;
+        }
+        const onlineValue = JSON.parse(online);
+        form?.setValue('online', onlineValue);
+    }, [form]);
+
+    const handleLogout = useCallback(async () => {
+        try {
+            setToken('');
+            await AsyncStorage.setItem('Token', '');
+        } catch (err) {
+            setVisibleDialog(true);
+            setTextDialog('Network Error');
+        }
+    }, [setToken]);
+
+    const handleCloseDialog = () => {
+        setVisibleDialog(false);
+    };
+
+    useEffect(() => {
+        handleInitOnline();
+    }, [handleInitOnline]);
 
     return (
         <SafeAreaView style={styles.container}>
+            <Portal>
+                <AlertDialog
+                    titleText={'Warning'}
+                    textContent={textDialog}
+                    visible={visibleDialog}
+                    handleClose={handleCloseDialog}
+                    children={''}
+                />
+            </Portal>
             <View style={styles.modeSectionWrap}>
                 <View>
                     <View style={styles.modeSection}>
-                        <StatusTag status={'Online'} />
-                        <Switch
-                            trackColor={{
-                                false: '#767577',
-                                true: '#81b0ff'
-                            }}
-                            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={toggleSwitch}
-                            value={isEnabled}
+                        <StatusTag
+                            status={form.watch('online') ? 'Online' : 'Offline'}
+                        />
+                        <Controller
+                            name="online"
+                            defaultValue={true}
+                            control={form?.control}
+                            render={({ field }) => (
+                                <Switch
+                                    {...field}
+                                    trackColor={{
+                                        false: theme.colors.disableSwitch,
+                                        true: theme.colors.primary
+                                    }}
+                                    thumbColor={theme.colors.white}
+                                    onValueChange={async (value) => {
+                                        field?.onChange(value);
+                                        await AsyncStorage.setItem(
+                                            'Online',
+                                            JSON.stringify(value)
+                                        );
+                                    }}
+                                />
+                            )}
                         />
                     </View>
                 </View>
-                <View>
-                    <FontAwesomeIcon icon={faRightFromBracket} />
-                </View>
+
+                <TouchableOpacity activeOpacity={0.5} onPress={handleLogout}>
+                    <View>
+                        <FontAwesomeIcon icon={faRightFromBracket} />
+                    </View>
+                </TouchableOpacity>
             </View>
             <View>
                 <Text variant="displayMedium" style={styles.textHeader}>
