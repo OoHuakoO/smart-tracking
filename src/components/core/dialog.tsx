@@ -1,22 +1,19 @@
-import * as React from 'react';
+import React, { ComponentProps, FC } from 'react';
 import { StyleSheet } from 'react-native';
 import { Button, Dialog, MD3Colors, Portal, Text } from 'react-native-paper';
 
-const DialogWithIcon = ({
-    visible,
-    close,
-    titleText,
-    contentText
-}: {
+type DialogWithIconProps = ComponentProps<typeof Dialog> & {
     visible: boolean;
     close: () => void;
-    titleText: string;
-    contentText: string;
-}) => {
+    titleText?: string;
+    contentText?: string;
+};
+
+const DialogWithIcon: FC<DialogWithIconProps> = (props) => {
+    const { visible, close, titleText, contentText } = props;
     return (
         <Portal>
             <Dialog onDismiss={close} visible={visible}>
-                {/* <Dialog.Icon icon="alert" /> */}
                 <Dialog.Title style={styles.title}>{titleText}</Dialog.Title>
                 <Dialog.Content>
                     <Text>{contentText}</Text>

@@ -9,7 +9,7 @@ const Button = ({ mode, style, children, ...props }: Props) => (
     <PaperButton
         style={[
             styles.button,
-            mode === 'outlined' && { backgroundColor: theme.colors.primary },
+            mode === 'contained' && { backgroundColor: theme.colors.primary },
             style
         ]}
         labelStyle={styles.text}
@@ -23,13 +23,14 @@ const Button = ({ mode, style, children, ...props }: Props) => (
 const styles = StyleSheet.create({
     button: {
         width: '100%',
+        height: 60,
         justifyContent: 'center',
         marginVertical: 10,
         alignSelf: 'center'
     },
     text: {
         fontWeight: 'bold',
-        fontSize: 15,
+        fontSize: 20,
         lineHeight: 26
     }
 });

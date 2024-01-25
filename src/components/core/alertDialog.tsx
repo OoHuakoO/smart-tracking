@@ -1,37 +1,38 @@
 import React, { ComponentProps, FC, memo } from 'react';
-import { StyleSheet, Text, TextInput } from 'react-native';
-import { Modal } from 'react-native-paper';
+import { Dialog, Portal, Text } from 'react-native-paper';
 
-type AlertDialogProps = ComponentProps<typeof TextInput> & {
+type AlertDialogProps = ComponentProps<typeof Dialog> & {
     visible: boolean;
-    text: string;
+    titleText: string;
+    textContent: string;
     handleClose: () => void;
 };
 
 const AlertDialog: FC<AlertDialogProps> = (props) => {
-    const { visible, text, handleClose } = props;
+    const { visible, titleText, textContent, handleClose } = props;
     return (
-        <Modal
-            visible={visible}
-            onDismiss={() => handleClose()}
-            contentContainerStyle={styles.container}
-        >
-            <Text>{text}</Text>
-        </Modal>
+        <Portal>
+            <Dialog visible={visible} onDismiss={handleClose}>
+                <Dialog.Title>{titleText}</Dialog.Title>
+                <Dialog.Content>
+                    <Text variant="bodyMedium">{textContent}</Text>
+                </Dialog.Content>
+            </Dialog>
+        </Portal>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: 'white',
-        padding: 20,
-        height: 300,
-        width: 300,
-        alignSelf: 'center',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-});
+// const styles = StyleSheet.create({
+//     container: {
+//         backgroundColor: 'white',
+//         padding: 20,
+//         height: 300,
+//         width: 300,
+//         alignSelf: 'center',
+//         display: 'flex',
+//         justifyContent: 'center',
+//         alignItems: 'center'
+//     }
+// });
 
 export default memo(AlertDialog);

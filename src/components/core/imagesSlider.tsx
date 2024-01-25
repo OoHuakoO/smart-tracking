@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Paragraph } from 'react-native-paper';
 
 const ImageSlider = () => {
@@ -14,22 +15,17 @@ const ImageSlider = () => {
         //         <Image source={ImagesAssets.total} />
         //     </View>
         // </Swiper>
-        <Paragraph>TESEE jss</Paragraph>
+        <View style={styles.wrapper}>
+            <Paragraph>Advertisement section</Paragraph>
+        </View>
     );
 };
 
-// const styles = StyleSheet.create({
-//     wrapper: {},
-//     slide1: {
-//         flex: 1,
-//         justifyContent: 'center',
-//         alignItems: 'center'
-//     },
-//     image: {
-//         width: '100%',
-//         height: '100%',
-//         resizeMode: 'cover'
-//     }
-// });
+const styles = StyleSheet.create({
+    wrapper: {
+        height: 150,
+        backgroundColor: 'red'
+    }
+});
 
 export default ImageSlider;
