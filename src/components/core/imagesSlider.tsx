@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 const ImageSlider = () => {
@@ -18,10 +18,16 @@ const ImageSlider = () => {
                     />
                 </View>
                 <View style={styles.slide2}>
-                    <Text style={styles.text}>Beautiful</Text>
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/img1.jpg')}
+                    />
                 </View>
                 <View style={styles.slide3}>
-                    <Text style={styles.text}>And simple</Text>
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/img3.jpg')}
+                    />
                 </View>
             </Swiper>
         </View>
@@ -60,8 +66,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     image: {
-        width: 200,
-        height: 200
+        width: 500,
+        height: 200,
+        objectFit: 'fill'
     }
 });
 
