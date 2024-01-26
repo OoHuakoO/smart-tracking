@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 const ImageSlider = () => {
@@ -12,7 +12,10 @@ const ImageSlider = () => {
                 autoplayTimeout={3}
             >
                 <View style={styles.slide1}>
-                    <Text style={styles.text}>Hello Swiper</Text>
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/10103065.jpg')}
+                    />
                 </View>
                 <View style={styles.slide2}>
                     <Text style={styles.text}>Beautiful</Text>
@@ -55,6 +58,10 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 30,
         fontWeight: 'bold'
+    },
+    image: {
+        width: 200,
+        height: 200
     }
 });
 

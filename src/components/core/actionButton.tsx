@@ -13,7 +13,7 @@ const ActionButton: FC<ActionButtonProps> = (props) => {
     const { size, icon } = props;
     return (
         <FAB
-            color={theme.colors.textWhitePrimary}
+            color={theme.colors.white}
             style={styles.fab}
             icon={icon}
             size={size}
