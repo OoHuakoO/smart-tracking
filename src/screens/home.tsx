@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
+import AssetCardDetail from '@src/components/core/assetCardDetail';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
@@ -114,6 +115,7 @@ const HomeScreen: FC<HomeScreenProps> = () => {
                 </Text>
             </View>
             <ImageSlider />
+            <AssetCardDetail />
             <ShortcutMenu />
         </SafeAreaView>
     );

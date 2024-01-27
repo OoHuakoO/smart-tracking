@@ -1,8 +1,8 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 
 interface MenuProps {
@@ -16,13 +16,20 @@ const Menu: FC<MenuProps> = (props) => {
     return (
         <TouchableOpacity onPress={menuPage}>
             <View style={styles.containerMenuWrap}>
-                <View style={styles.containerMenu}>
-                    <FontAwesomeIcon
-                        icon={icon}
-                        size={45}
-                        style={styles.iconStyle}
-                    />
-                </View>
+                <LinearGradient
+                    start={{ x: 0, y: 1 }}
+                    end={{ x: 1, y: 0 }}
+                    colors={['#2C86BF', '#2C86BF', '#8DC4E6']}
+                    style={styles.test}
+                >
+                    <View style={styles.containerMenu}>
+                        <FontAwesomeIcon
+                            icon={icon}
+                            size={45}
+                            style={styles.iconStyle}
+                        />
+                    </View>
+                </LinearGradient>
                 <View>
                     <Text variant="titleMedium">{menuName}</Text>
                 </View>
@@ -32,17 +39,16 @@ const Menu: FC<MenuProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
-    containerMenuWrap: {
-        alignItems: 'center'
-    },
+    containerMenuWrap: {},
     containerMenu: {
         width: 75,
         height: 85,
-        backgroundColor: theme.colors.primary,
-        borderRadius: 20,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    test: {
+        borderRadius: 20
     },
     iconStyle: {
         color: '#FFFFFF'
