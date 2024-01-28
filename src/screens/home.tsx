@@ -156,7 +156,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
-
             <ShortcutMenu
                 navigation={navigation}
                 route={route}

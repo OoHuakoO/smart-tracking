@@ -7,14 +7,18 @@ type FABSize = 'small' | 'medium' | 'large';
 interface ActionButtonProps {
     size?: FABSize;
     icon: string;
+    backgroundColor: string;
 }
 
 const ActionButton: FC<ActionButtonProps> = (props) => {
-    const { size, icon } = props;
+    const { size, icon, backgroundColor } = props;
     return (
         <FAB
             color={theme.colors.white}
-            style={styles.fab}
+            style={[
+                styles.fab,
+                { backgroundColor: backgroundColor || '#4499CE' }
+            ]}
             icon={icon}
             size={size}
         />
@@ -23,8 +27,7 @@ const ActionButton: FC<ActionButtonProps> = (props) => {
 
 const styles = StyleSheet.create({
     fab: {
-        borderRadius: 25,
-        backgroundColor: '#4499CE'
+        borderRadius: 25
     }
 });
 

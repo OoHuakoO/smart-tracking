@@ -17,7 +17,7 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
             <View style={styles.imagesContainer}>
                 <Image
                     style={styles.image}
-                    source={require('../../../assets/images/img3.jpg')}
+                    source={require('../../../assets/images/img1.jpg')}
                 />
             </View>
             <View style={styles.textContainer}>
@@ -54,12 +54,12 @@ const styles = StyleSheet.create({
         width: 80,
         height: 100,
         backgroundColor: 'red',
-        borderRadius: 15
+        borderRadius: 10
     },
     image: {
         width: '100%',
         height: '100%',
-        borderRadius: 15
+        borderRadius: 10
     },
     textContainer: {
         marginLeft: 20
