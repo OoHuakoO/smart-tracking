@@ -1,6 +1,10 @@
-import React from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PrivateStackParamsList } from '@src/typings/navigation';
+import React, { FC } from 'react';
 
-const Asset = () => {
+type AssetScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Asset'>;
+
+const Asset: FC<AssetScreenProps> = () => {
     return <div>Asset</div>;
 };
 

@@ -115,7 +115,11 @@ const HomeScreen: FC<HomeScreenProps> = () => {
                 </Text>
             </View>
             <ImageSlider />
-            <AssetCardDetail />
+            <AssetCardDetail
+                assetCode="RB0001"
+                assetName="Table"
+                assetLocation="Location 01"
+            />
             <ShortcutMenu />
         </SafeAreaView>
     );

@@ -1,27 +1,31 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React from 'react';
+import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-const AssetCardDetail = () => {
+interface AssetCardDetailProps {
+    assetCode: string;
+    assetName: string;
+    assetLocation: string;
+}
+
+const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
+    const { assetCode, assetName, assetLocation } = props;
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <View>
-                    <Image
-                        style={styles.image}
-                        source={require('../../../assets/images/img3.jpg')}
-                    />
-                </View>
+                <Image
+                    style={styles.image}
+                    source={require('../../../assets/images/img3.jpg')}
+                />
             </View>
-
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>RB0001</Text>
-                <Text style={styles.additionalText}>Table</Text>
-                <View>
-                    <FontAwesomeIcon icon={faLocationDot} color="red" />
-                    <Text style={styles.locationText}>Location-01</Text>
+                <Text style={styles.assetCode}>{assetCode}</Text>
+                <Text style={styles.additionalText}>{assetName}</Text>
+                <View style={styles.iconContainer}>
+                    <FontAwesomeIcon icon={faLocationDot} color="#DC3E3F" />
+                    <Text style={styles.locationText}>{assetLocation}</Text>
                 </View>
             </View>
         </View>
@@ -33,18 +37,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: 370,
         height: 130,
-        backgroundColor: '#F7F7F7',
+        backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
         borderRadius: 10,
-        shadowColor: 'rgba(0, 0, 0, 0.1)',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 1,
-        shadowRadius: 4
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 1.41,
+        elevation: 2
     },
     imagesContainer: {
-        width: 75,
-        height: 75,
+        width: 80,
+        height: 100,
         backgroundColor: 'red',
         borderRadius: 15
     },
@@ -59,17 +67,22 @@ const styles = StyleSheet.create({
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: 'blue'
+        color: '#404040'
     },
     additionalText: {
         fontSize: 14,
         color: '#777'
     },
-
+    iconContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
     locationText: {
         color: 'black',
         fontWeight: 'bold',
-        marginTop: 6
+        alignContent: 'center',
+        margin: 5
     }
 });
 

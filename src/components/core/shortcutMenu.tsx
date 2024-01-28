@@ -37,7 +37,7 @@ const ShortcutMenu = () => {
                 <Menu
                     icon={faBoxesStacked}
                     menuName={'Asset'}
-                    menuPage={() => console.log('Press Menu3')}
+                    menuPage={() => console.log('Press Menu2')}
                 />
                 <Menu
                     icon={faFlag}
