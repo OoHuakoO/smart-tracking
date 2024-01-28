@@ -120,7 +120,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 style={styles.settingButton}
                 onPress={handlePressSetting}
             >
-                <ActionButton icon={'cog'} />
+                <ActionButton icon={'cog'} backgroundColor={''} />
             </TouchableOpacity>
         </SafeAreaView>
     );
