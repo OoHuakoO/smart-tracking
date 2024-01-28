@@ -17,10 +17,13 @@ import {
 } from 'react-native-responsive-screen';
 import Menu from './menu';
 
-type ShortcutMenuProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
+interface ShortcutMenuProps
+    extends NativeStackScreenProps<PrivateStackParamsList, 'Home'> {
+    handleDownload: () => void;
+}
 
 const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, handleDownload } = props;
 
     return (
         <View style={styles.container}>
@@ -53,12 +56,12 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
                 <Menu
                     icon={faUpload}
                     menuName={'Upload'}
-                    menuPage={() => navigation.navigate('Upload')}
+                    menuPage={handleDownload}
                 />
                 <Menu
                     icon={faDownload}
                     menuName={'Download'}
-                    menuPage={() => navigation.navigate('Download')}
+                    menuPage={handleDownload}
                 />
             </View>
         </View>

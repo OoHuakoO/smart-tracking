@@ -12,12 +12,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
-import AssetCardDetail from '@src/components/core/assetCardDetail';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
+import { GetAssets } from '@src/services/asset';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
+import { AssetData } from '@src/typings/asset';
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
@@ -56,6 +57,46 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleCloseDialog = () => {
         setVisibleDialog(false);
     };
+
+    const handleLoadAssets = useCallback(
+        async (totalPages: number): Promise<AssetData[]> => {
+            const promises = Array.from({ length: totalPages }, (_, i) =>
+                GetAssets({ page: i + 1, limit: 1000 })
+            );
+            const results = await Promise.allSettled(promises);
+            const listAssets = results.flatMap((result) => {
+                if (result.status === 'fulfilled' && !result.value.error) {
+                    return result.value.result.data.asset;
+                } else {
+                    setVisibleDialog(true);
+                    setTextDialog(
+                        'Something went wrong with one of the requests'
+                    );
+                    return [];
+                }
+            });
+
+            return listAssets;
+        },
+        []
+    );
+
+    const handleDownload = useCallback(async () => {
+        try {
+            const initialResponse = await GetAssets({ page: 1, limit: 1000 });
+            if (initialResponse?.error) {
+                setVisibleDialog(true);
+                setTextDialog('Something went wrong');
+                return;
+            }
+            const total_pages = initialResponse?.result?.data?.total_page;
+            const listAssets = await handleLoadAssets(total_pages);
+            console.log(listAssets.length);
+        } catch (err) {
+            setVisibleDialog(true);
+            setTextDialog('Network Error');
+        }
+    }, [handleLoadAssets]);
 
     useEffect(() => {
         handleInitOnline();
@@ -115,12 +156,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
-            <AssetCardDetail
-                assetCode="RB0001"
-                assetName="Table"
-                assetLocation="Location 01"
+
+            <ShortcutMenu
+                navigation={navigation}
+                route={route}
+                handleDownload={handleDownload}
             />
-            <ShortcutMenu navigation={navigation} route={route} />
         </SafeAreaView>
     );
 };

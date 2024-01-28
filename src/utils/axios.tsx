@@ -1,19 +1,26 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SettingParams } from '@src/typings/login';
 import axios, {
     AxiosError,
     AxiosRequestConfig,
     InternalAxiosRequestConfig
 } from 'axios';
 
-export const apiInstances = axios.create({
-    baseURL: `http://27.254.207.59:10116`,
-    responseType: 'json'
-});
+export const apiInstances = axios.create();
+
+const getBaseURL = async () => {
+    const settings = await AsyncStorage.getItem('Settings');
+    const jsonSettings: SettingParams = JSON.parse(settings);
+    return `http://${jsonSettings?.server}:${jsonSettings?.port}`;
+};
 
 apiInstances.interceptors.request.use(
     async (config: InternalAxiosRequestConfig) => {
         if (config.data instanceof FormData) {
             config.headers.set('Content-Type', 'multipart/form-data');
         } else {
+            config.baseURL = await getBaseURL();
+            config.responseType = 'json';
             config.headers.set(
                 'content-type',
                 'application/json;charset=UTF-8'
@@ -61,7 +68,17 @@ export async function post<T = any>(
     data?: any,
     config?: AxiosRequestConfig<any> | undefined
 ): Promise<Response<T>> {
-    const convertData = { jsonrpc: '2.0', params: { ...data, db: 'ST1' } };
+    const settings = await AsyncStorage.getItem('Settings');
+    const jsonSettings: SettingParams = JSON.parse(settings);
+    const convertData = {
+        jsonrpc: '2.0',
+        params: {
+            ...data,
+            db: jsonSettings?.db,
+            login: jsonSettings?.login,
+            password: jsonSettings?.password
+        }
+    };
     const res = await apiInstances.post<Response<T>>(url, convertData, config);
     return res.data;
 }
