@@ -11,6 +11,10 @@ export type PublicStackParamsList = {
 export type PrivateStackParamsList = {
     Setting: undefined;
     Home: undefined;
-    Asset: undefined;
+    Assets: undefined;
     Location: undefined;
+    Document: undefined;
+    Report: undefined;
+    Upload: undefined;
+    Download: undefined;
 };

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AssetScreen from '@src/screens/assets';
 import HomeScreen from '@src/screens/home';
-import SettingScreen from '@src/screens/setting';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { memo } from 'react';
 
@@ -15,7 +15,13 @@ const PrivateStack = () => {
                 }}
                 component={HomeScreen}
             />
-            <Stack.Screen name="Setting" component={SettingScreen} />
+            <Stack.Screen
+                name="Assets"
+                options={{
+                    headerShown: false
+                }}
+                component={AssetScreen}
+            />
         </Stack.Navigator>
     );
 };

@@ -6,7 +6,9 @@ import {
     faLocationDot,
     faUpload
 } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PrivateStackParamsList } from '@src/typings/navigation';
+import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import {
@@ -15,7 +17,11 @@ import {
 } from 'react-native-responsive-screen';
 import Menu from './menu';
 
-const ShortcutMenu = () => {
+type ShortcutMenuProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
+
+const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
+    const { navigation } = props;
+
     return (
         <View style={styles.container}>
             <View>
@@ -27,32 +33,32 @@ const ShortcutMenu = () => {
                 <Menu
                     icon={faFile}
                     menuName={'Document'}
-                    menuPage={() => console.log('Press Menu1')}
+                    menuPage={() => navigation.navigate('Document')}
                 />
                 <Menu
                     icon={faLocationDot}
                     menuName={'Location'}
-                    menuPage={() => console.log('Press Menu2')}
+                    menuPage={() => navigation.navigate('Location')}
                 />
                 <Menu
                     icon={faBoxesStacked}
                     menuName={'Asset'}
-                    menuPage={() => console.log('Press Menu2')}
+                    menuPage={() => navigation.navigate('Assets')}
                 />
                 <Menu
                     icon={faFlag}
                     menuName={'Report'}
-                    menuPage={() => console.log('Press Menu4')}
+                    menuPage={() => navigation.navigate('Report')}
                 />
                 <Menu
                     icon={faUpload}
                     menuName={'Upload'}
-                    menuPage={() => console.log('Press Menu5')}
+                    menuPage={() => navigation.navigate('Upload')}
                 />
                 <Menu
                     icon={faDownload}
                     menuName={'Download'}
-                    menuPage={() => console.log('Press Menu6')}
+                    menuPage={() => navigation.navigate('Download')}
                 />
             </View>
         </View>

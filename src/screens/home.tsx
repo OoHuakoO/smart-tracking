@@ -26,8 +26,8 @@ import { Portal, Text } from 'react-native-paper';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
-const HomeScreen: FC<HomeScreenProps> = () => {
-    // const { navigation } = props;
+const HomeScreen: FC<HomeScreenProps> = (props) => {
+    const { navigation, route } = props;
     const form = useForm<SettingParams>({});
     const setToken = useSetRecoilState<string>(authState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -120,7 +120,7 @@ const HomeScreen: FC<HomeScreenProps> = () => {
                 assetName="Table"
                 assetLocation="Location 01"
             />
-            <ShortcutMenu />
+            <ShortcutMenu navigation={navigation} route={route} />
         </SafeAreaView>
     );
 };
