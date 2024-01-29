@@ -5,6 +5,7 @@ import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
     heightPercentageToDP as hp,
@@ -17,21 +18,25 @@ type AssetsScreenProps = NativeStackScreenProps<
     'Assets'
 >;
 
-const AssetsScreen: FC<AssetsScreenProps> = () => {
+const AssetsScreen: FC<AssetsScreenProps> = (props) => {
+    const { navigation } = props;
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.topSectionList}>
+            <LinearGradient
+                start={{ x: 0, y: 1 }}
+                end={{ x: 1, y: 0 }}
+                colors={['#2C86BF', '#2C86BF', '#8DC4E6']}
+                style={styles.topSectionList}
+            >
                 <View style={styles.backToPrevious}>
                     <TouchableOpacity
                         activeOpacity={0.5}
-                        onPress={() =>
-                            console.log('Pressed back to previous page')
-                        }
+                        onPress={() => navigation.navigate('Home')}
                     >
                         <ActionButton
                             icon={'chevron-left'}
                             size="small"
-                            backgroundColor={'#E0E0E0'}
+                            backgroundColor={theme.colors.white}
                         />
                     </TouchableOpacity>
                 </View>
@@ -43,18 +48,18 @@ const AssetsScreen: FC<AssetsScreenProps> = () => {
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
                 </View>
-            </View>
+            </LinearGradient>
             <View style={styles.listSection}>
                 <View style={styles.searchButton}>
                     <TouchableOpacity
-                        activeOpacity={0.5}
+                        activeOpacity={1}
                         style={styles.searchButtonTest}
                         onPress={() => console.log('Pressed search button')}
                     >
                         <ActionButton
                             icon={'magnify'}
                             size="medium"
-                            backgroundColor={''}
+                            backgroundColor={theme.colors.white}
                         />
                     </TouchableOpacity>
                 </View>
@@ -63,35 +68,48 @@ const AssetsScreen: FC<AssetsScreenProps> = () => {
                         Total Asset : 999
                     </Text>
                     <View style={styles.wrapDetailList}>
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            style={styles.searchButtonTest}
+                            onPress={() => navigation.navigate('AssetDetail')}
+                        >
+                            <AssetCardDetail
+                                assetCode={'RB0001'}
+                                assetName={'Table'}
+                                assetLocation={'Location-01'}
+                                imageSource={require('../../assets/images/img1.jpg')}
+                            />
+                        </TouchableOpacity>
+
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
                             assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img2.jpg')}
                         />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
                             assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img3.jpg')}
                         />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
                             assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img1.jpg')}
                         />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
                             assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img2.jpg')}
                         />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
                             assetLocation={'Location-01'}
-                        />
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img3.jpg')}
                         />
                     </View>
                 </ScrollView>
@@ -107,7 +125,6 @@ const styles = StyleSheet.create({
     topSectionList: {
         height: hp('30%'),
         width: wp('100%'),
-        backgroundColor: theme.colors.primary,
         position: 'absolute',
         display: 'flex'
     },
@@ -136,7 +153,8 @@ const styles = StyleSheet.create({
         height: hp('30%'),
         width: wp('100%'),
         backgroundColor: theme.colors.background,
-        borderRadius: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         marginTop: '50%',
         zIndex: 1
     },

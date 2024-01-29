@@ -8,17 +8,15 @@ interface AssetCardDetailProps {
     assetCode: string;
     assetName: string;
     assetLocation: string;
+    imageSource?: any;
 }
 
 const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
-    const { assetCode, assetName, assetLocation } = props;
+    const { assetCode, assetName, assetLocation, imageSource } = props;
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={require('../../../assets/images/img1.jpg')}
-                />
+                <Image style={styles.image} source={imageSource} />
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
@@ -53,7 +51,7 @@ const styles = StyleSheet.create({
     imagesContainer: {
         width: 80,
         height: 100,
-        backgroundColor: 'red',
+        backgroundColor: 'gray',
         borderRadius: 10
     },
     image: {
