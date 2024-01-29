@@ -43,8 +43,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#9DD6EB',
-        borderRadius: 20
+        backgroundColor: 'red'
     },
     slide2: {
         flex: 1,

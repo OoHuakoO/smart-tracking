@@ -11,7 +11,8 @@ export const theme = {
         error: '#f13a59',
         textPrimary: '#404040',
         textBody: '#828282',
-        white: '#FFFFFF',
-        disableSwitch: '#767577'
+        white: '#F7F7F7',
+        disableSwitch: '#767577',
+        black: '#121212'
     }
 };
