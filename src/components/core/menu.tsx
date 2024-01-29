@@ -39,7 +39,9 @@ const Menu: FC<MenuProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
-    containerMenuWrap: {},
+    containerMenuWrap: {
+        alignItems: 'center'
+    },
     containerMenu: {
         width: 75,
         height: 85,
