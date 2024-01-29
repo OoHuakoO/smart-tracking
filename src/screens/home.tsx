@@ -15,12 +15,13 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
-import { GetAssets } from '@src/services/asset';
+import { GetAssets, GetLocation, GetUseStatus } from '@src/services/asset';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/asset';
+import { AssetData, LocationData, UseStatusData } from '@src/typings/asset';
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { ErrorResponse } from '@src/utils/axios';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Portal, Text } from 'react-native-paper';
@@ -54,49 +55,136 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [setToken]);
 
-    const handleCloseDialog = () => {
+    const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
-    };
+    }, []);
 
-    const handleLoadAssets = useCallback(
+    const handleResponseError = useCallback(
+        (error: ErrorResponse | undefined): boolean => {
+            if (error) {
+                setVisibleDialog(true);
+                setTextDialog('Something went wrong');
+                return true;
+            }
+            return false;
+        },
+        []
+    );
+
+    const handleLoadAsset = useCallback(
         async (totalPages: number): Promise<AssetData[]> => {
-            const promises = Array.from({ length: totalPages }, (_, i) =>
-                GetAssets({ page: i + 1, limit: 1000 })
-            );
-            const results = await Promise.allSettled(promises);
-            const listAssets = results.flatMap((result) => {
-                if (result.status === 'fulfilled' && !result.value.error) {
-                    return result.value.result.data.asset;
-                } else {
-                    setVisibleDialog(true);
-                    setTextDialog(
-                        'Something went wrong with one of the requests'
-                    );
-                    return [];
-                }
-            });
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetAssets({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const assets = results.flatMap(
+                    (result) => result?.result?.data?.asset ?? []
+                );
+                return assets;
+            } catch (err) {
+                setVisibleDialog(true);
+                setTextDialog('Something went wrong');
+                return [];
+            }
+        },
+        []
+    );
 
-            return listAssets;
+    const handleLoadLocation = useCallback(
+        async (totalPages: number): Promise<LocationData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetLocation({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const assets = results.flatMap(
+                    (result) => result?.result?.data?.data ?? []
+                );
+                return assets;
+            } catch (err) {
+                setVisibleDialog(true);
+                setTextDialog('Something went wrong');
+                return [];
+            }
+        },
+        []
+    );
+
+    const handleLoadUseStatus = useCallback(
+        async (totalPages: number): Promise<UseStatusData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetUseStatus({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const assets = results.flatMap(
+                    (result) => result?.result?.data?.data ?? []
+                );
+                return assets;
+            } catch (err) {
+                setVisibleDialog(true);
+                setTextDialog('Something went wrong');
+                return [];
+            }
         },
         []
     );
 
     const handleDownload = useCallback(async () => {
         try {
-            const initialResponse = await GetAssets({ page: 1, limit: 1000 });
-            if (initialResponse?.error) {
-                setVisibleDialog(true);
-                setTextDialog('Something went wrong');
+            const [
+                initialResponseAssets,
+                initialResponseLocation,
+                initialResponseUseStatus
+            ] = await Promise.all([
+                GetAssets({ page: 1, limit: 1000 }),
+                GetLocation({ page: 1, limit: 1000 }),
+                GetUseStatus({ page: 1, limit: 1000 })
+            ]);
+
+            const errorAssets = handleResponseError(
+                initialResponseAssets?.error
+            );
+            const errorLocation = handleResponseError(
+                initialResponseLocation?.error
+            );
+            const errorUseStatus = handleResponseError(
+                initialResponseUseStatus?.error
+            );
+
+            if (errorAssets || errorLocation || errorUseStatus) {
                 return;
             }
-            const total_pages = initialResponse?.result?.data?.total_page;
-            const listAssets = await handleLoadAssets(total_pages);
+
+            const totalPagesAssets =
+                initialResponseAssets?.result?.data?.total_page;
+            const totalPagesLocation =
+                initialResponseLocation?.result?.data?.total_page;
+            const totalPagesUseStatus =
+                initialResponseUseStatus?.result?.data?.total_page;
+
+            const [listAssets, listLocation, listUseStatus] = await Promise.all(
+                [
+                    handleLoadAsset(totalPagesAssets),
+                    handleLoadLocation(totalPagesLocation),
+                    handleLoadUseStatus(totalPagesUseStatus)
+                ]
+            );
+
             console.log(listAssets.length);
+            console.log(listLocation.length);
+            console.log(listUseStatus.length);
         } catch (err) {
             setVisibleDialog(true);
-            setTextDialog('Network Error');
+            setTextDialog('Something went wrong');
         }
-    }, [handleLoadAssets]);
+    }, [
+        handleLoadAsset,
+        handleLoadLocation,
+        handleLoadUseStatus,
+        handleResponseError
+    ]);
 
     useEffect(() => {
         handleInitOnline();
