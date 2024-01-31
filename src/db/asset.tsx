@@ -1,3 +1,4 @@
+import { AssetData } from '@src/typings/asset';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableAsset = (db: SQLiteDatabase) => {
@@ -5,8 +6,8 @@ export const createTableAsset = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS asset(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            asset_id INTEGER NOT NULL UNIQUE,
-            default_code TEXT NOT NULL UNIQUE,
+            asset_id INTEGER NOT NULL,
+            default_code TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
             category_id INTEGER,
@@ -41,4 +42,45 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             console.log('Transaction createTableAsset completed successfully');
         }
     );
+};
+
+export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
+    const queryInsert =
+        `INSERT INTO asset (
+      asset_id,
+      default_code,
+      name,
+      description,
+      category_id,
+      serial_no,
+      brand_name,
+      quantity,
+      location_id,
+      picture
+    ) VALUES ` +
+        assets
+            .map(
+                (item) => `(
+                    ${item.asset_id},
+                    '${item.default_code}',
+                    '${item.name}',
+                    '${item.description}',
+                    ${item.category_id},
+                    '${item.serial_no}',
+                    '${item.brand_name}',
+                    ${item.quantity},
+                    ${item.location_id},
+                    '${item.picture}'
+                    )`
+            )
+            .join(',');
+
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(queryInsert);
+        });
+        console.log('All assets inserted successfully');
+    } catch (err) {
+        throw new Error(`Error inserting assets: ${err.message}`);
+    }
 };

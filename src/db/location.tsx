@@ -1,3 +1,4 @@
+import { LocationData } from '@src/typings/asset';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableLocation = (db: SQLiteDatabase) => {
@@ -34,4 +35,33 @@ export const createTableLocation = (db: SQLiteDatabase) => {
             );
         }
     );
+};
+
+export const insertLocationData = (
+    db: SQLiteDatabase,
+    locations: LocationData[]
+) => {
+    const queryInsert =
+        `INSERT INTO location (
+            asset_location_id,
+            name
+        ) VALUES ` +
+        locations
+            .map(
+                (item) =>
+                    `(
+                  ${item.asset_location_id},
+                 '${item.name}'
+                     )`
+            )
+            .join(',');
+
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(queryInsert);
+        });
+        console.log('All locations inserted successfully');
+    } catch (err) {
+        throw new Error(`Error inserting locations: ${err.message}`);
+    }
 };

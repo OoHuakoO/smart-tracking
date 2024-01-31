@@ -5,9 +5,11 @@ enablePromise(true);
 export const getDBConnection = async () => {
     return openDatabase(
         { name: 'smart-tracking', location: 'default' },
-        () => {},
+        () => {
+            console.log('Connect to database successfully');
+        },
         (error) => {
-            console.error(error);
+            console.log(error);
             throw Error('Could not connect to database');
         }
     );

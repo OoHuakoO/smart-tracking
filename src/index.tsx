@@ -9,6 +9,7 @@ import { RootStackParamsList } from './typings/navigation';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createTableAsset } from './db/asset';
+import { dropAllMasterTable } from './db/common';
 import { getDBConnection } from './db/config';
 import { createTableLocation } from './db/location';
 import { createTableUseStatus } from './db/useStatus';
@@ -32,6 +33,7 @@ export default function App() {
     const loadDataDB = useCallback(async () => {
         try {
             const db = await getDBConnection();
+            await dropAllMasterTable(db);
             await createTableAsset(db);
             await createTableLocation(db);
             await createTableUseStatus(db);

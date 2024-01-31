@@ -15,6 +15,11 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
+import { createTableAsset, insertAssetData } from '@src/db/asset';
+import { dropAllMasterTable } from '@src/db/common';
+import { getDBConnection } from '@src/db/config';
+import { createTableLocation, insertLocationData } from '@src/db/location';
+import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { GetAssets, GetLocation, GetUseStatus } from '@src/services/asset';
 import { authState, useSetRecoilState } from '@src/store';
 import { theme } from '@src/theme';
@@ -63,7 +68,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         (error: ErrorResponse | undefined): boolean => {
             if (error) {
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong');
+                setTextDialog('Something went wrong response error');
                 return true;
             }
             return false;
@@ -83,8 +88,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
+                console.log(err);
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong');
+                setTextDialog('Something went wrong load asset');
                 return [];
             }
         },
@@ -103,8 +109,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
+                console.log(err.message);
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong');
+                setTextDialog('Something went wrong load location');
                 return [];
             }
         },
@@ -123,8 +130,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
+                console.log(err.message);
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong');
+                setTextDialog('Something went wrong load use status');
                 return [];
             }
         },
@@ -171,13 +179,24 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     handleLoadUseStatus(totalPagesUseStatus)
                 ]
             );
-
-            console.log(listAssets.length);
-            console.log(listLocation.length);
-            console.log(listUseStatus.length);
+            if (
+                listAssets?.length > 0 &&
+                listLocation?.length > 0 &&
+                listUseStatus?.length > 0
+            ) {
+                const db = await getDBConnection();
+                await dropAllMasterTable(db);
+                await createTableAsset(db);
+                await createTableLocation(db);
+                await createTableUseStatus(db);
+                await insertAssetData(db, listAssets);
+                await insertLocationData(db, listLocation);
+                await insertUseStatusData(db, listUseStatus);
+            }
         } catch (err) {
+            console.log(err.message);
             setVisibleDialog(true);
-            setTextDialog('Something went wrong');
+            setTextDialog(`Something went wrong download`);
         }
     }, [
         handleLoadAsset,
