@@ -8,6 +8,10 @@ import React, { useCallback, useEffect } from 'react';
 import { RootStackParamsList } from './typings/navigation';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createTableAsset } from './db/asset';
+import { getDBConnection } from './db/config';
+import { createTableLocation } from './db/location';
+import { createTableUseStatus } from './db/useStatus';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
 
@@ -25,9 +29,24 @@ export default function App() {
         }
     }, [setToken]);
 
+    const loadDataDB = useCallback(async () => {
+        try {
+            const db = await getDBConnection();
+            await createTableAsset(db);
+            await createTableLocation(db);
+            await createTableUseStatus(db);
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
+
     useEffect(() => {
         getUserToken();
-    }, [getUserToken]);
+    }, [getUserToken, loadDataDB]);
+
+    useEffect(() => {
+        loadDataDB();
+    }, [loadDataDB]);
 
     return (
         <NavigationContainer>
