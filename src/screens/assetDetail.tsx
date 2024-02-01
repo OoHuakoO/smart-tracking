@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
+import AssetTagStatus from '@src/components/core/assetTagStatus';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -61,6 +62,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     <Text variant="headlineLarge">เครื่องคิดเลข EL-782C</Text>
                     <Text variant="headlineSmall">CFFASDER500012</Text>
                 </View>
+                <View style={styles.assetStatus}>
+                    <AssetTagStatus status={'ปกติ'} />
+                </View>
+                <View />
             </View>
         </SafeAreaView>
     );
@@ -122,6 +127,10 @@ const styles = StyleSheet.create({
     assetName: {
         marginHorizontal: 20,
         marginVertical: 30
+    },
+    assetStatus: {
+        display: 'flex',
+        alignItems: 'center'
     }
 });
 
