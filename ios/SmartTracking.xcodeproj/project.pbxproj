@@ -18,6 +18,10 @@
 		42175D226B884144AC7090BF /* DMSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */; };
 		92215BA98F13444CB693936D /* DMSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */; };
 		A56C71430D2C4357BD394CD6 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */; };
+		2718A5578EE644F6A90983A1 /* Sarabun-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */; };
+		1C31191C91634D699F2164C4 /* Sarabun-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */; };
+		48BF90EB295848CB8B68C8FC /* Sarabun-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */; };
+		320324B19BB844639CD418AB /* Sarabun-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +56,10 @@
 		EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */ = {isa = PBXFileReference; name = "DMSans-Light.ttf"; path = "../assets/fonts/DMSans-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */ = {isa = PBXFileReference; name = "DMSans-Medium.ttf"; path = "../assets/fonts/DMSans-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */ = {isa = PBXFileReference; name = "DMSans-Regular.ttf"; path = "../assets/fonts/DMSans-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */ = {isa = PBXFileReference; name = "Sarabun-Bold.ttf"; path = "../assets/fonts/Sarabun-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */ = {isa = PBXFileReference; name = "Sarabun-Light.ttf"; path = "../assets/fonts/Sarabun-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */ = {isa = PBXFileReference; name = "Sarabun-Medium.ttf"; path = "../assets/fonts/Sarabun-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */ = {isa = PBXFileReference; name = "Sarabun-Regular.ttf"; path = "../assets/fonts/Sarabun-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +172,10 @@
 				EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */,
 				FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */,
 				6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */,
+				4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */,
+				1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */,
+				705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */,
+				54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -268,6 +280,10 @@
 				42175D226B884144AC7090BF /* DMSans-Light.ttf in Resources */,
 				92215BA98F13444CB693936D /* DMSans-Medium.ttf in Resources */,
 				A56C71430D2C4357BD394CD6 /* DMSans-Regular.ttf in Resources */,
+				2718A5578EE644F6A90983A1 /* Sarabun-Bold.ttf in Resources */,
+				1C31191C91634D699F2164C4 /* Sarabun-Light.ttf in Resources */,
+				48BF90EB295848CB8B68C8FC /* Sarabun-Medium.ttf in Resources */,
+				320324B19BB844639CD418AB /* Sarabun-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

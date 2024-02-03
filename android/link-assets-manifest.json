@@ -16,6 +16,22 @@
     {
       "path": "assets/fonts/DMSans-Regular.ttf",
       "sha1": "ac9a042a40e49e8cdbfe0e64e84d9b1c5724e98d"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Bold.ttf",
+      "sha1": "8a5854cb1d43fe0caf68d4f82a62c3dfd4f5cb5a"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Light.ttf",
+      "sha1": "49e7b35305be84b3de4cf02cadd9eebc21c8f681"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Medium.ttf",
+      "sha1": "39c5f343e03df2db76283f8b07125e15ffff0b75"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Regular.ttf",
+      "sha1": "a9b65e36ee8224b459b9dcdb8bf55ef41b4ab867"
     }
   ]
 }
