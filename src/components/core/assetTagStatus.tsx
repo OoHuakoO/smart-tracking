@@ -28,7 +28,7 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <Text variant="titleLarge" style={styles.statusText}>
-                สถานะ: {status}
+                สถานะ : {status}
             </Text>
         </View>
     );
@@ -40,11 +40,19 @@ const styles = StyleSheet.create({
         height: 35,
         borderRadius: 20,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 1.41,
+        elevation: 2
     },
     statusText: {
         fontFamily: 'Sarabun',
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: '700',
         color: theme.colors.white
     }

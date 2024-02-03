@@ -35,7 +35,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             />
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.button}>
+                    {/* <View style={styles.button}>
                         <TouchableOpacity
                             activeOpacity={0.5}
                             onPress={() =>
@@ -48,7 +48,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                                 backgroundColor={theme.colors.white}
                             />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
                 <View style={styles.imagesContainer}>
                     <Image
@@ -65,7 +65,43 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                 <View style={styles.assetStatus}>
                     <AssetTagStatus status={'ปกติ'} />
                 </View>
-                <View />
+                <View style={styles.assetDetail}>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Serial Number</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: 27 }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Brand Name</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: 40 }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Category</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: '20%' }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Location</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: '21%' }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Owner</Text>
+                        <Text
+                            variant="bodyLarge"
+                            style={{
+                                marginLeft: '26%'
+                            }}
+                        >
+                            text
+                        </Text>
+                    </View>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -85,7 +121,6 @@ const styles = StyleSheet.create({
     containerButton: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignSelf: 'stretch',
         zIndex: 2
     },
@@ -131,6 +166,15 @@ const styles = StyleSheet.create({
     assetStatus: {
         display: 'flex',
         alignItems: 'center'
+    },
+    assetDetail: {
+        margin: 35
+    },
+    detail: {
+        display: 'flex',
+        flexDirection: 'row',
+        fontSize: 14,
+        padding: 10
     }
 });
 

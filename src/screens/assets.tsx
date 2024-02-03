@@ -50,11 +50,11 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>
-                <View style={styles.searchButton}>
+                <View style={styles.searchButtonWrap}>
                     <TouchableOpacity
                         activeOpacity={1}
-                        style={styles.searchButtonTest}
-                        onPress={() => console.log('Pressed search button')}
+                        style={styles.searchButton}
+                        onPress={() => console.log('Asset search')}
                     >
                         <ActionButton
                             icon={'magnify'}
@@ -63,6 +63,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         />
                     </TouchableOpacity>
                 </View>
+
                 <ScrollView>
                     <Text variant="bodyLarge" style={styles.textTotalAsset}>
                         Total Asset : 999
@@ -70,8 +71,8 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     <View style={styles.wrapDetailList}>
                         <TouchableOpacity
                             activeOpacity={0.9}
-                            style={styles.searchButtonTest}
                             onPress={() => navigation.navigate('AssetDetail')}
+                            style={styles.searchButton}
                         >
                             <AssetCardDetail
                                 assetCode={'RB0001'}
@@ -165,12 +166,12 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 5
     },
-    searchButton: {
+    searchButtonWrap: {
         position: 'absolute',
         right: 25,
         top: -25
     },
-    searchButtonTest: {
+    searchButton: {
         zIndex: 2
     },
     textTotalAsset: {

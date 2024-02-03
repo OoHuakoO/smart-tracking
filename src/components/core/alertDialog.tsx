@@ -22,17 +22,4 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
     );
 };
 
-// const styles = StyleSheet.create({
-//     container: {
-//         backgroundColor: 'white',
-//         padding: 20,
-//         height: 300,
-//         width: 300,
-//         alignSelf: 'center',
-//         display: 'flex',
-//         justifyContent: 'center',
-//         alignItems: 'center'
-//     }
-// });
-
 export default memo(AlertDialog);
