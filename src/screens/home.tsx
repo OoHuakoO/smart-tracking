@@ -15,6 +15,7 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
 import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
+import { WARNING } from '@src/constant';
 import { createTableAsset, insertAssetData } from '@src/db/asset';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
@@ -38,42 +39,73 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const form = useForm<SettingParams>({});
     const setToken = useSetRecoilState<string>(authState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-    const [textDialog, setTextDialog] = useState<string>('');
+    const [titleDialog, setTitleDialog] = useState<string>('');
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [disableCloseDialog, setDisableCloseDialog] =
+        useState<boolean>(false);
+    const [typeDialog, setTypeDialog] = useState<string>('warning');
+    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
+    const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+        setDisableCloseDialog(false);
+        setTypeDialog('warning');
+        setShowCancelDialog(false);
+        setShowProgressBar(false);
+    }, []);
 
     const handleInitOnline = useCallback(async () => {
-        const online = await AsyncStorage.getItem('Online');
-        if (!online) {
-            await AsyncStorage.setItem('Online', JSON.stringify(true));
-            return;
+        try {
+            const online = await AsyncStorage.getItem('Online');
+            if (!online) {
+                await AsyncStorage.setItem('Online', JSON.stringify(true));
+                return;
+            }
+            const onlineValue = JSON.parse(online);
+            form?.setValue('online', onlineValue);
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
         }
-        const onlineValue = JSON.parse(online);
-        form?.setValue('online', onlineValue);
-    }, [form]);
+    }, [clearStateDialog, form]);
 
     const handleLogout = useCallback(async () => {
         try {
             setToken('');
             await AsyncStorage.setItem('Token', '');
         } catch (err) {
+            clearStateDialog();
             setVisibleDialog(true);
-            setTextDialog('Network Error');
         }
-    }, [setToken]);
+    }, [clearStateDialog, setToken]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
 
+    const handleOpenDialogDownload = useCallback(async () => {
+        setVisibleDialog(true);
+        setTitleDialog('Data Not Found');
+        setContentDialog('Please download the current data');
+        setTypeDialog('download');
+        setShowCancelDialog(false);
+    }, []);
+
     const handleResponseError = useCallback(
         (error: ErrorResponse | undefined): boolean => {
             if (error) {
+                clearStateDialog();
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong response error');
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong response error');
                 return true;
             }
             return false;
         },
-        []
+        [clearStateDialog]
     );
 
     const handleLoadAsset = useCallback(
@@ -88,13 +120,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
-                console.log(err);
+                clearStateDialog();
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong load asset');
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load asset');
                 return [];
             }
         },
-        []
+        [clearStateDialog]
     );
 
     const handleLoadLocation = useCallback(
@@ -109,13 +142,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
-                console.log(err.message);
+                clearStateDialog();
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong load location');
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load location');
                 return [];
             }
         },
-        []
+        [clearStateDialog]
     );
 
     const handleLoadUseStatus = useCallback(
@@ -130,17 +164,20 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
-                console.log(err.message);
+                clearStateDialog();
                 setVisibleDialog(true);
-                setTextDialog('Something went wrong load use status');
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load use status');
                 return [];
             }
         },
-        []
+        [clearStateDialog]
     );
 
     const handleDownload = useCallback(async () => {
         try {
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
             const [
                 initialResponseAssets,
                 initialResponseLocation,
@@ -193,17 +230,40 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
             }
+            clearStateDialog();
         } catch (err) {
-            console.log(err.message);
+            clearStateDialog();
             setVisibleDialog(true);
-            setTextDialog(`Something went wrong download`);
+            setTitleDialog(WARNING);
+            setContentDialog(`Something went wrong download`);
+            setTypeDialog('warning');
         }
     }, [
+        clearStateDialog,
         handleLoadAsset,
         handleLoadLocation,
         handleLoadUseStatus,
         handleResponseError
     ]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (typeDialog) {
+            case 'download':
+                await handleDownload();
+                break;
+            case 'upload':
+                // handleUpload
+                break;
+            case 'warning':
+                setShowCancelDialog(false);
+                setVisibleDialog(false);
+                break;
+            default:
+                setShowCancelDialog(false);
+                setVisibleDialog(false);
+                break;
+        }
+    }, [handleDownload, typeDialog]);
 
     useEffect(() => {
         handleInitOnline();
@@ -213,11 +273,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         <SafeAreaView style={styles.container}>
             <Portal>
                 <AlertDialog
-                    titleText={'Warning'}
-                    textContent={textDialog}
+                    textTitle={titleDialog}
+                    textContent={contentDialog}
                     visible={visibleDialog}
                     handleClose={handleCloseDialog}
-                    children={''}
+                    disableClose={disableCloseDialog}
+                    showCloseDialog={showCancelDialog}
+                    handleConfirm={handleConfirmDialog}
+                    showProgressBar={showProgressBar}
                 />
             </Portal>
             <View style={styles.modeSectionWrap}>
@@ -266,7 +329,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             <ShortcutMenu
                 navigation={navigation}
                 route={route}
-                handleDownload={handleDownload}
+                handleDownload={handleOpenDialogDownload}
             />
         </SafeAreaView>
     );
@@ -281,7 +344,7 @@ const styles = StyleSheet.create({
     textHeader: {
         width: '100%',
         color: theme.colors.textPrimary,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Medium',
         textAlign: 'left',
         marginBottom: 15
     },
