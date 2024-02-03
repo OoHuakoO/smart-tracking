@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import ActionButton from '@src/components/core/actionButton';
 import AssetCardDetail from '@src/components/core/assetCardDetail';
+import BackButton from '@src/components/core/backButton';
+import SearchButton from '@src/components/core/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -20,6 +21,7 @@ type AssetsScreenProps = NativeStackScreenProps<
 
 const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const { navigation } = props;
+
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -29,16 +31,9 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 style={styles.topSectionList}
             >
                 <View style={styles.backToPrevious}>
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        onPress={() => navigation.navigate('Home')}
-                    >
-                        <ActionButton
-                            icon={'chevron-left'}
-                            size="small"
-                            backgroundColor={theme.colors.white}
-                        />
-                    </TouchableOpacity>
+                    <BackButton
+                        handlePress={() => navigation.navigate('Home')}
+                    />
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
@@ -50,18 +45,10 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>
-                <View style={styles.searchButton}>
-                    <TouchableOpacity
-                        activeOpacity={1}
-                        style={styles.searchButtonTest}
-                        onPress={() => console.log('Pressed search button')}
-                    >
-                        <ActionButton
-                            icon={'magnify'}
-                            size="medium"
-                            backgroundColor={theme.colors.white}
-                        />
-                    </TouchableOpacity>
+                <View style={styles.searchButtonWrap}>
+                    <SearchButton
+                        handlePress={() => navigation.navigate('AssetSearch')}
+                    />
                 </View>
                 <ScrollView>
                     <Text variant="bodyLarge" style={styles.textTotalAsset}>
@@ -70,8 +57,8 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     <View style={styles.wrapDetailList}>
                         <TouchableOpacity
                             activeOpacity={0.9}
-                            style={styles.searchButtonTest}
                             onPress={() => navigation.navigate('AssetDetail')}
+                            style={styles.searchButton}
                         >
                             <AssetCardDetail
                                 assetCode={'RB0001'}
@@ -81,24 +68,6 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             />
                         </TouchableOpacity>
 
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img2.jpg')}
-                        />
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img3.jpg')}
-                        />
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img1.jpg')}
-                        />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
@@ -165,12 +134,12 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 5
     },
-    searchButton: {
+    searchButtonWrap: {
         position: 'absolute',
         right: 25,
         top: -25
     },
-    searchButtonTest: {
+    searchButton: {
         zIndex: 2
     },
     textTotalAsset: {
@@ -178,6 +147,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontWeight: '700',
         fontSize: 15
+    },
+    drawer: {
+        width: '80%' // Adjust the width as needed
     }
 });
 

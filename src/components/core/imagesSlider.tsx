@@ -43,21 +43,19 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'red'
+        backgroundColor: 'gray'
     },
     slide2: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#97CAE5',
-        borderRadius: 20
+        backgroundColor: '#97CAE5'
     },
     slide3: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#92BBD9',
-        borderRadius: 20
+        backgroundColor: '#92BBD9'
     },
     text: {
         color: '#fff',

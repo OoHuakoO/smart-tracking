@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
+import AssetTagStatus from '@src/components/core/assetTagStatus';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -34,20 +35,6 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             />
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.button}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() =>
-                                console.log('Pressed tack a picture icon')
-                            }
-                        >
-                            <ActionButton
-                                icon={'camera-plus'}
-                                size="small"
-                                backgroundColor={theme.colors.white}
-                            />
-                        </TouchableOpacity>
-                    </View>
                 </View>
                 <View style={styles.imagesContainer}>
                     <Image
@@ -60,6 +47,46 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                 <View style={styles.assetName}>
                     <Text variant="headlineLarge">เครื่องคิดเลข EL-782C</Text>
                     <Text variant="headlineSmall">CFFASDER500012</Text>
+                </View>
+                <View style={styles.assetStatus}>
+                    <AssetTagStatus status={'ปกติ'} />
+                </View>
+                <View style={styles.assetDetail}>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Serial Number</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: 27 }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Brand Name</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: 40 }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Category</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: '20%' }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Location</Text>
+                        <Text variant="bodyLarge" style={{ marginLeft: '21%' }}>
+                            text
+                        </Text>
+                    </View>
+                    <View style={styles.detail}>
+                        <Text variant="titleMedium">Owner</Text>
+                        <Text
+                            variant="bodyLarge"
+                            style={{
+                                marginLeft: '26%'
+                            }}
+                        >
+                            text
+                        </Text>
+                    </View>
                 </View>
             </View>
         </SafeAreaView>
@@ -80,7 +107,6 @@ const styles = StyleSheet.create({
     containerButton: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignSelf: 'stretch',
         zIndex: 2
     },
@@ -122,6 +148,19 @@ const styles = StyleSheet.create({
     assetName: {
         marginHorizontal: 20,
         marginVertical: 30
+    },
+    assetStatus: {
+        display: 'flex',
+        alignItems: 'center'
+    },
+    assetDetail: {
+        margin: 35
+    },
+    detail: {
+        display: 'flex',
+        flexDirection: 'row',
+        fontSize: 14,
+        padding: 10
     }
 });
 

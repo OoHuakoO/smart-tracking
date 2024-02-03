@@ -1,21 +1,25 @@
-import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import ActionButton from './actionButton';
 
 interface BackButtonProps {
     handlePress: () => void;
-    color: string;
-    size: number;
 }
 
 const BackButton: FC<BackButtonProps> = (props) => {
-    const { handlePress, color, size } = props;
+    const { handlePress } = props;
     return (
-        <TouchableOpacity style={styles.container} onPress={handlePress}>
-            <View>
-                <FontAwesomeIcon size={size} color={color} icon={faAngleLeft} />
-            </View>
+        <TouchableOpacity
+            style={styles.container}
+            onPress={handlePress}
+            activeOpacity={0.5}
+        >
+            <ActionButton
+                icon={'chevron-left'}
+                size="small"
+                backgroundColor={theme.colors.white}
+            />
         </TouchableOpacity>
     );
 };

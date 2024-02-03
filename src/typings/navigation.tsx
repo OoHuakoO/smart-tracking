@@ -18,4 +18,5 @@ export type PrivateStackParamsList = {
     Upload: undefined;
     Download: undefined;
     AssetDetail: undefined;
+    AssetSearch: undefined;
 };
