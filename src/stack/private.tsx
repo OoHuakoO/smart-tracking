@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AssetDetail from '@src/screens/assetDetail';
+import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
 import HomeScreen from '@src/screens/home';
@@ -31,6 +32,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={AssetDetail}
+            />
+            <Stack.Screen
+                name="AssetSearch"
+                options={{
+                    headerShown: false
+                }}
+                component={AssetSearch}
             />
             <Stack.Screen
                 name="Location"

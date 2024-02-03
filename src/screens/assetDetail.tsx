@@ -35,20 +35,6 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             />
                         </TouchableOpacity>
                     </View>
-                    {/* <View style={styles.button}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() =>
-                                console.log('Pressed tack a picture icon')
-                            }
-                        >
-                            <ActionButton
-                                icon={'camera-plus'}
-                                size="small"
-                                backgroundColor={theme.colors.white}
-                            />
-                        </TouchableOpacity>
-                    </View> */}
                 </View>
                 <View style={styles.imagesContainer}>
                     <Image
