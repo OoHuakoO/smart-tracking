@@ -13,7 +13,6 @@ export interface SettingParams {
 }
 
 export interface LoginResponse {
-    jsonrpc: string;
-    id: string;
+    uid: string;
     session_id: string;
 }

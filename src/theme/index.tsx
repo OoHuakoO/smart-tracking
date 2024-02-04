@@ -1,18 +1,9 @@
-import { DefaultTheme } from 'react-native-paper';
+import { DefaultTheme, configureFonts } from 'react-native-paper';
+import { colorConfig } from './color';
+import { fontConfig } from './font';
 
 export const theme = {
     ...DefaultTheme,
-    colors: {
-        ...DefaultTheme.colors,
-        primary: '#2983BC',
-        secondary: '#49A5DE',
-        normal: '#63CA7F',
-        warning: '#F8A435',
-        error: '#f13a59',
-        textPrimary: '#404040',
-        textBody: '#828282',
-        white: '#F7F7F7',
-        disableSwitch: '#767577',
-        black: '#121212'
-    }
+    colors: colorConfig,
+    fonts: configureFonts({ config: fontConfig })
 };

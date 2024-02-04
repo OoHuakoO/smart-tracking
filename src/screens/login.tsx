@@ -24,7 +24,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const setToken = useSetRecoilState<string>(authState);
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-    const [textDialog, setTextDialog] = useState<string>('');
+    const [contentDialog, setContentDialog] = useState<string>('');
 
     const handleLogin = useCallback(
         async (data: LoginParams) => {
@@ -35,7 +35,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 });
                 if (response?.error) {
                     setVisibleDialog(true);
-                    setTextDialog('Email Or Password Incorrect');
+                    setContentDialog('Email Or Password Incorrect');
                     return;
                 }
                 setToken(response?.result?.session_id || '');
@@ -45,7 +45,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 );
             } catch (err) {
                 setVisibleDialog(true);
-                setTextDialog('Network Error');
+                setContentDialog(`Something went wrong login`);
             }
         },
         [setToken]
@@ -66,11 +66,10 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             </Text>
             <Portal>
                 <AlertDialog
-                    titleText={'Warning'}
-                    textContent={textDialog}
+                    textContent={contentDialog}
                     visible={visibleDialog}
                     handleClose={handleCloseDialog}
-                    children={''}
+                    handleConfirm={handleCloseDialog}
                 />
             </Portal>
             <View style={styles.sectionLogin}>

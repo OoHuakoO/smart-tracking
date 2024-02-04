@@ -2,8 +2,36 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "assets/fonts/DMSans.ttf",
-      "sha1": "bd912858c0f8887c01a56b09e6b1ca1cf81418ee"
+      "path": "assets/fonts/DMSans-Bold.ttf",
+      "sha1": "5987ba6a8b8c8cc7f755431eca614ea7f5de1b96"
+    },
+    {
+      "path": "assets/fonts/DMSans-Light.ttf",
+      "sha1": "52d4f475534271ece8eb846df8e8177664ec7fb4"
+    },
+    {
+      "path": "assets/fonts/DMSans-Medium.ttf",
+      "sha1": "00ea5b83c109e751b844413d32e21b7689bf786d"
+    },
+    {
+      "path": "assets/fonts/DMSans-Regular.ttf",
+      "sha1": "ac9a042a40e49e8cdbfe0e64e84d9b1c5724e98d"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Bold.ttf",
+      "sha1": "8a5854cb1d43fe0caf68d4f82a62c3dfd4f5cb5a"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Light.ttf",
+      "sha1": "49e7b35305be84b3de4cf02cadd9eebc21c8f681"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Medium.ttf",
+      "sha1": "39c5f343e03df2db76283f8b07125e15ffff0b75"
+    },
+    {
+      "path": "assets/fonts/Sarabun-Regular.ttf",
+      "sha1": "a9b65e36ee8224b459b9dcdb8bf55ef41b4ab867"
     }
   ]
 }

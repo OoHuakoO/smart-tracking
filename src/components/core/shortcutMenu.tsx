@@ -11,19 +11,19 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp
-} from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Menu from './menu';
 
-type ShortcutMenuProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
+interface ShortcutMenuProps
+    extends NativeStackScreenProps<PrivateStackParamsList, 'Home'> {
+    handleDownload: () => void;
+}
 
 const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, handleDownload } = props;
 
     return (
-        <View style={styles.container}>
+        <View>
             <View>
                 <Text variant="headlineSmall" style={styles.textMenu}>
                     Menu
@@ -53,12 +53,12 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
                 <Menu
                     icon={faUpload}
                     menuName={'Upload'}
-                    menuPage={() => navigation.navigate('Upload')}
+                    menuPage={handleDownload}
                 />
                 <Menu
                     icon={faDownload}
                     menuName={'Download'}
-                    menuPage={() => navigation.navigate('Download')}
+                    menuPage={handleDownload}
                 />
             </View>
         </View>
@@ -66,9 +66,6 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
     textMenu: {
         marginTop: 15,
         fontWeight: 'bold'
@@ -79,7 +76,6 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginTop: 10,
         gap: 20,
-        height: hp('25%'),
         width: wp('90%')
     }
 });

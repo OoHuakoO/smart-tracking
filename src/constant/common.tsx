@@ -10,3 +10,7 @@ export const STATUS_ASSET = {
     Damaged: 'ชำรุด',
     Repair: 'รอส่งซ่อม'
 };
+
+export const SOMETHING_WENT_WRONG = 'Something went wrong! Try Again';
+
+export const WARNING = 'Warning';
