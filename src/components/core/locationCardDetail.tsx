@@ -61,12 +61,14 @@ const styles = StyleSheet.create({
     },
     iconContainer: {
         flexDirection: 'row',
+        alignItems: 'center',
         flex: 1
     },
     locationText: {
         color: 'black',
         fontWeight: 'bold',
-        fontSize: 18
+        fontSize: 18,
+        marginLeft: 5
     }
 });
 

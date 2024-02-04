@@ -59,13 +59,14 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             activeOpacity={0.9}
                             onPress={() => navigation.navigate('AssetDetail')}
                             style={styles.searchButton}
-                        />
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img1.jpg')}
-                        />
+                        >
+                            <AssetCardDetail
+                                assetCode={'RB0001'}
+                                assetName={'Table'}
+                                assetLocation={'Location-01'}
+                                imageSource={require('../../assets/images/img1.jpg')}
+                            />
+                        </TouchableOpacity>
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
@@ -108,11 +109,11 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: '#FFFFFF',
-        fontWeight: '700'
+        fontWeight: '700',
+        marginBottom: 10
     },
     textDescription: {
-        fontFamily: 'Sarabun',
-        fontWeight: '500',
+        fontFamily: 'Sarabun-Regular',
         color: '#FFFFFF'
     },
     listSection: {
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
     searchButtonWrap: {
         position: 'absolute',
         right: 25,
-        top: -25
+        top: -20
     },
     searchButton: {
         zIndex: 2

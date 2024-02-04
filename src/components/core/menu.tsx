@@ -1,5 +1,6 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -20,7 +21,7 @@ const Menu: FC<MenuProps> = (props) => {
                     start={{ x: 0, y: 1 }}
                     end={{ x: 1, y: 0 }}
                     colors={['#2C86BF', '#2C86BF', '#8DC4E6']}
-                    style={styles.test}
+                    style={styles.gradientBox}
                 >
                     <View style={styles.containerMenu}>
                         <FontAwesomeIcon
@@ -31,7 +32,9 @@ const Menu: FC<MenuProps> = (props) => {
                     </View>
                 </LinearGradient>
                 <View>
-                    <Text variant="titleMedium">{menuName}</Text>
+                    <Text variant="titleMedium" style={styles.textMenu}>
+                        {menuName}
+                    </Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -49,11 +52,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    test: {
+    gradientBox: {
         borderRadius: 20
     },
     iconStyle: {
-        color: '#FFFFFF'
+        color: theme.colors.white
+    },
+    textMenu: {
+        fontFamily: 'DMSans-Medium'
     }
 });
 
