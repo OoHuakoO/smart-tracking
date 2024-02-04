@@ -59,15 +59,13 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             activeOpacity={0.9}
                             onPress={() => navigation.navigate('AssetDetail')}
                             style={styles.searchButton}
-                        >
-                            <AssetCardDetail
-                                assetCode={'RB0001'}
-                                assetName={'Table'}
-                                assetLocation={'Location-01'}
-                                imageSource={require('../../assets/images/img1.jpg')}
-                            />
-                        </TouchableOpacity>
-
+                        />
+                        <AssetCardDetail
+                            assetCode={'RB0001'}
+                            assetName={'Table'}
+                            assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img1.jpg')}
+                        />
                         <AssetCardDetail
                             assetCode={'RB0001'}
                             assetName={'Table'}
