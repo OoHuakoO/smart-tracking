@@ -1,9 +1,14 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React from 'react';
+import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-const LocationCardDetail = () => {
+interface LocationDetailProps {
+    location: string;
+    locationId: string;
+}
+const LocationCardDetail: FC<LocationDetailProps> = (props) => {
+    const { location, locationId } = props;
     return (
         <View style={styles.cardContainer}>
             <View style={styles.iconContainer}>
@@ -12,19 +17,19 @@ const LocationCardDetail = () => {
                     color="#DC3E3F"
                     size={20}
                 />
-                <Text style={styles.locationText}>Location</Text>
+                <Text style={styles.locationText}>{location}</Text>
             </View>
-            <Text style={styles.locationId}>Location ID: 0001 </Text>
+            <Text style={styles.locationId}> LocationID : {locationId}</Text>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: 320,
+        width: 370,
         height: 80,
         backgroundColor: '#f7f7f7',
-        paddingVertical: 10,
+        paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 15,
         shadowColor: '#000',
