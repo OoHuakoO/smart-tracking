@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
-import LocationCardDetail from '@src/components/core/locationCardDetail';
+import LocationCardDetail from '@src/components/views/locationCardDetail';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';

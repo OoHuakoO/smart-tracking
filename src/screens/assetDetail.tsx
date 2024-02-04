@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
-import AssetTagStatus from '@src/components/core/assetTagStatus';
+import AssetTagStatus from '@src/components/views/assetTagStatus';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';

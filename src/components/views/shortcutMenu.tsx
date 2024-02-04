@@ -12,7 +12,7 @@ import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import Menu from './menu';
+import Menu from '../core/menu';
 
 interface ShortcutMenuProps
     extends NativeStackScreenProps<PrivateStackParamsList, 'Home'> {

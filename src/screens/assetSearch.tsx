@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import SearchAsset from '@src/components/core/searchAsset';
+import SearchAsset from '@src/components/views/searchAsset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
 import { View } from 'react-native';

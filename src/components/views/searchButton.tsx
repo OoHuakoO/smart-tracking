@@ -1,7 +1,7 @@
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import ActionButton from './actionButton';
+import ActionButton from '../core/actionButton';
 
 interface SearchButtonProps {
     handlePress: () => void;
