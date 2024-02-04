@@ -45,7 +45,9 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
             </View>
             <View style={styles.assetDetailSection}>
                 <View style={styles.assetName}>
-                    <Text variant="headlineLarge">เครื่องคิดเลข EL-782C</Text>
+                    <Text variant="headlineLarge" style={styles.textAssetName}>
+                        เครื่องคิดเลข EL-782C
+                    </Text>
                     <Text variant="headlineSmall">CFFASDER500012</Text>
                 </View>
                 <View style={styles.assetStatus}>
@@ -147,7 +149,11 @@ const styles = StyleSheet.create({
     },
     assetName: {
         marginHorizontal: 20,
-        marginVertical: 30
+        marginVertical: 15
+    },
+    textAssetName: {
+        fontFamily: 'Sarabun-Regular',
+        lineHeight: 60
     },
     assetStatus: {
         display: 'flex',

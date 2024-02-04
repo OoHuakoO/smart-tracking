@@ -9,7 +9,7 @@ interface DrawerAssetProps extends DrawerSectionProps {
     handleClose: () => void;
 }
 
-const DrawerAsset: FC<DrawerAssetProps> = (props) => {
+const SearchAsset: FC<DrawerAssetProps> = (props) => {
     const { handleClose } = props;
     return (
         <Drawer.Section showDivider={false}>
@@ -148,4 +148,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default memo(DrawerAsset);
+export default memo(SearchAsset);

@@ -14,8 +14,6 @@ const PublicStack = () => {
     const BackButtonComponent = useCallback(
         () => (
             <BackButton
-                size={20}
-                color={theme.colors.white}
                 handlePress={() => {
                     navigation.navigate('Login');
                 }}

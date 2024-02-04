@@ -114,11 +114,11 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: '#FFFFFF',
-        fontWeight: '700'
+        fontWeight: '700',
+        marginBottom: 10
     },
     textDescription: {
-        fontFamily: 'Sarabun',
-        fontWeight: '500',
+        fontFamily: 'Sarabun-Regular',
         color: '#FFFFFF'
     }
 });

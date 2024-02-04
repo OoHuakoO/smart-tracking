@@ -17,7 +17,7 @@ const SearchButton: FC<SearchButtonProps> = (props) => {
         >
             <ActionButton
                 icon={'magnify'}
-                size="medium"
+                size="small"
                 backgroundColor={theme.colors.white}
             />
         </TouchableOpacity>
