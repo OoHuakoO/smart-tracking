@@ -14,8 +14,6 @@ const PublicStack = () => {
     const BackButtonComponent = useCallback(
         () => (
             <BackButton
-                size={20}
-                color={theme.colors.white}
                 handlePress={() => {
                     navigation.navigate('Login');
                 }}
@@ -35,7 +33,7 @@ const PublicStack = () => {
                     },
                     headerTintColor: theme.colors.white,
                     headerTitleStyle: {
-                        fontWeight: 'bold'
+                        fontFamily: 'DMSans-Bold'
                     },
                     headerLeft: BackButtonComponent
                 }}

@@ -20,6 +20,7 @@ const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
             <TextInput
                 style={styles.input}
                 placeholder={placeholder}
+                placeholderTextColor={theme.colors.textBody}
                 {...props}
                 ref={ref}
             />
@@ -41,7 +42,9 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         paddingHorizontal: 10,
         width: '100%',
-        borderRadius: 20
+        borderRadius: 20,
+        fontFamily: 'DMSans-Bold',
+        color: theme.colors.textBody
     },
     error: {
         fontSize: 14,
