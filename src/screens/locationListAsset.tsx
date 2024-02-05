@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
-import LocationListAssetCard from '@src/components/core/locationListAssetCard';
-import SearchButton from '@src/components/core/searchButton';
+import LocationListAssetCard from '@src/components/views/locationListAssetCard';
+import SearchButton from '@src/components/views/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -9,8 +9,8 @@ import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp
+    heightPercentageToDP as hp,
+    widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 type LocationListAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
