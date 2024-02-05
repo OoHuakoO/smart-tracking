@@ -13,8 +13,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
-import ShortcutMenu from '@src/components/core/shortcutMenu';
 import StatusTag from '@src/components/core/statusTag';
+import ToastComponent from '@src/components/core/toast';
+import ShortcutMenu from '@src/components/views/shortcutMenu';
 import { WARNING } from '@src/constant';
 import { createTableAsset, insertAssetData } from '@src/db/asset';
 import { dropAllMasterTable } from '@src/db/common';
@@ -23,8 +24,10 @@ import { createTableLocation, insertLocationData } from '@src/db/location';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { GetAssets, GetLocation, GetUseStatus } from '@src/services/asset';
 import { authState, useSetRecoilState } from '@src/store';
+import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { AssetData, LocationData, UseStatusData } from '@src/typings/asset';
+import { Toast } from '@src/typings/common';
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
@@ -46,6 +49,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [typeDialog, setTypeDialog] = useState<string>('warning');
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+    const setToast = useSetRecoilState<Toast>(toastState);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -76,11 +80,15 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         try {
             setToken('');
             await AsyncStorage.setItem('Token', '');
+            await AsyncStorage.setItem('Online', JSON.stringify(true));
+            setTimeout(() => {
+                setToast({ open: true, text: 'Logout Successfully' });
+            }, 0);
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
         }
-    }, [clearStateDialog, setToken]);
+    }, [clearStateDialog, setToast, setToken]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -331,6 +339,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 route={route}
                 handleDownload={handleOpenDialogDownload}
             />
+            <ToastComponent />
         </SafeAreaView>
     );
 };

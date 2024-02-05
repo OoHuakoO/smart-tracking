@@ -33,7 +33,7 @@ const PublicStack = () => {
                     },
                     headerTintColor: theme.colors.white,
                     headerTitleStyle: {
-                        fontWeight: 'bold'
+                        fontFamily: 'DMSans-Bold'
                     },
                     headerLeft: BackButtonComponent
                 }}

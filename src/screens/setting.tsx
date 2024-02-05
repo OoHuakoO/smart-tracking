@@ -5,6 +5,10 @@ import { theme } from '@src/theme';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import ToastComponent from '@src/components/core/toast';
+import { useSetRecoilState } from '@src/store';
+import { toastState } from '@src/store/toast';
+import { Toast } from '@src/typings/common';
 import { SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
@@ -23,16 +27,24 @@ type SettingScreenProps = NativeStackScreenProps<
     'Setting'
 >;
 
-const SettingScreen: FC<SettingScreenProps> = () => {
+const SettingScreen: FC<SettingScreenProps> = (props) => {
+    const { navigation } = props;
     const form = useForm<SettingParams>({});
-
-    const handleSaveSettings = useCallback(async (data: SettingParams) => {
-        try {
-            await AsyncStorage.setItem('Settings', JSON.stringify(data));
-        } catch (err) {
-            console.log(err);
-        }
-    }, []);
+    const setToast = useSetRecoilState<Toast>(toastState);
+    const handleSaveSettings = useCallback(
+        async (data: SettingParams) => {
+            try {
+                await AsyncStorage.setItem('Settings', JSON.stringify(data));
+                navigation.navigate('Login');
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Save Setting Successfully' });
+                }, 0);
+            } catch (err) {
+                console.log(err);
+            }
+        },
+        [navigation, setToast]
+    );
 
     const handleInitSetting = useCallback(async () => {
         const settings = await AsyncStorage.getItem('Settings');
@@ -168,6 +180,7 @@ const SettingScreen: FC<SettingScreenProps> = () => {
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+            <ToastComponent />
         </SafeAreaView>
     );
 };

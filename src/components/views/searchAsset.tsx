@@ -2,8 +2,8 @@ import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Drawer, DrawerSectionProps, Text } from 'react-native-paper';
-import ActionButton from './actionButton';
-import InputText from './inputText';
+import ActionButton from '../core/actionButton';
+import InputText from '../core/inputText';
 
 interface DrawerAssetProps extends DrawerSectionProps {
     handleClose: () => void;

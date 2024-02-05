@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import AssetCardDetail from '@src/components/core/assetCardDetail';
 import BackButton from '@src/components/core/backButton';
-import SearchButton from '@src/components/core/searchButton';
+import AssetCardDetail from '@src/components/views/assetCardDetail';
+import SearchButton from '@src/components/views/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';

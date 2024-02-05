@@ -33,13 +33,13 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                 style={styles.dialogContainer}
                 {...(disableClose && { dismissable: false })}
             >
-                <Dialog.Title style={styles.dialogTitle}>
-                    <Text style={styles.dialogTitle}>
+                <Dialog.Title>
+                    <Text variant="titleLarge" style={styles.dialogTitle}>
                         {textTitle || WARNING}
                     </Text>
                 </Dialog.Title>
                 <Dialog.Content>
-                    <Text style={styles.dialogContent}>
+                    <Text variant="titleMedium">
                         {textContent || SOMETHING_WENT_WRONG}
                     </Text>
                 </Dialog.Content>
@@ -56,7 +56,10 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                                 style={styles.dialogActionCancel}
                                 onPress={handleClose}
                             >
-                                <Text style={styles.textActionCancel}>
+                                <Text
+                                    style={styles.textActionCancel}
+                                    variant="bodyLarge"
+                                >
                                     Cancel
                                 </Text>
                             </Button>
@@ -66,7 +69,10 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                             style={styles.dialogActionConfirm}
                             onPress={handleConfirm}
                         >
-                            <Text style={styles.textActionConfirm}>
+                            <Text
+                                style={styles.textActionConfirm}
+                                variant="bodyLarge"
+                            >
                                 Confirm
                             </Text>
                         </Button>
@@ -85,13 +91,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     dialogTitle: {
-        fontFamily: 'DMSans-Bold',
-        fontSize: 22
+        fontWeight: 'bold'
     },
-    dialogContent: {
-        fontFamily: 'DMSans-Regular',
-        fontSize: 16
-    },
+
     dialogActionCancel: {
         paddingVertical: 2,
         paddingHorizontal: 5,

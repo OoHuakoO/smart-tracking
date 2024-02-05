@@ -8,9 +8,12 @@ import InputText from '@src/components/core/inputText';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
+import ToastComponent from '@src/components/core/toast';
 import { Login } from '@src/services/login';
 import { authState, useSetRecoilState } from '@src/store';
+import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
+import { Toast } from '@src/typings/common';
 import { LoginParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
@@ -25,6 +28,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
+    const setToast = useSetRecoilState<Toast>(toastState);
 
     const handleLogin = useCallback(
         async (data: LoginParams) => {
@@ -33,7 +37,11 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     login: data?.login,
                     password: data?.password
                 });
-                if (response?.error) {
+                if (
+                    response?.error ||
+                    data?.login === '' ||
+                    data?.password === ''
+                ) {
                     setVisibleDialog(true);
                     setContentDialog('Email Or Password Incorrect');
                     return;
@@ -43,12 +51,15 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     'Token',
                     response?.result?.session_id || ''
                 );
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Login Successfully' });
+                }, 0);
             } catch (err) {
                 setVisibleDialog(true);
                 setContentDialog(`Something went wrong login`);
             }
         },
-        [setToken]
+        [setToast, setToken]
     );
 
     const handleCloseDialog = () => {
@@ -104,23 +115,30 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     )}
                 />
                 <TouchableOpacity onPress={form?.handleSubmit(handleLogin)}>
-                    <Button mode="contained">Login</Button>
+                    <Button mode="contained">
+                        <Text variant="titleMedium" style={styles.textLogin}>
+                            Login
+                        </Text>
+                    </Button>
                 </TouchableOpacity>
             </View>
-            <View style={styles.textLogin}>
-                <Text>
+            <View style={styles.boxRetail}>
+                <Text variant="bodyMedium" style={styles.textRetail}>
                     @ 2024 Retail Business Services Co.,Ltd. All Rights
                     Reserved.
                 </Text>
-                <Text>Line Support : va_rbs (08.30 น. - 17.30 น.)</Text>
+                <Text variant="bodyMedium" style={styles.textRetail}>
+                    Line Support : va_rbs (08.30 น. - 17.30 น.)
+                </Text>
             </View>
             <TouchableOpacity
                 activeOpacity={0.5}
                 style={styles.settingButton}
                 onPress={handlePressSetting}
             >
-                <ActionButton icon={'cog'} color={theme.colors.white} />
+                <ActionButton icon="cog" color={theme.colors.white} />
             </TouchableOpacity>
+            <ToastComponent />
         </SafeAreaView>
     );
 };
@@ -134,7 +152,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '700',
         marginBottom: 40,
-        fontFamily: 'DMSans',
         marginTop: 40
     },
     sectionLogin: {
@@ -144,8 +161,15 @@ const styles = StyleSheet.create({
         color: theme.colors.secondary
     },
     textLogin: {
-        marginTop: 25,
-        alignItems: 'center'
+        color: theme.colors.white,
+        fontWeight: '700'
+    },
+    textRetail: {
+        textAlign: 'center'
+    },
+    boxRetail: {
+        padding: 16,
+        alignSelf: 'center'
     },
     settingButton: {
         position: 'absolute',

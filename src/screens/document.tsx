@@ -1,4 +1,4 @@
-import SearchDocument from '@src/components/core/searchDocument';
+import SearchDocument from '@src/components/views/searchDocument';
 import React from 'react';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
