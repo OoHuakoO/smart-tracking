@@ -174,8 +174,13 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
                     <TouchableOpacity
                         onPress={form?.handleSubmit(handleSaveSettings)}
                     >
-                        <Button mode="contained-tonal" style={styles.button}>
-                            Save
+                        <Button style={styles.buttonConfirm}>
+                            <Text
+                                style={styles.textConfirm}
+                                variant="bodyLarge"
+                            >
+                                Save
+                            </Text>
                         </Button>
                     </TouchableOpacity>
                 </View>
@@ -216,8 +221,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    button: {
-        margin: 4
+
+    buttonConfirm: {
+        paddingVertical: 2,
+        paddingHorizontal: 5,
+        backgroundColor: theme.colors.buttonConfirm,
+        borderRadius: 10,
+        marginTop: 30
+    },
+    textConfirm: {
+        fontFamily: 'DMSans-Medium',
+        color: theme.colors.white
     }
 });
 
