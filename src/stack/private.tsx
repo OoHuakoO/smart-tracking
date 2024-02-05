@@ -5,6 +5,7 @@ import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
 import HomeScreen from '@src/screens/home';
 import Location from '@src/screens/location';
+import LocationListAsset from '@src/screens/locationListAsset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { memo } from 'react';
 
@@ -53,6 +54,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={Document}
+            />
+            <Stack.Screen
+                name="LocationListAsset"
+                options={{
+                    headerShown: false
+                }}
+                component={LocationListAsset}
             />
         </Stack.Navigator>
     );

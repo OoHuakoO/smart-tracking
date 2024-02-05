@@ -1,29 +1,23 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
-import LocationCardDetail from '@src/components/core/locationCardDetail';
+import LocationListAssetCard from '@src/components/core/locationListAssetCard';
+import SearchButton from '@src/components/core/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
-import {
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-
-type LocationScreenProps = NativeStackScreenProps<
+type LocationListAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
-    'Location'
+    'LocationListAsset'
 >;
 
-const LocationScreen: FC<LocationScreenProps> = (props) => {
+const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
     const { navigation } = props;
     return (
         <SafeAreaView style={styles.container}>
@@ -35,45 +29,47 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
             >
                 <View style={styles.backToPrevious}>
                     <BackButton
-                        handlePress={() => navigation.navigate('Home')}
+                        handlePress={() => navigation.navigate('Location')}
                     />
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Location
+                        Location-01
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        สามารถดูสถานที่ทั้งหมดในบริษัทของคุณ
+                        รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
                 </View>
             </LinearGradient>
 
             <View style={styles.listSection}>
+                <View style={styles.searchButtonWrap}>
+                    <SearchButton
+                        handlePress={() => navigation.navigate('AssetSearch')}
+                    />
+                </View>
                 <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalLocation}>
-                        Total Location : 999
+                    <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                        Total Asset : 3
                     </Text>
                     <View style={styles.wrapDetailList}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
-                            onPress={() =>
-                                navigation.navigate('LocationListAsset')
-                            }
-                            style={styles.searchButton}
-                        >
-                            <LocationCardDetail
-                                location={'Location01'}
-                                locationId={'0001'}
-                            />
-                        </TouchableOpacity>
-                        <LocationCardDetail
-                            location={'Location02'}
-                            locationId={'0002'}
+                        <LocationListAssetCard
+                            assetCode={'RB0001'}
+                            assetName={'Table'}
+                            assetLocation={'Location-01'}
+                            imageSource={require('../../assets/images/img1.jpg')}
                         />
-
-                        <LocationCardDetail
-                            location={'Location03'}
-                            locationId={'0003'}
+                        <LocationListAssetCard
+                            assetCode={'RB0001'}
+                            assetName={'Table'}
+                            assetLocation={'Location-02'}
+                            imageSource={require('../../assets/images/img2.jpg')}
+                        />
+                        <LocationListAssetCard
+                            assetCode={'RB0001'}
+                            assetName={'Table'}
+                            assetLocation={'Location-03'}
+                            imageSource={require('../../assets/images/img3.jpg')}
                         />
                     </View>
                 </ScrollView>
@@ -100,33 +96,6 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         alignSelf: 'stretch'
     },
-    listSection: {
-        flex: 1,
-        height: hp('30%'),
-        width: wp('100%'),
-        backgroundColor: theme.colors.background,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        marginTop: '50%',
-        zIndex: 1
-    },
-    textTotalLocation: {
-        marginLeft: 20,
-        marginTop: 20,
-        fontWeight: '700',
-        fontSize: 15
-    },
-    wrapDetailList: {
-        display: 'flex',
-        alignItems: 'center',
-        gap: 15,
-        marginTop: 20,
-        marginBottom: 5
-    },
-
-    searchButton: {
-        zIndex: 2
-    },
     containerText: {
         marginHorizontal: 20
     },
@@ -138,7 +107,41 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: '#FFFFFF'
+    },
+    listSection: {
+        flex: 1,
+        height: hp('30%'),
+        width: wp('100%'),
+        backgroundColor: theme.colors.background,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        marginTop: '50%',
+        zIndex: 1
+    },
+    searchButtonWrap: {
+        position: 'absolute',
+        right: 25,
+        top: -20
+    },
+
+    wrapDetailList: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 15,
+        marginTop: 20,
+        marginBottom: 5
+    },
+
+    searchButton: {
+        zIndex: 2
+    },
+
+    textTotalAsset: {
+        marginLeft: 20,
+        marginTop: 20,
+        fontWeight: '700',
+        fontSize: 15
     }
 });
 
-export default LocationScreen;
+export default LocationListAssetScreen;
