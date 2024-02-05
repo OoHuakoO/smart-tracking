@@ -238,6 +238,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
             }
+            setTimeout(() => {
+                setToast({ open: true, text: 'Download Successfully' });
+            }, 0);
             clearStateDialog();
         } catch (err) {
             clearStateDialog();
@@ -251,7 +254,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         handleLoadAsset,
         handleLoadLocation,
         handleLoadUseStatus,
-        handleResponseError
+        handleResponseError,
+        setToast
     ]);
 
     const handleConfirmDialog = useCallback(async () => {
