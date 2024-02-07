@@ -1,9 +1,15 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import LocationCardDetail from '@src/components/views/locationCardDetail';
+import { getDBConnection } from '@src/db/config';
+import { getAllLocations, getTotalLocations } from '@src/db/location';
+import { GetLocation } from '@src/services/asset';
 import { theme } from '@src/theme';
+import { LocationData } from '@src/typings/asset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     SafeAreaView,
     ScrollView,
@@ -25,8 +31,54 @@ type LocationScreenProps = NativeStackScreenProps<
 
 const LocationScreen: FC<LocationScreenProps> = (props) => {
     const { navigation } = props;
+
+    const [countTotalLocation, setCountLocation] = useState<number>(0);
+    const [listLocation, setListLocation] = useState<LocationData[]>([]);
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
+    const handleFetchLocation = useCallback(async () => {
+        try {
+            const online = await AsyncStorage.getItem('Online');
+            const onlineValue = JSON.parse(online);
+            if (onlineValue) {
+                const response = await GetLocation({
+                    page: 1,
+                    limit: 1000
+                });
+                const totalPagesLocation = response?.result?.data?.total;
+                setCountLocation(totalPagesLocation);
+                setListLocation(response?.result?.data?.data);
+            } else {
+                const db = await getDBConnection();
+                const countLocation = await getTotalLocations(db);
+                const listLocationDB = await getAllLocations(db);
+                setCountLocation(countLocation);
+                setListLocation(listLocationDB);
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch location');
+        }
+    }, []);
+
+    useEffect(() => {
+        handleFetchLocation();
+    }, [handleFetchLocation]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
+
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -49,33 +101,30 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
             </LinearGradient>
 
             <View style={styles.listSection}>
+                <Text variant="bodyLarge" style={styles.textTotalLocation}>
+                    Total Location : {countTotalLocation}
+                </Text>
                 <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalLocation}>
-                        Total Location : 999
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
-                            onPress={() =>
-                                navigation.navigate('LocationListAsset')
-                            }
-                            style={styles.searchButton}
-                        >
-                            <LocationCardDetail
-                                location={'Location01'}
-                                locationId={'0001'}
-                            />
-                        </TouchableOpacity>
-                        <LocationCardDetail
-                            location={'Location02'}
-                            locationId={'0002'}
-                        />
-
-                        <LocationCardDetail
-                            location={'Location03'}
-                            locationId={'0003'}
-                        />
-                    </View>
+                    {listLocation?.length > 0 &&
+                        listLocation.map((item) => (
+                            <View
+                                style={styles.wrapDetailList}
+                                key={item.asset_location_id}
+                            >
+                                <TouchableOpacity
+                                    activeOpacity={0.9}
+                                    onPress={() =>
+                                        navigation.navigate('LocationListAsset')
+                                    }
+                                    style={styles.searchButton}
+                                >
+                                    <LocationCardDetail
+                                        location={item?.name}
+                                        locationId={item?.asset_location_id?.toString()}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        ))}
                 </ScrollView>
             </View>
         </SafeAreaView>

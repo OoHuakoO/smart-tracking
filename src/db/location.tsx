@@ -65,3 +65,41 @@ export const insertLocationData = (
         throw new Error(`Error inserting locations: ${err.message}`);
     }
 };
+
+export const getAllLocations = async (
+    db: SQLiteDatabase
+): Promise<LocationData[]> => {
+    const query = `SELECT * FROM location`;
+
+    try {
+        const results = await db.executeSql(query);
+        const locations = [];
+
+        if (results.length > 0) {
+            for (let i = 0; i < results[0].rows.length; i++) {
+                locations.push(results[0].rows.item(i));
+            }
+        }
+
+        return locations;
+    } catch (err) {
+        throw new Error(`Error retrieving locations: ${err.message}`);
+    }
+};
+
+export const getTotalLocations = async (
+    db: SQLiteDatabase
+): Promise<number> => {
+    const queryTotal = `SELECT COUNT(*) as total FROM location`;
+
+    try {
+        const results = await db.executeSql(queryTotal);
+        if (results.length > 0) {
+            return results[0].rows?.item(0)?.total;
+        } else {
+            return 0;
+        }
+    } catch (err) {
+        throw new Error(`Error calculating total locations: ${err.message}`);
+    }
+};
