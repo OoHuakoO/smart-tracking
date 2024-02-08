@@ -84,3 +84,42 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
         throw new Error(`Error inserting assets: ${err.message}`);
     }
 };
+
+export const getAsset = async (
+    db: SQLiteDatabase,
+    page: number = 1,
+    limit: number = 10
+): Promise<AssetData[]> => {
+    const offset = (page - 1) * limit;
+    const query = `SELECT * FROM asset LIMIT ? OFFSET ?`;
+
+    try {
+        const results = await db.executeSql(query, [limit, offset]);
+        const assets = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                assets.push(results[0]?.rows?.item(i));
+            }
+        }
+
+        return assets;
+    } catch (err) {
+        throw new Error(`Error retrieving asset: ${err.message}`);
+    }
+};
+
+export const getTotalAssets = async (db: SQLiteDatabase): Promise<number> => {
+    const queryTotal = `SELECT COUNT(*) as total FROM asset`;
+
+    try {
+        const results = await db.executeSql(queryTotal);
+        if (results.length > 0) {
+            return results[0].rows?.item(0)?.total;
+        } else {
+            return 0;
+        }
+    } catch (err) {
+        throw new Error(`Error calculating total asset: ${err.message}`);
+    }
+};
