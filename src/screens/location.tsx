@@ -1,18 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import LocationCardDetail from '@src/components/views/locationCardDetail';
 import { getDBConnection } from '@src/db/config';
-import { getAllLocations, getTotalLocations } from '@src/db/location';
+import { getLocations, getTotalLocations } from '@src/db/location';
 import { GetLocation } from '@src/services/asset';
 import { theme } from '@src/theme';
 import { LocationData } from '@src/typings/asset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    FlatList,
     SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View
@@ -36,6 +36,9 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
     const [listLocation, setListLocation] = useState<LocationData[]>([]);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(1);
+    const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -43,12 +46,12 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
 
     const handleFetchLocation = useCallback(async () => {
         try {
-            const online = await AsyncStorage.getItem('Online');
-            const onlineValue = JSON.parse(online);
-            if (onlineValue) {
+            setLoading(true);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
                 const response = await GetLocation({
                     page: 1,
-                    limit: 1000
+                    limit: 10
                 });
                 const totalPagesLocation = response?.result?.data?.total;
                 setCountLocation(totalPagesLocation);
@@ -56,15 +59,48 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
             } else {
                 const db = await getDBConnection();
                 const countLocation = await getTotalLocations(db);
-                const listLocationDB = await getAllLocations(db);
+                const listLocationDB = await getLocations(db);
                 setCountLocation(countLocation);
                 setListLocation(listLocationDB);
             }
+            setLoading(false);
         } catch (err) {
+            setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');
         }
     }, []);
+
+    const handleOnEndReached = async () => {
+        try {
+            setLoading(true);
+            if (!stopFetchMore) {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetLocation({
+                        page: page + 1,
+                        limit: 10
+                    });
+
+                    setListLocation([
+                        ...listLocation,
+                        ...response?.result?.data?.data
+                    ]);
+                } else {
+                    const db = await getDBConnection();
+                    const listLocationDB = await getLocations(db, page + 1);
+                    setListLocation([...listLocation, ...listLocationDB]);
+                }
+            }
+            setPage(page + 1);
+            setLoading(false);
+        } catch (err) {
+            setStopFetchMore(true);
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch more location');
+        }
+    };
 
     useEffect(() => {
         handleFetchLocation();
@@ -104,28 +140,32 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                 <Text variant="bodyLarge" style={styles.textTotalLocation}>
                     Total Location : {countTotalLocation}
                 </Text>
-                <ScrollView>
-                    {listLocation?.length > 0 &&
-                        listLocation.map((item) => (
-                            <View
-                                style={styles.wrapDetailList}
-                                key={item.asset_location_id}
+
+                <FlatList
+                    data={listLocation}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('LocationListAsset')
+                                }
+                                style={styles.searchButton}
                             >
-                                <TouchableOpacity
-                                    activeOpacity={0.9}
-                                    onPress={() =>
-                                        navigation.navigate('LocationListAsset')
-                                    }
-                                    style={styles.searchButton}
-                                >
-                                    <LocationCardDetail
-                                        location={item?.name}
-                                        locationId={item?.asset_location_id?.toString()}
-                                    />
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                </ScrollView>
+                                <LocationCardDetail
+                                    location={item?.name}
+                                    locationId={item?.asset_location_id?.toString()}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.asset_location_id.toString()}
+                    onRefresh={() => console.log('refreshing')}
+                    refreshing={loading}
+                    onEndReached={handleOnEndReached}
+                    onEndReachedThreshold={0.5}
+                    onScrollBeginDrag={() => setStopFetchMore(false)}
+                />
             </View>
         </SafeAreaView>
     );
@@ -157,13 +197,15 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         marginTop: '50%',
-        zIndex: 1
+        zIndex: 1,
+        marginBottom: 20
     },
     textTotalLocation: {
         marginLeft: 20,
         marginTop: 20,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     },
     wrapDetailList: {
         display: 'flex',
