@@ -73,7 +73,7 @@ export const getLocations = async (
 ): Promise<LocationData[]> => {
     const offset = (page - 1) * limit;
     const query = `SELECT * FROM location LIMIT ? OFFSET ?`;
-    console.log(offset, page);
+
     try {
         const results = await db.executeSql(query, [limit, offset]);
         const locations = [];

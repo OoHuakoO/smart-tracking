@@ -1,7 +1,7 @@
 import { SOMETHING_WENT_WRONG, WARNING } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Dialog, Portal, ProgressBar, Text } from 'react-native-paper';
 interface AlertDialogProps {
     visible: boolean;
@@ -52,30 +52,27 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                 ) : (
                     <Dialog.Actions>
                         {showCloseDialog && (
-                            <Button
-                                style={styles.dialogActionCancel}
-                                onPress={handleClose}
-                            >
+                            <TouchableOpacity onPress={handleClose}>
+                                <Button style={styles.dialogActionCancel}>
+                                    <Text
+                                        style={styles.textActionCancel}
+                                        variant="bodyLarge"
+                                    >
+                                        Cancel
+                                    </Text>
+                                </Button>
+                            </TouchableOpacity>
+                        )}
+                        <TouchableOpacity onPress={handleConfirm}>
+                            <Button style={styles.dialogActionConfirm}>
                                 <Text
-                                    style={styles.textActionCancel}
+                                    style={styles.textActionConfirm}
                                     variant="bodyLarge"
                                 >
-                                    Cancel
+                                    Confirm
                                 </Text>
                             </Button>
-                        )}
-
-                        <Button
-                            style={styles.dialogActionConfirm}
-                            onPress={handleConfirm}
-                        >
-                            <Text
-                                style={styles.textActionConfirm}
-                                variant="bodyLarge"
-                            >
-                                Confirm
-                            </Text>
-                        </Button>
+                        </TouchableOpacity>
                     </Dialog.Actions>
                 )}
             </Dialog>
