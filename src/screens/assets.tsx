@@ -1,11 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import AssetCardDetail from '@src/components/views/assetCardDetail';
 import SearchButton from '@src/components/views/searchButton';
+import { getAsset, getTotalAssets } from '@src/db/asset';
+import { getDBConnection } from '@src/db/config';
+import { GetAssets } from '@src/services/asset';
 import { theme } from '@src/theme';
+import { AssetData } from '@src/typings/asset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { getOnlineMode } from '@src/utils/common';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -22,8 +28,88 @@ type AssetsScreenProps = NativeStackScreenProps<
 const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const { navigation } = props;
 
+    const [countTotalAsset, setCountAsset] = useState<number>(0);
+    const [listAsset, setListAsset] = useState<AssetData[]>([]);
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(1);
+    const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
+    const handleFetchAsset = useCallback(async () => {
+        try {
+            setLoading(true);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetAssets({
+                    page: 1,
+                    limit: 10
+                });
+                const totalPagesLocation = response?.result?.data?.total;
+                setCountAsset(totalPagesLocation);
+                setListAsset(response?.result?.data?.asset);
+            } else {
+                const db = await getDBConnection();
+                const countAsset = await getTotalAssets(db);
+                const listAssetDB = await getAsset(db);
+                setCountAsset(countAsset);
+                setListAsset(listAssetDB);
+            }
+            setLoading(false);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch location');
+        }
+    }, []);
+
+    const handleOnEndReached = async () => {
+        try {
+            setLoading(true);
+            if (!stopFetchMore) {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetAssets({
+                        page: page + 1,
+                        limit: 10
+                    });
+
+                    setListAsset([
+                        ...listAsset,
+                        ...response?.result?.data?.asset
+                    ]);
+                } else {
+                    const db = await getDBConnection();
+                    const listAssetDB = await getAsset(db, page + 1);
+                    setListAsset([...listAsset, ...listAssetDB]);
+                }
+            }
+            setPage(page + 1);
+            setLoading(false);
+        } catch (err) {
+            setStopFetchMore(true);
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch more location');
+        }
+    };
+
+    useEffect(() => {
+        handleFetchAsset();
+    }, [handleFetchAsset]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -50,37 +136,37 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         handlePress={() => navigation.navigate('AssetSearch')}
                     />
                 </View>
-                <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalAsset}>
-                        Total Asset : 999
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
-                            onPress={() => navigation.navigate('AssetDetail')}
-                            style={styles.searchButton}
-                        >
-                            <AssetCardDetail
-                                assetCode={'RB0001'}
-                                assetName={'Table'}
-                                assetLocation={'Location-01'}
-                                imageSource={require('../../assets/images/img1.jpg')}
-                            />
-                        </TouchableOpacity>
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img2.jpg')}
-                        />
-                        <AssetCardDetail
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img3.jpg')}
-                        />
-                    </View>
-                </ScrollView>
+                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                    Total Asset : {countTotalAsset}
+                </Text>
+
+                <FlatList
+                    data={listAsset}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('AssetDetail')
+                                }
+                                style={styles.searchButton}
+                            >
+                                <AssetCardDetail
+                                    assetCode={item?.default_code}
+                                    assetName={item?.name}
+                                    assetLocation={item?.location_id.toString()}
+                                    imageSource={require('../../assets/images/img1.jpg')}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.asset_id.toString()}
+                    onRefresh={() => console.log('refreshing')}
+                    refreshing={loading}
+                    onEndReached={handleOnEndReached}
+                    onEndReachedThreshold={0.5}
+                    onScrollBeginDrag={() => setStopFetchMore(false)}
+                />
             </View>
         </SafeAreaView>
     );
@@ -124,7 +210,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         marginTop: '50%',
-        zIndex: 1
+        zIndex: 1,
+        marginBottom: 20
     },
     wrapDetailList: {
         display: 'flex',
@@ -145,10 +232,11 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     },
     drawer: {
-        width: '80%' // Adjust the width as needed
+        width: '80%'
     }
 });
 

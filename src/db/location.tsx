@@ -66,13 +66,16 @@ export const insertLocationData = (
     }
 };
 
-export const getAllLocations = async (
-    db: SQLiteDatabase
+export const getLocations = async (
+    db: SQLiteDatabase,
+    page: number = 1,
+    limit: number = 10
 ): Promise<LocationData[]> => {
-    const query = `SELECT * FROM location`;
+    const offset = (page - 1) * limit;
+    const query = `SELECT * FROM location LIMIT ? OFFSET ?`;
 
     try {
-        const results = await db.executeSql(query);
+        const results = await db.executeSql(query, [limit, offset]);
         const locations = [];
 
         if (results.length > 0) {

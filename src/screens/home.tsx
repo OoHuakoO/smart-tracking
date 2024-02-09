@@ -31,6 +31,7 @@ import { Toast } from '@src/typings/common';
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
+import { getOnlineMode } from '@src/utils/common';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Portal, Text } from 'react-native-paper';
@@ -184,64 +185,74 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleDownload = useCallback(async () => {
         try {
-            setDisableCloseDialog(true);
-            setShowProgressBar(true);
-            const [
-                initialResponseAssets,
-                initialResponseLocation,
-                initialResponseUseStatus
-            ] = await Promise.all([
-                GetAssets({ page: 1, limit: 1000 }),
-                GetLocation({ page: 1, limit: 1000 }),
-                GetUseStatus({ page: 1, limit: 1000 })
-            ]);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                setDisableCloseDialog(true);
+                setShowProgressBar(true);
+                const [
+                    initialResponseAssets,
+                    initialResponseLocation,
+                    initialResponseUseStatus
+                ] = await Promise.all([
+                    GetAssets({ page: 1, limit: 1000 }),
+                    GetLocation({ page: 1, limit: 1000 }),
+                    GetUseStatus({ page: 1, limit: 1000 })
+                ]);
 
-            const errorAssets = handleResponseError(
-                initialResponseAssets?.error
-            );
-            const errorLocation = handleResponseError(
-                initialResponseLocation?.error
-            );
-            const errorUseStatus = handleResponseError(
-                initialResponseUseStatus?.error
-            );
+                const errorAssets = handleResponseError(
+                    initialResponseAssets?.error
+                );
+                const errorLocation = handleResponseError(
+                    initialResponseLocation?.error
+                );
+                const errorUseStatus = handleResponseError(
+                    initialResponseUseStatus?.error
+                );
 
-            if (errorAssets || errorLocation || errorUseStatus) {
-                return;
+                if (errorAssets || errorLocation || errorUseStatus) {
+                    return;
+                }
+
+                const totalPagesAssets =
+                    initialResponseAssets?.result?.data?.total_page;
+                const totalPagesLocation =
+                    initialResponseLocation?.result?.data?.total_page;
+                const totalPagesUseStatus =
+                    initialResponseUseStatus?.result?.data?.total_page;
+
+                const [listAssets, listLocation, listUseStatus] =
+                    await Promise.all([
+                        handleLoadAsset(totalPagesAssets),
+                        handleLoadLocation(totalPagesLocation),
+                        handleLoadUseStatus(totalPagesUseStatus)
+                    ]);
+                if (
+                    listAssets?.length > 0 &&
+                    listLocation?.length > 0 &&
+                    listUseStatus?.length > 0
+                ) {
+                    const db = await getDBConnection();
+                    await dropAllMasterTable(db);
+                    await createTableAsset(db);
+                    await createTableLocation(db);
+                    await createTableUseStatus(db);
+                    await insertAssetData(db, listAssets);
+                    await insertLocationData(db, listLocation);
+                    await insertUseStatusData(db, listUseStatus);
+                }
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Download Successfully' });
+                }, 0);
+                clearStateDialog();
+            } else {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(
+                    `Online mode is close, please open online mode to download`
+                );
+                setTypeDialog('warning');
             }
-
-            const totalPagesAssets =
-                initialResponseAssets?.result?.data?.total_page;
-            const totalPagesLocation =
-                initialResponseLocation?.result?.data?.total_page;
-            const totalPagesUseStatus =
-                initialResponseUseStatus?.result?.data?.total_page;
-
-            const [listAssets, listLocation, listUseStatus] = await Promise.all(
-                [
-                    handleLoadAsset(totalPagesAssets),
-                    handleLoadLocation(totalPagesLocation),
-                    handleLoadUseStatus(totalPagesUseStatus)
-                ]
-            );
-            if (
-                listAssets?.length > 0 &&
-                listLocation?.length > 0 &&
-                listUseStatus?.length > 0
-            ) {
-                const db = await getDBConnection();
-                await dropAllMasterTable(db);
-                await createTableAsset(db);
-                await createTableLocation(db);
-                await createTableUseStatus(db);
-                await insertAssetData(db, listAssets);
-                await insertLocationData(db, listLocation);
-                await insertUseStatusData(db, listUseStatus);
-            }
-            setTimeout(() => {
-                setToast({ open: true, text: 'Download Successfully' });
-            }, 0);
-            clearStateDialog();
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
