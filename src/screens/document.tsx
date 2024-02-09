@@ -1,11 +1,19 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import ActionButton from '@src/components/core/actionButton';
 import BackButton from '@src/components/core/backButton';
+import DocumentDialog from '@src/components/core/documentDialog';
 import DocumentCard from '@src/components/views/documentCard';
 import SearchButton from '@src/components/views/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import React, { FC, useState } from 'react';
+import {
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -20,6 +28,11 @@ type DocumentScreenProp = NativeStackScreenProps<
 
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation } = props;
+    const [dialogVisible, setDialogVisible] = useState(false);
+    const toggleDialog = () => {
+        setDialogVisible(!dialogVisible);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -42,6 +55,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     </Text>
                 </View>
             </LinearGradient>
+
             <View style={styles.listSection}>
                 <View style={styles.searchButtonWrap}>
                     <SearchButton
@@ -72,14 +86,25 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             documentStatus={'done'}
                         />
                         <DocumentCard
-                            documentTitle={'Document 003'}
+                            documentTitle={'Document 004'}
                             locationInfo={'H0-12th'}
                             dateInfo={'01/01/2567'}
                             documentStatus={'canceled'}
                         />
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            style={styles.Button}
+                            onPress={toggleDialog}
+                        >
+                            <ActionButton
+                                icon="cog"
+                                color={theme.colors.white}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
+            <DocumentDialog visible={dialogVisible} onClose={toggleDialog} />
         </SafeAreaView>
     );
 };
@@ -121,8 +146,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%',
-        zIndex: 1
+        marginTop: '50%'
     },
     wrapDetailList: {
         display: 'flex',
@@ -147,6 +171,12 @@ const styles = StyleSheet.create({
     },
     drawer: {
         width: '80%' // Adjust the width as needed
+    },
+    Button: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0
     }
 });
 
