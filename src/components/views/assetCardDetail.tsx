@@ -1,5 +1,6 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,7 +17,13 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image style={styles.image} source={imageSource} />
+                <Image
+                    style={styles.image}
+                    source={{
+                        uri: `data:image/png;base64,${imageSource}`
+                    }}
+                    resizeMode="cover"
+                />
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
@@ -51,7 +58,7 @@ const styles = StyleSheet.create({
     imagesContainer: {
         width: 80,
         height: 100,
-        backgroundColor: 'gray',
+        backgroundColor: theme.colors.emptyPicture,
         borderRadius: 10
     },
     image: {

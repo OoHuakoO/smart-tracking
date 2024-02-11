@@ -13,5 +13,6 @@ export const colorConfig = {
     disableSwitch: '#767577',
     black: '#121212',
     buttonCancel: '#FF6C6C',
-    buttonConfirm: '#386BA9'
+    buttonConfirm: '#386BA9',
+    emptyPicture: '#ACACAC'
 };

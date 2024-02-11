@@ -155,7 +155,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
                                     assetLocation={item?.location_id.toString()}
-                                    imageSource={require('../../assets/images/img1.jpg')}
+                                    imageSource={item?.picture}
                                 />
                             </TouchableOpacity>
                         </View>
