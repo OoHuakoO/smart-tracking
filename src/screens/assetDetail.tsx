@@ -26,7 +26,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     <View style={styles.button}>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => navigation.navigate('Assets')}
+                            onPress={() => navigation.goBack()}
                         >
                             <ActionButton
                                 icon={'chevron-left'}

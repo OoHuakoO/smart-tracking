@@ -1,3 +1,5 @@
+import { LocationData } from './asset';
+
 export type RootStackParamsList = {
     PrivateStack: undefined;
     PublicStack: undefined;
@@ -19,5 +21,7 @@ export type PrivateStackParamsList = {
     Download: undefined;
     AssetDetail: undefined;
     AssetSearch: undefined;
-    LocationListAsset: undefined;
+    LocationListAsset: {
+        LocationData: LocationData;
+    };
 };

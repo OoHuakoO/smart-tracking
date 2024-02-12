@@ -84,17 +84,33 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
         throw new Error(`Error inserting assets: ${err.message}`);
     }
 };
-
 export const getAsset = async (
     db: SQLiteDatabase,
+    filters?: {
+        location_id?: number;
+    },
     page: number = 1,
     limit: number = 10
 ): Promise<AssetData[]> => {
     const offset = (page - 1) * limit;
-    const query = `SELECT * FROM asset LIMIT ? OFFSET ?`;
+    let query = `SELECT * FROM asset`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.location_id !== undefined) {
+        whereConditions.push(`location_id = ?`);
+        queryParams.push(filters.location_id);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
 
     try {
-        const results = await db.executeSql(query, [limit, offset]);
+        const results = await db.executeSql(query, queryParams);
         const assets = [];
 
         if (results?.length > 0) {
@@ -105,21 +121,37 @@ export const getAsset = async (
 
         return assets;
     } catch (err) {
-        throw new Error(`Error retrieving asset: ${err.message}`);
+        throw new Error(`Error retrieving assets : ${err.message}`);
     }
 };
 
-export const getTotalAssets = async (db: SQLiteDatabase): Promise<number> => {
-    const queryTotal = `SELECT COUNT(*) as total FROM asset`;
+export const getTotalAssets = async (
+    db: SQLiteDatabase,
+    filters?: {
+        location_id?: number;
+    }
+): Promise<number> => {
+    let queryTotal = `SELECT COUNT(*) as total FROM asset`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters.location_id !== undefined) {
+        whereConditions.push(`location_id = ?`);
+        queryParams.push(filters.location_id);
+    }
+
+    if (whereConditions.length > 0) {
+        queryTotal += ` WHERE ` + whereConditions.join(' AND ');
+    }
 
     try {
-        const results = await db.executeSql(queryTotal);
-        if (results.length > 0) {
-            return results[0].rows?.item(0)?.total;
+        const results = await db.executeSql(queryTotal, queryParams);
+        if (results.length > 0 && results[0].rows.length > 0) {
+            return results[0].rows.item(0).total;
         } else {
             return 0;
         }
     } catch (err) {
-        throw new Error(`Error calculating total asset: ${err.message}`);
+        throw new Error(`Error calculating total assets :  ${err.message}`);
     }
 };

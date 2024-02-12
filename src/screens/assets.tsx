@@ -84,7 +84,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     ]);
                 } else {
                     const db = await getDBConnection();
-                    const listAssetDB = await getAsset(db, page + 1);
+                    const listAssetDB = await getAsset(db, null, page + 1);
                     setListAsset([...listAsset, ...listAssetDB]);
                 }
             }
