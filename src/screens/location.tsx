@@ -122,9 +122,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                 style={styles.topSectionList}
             >
                 <View style={styles.backToPrevious}>
-                    <BackButton
-                        handlePress={() => navigation.navigate('Home')}
-                    />
+                    <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
@@ -148,7 +146,9 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('LocationListAsset')
+                                    navigation.navigate('LocationListAsset', {
+                                        LocationData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >

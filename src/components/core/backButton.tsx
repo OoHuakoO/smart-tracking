@@ -16,7 +16,7 @@ const BackButton: FC<BackButtonProps> = (props) => {
             activeOpacity={0.5}
         >
             <ActionButton
-                icon={'chevron-left'}
+                icon="chevron-left"
                 size="small"
                 backgroundColor={theme.colors.white}
             />

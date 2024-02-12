@@ -1,11 +1,21 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import LocationListAssetCard from '@src/components/views/locationListAssetCard';
 import SearchButton from '@src/components/views/searchButton';
+import { getAsset, getTotalAssets } from '@src/db/asset';
+import { getDBConnection } from '@src/db/config';
 import { theme } from '@src/theme';
+import { AssetData } from '@src/typings/asset';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import {
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -18,9 +28,95 @@ type LocationListAssetProps = NativeStackScreenProps<
 >;
 
 const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
+
+    const [countTotalAsset, setCountAsset] = useState<number>(0);
+    const [listAsset, setListAsset] = useState<AssetData[]>([]);
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(1);
+    const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
+    const handleFetchAssetLocation = useCallback(async () => {
+        try {
+            setLoading(true);
+            // const isOnline = await getOnlineMode();
+            // if (isOnline) {
+            //     const response = await GetLocation({
+            //         page: 1,
+            //         limit: 10
+            //     });
+            //     const totalPagesLocation = response?.result?.data?.total;
+            //     setCountLocation(totalPagesLocation);
+            //     setListLocation(response?.result?.data?.data);
+            // }
+            const filter = {
+                location_id: route?.params?.LocationData?.asset_location_id
+            };
+            const db = await getDBConnection();
+            const countAsset = await getTotalAssets(db, filter);
+            const listAssetDB = await getAsset(db, filter);
+            setCountAsset(countAsset);
+            setListAsset(listAssetDB);
+
+            setLoading(false);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch asset');
+        }
+    }, [route?.params?.LocationData?.asset_location_id]);
+
+    const handleOnEndReached = async () => {
+        try {
+            setLoading(true);
+            if (!stopFetchMore) {
+                // const isOnline = await getOnlineMode();
+                // if (isOnline) {
+                //     const response = await GetLocation({
+                //         page: page + 1,
+                //         limit: 10
+                //     });
+
+                //     setListLocation([
+                //         ...listLocation,
+                //         ...response?.result?.data?.data
+                //     ]);
+                // }
+                const filter = {
+                    location_id: route?.params?.LocationData?.asset_location_id
+                };
+                const db = await getDBConnection();
+                const listAssetDB = await getAsset(db, filter, page + 1);
+                setListAsset([...listAsset, ...listAssetDB]);
+            }
+            setPage(page + 1);
+            setLoading(false);
+        } catch (err) {
+            setStopFetchMore(true);
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch more asset');
+        }
+    };
+
+    useEffect(() => {
+        handleFetchAssetLocation();
+    }, [handleFetchAssetLocation]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -28,13 +124,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                 style={styles.topSectionList}
             >
                 <View style={styles.backToPrevious}>
-                    <BackButton
-                        handlePress={() => navigation.navigate('Location')}
-                    />
+                    <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Location-01
+                        {route?.params?.LocationData?.name}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
@@ -48,31 +142,37 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                         handlePress={() => navigation.navigate('AssetSearch')}
                     />
                 </View>
-                <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalAsset}>
-                        Total Asset : 3
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <LocationListAssetCard
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-01'}
-                            imageSource={require('../../assets/images/img1.jpg')}
-                        />
-                        <LocationListAssetCard
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-02'}
-                            imageSource={require('../../assets/images/img2.jpg')}
-                        />
-                        <LocationListAssetCard
-                            assetCode={'RB0001'}
-                            assetName={'Table'}
-                            assetLocation={'Location-03'}
-                            imageSource={require('../../assets/images/img3.jpg')}
-                        />
-                    </View>
-                </ScrollView>
+                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                    Total Asset : {countTotalAsset}
+                </Text>
+
+                <FlatList
+                    data={listAsset}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('AssetDetail')
+                                }
+                                style={styles.searchButton}
+                            >
+                                <LocationListAssetCard
+                                    assetCode={item?.default_code}
+                                    assetName={item?.name}
+                                    assetLocation={item?.location_id.toString()}
+                                    imageSource={item?.picture}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.asset_id.toString()}
+                    onRefresh={() => console.log('refreshing')}
+                    refreshing={loading}
+                    onEndReached={handleOnEndReached}
+                    onEndReachedThreshold={0.5}
+                    onScrollBeginDrag={() => setStopFetchMore(false)}
+                />
             </View>
         </SafeAreaView>
     );
@@ -116,7 +216,8 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         marginTop: '50%',
-        zIndex: 1
+        zIndex: 1,
+        marginBottom: 20
     },
     searchButtonWrap: {
         position: 'absolute',
@@ -140,7 +241,8 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     }
 });
 
