@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import DocumentAssetStatus from '@src/screens/DocumentAssetStatus';
 import AssetDetail from '@src/screens/assetDetail';
 import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
@@ -61,6 +62,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={LocationListAsset}
+            />
+            <Stack.Screen
+                name="DocumentAssetStatus"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentAssetStatus}
             />
         </Stack.Navigator>
     );

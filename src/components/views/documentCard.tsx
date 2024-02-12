@@ -1,7 +1,7 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 interface DocumentScreenProp {
     documentTitle: string;
@@ -35,9 +35,14 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
     return (
         <View style={[styles.cardContainer, { borderColor }]}>
             <View style={styles.deleteIconContainer}>
-                {documentStatus === 'draft' ? (
-                    <FontAwesomeIcon icon={faTrash} color="#F0787A" />
-                ) : null}
+                {documentStatus === 'draft' && (
+                    <TouchableOpacity
+                        onPress={() => console.log('Delete')}
+                        activeOpacity={0.5}
+                    >
+                        <FontAwesomeIcon icon={faTrash} color="#F0787A" />
+                    </TouchableOpacity>
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.documentTitle}>{documentTitle}</Text>
