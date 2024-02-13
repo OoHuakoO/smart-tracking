@@ -67,6 +67,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const online = await AsyncStorage.getItem('Online');
             if (!online) {
                 await AsyncStorage.setItem('Online', JSON.stringify(true));
+                form?.setValue('online', true);
                 return;
             }
             const onlineValue = JSON.parse(online);
