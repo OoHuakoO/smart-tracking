@@ -7,18 +7,18 @@ import React, { FC } from 'react';
 import { Text } from 'react-native-paper';
 
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
 import LinearGradient from 'react-native-linear-gradient';
 import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp
+    heightPercentageToDP as hp,
+    widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 
 type DocumentAssetStatusScreenProps = NativeStackScreenProps<
