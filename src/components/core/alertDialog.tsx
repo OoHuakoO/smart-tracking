@@ -39,9 +39,17 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                     </Text>
                 </Dialog.Title>
                 <Dialog.Content>
-                    <Text variant="titleMedium">
-                        {textContent || SOMETHING_WENT_WRONG}
-                    </Text>
+                    {textContent.includes('\n') ? (
+                        textContent.split('\n').map((line, index) => (
+                            <Text key={index} variant="titleMedium">
+                                {line}
+                            </Text>
+                        ))
+                    ) : (
+                        <Text variant="titleMedium">
+                            {textContent || SOMETHING_WENT_WRONG}
+                        </Text>
+                    )}
                 </Dialog.Content>
                 {showProgressBar ? (
                     <ProgressBar

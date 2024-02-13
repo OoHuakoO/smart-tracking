@@ -17,7 +17,11 @@ import StatusTag from '@src/components/core/statusTag';
 import ToastComponent from '@src/components/core/toast';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
 import { WARNING } from '@src/constant';
-import { createTableAsset, insertAssetData } from '@src/db/asset';
+import {
+    createTableAsset,
+    getTotalAssets,
+    insertAssetData
+} from '@src/db/asset';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import { createTableLocation, insertLocationData } from '@src/db/location';
@@ -97,12 +101,35 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, []);
 
     const handleOpenDialogDownload = useCallback(async () => {
+        const isOnline = await getOnlineMode();
+        if (isOnline) {
+            const db = await getDBConnection();
+            const countAsset = await getTotalAssets(db);
+            if (countAsset > 0) {
+                setVisibleDialog(true);
+                setTitleDialog('Download Lasted Data');
+                setContentDialog(
+                    'Your old data will be deleted\nDo you want to download the latest data?'
+                );
+                setTypeDialog('download');
+                setShowCancelDialog(false);
+                return;
+            }
+            setVisibleDialog(true);
+            setTitleDialog('Data Not Found');
+            setContentDialog('Please download the current data');
+            setTypeDialog('download');
+            setShowCancelDialog(false);
+            return;
+        }
+        clearStateDialog();
         setVisibleDialog(true);
-        setTitleDialog('Data Not Found');
-        setContentDialog('Please download the current data');
-        setTypeDialog('download');
-        setShowCancelDialog(false);
-    }, []);
+        setTitleDialog(WARNING);
+        setContentDialog(
+            `Online mode is close, please open online mode to download`
+        );
+        setTypeDialog('warning');
+    }, [clearStateDialog]);
 
     const handleResponseError = useCallback(
         (error: ErrorResponse | undefined): boolean => {
@@ -186,74 +213,64 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleDownload = useCallback(async () => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                setDisableCloseDialog(true);
-                setShowProgressBar(true);
-                const [
-                    initialResponseAssets,
-                    initialResponseLocation,
-                    initialResponseUseStatus
-                ] = await Promise.all([
-                    GetAssets({ page: 1, limit: 1000 }),
-                    GetLocation({ page: 1, limit: 1000 }),
-                    GetUseStatus({ page: 1, limit: 1000 })
-                ]);
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
+            const [
+                initialResponseAssets,
+                initialResponseLocation,
+                initialResponseUseStatus
+            ] = await Promise.all([
+                GetAssets({ page: 1, limit: 1000 }),
+                GetLocation({ page: 1, limit: 1000 }),
+                GetUseStatus({ page: 1, limit: 1000 })
+            ]);
 
-                const errorAssets = handleResponseError(
-                    initialResponseAssets?.error
-                );
-                const errorLocation = handleResponseError(
-                    initialResponseLocation?.error
-                );
-                const errorUseStatus = handleResponseError(
-                    initialResponseUseStatus?.error
-                );
+            const errorAssets = handleResponseError(
+                initialResponseAssets?.error
+            );
+            const errorLocation = handleResponseError(
+                initialResponseLocation?.error
+            );
+            const errorUseStatus = handleResponseError(
+                initialResponseUseStatus?.error
+            );
 
-                if (errorAssets || errorLocation || errorUseStatus) {
-                    return;
-                }
-
-                const totalPagesAssets =
-                    initialResponseAssets?.result?.data?.total_page;
-                const totalPagesLocation =
-                    initialResponseLocation?.result?.data?.total_page;
-                const totalPagesUseStatus =
-                    initialResponseUseStatus?.result?.data?.total_page;
-
-                const [listAssets, listLocation, listUseStatus] =
-                    await Promise.all([
-                        handleLoadAsset(totalPagesAssets),
-                        handleLoadLocation(totalPagesLocation),
-                        handleLoadUseStatus(totalPagesUseStatus)
-                    ]);
-                if (
-                    listAssets?.length > 0 &&
-                    listLocation?.length > 0 &&
-                    listUseStatus?.length > 0
-                ) {
-                    const db = await getDBConnection();
-                    await dropAllMasterTable(db);
-                    await createTableAsset(db);
-                    await createTableLocation(db);
-                    await createTableUseStatus(db);
-                    await insertAssetData(db, listAssets);
-                    await insertLocationData(db, listLocation);
-                    await insertUseStatusData(db, listUseStatus);
-                }
-                setTimeout(() => {
-                    setToast({ open: true, text: 'Download Successfully' });
-                }, 0);
-                clearStateDialog();
-            } else {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog(
-                    `Online mode is close, please open online mode to download`
-                );
-                setTypeDialog('warning');
+            if (errorAssets || errorLocation || errorUseStatus) {
+                return;
             }
+
+            const totalPagesAssets =
+                initialResponseAssets?.result?.data?.total_page;
+            const totalPagesLocation =
+                initialResponseLocation?.result?.data?.total_page;
+            const totalPagesUseStatus =
+                initialResponseUseStatus?.result?.data?.total_page;
+
+            const [listAssets, listLocation, listUseStatus] = await Promise.all(
+                [
+                    handleLoadAsset(totalPagesAssets),
+                    handleLoadLocation(totalPagesLocation),
+                    handleLoadUseStatus(totalPagesUseStatus)
+                ]
+            );
+            if (
+                listAssets?.length > 0 &&
+                listLocation?.length > 0 &&
+                listUseStatus?.length > 0
+            ) {
+                const db = await getDBConnection();
+                await dropAllMasterTable(db);
+                await createTableAsset(db);
+                await createTableLocation(db);
+                await createTableUseStatus(db);
+                await insertAssetData(db, listAssets);
+                await insertLocationData(db, listLocation);
+                await insertUseStatusData(db, listUseStatus);
+            }
+            setTimeout(() => {
+                setToast({ open: true, text: 'Download Successfully' });
+            }, 0);
+            clearStateDialog();
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);

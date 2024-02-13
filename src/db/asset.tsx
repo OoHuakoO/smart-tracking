@@ -135,7 +135,7 @@ export const getTotalAssets = async (
     const queryParams = [];
     const whereConditions = [];
 
-    if (filters.location_id !== undefined) {
+    if (filters?.location_id !== undefined) {
         whereConditions.push(`location_id = ?`);
         queryParams.push(filters.location_id);
     }
