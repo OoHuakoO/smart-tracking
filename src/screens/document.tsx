@@ -67,12 +67,19 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         Total Document : 3
                     </Text>
                     <View style={styles.wrapDetailList}>
-                        <DocumentCard
-                            documentTitle={'Document Draft'}
-                            locationInfo={'H0-10th'}
-                            dateInfo={'01/01/2567'}
-                            documentStatus={'draft'}
-                        />
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            onPress={() =>
+                                navigation.navigate('DocumentAssetStatus')
+                            }
+                        >
+                            <DocumentCard
+                                documentTitle={'Document Draft'}
+                                locationInfo={'H0-10th'}
+                                dateInfo={'01/01/2567'}
+                                documentStatus={'draft'}
+                            />
+                        </TouchableOpacity>
                         <DocumentCard
                             documentTitle={'Document 001'}
                             locationInfo={'H0-11th'}
@@ -91,20 +98,17 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             dateInfo={'01/01/2567'}
                             documentStatus={'canceled'}
                         />
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            style={styles.Button}
-                            onPress={toggleDialog}
-                        >
-                            <ActionButton
-                                icon="cog"
-                                color={theme.colors.white}
-                            />
-                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
             <DocumentDialog visible={dialogVisible} onClose={toggleDialog} />
+            <TouchableOpacity
+                activeOpacity={0.5}
+                style={styles.Button}
+                onPress={toggleDialog}
+            >
+                <ActionButton icon="plus" color={theme.colors.white} />
+            </TouchableOpacity>
         </SafeAreaView>
     );
 };

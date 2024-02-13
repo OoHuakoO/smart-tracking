@@ -1,7 +1,7 @@
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Modal, Text } from 'react-native-paper';
+import { Modal, Searchbar, Text } from 'react-native-paper';
 
 interface DocumentDialogProp {
     visible: boolean;
@@ -18,10 +18,22 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                     <Text variant="titleMedium" style={styles.dialogTitle}>
                         Search Location
                     </Text>
-                    {/* <Searchbar placeholder="Search" style={styles.searchBar} /> */}
+                    <Searchbar
+                        placeholder="Search"
+                        style={styles.searchBar}
+                        value=""
+                    />
 
                     <View style={styles.searchList}>
-                        <Text>dddd</Text>
+                        <View style={styles.listStyle}>
+                            <Text variant="bodyLarge">H0-10th</Text>
+                        </View>
+                        <View style={styles.listStyle}>
+                            <Text variant="bodyLarge">H0-11th</Text>
+                        </View>
+                        <View style={styles.listStyle}>
+                            <Text variant="bodyLarge">H0-12th</Text>
+                        </View>
                     </View>
 
                     <View style={styles.buttonContainer}>
@@ -64,10 +76,15 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#A1A1A1',
         backgroundColor: 'white',
-        borderRadius: 10,
-        marginLeft: 10
+        borderRadius: 10
     },
     searchList: {},
+    listStyle: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#f5f5f5',
+
+        paddingVertical: 15
+    },
     buttonContainer: {
         marginTop: 20
     },
