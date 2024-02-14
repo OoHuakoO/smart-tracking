@@ -1,9 +1,7 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import ActionButton from '../core/actionButton';
 
 interface ReportAssetDataCardProps {
     location: string;
@@ -22,13 +20,6 @@ const ReportAssetDataCard: FC<ReportAssetDataCardProps> = (props) => {
                 <Text style={styles.locationText}>{location}</Text>
             </View>
             <Text style={styles.locationId}> Total Asset : {totalAsset}</Text>
-            <View style={styles.buttonContainer}>
-                <ActionButton
-                    icon="chevron-right"
-                    size="small"
-                    backgroundColor={theme.colors.white}
-                />
-            </View>
         </View>
     );
 };

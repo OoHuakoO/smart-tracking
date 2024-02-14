@@ -18,7 +18,7 @@ type ReportAssetDataProps = NativeStackScreenProps<
     'ReportAssetData'
 >;
 const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -34,7 +34,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Asset Master
+                        {route?.params?.ReportAssetData?.title}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         จำนวนทรัพย์สินในแต่ละสถานที่

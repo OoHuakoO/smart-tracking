@@ -54,38 +54,37 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     <AssetTagStatus status={'ปกติ'} />
                 </View>
                 <View style={styles.assetDetail}>
-                    <View style={styles.detail}>
-                        <Text variant="titleMedium">Serial Number</Text>
-                        <Text variant="bodyLarge" style={{ marginLeft: 27 }}>
-                            text
+                    <View>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Serial Number
+                        </Text>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Brand Name
+                        </Text>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Category
+                        </Text>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Location
+                        </Text>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Owner
                         </Text>
                     </View>
-                    <View style={styles.detail}>
-                        <Text variant="titleMedium">Brand Name</Text>
-                        <Text variant="bodyLarge" style={{ marginLeft: 40 }}>
+                    <View style={styles.assetDetailDes}>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
                             text
                         </Text>
-                    </View>
-                    <View style={styles.detail}>
-                        <Text variant="titleMedium">Category</Text>
-                        <Text variant="bodyLarge" style={{ marginLeft: '20%' }}>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
                             text
                         </Text>
-                    </View>
-                    <View style={styles.detail}>
-                        <Text variant="titleMedium">Location</Text>
-                        <Text variant="bodyLarge" style={{ marginLeft: '21%' }}>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
                             text
                         </Text>
-                    </View>
-                    <View style={styles.detail}>
-                        <Text variant="titleMedium">Owner</Text>
-                        <Text
-                            variant="bodyLarge"
-                            style={{
-                                marginLeft: '26%'
-                            }}
-                        >
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            text
+                        </Text>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
                             text
                         </Text>
                     </View>
@@ -160,13 +159,24 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     assetDetail: {
-        margin: 35
-    },
-    detail: {
+        height: hp('30%'),
+        width: wp('80%'),
+        alignSelf: 'center',
         display: 'flex',
         flexDirection: 'row',
-        fontSize: 14,
-        padding: 10
+        marginTop: 35,
+        alignItems: 'baseline'
+    },
+    assetTitle: {
+        fontSize: 18,
+        marginBottom: 15
+    },
+    assetDetailDes: {
+        marginLeft: 20
+    },
+    assetDes: {
+        fontSize: 18,
+        marginBottom: 15
     }
 });
 

@@ -48,24 +48,44 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                         <ReportAssetStatusButton
                             buttonText="Asset Master"
                             handlePress={() =>
-                                navigation.navigate('ReportAssetData')
+                                navigation.navigate('ReportAssetData', {
+                                    ReportAssetData: { title: 'Asset Master' }
+                                })
                             }
                         />
                         <ReportAssetStatusButton
                             buttonText="Asset New"
-                            handlePress={() => navigation.navigate('Home')}
+                            handlePress={() =>
+                                navigation.navigate('ReportAssetData', {
+                                    ReportAssetData: { title: 'Asset New' }
+                                })
+                            }
                         />
                         <ReportAssetStatusButton
                             buttonText="Asset Found"
-                            handlePress={() => navigation.navigate('Home')}
+                            handlePress={() =>
+                                navigation.navigate('ReportAssetData', {
+                                    ReportAssetData: { title: 'Asset Found' }
+                                })
+                            }
                         />
                         <ReportAssetStatusButton
                             buttonText="Asset Not Found"
-                            handlePress={() => navigation.navigate('Home')}
+                            handlePress={() =>
+                                navigation.navigate('ReportAssetData', {
+                                    ReportAssetData: {
+                                        title: 'Asset Not Found'
+                                    }
+                                })
+                            }
                         />
                         <ReportAssetStatusButton
                             buttonText="Asset Transfer"
-                            handlePress={() => navigation.navigate('Home')}
+                            handlePress={() =>
+                                navigation.navigate('ReportAssetData', {
+                                    ReportAssetData: { title: 'Asset Transfer' }
+                                })
+                            }
                         />
                     </View>
                 </ScrollView>

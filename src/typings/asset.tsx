@@ -8,7 +8,10 @@ export interface AssetData {
     brand_name: string;
     quantity: number;
     location_id: number;
-    picture: string;
+    image: string;
+    use_state: string;
+    owner: string;
+    new_img: boolean;
 }
 
 export interface GetAssetsData {
@@ -57,4 +60,8 @@ export interface GetUseStatusResponse {
     success: boolean;
     message: string;
     data: GetUseStatusData;
+}
+
+export interface ReportLocationParams {
+    title: string;
 }
