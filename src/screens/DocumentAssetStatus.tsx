@@ -7,18 +7,18 @@ import React, { FC } from 'react';
 import { Text } from 'react-native-paper';
 
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
 import LinearGradient from 'react-native-linear-gradient';
 import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp
+    heightPercentageToDP as hp,
+    widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 
 type DocumentAssetStatusScreenProps = NativeStackScreenProps<
@@ -58,6 +58,22 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         handlePress={() => navigation.navigate('Document')}
                     />
                 </View>
+                {documentStatus === 'canceled' && (
+                    <TouchableOpacity
+                        activeOpacity={0.5}
+                        style={styles.resetCancel}
+                    >
+                        <Text
+                            variant="bodySmall"
+                            style={{
+                                fontWeight: 'bold',
+                                color: '#F0787A'
+                            }}
+                        >
+                            Reset to Inprogress
+                        </Text>
+                    </TouchableOpacity>
+                )}
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Document
@@ -142,6 +158,17 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'flex-start',
         alignSelf: 'stretch'
+    },
+    resetCancel: {
+        position: 'absolute',
+        right: 15,
+        top: 30,
+        borderWidth: 2,
+        borderColor: '#F0787A',
+        backgroundColor: theme.colors.white,
+        borderRadius: 25,
+        paddingVertical: 5,
+        paddingHorizontal: 15
     },
     statusIndicator: {
         alignSelf: 'flex-start',

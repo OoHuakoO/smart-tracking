@@ -1,42 +1,20 @@
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
-interface DocumentAssetStatusProps {
+interface ReportAssetCardProps {
     imageSource?: any;
     assetCode: string;
     assetName: string;
     assetStatus: string;
-    assetMovement: string;
-    assetDate: string;
-    documentStatus: string;
+    assetLocation: string;
 }
 
-const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
-    const {
-        imageSource,
-        assetCode,
-        assetName,
-        assetStatus,
-        assetMovement,
-        assetDate,
-        documentStatus
-    } = props;
-
+const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
+    const { imageSource, assetCode, assetName, assetStatus, assetLocation } =
+        props;
     return (
         <View style={styles.cardContainer}>
-            <View style={styles.deleteIconContainer}>
-                {documentStatus === 'draft' && (
-                    <TouchableOpacity
-                        onPress={() => console.log('Delete')}
-                        activeOpacity={0.5}
-                    >
-                        <FontAwesomeIcon icon={faTrash} color="#F0787A" />
-                    </TouchableOpacity>
-                )}
-            </View>
             <View style={styles.imagesContainer}>
                 <Image style={styles.image} source={imageSource} />
             </View>
@@ -44,16 +22,12 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
                 <Text style={styles.assetCode}>{assetCode}</Text>
                 <Text variant="bodyLarge">{assetName}</Text>
                 <Text variant="bodyMedium">
-                    Status {}
+                    Status: {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
                 </Text>
                 <Text variant="bodyMedium">
-                    Movement {}
-                    <Text style={styles.additionalText}>{assetMovement}</Text>
-                </Text>
-                <Text variant="bodyMedium">
-                    Date {}
-                    <Text style={styles.additionalText}>{assetDate}</Text>
+                    Location: {}
+                    <Text style={styles.additionalText}>{assetLocation}</Text>
                 </Text>
             </View>
         </View>
@@ -108,4 +82,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default DocumentAssetStatusCard;
+export default ReportAssetCard;
