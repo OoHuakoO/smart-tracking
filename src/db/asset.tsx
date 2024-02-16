@@ -1,4 +1,4 @@
-import { AssetData } from '@src/typings/asset';
+import { AssetData } from '@src/typings/masterData';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableAsset = (db: SQLiteDatabase) => {
@@ -15,7 +15,10 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             brand_name TEXT,
             quantity INTEGER NOT NULL,
             location_id INTEGER,
-            picture TEXT
+            image TEXT,
+            use_state TEXT,
+            new_img BOOLEAN,
+            owner TEXT
         );`;
 
             tx.executeSql(
@@ -56,7 +59,10 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
       brand_name,
       quantity,
       location_id,
-      picture
+      image,
+      use_state,
+      new_img,
+      owner
     ) VALUES ` +
         assets
             .map(
@@ -70,7 +76,10 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
                     '${item.brand_name}',
                     ${item.quantity},
                     ${item.location_id},
-                    '${item.picture}'
+                    '${item.image}',
+                    '${item.use_state}',
+                    ${item.new_img},
+                    '${item.owner}'
                     )`
             )
             .join(',');

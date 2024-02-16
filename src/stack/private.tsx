@@ -1,9 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import AssetDetail from '@src/screens/assetDetail';
 import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
+import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import HomeScreen from '@src/screens/home';
 import Location from '@src/screens/location';
 import LocationListAsset from '@src/screens/locationListAsset';

@@ -26,13 +26,17 @@ import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
-import { GetAssets, GetLocation, GetUseStatus } from '@src/services/asset';
+import { GetAssets, GetLocation, GetUseStatus } from '@src/services/masterData';
 import { authState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
-import { AssetData, LocationData, UseStatusData } from '@src/typings/asset';
 import { Toast } from '@src/typings/common';
 import { SettingParams } from '@src/typings/login';
+import {
+    AssetData,
+    LocationData,
+    UseStatusData
+} from '@src/typings/masterData';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { getOnlineMode } from '@src/utils/common';

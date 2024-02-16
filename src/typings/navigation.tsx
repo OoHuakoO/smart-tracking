@@ -1,4 +1,4 @@
-import { LocationData, ReportLocationParams } from './asset';
+import { LocationData, ReportLocationParams } from './masterData';
 
 export type RootStackParamsList = {
     PrivateStack: undefined;

@@ -31,6 +31,7 @@
   "javascript.suggest.autoImports": true,
   "typescript.suggest.autoImports": true,
   "cSpell.words": [
-    "AUTOINCREMENT"
+    "AUTOINCREMENT",
+    "categorys"
   ]
 }

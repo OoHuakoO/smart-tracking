@@ -6,7 +6,7 @@ import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/asset';
+import { AssetData } from '@src/typings/masterData';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {

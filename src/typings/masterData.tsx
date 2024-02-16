@@ -65,3 +65,23 @@ export interface GetUseStatusResponse {
 export interface ReportLocationParams {
     title: string;
 }
+
+export interface CategoryData {
+    category_id: number;
+    category_name: string;
+    category_code: string;
+}
+
+export interface GetCategoryData {
+    uid: number;
+    total_page: number;
+    current_page: number;
+    asset: CategoryData[];
+    total: number;
+}
+
+export interface GetCategoryResponse {
+    success: boolean;
+    message: string;
+    data: GetLocationData;
+}

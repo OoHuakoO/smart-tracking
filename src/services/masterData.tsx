@@ -1,9 +1,10 @@
+import { GetParams } from '@src/typings/common';
 import {
     GetAssetsResponse,
+    GetCategoryResponse,
     GetLocationResponse,
     GetUseStatusResponse
-} from '@src/typings/asset';
-import { GetParams } from '@src/typings/common';
+} from '@src/typings/masterData';
 import { Response, post } from '@src/utils/axios';
 
 export function GetAssets(
@@ -22,4 +23,10 @@ export function GetLocation(
     params: GetParams
 ): Promise<Response<GetLocationResponse>> {
     return post<GetLocationResponse>('/api/all/locations', params);
+}
+
+export function GetCategory(
+    params: GetParams
+): Promise<Response<GetCategoryResponse>> {
+    return post<GetCategoryResponse>('/api/all/categorys', params);
 }
