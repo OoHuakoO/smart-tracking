@@ -86,3 +86,40 @@ export interface GetCategoryResponse {
     message: string;
     data: GetCategoryData;
 }
+
+export interface ReportAssetData {
+    code: string;
+    name: string;
+    category: number;
+    serial_no: string;
+    location_old: string;
+    location: string;
+    quantity: number;
+    state: string;
+    use_state: string;
+    new_img: boolean;
+    image: string;
+}
+
+export interface ReportData {
+    id: number;
+    state: string;
+    date_order: string;
+    owner: string;
+    owner_id: number;
+    assets: ReportAssetData[];
+}
+
+export interface GetReportData {
+    total_page: number;
+    current_page: number;
+    asset: ReportData[];
+    total: number;
+    uid: number;
+}
+
+export interface GetReportResponse {
+    success: boolean;
+    message: string;
+    data: GetReportData;
+}

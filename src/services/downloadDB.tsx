@@ -3,6 +3,7 @@ import {
     GetAssetsResponse,
     GetCategoryResponse,
     GetLocationResponse,
+    GetReportResponse,
     GetUseStatusResponse
 } from '@src/typings/downloadDB';
 import { Response, post } from '@src/utils/axios';
@@ -29,4 +30,10 @@ export function GetCategory(
     params: GetParams
 ): Promise<Response<GetCategoryResponse>> {
     return post<GetCategoryResponse>('/api/all/categorys', params);
+}
+
+export function GetReport(
+    params: GetParams
+): Promise<Response<GetReportResponse>> {
+    return post<GetReportResponse>('/api/all/documents', params);
 }
