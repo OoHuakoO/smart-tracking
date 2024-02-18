@@ -1,4 +1,4 @@
-import { LocationData, ReportLocationParams } from './masterData';
+import { LocationData, ReportLocationParams } from './downloadDB';
 
 export type RootStackParamsList = {
     PrivateStack: undefined;

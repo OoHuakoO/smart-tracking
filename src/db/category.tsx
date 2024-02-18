@@ -1,4 +1,4 @@
-import { CategoryData } from '@src/typings/masterData';
+import { CategoryData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableCategory = (db: SQLiteDatabase) => {

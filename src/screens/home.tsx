@@ -32,18 +32,18 @@ import {
     GetCategory,
     GetLocation,
     GetUseStatus
-} from '@src/services/masterData';
+} from '@src/services/downloadDB';
 import { authState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { Toast } from '@src/typings/common';
-import { SettingParams } from '@src/typings/login';
 import {
     AssetData,
     CategoryData,
     LocationData,
     UseStatusData
-} from '@src/typings/masterData';
+} from '@src/typings/downloadDB';
+import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { getOnlineMode } from '@src/utils/common';

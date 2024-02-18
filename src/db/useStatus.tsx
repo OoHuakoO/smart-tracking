@@ -1,4 +1,4 @@
-import { UseStatusData } from '@src/typings/masterData';
+import { UseStatusData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableUseStatus = (db: SQLiteDatabase) => {

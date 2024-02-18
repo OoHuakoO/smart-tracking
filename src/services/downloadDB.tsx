@@ -4,7 +4,7 @@ import {
     GetCategoryResponse,
     GetLocationResponse,
     GetUseStatusResponse
-} from '@src/typings/masterData';
+} from '@src/typings/downloadDB';
 import { Response, post } from '@src/utils/axios';
 
 export function GetAssets(

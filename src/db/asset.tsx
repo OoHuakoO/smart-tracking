@@ -1,4 +1,4 @@
-import { AssetData } from '@src/typings/masterData';
+import { AssetData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableAsset = (db: SQLiteDatabase) => {

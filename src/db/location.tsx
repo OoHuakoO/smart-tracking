@@ -1,4 +1,4 @@
-import { LocationData } from '@src/typings/masterData';
+import { LocationData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableLocation = (db: SQLiteDatabase) => {
