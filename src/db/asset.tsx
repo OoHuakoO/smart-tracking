@@ -93,6 +93,7 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
         throw new Error(`Error inserting assets: ${err.message}`);
     }
 };
+
 export const getAsset = async (
     db: SQLiteDatabase,
     filters?: {
@@ -102,12 +103,15 @@ export const getAsset = async (
     limit: number = 10
 ): Promise<AssetData[]> => {
     const offset = (page - 1) * limit;
-    let query = `SELECT * FROM asset`;
+    let query = `SELECT asset.*, location.name AS location_name, category.category_name AS category_name FROM asset`;
+    query += ` INNER JOIN location ON asset.location_id = location.asset_location_id`;
+    query += ` INNER JOIN category ON asset.category_id = category.category_id`;
+
     const queryParams = [];
     const whereConditions = [];
 
     if (filters?.location_id !== undefined) {
-        whereConditions.push(`location_id = ?`);
+        whereConditions.push(`asset.location_id = ?`);
         queryParams.push(filters.location_id);
     }
 
@@ -115,7 +119,7 @@ export const getAsset = async (
         query += ` WHERE ` + whereConditions.join(' AND ');
     }
 
-    query += ` LIMIT ? OFFSET ?`;
+    query += ` ORDER BY asset.id LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
 
     try {
@@ -130,7 +134,7 @@ export const getAsset = async (
 
         return assets;
     } catch (err) {
-        throw new Error(`Error retrieving assets : ${err.message}`);
+        throw new Error(`Error retrieving assets: ${err.message}`);
     }
 };
 
