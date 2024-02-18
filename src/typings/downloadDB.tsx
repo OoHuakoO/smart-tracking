@@ -64,10 +64,6 @@ export interface GetUseStatusResponse {
     data: GetUseStatusData;
 }
 
-export interface ReportLocationParams {
-    title: string;
-}
-
 export interface CategoryData {
     category_id: number;
     category_name: string;

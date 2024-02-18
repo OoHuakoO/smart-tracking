@@ -46,18 +46,10 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                 <ScrollView>
                     <View style={styles.wrapDetailList}>
                         <ReportAssetStatusButton
-                            buttonText="Asset Master"
-                            handlePress={() =>
-                                navigation.navigate('ReportAssetData', {
-                                    ReportAssetData: { title: 'Asset Master' }
-                                })
-                            }
-                        />
-                        <ReportAssetStatusButton
                             buttonText="Asset New"
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    ReportAssetData: { title: 'Asset New' }
+                                    title: 'Asset New'
                                 })
                             }
                         />
@@ -65,7 +57,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                             buttonText="Asset Found"
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    ReportAssetData: { title: 'Asset Found' }
+                                    title: 'Asset Found'
                                 })
                             }
                         />
@@ -73,9 +65,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                             buttonText="Asset Not Found"
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    ReportAssetData: {
-                                        title: 'Asset Not Found'
-                                    }
+                                    title: 'Asset Not Found'
                                 })
                             }
                         />
@@ -83,7 +73,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                             buttonText="Asset Transfer"
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    ReportAssetData: { title: 'Asset Transfer' }
+                                    title: 'Asset Transfer'
                                 })
                             }
                         />

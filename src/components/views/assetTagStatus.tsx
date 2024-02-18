@@ -17,7 +17,7 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
         case 'รอส่งซ่อม':
             backgroundColor = '#F8A435';
             break;
-        case 'ปกติ':
+        case 'Normal':
             backgroundColor = '#63CA7F';
             break;
         default:
@@ -28,7 +28,7 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <Text variant="titleMedium" style={styles.statusText}>
-                สถานะ : {status}
+                สถานะ : {status === 'Normal' ? 'ปกติ' : status}
             </Text>
         </View>
     );

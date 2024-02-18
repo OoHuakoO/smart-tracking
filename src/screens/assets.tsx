@@ -147,7 +147,9 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('AssetDetail')
+                                    navigation.navigate('AssetDetail', {
+                                        assetData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >
