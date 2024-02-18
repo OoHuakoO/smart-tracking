@@ -57,7 +57,12 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                 </View>
                 <View style={styles.assetStatus}>
                     <AssetTagStatus
-                        status={route?.params?.assetData?.use_state || 'Normal'}
+                        status={
+                            route?.params?.assetData?.use_state?.toString() !==
+                            'false'
+                                ? route?.params?.assetData?.use_state
+                                : 'Normal'
+                        }
                     />
                 </View>
                 <View style={styles.assetDetail}>

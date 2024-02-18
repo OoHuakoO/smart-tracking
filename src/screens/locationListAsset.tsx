@@ -162,7 +162,10 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                                 <LocationListAssetCard
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
-                                    assetLocation={item?.location_id.toString()}
+                                    assetLocation={
+                                        item?.location_name ||
+                                        item?.location_id.toString()
+                                    }
                                     imageSource={item?.image}
                                 />
                             </TouchableOpacity>
