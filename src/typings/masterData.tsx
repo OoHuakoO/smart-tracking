@@ -19,6 +19,7 @@ export interface GetAssetsData {
     current_page: number;
     asset: AssetData[];
     total: number;
+    uid: number;
 }
 
 export interface GetAssetsResponse {

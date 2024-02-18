@@ -16,7 +16,7 @@ export function GetAssets(
 export function GetUseStatus(
     params: GetParams
 ): Promise<Response<GetUseStatusResponse>> {
-    return post<GetUseStatusResponse>('/api/all/status', params);
+    return post<GetUseStatusResponse>('/api/all/use/state', params);
 }
 
 export function GetLocation(

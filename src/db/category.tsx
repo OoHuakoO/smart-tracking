@@ -53,7 +53,7 @@ export const insertCategoryData = (
                 (item) =>
                     `(
                   ${item.category_id},
-                 '${item.category_name}'
+                 '${item.category_name}',
                  '${item.category_code}'
                      )`
             )
