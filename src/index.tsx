@@ -14,6 +14,7 @@ import { createTableCategory } from './db/category';
 import { dropAllMasterTable } from './db/common';
 import { getDBConnection } from './db/config';
 import { createTableLocation } from './db/location';
+import { createTableReport } from './db/report';
 import { createTableUseStatus } from './db/useStatus';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
@@ -40,6 +41,7 @@ export default function App() {
             await createTableLocation(db);
             await createTableUseStatus(db);
             await createTableCategory(db);
+            await createTableReport(db);
         } catch (error) {
             console.error(error);
         }

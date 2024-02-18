@@ -4,7 +4,7 @@ import { SQLiteDatabase } from 'react-native-sqlite-storage';
 export const createTableReport = (db: SQLiteDatabase) => {
     db.transaction(
         (tx) => {
-            const query = `CREATE TABLE IF NOT EXISTS report(
+            const query = `CREATE TABLE IF NOT EXISTS report (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             code TEXT NOT NULL,
             name TEXT NOT NULL,
@@ -47,7 +47,7 @@ export const createTableReport = (db: SQLiteDatabase) => {
 
 export const insertReportData = (
     db: SQLiteDatabase,
-    assets: ReportAssetData[]
+    reportAsset: ReportAssetData[]
 ) => {
     const queryInsert =
         `INSERT INTO report (
@@ -63,7 +63,7 @@ export const insertReportData = (
           new_img,
           image
     ) VALUES ` +
-        assets
+        reportAsset
             .map(
                 (item) => `(
                     '${item.code}',

@@ -26,7 +26,7 @@ import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import { createTableLocation, insertLocationData } from '@src/db/location';
-import { insertReportData } from '@src/db/report';
+import { createTableReport, insertReportData } from '@src/db/report';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import {
     GetAssets,
@@ -355,6 +355,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await createTableLocation(db);
                 await createTableUseStatus(db);
                 await createTableCategory(db);
+                await createTableReport(db);
                 await insertAssetData(db, listAssets);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
