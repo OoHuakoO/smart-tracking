@@ -153,7 +153,9 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('AssetDetail')
+                                    navigation.navigate('AssetDetail', {
+                                        assetData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >
@@ -161,7 +163,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
                                     assetLocation={item?.location_id.toString()}
-                                    imageSource={item?.picture}
+                                    imageSource={item?.image}
                                 />
                             </TouchableOpacity>
                         </View>
