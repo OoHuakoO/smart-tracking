@@ -6,6 +6,7 @@ export const createTableUseStatus = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS useStatus(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            use_status_id INTEGER NOT NULL UNIQUE,
             name TEXT NOT NULL
         );`;
             tx.executeSql(
@@ -42,12 +43,14 @@ export const insertUseStatusData = (
 ) => {
     const queryInsert =
         `INSERT INTO useStatus (
+         use_status_id,
          name
     ) VALUES ` +
         useStatuses
             .map(
                 (item) =>
                     `(
+                 ${item.id},
                 '${item.name}'
                      )`
             )

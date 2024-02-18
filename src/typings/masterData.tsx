@@ -46,6 +46,7 @@ export interface GetLocationResponse {
 }
 
 export interface UseStatusData {
+    id: number;
     name: string;
 }
 
@@ -83,5 +84,5 @@ export interface GetCategoryData {
 export interface GetCategoryResponse {
     success: boolean;
     message: string;
-    data: GetLocationData;
+    data: GetCategoryData;
 }
