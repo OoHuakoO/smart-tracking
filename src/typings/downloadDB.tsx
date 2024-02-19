@@ -34,6 +34,9 @@ export interface GetAssetsResponse {
 export interface LocationData {
     asset_location_id: number;
     name: string;
+    // for report
+    total_asset?: number;
+    report_asset?: ReportAssetData[];
 }
 
 export interface GetLocationData {

@@ -61,14 +61,14 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                                 })
                             }
                         />
-                        <ReportAssetStatusButton
+                        {/* <ReportAssetStatusButton
                             buttonText="Asset Not Found"
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
                                     title: 'Asset Not Found'
                                 })
                             }
-                        />
+                        /> */}
                         <ReportAssetStatusButton
                             buttonText="Asset Transfer"
                             handlePress={() =>
