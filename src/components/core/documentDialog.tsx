@@ -6,10 +6,11 @@ import { Modal, Searchbar, Text } from 'react-native-paper';
 interface DocumentDialogProp {
     visible: boolean;
     onClose: () => void;
+    pageNavigate: () => void;
 }
 
 const DocumentDialog: FC<DocumentDialogProp> = (props) => {
-    const { visible, onClose } = props;
+    const { visible, onClose, pageNavigate } = props;
 
     return (
         <Modal visible={visible}>
@@ -25,15 +26,12 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                     />
 
                     <View style={styles.searchList}>
-                        <View style={styles.listStyle}>
+                        <TouchableOpacity
+                            style={styles.listStyle}
+                            onPress={pageNavigate}
+                        >
                             <Text variant="bodyLarge">H0-10th</Text>
-                        </View>
-                        <View style={styles.listStyle}>
-                            <Text variant="bodyLarge">H0-11th</Text>
-                        </View>
-                        <View style={styles.listStyle}>
-                            <Text variant="bodyLarge">H0-12th</Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
 
                     <View style={styles.buttonContainer}>

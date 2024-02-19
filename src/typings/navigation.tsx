@@ -29,4 +29,6 @@ export type PrivateStackParamsList = {
     };
     DocumentAssetStatus: undefined;
     LocationListReportAsset: undefined;
+    DocumentCreate: undefined;
+    DocumentCreateSearch: undefined;
 };
