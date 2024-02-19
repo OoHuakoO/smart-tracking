@@ -21,8 +21,7 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
         assetName,
         assetStatus,
         assetMovement,
-        assetDate,
-
+        assetDate
     } = props;
 
     const [selectedStatus, setSelectedStatus] = useState(assetStatus);
@@ -30,13 +29,12 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.deleteIconContainer}>
-                    <TouchableOpacity
-                        onPress={() => console.log('Delete')}
-                        activeOpacity={0.5}
-                    >
-                        <FontAwesomeIcon icon={faTrash} color="#F0787A" />
-                    </TouchableOpacity>
-
+                <TouchableOpacity
+                    onPress={() => console.log('Delete')}
+                    activeOpacity={0.5}
+                >
+                    <FontAwesomeIcon icon={faTrash} color="#F0787A" />
+                </TouchableOpacity>
             </View>
             <View style={styles.imagesContainer}>
                 <Image style={styles.image} source={imageSource} />
@@ -51,8 +49,7 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                         onValueChange={(value) => setSelectedStatus(value)}
                         items={[
                             { label: 'Normal', value: 'ปกติ' },
-                            { label: 'Abnormal', value: 'ไม่ปกติ' },
-
+                            { label: 'Abnormal', value: 'ไม่ปกติ' }
                         ]}
                         value={selectedStatus}
                     />
