@@ -22,21 +22,32 @@ import {
     getTotalAssets,
     insertAssetData
 } from '@src/db/asset';
+import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import { createTableLocation, insertLocationData } from '@src/db/location';
+import { createTableReport, insertReportData } from '@src/db/report';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
-import { GetAssets, GetLocation, GetUseStatus } from '@src/services/masterData';
+import {
+    GetAssets,
+    GetCategory,
+    GetLocation,
+    GetReport,
+    GetUseStatus
+} from '@src/services/downloadDB';
 import { authState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { Toast } from '@src/typings/common';
-import { SettingParams } from '@src/typings/login';
 import {
     AssetData,
+    CategoryData,
     LocationData,
+    ReportAssetData,
+    ReportData,
     UseStatusData
-} from '@src/typings/masterData';
+} from '@src/typings/downloadDB';
+import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { getOnlineMode } from '@src/utils/common';
@@ -215,6 +226,53 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadCategory = useCallback(
+        async (totalPages: number): Promise<CategoryData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetCategory({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const categorys = results.flatMap(
+                    (result) => result?.result?.data?.asset ?? []
+                );
+                return categorys;
+            } catch (err) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load use status');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
+    const handleLoadReport = useCallback(
+        async (totalPages: number): Promise<ReportAssetData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetReport({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const report = results.flatMap(
+                    (result) =>
+                        result?.result?.data?.asset?.flatMap(
+                            (reportData: ReportData) => reportData?.assets
+                        ) ?? []
+                );
+                return report;
+            } catch (err) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load use status');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
     const handleDownload = useCallback(async () => {
         try {
             setDisableCloseDialog(true);
@@ -222,11 +280,15 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const [
                 initialResponseAssets,
                 initialResponseLocation,
-                initialResponseUseStatus
+                initialResponseUseStatus,
+                initialResponseCategory,
+                initialResponseReport
             ] = await Promise.all([
                 GetAssets({ page: 1, limit: 1000 }),
                 GetLocation({ page: 1, limit: 1000 }),
-                GetUseStatus({ page: 1, limit: 1000 })
+                GetUseStatus({ page: 1, limit: 1000 }),
+                GetCategory({ page: 1, limit: 1000 }),
+                GetReport({ page: 1, limit: 1000 })
             ]);
 
             const errorAssets = handleResponseError(
@@ -238,8 +300,20 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const errorUseStatus = handleResponseError(
                 initialResponseUseStatus?.error
             );
+            const errorCategorys = handleResponseError(
+                initialResponseCategory?.error
+            );
+            const errorReport = handleResponseError(
+                initialResponseReport?.error
+            );
 
-            if (errorAssets || errorLocation || errorUseStatus) {
+            if (
+                errorAssets ||
+                errorLocation ||
+                errorUseStatus ||
+                errorCategorys ||
+                errorReport
+            ) {
                 return;
             }
 
@@ -249,27 +323,44 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseLocation?.result?.data?.total_page;
             const totalPagesUseStatus =
                 initialResponseUseStatus?.result?.data?.total_page;
+            const totalPagesCategory =
+                initialResponseCategory?.result?.data?.total_page;
+            const totalPagesReport =
+                initialResponseReport?.result?.data?.total_page;
 
-            const [listAssets, listLocation, listUseStatus] = await Promise.all(
-                [
-                    handleLoadAsset(totalPagesAssets),
-                    handleLoadLocation(totalPagesLocation),
-                    handleLoadUseStatus(totalPagesUseStatus)
-                ]
-            );
+            const [
+                listAssets,
+                listLocation,
+                listUseStatus,
+                listCategory,
+                listReport
+            ] = await Promise.all([
+                handleLoadAsset(totalPagesAssets),
+                handleLoadLocation(totalPagesLocation),
+                handleLoadUseStatus(totalPagesUseStatus),
+                handleLoadCategory(totalPagesCategory),
+                handleLoadReport(totalPagesReport)
+            ]);
+
             if (
                 listAssets?.length > 0 &&
                 listLocation?.length > 0 &&
-                listUseStatus?.length > 0
+                listUseStatus?.length > 0 &&
+                listCategory?.length > 0 &&
+                listReport?.length > 0
             ) {
                 const db = await getDBConnection();
                 await dropAllMasterTable(db);
                 await createTableAsset(db);
                 await createTableLocation(db);
                 await createTableUseStatus(db);
+                await createTableCategory(db);
+                await createTableReport(db);
                 await insertAssetData(db, listAssets);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
+                await insertCategoryData(db, listCategory);
+                await insertReportData(db, listReport);
             }
             setTimeout(() => {
                 setToast({ open: true, text: 'Download Successfully' });
@@ -285,7 +376,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, [
         clearStateDialog,
         handleLoadAsset,
+        handleLoadCategory,
         handleLoadLocation,
+        handleLoadReport,
         handleLoadUseStatus,
         handleResponseError,
         setToast

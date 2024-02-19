@@ -5,9 +5,9 @@ import AssetCardDetail from '@src/components/views/assetCardDetail';
 import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { GetAssets } from '@src/services/masterData';
+import { GetAssets, GetCategory, GetLocation } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/masterData';
+import { AssetData, CategoryData, LocationData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
@@ -30,6 +30,8 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
 
     const [countTotalAsset, setCountAsset] = useState<number>(0);
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
+    const [listLocation, setListLocation] = useState<LocationData[]>([]);
+    const [listCategory, setListCategory] = useState<CategoryData[]>([]);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -40,18 +42,61 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
         setVisibleDialog(false);
     }, []);
 
+    const handleTransformDataAssetOnline = useCallback(
+        (
+            assets: AssetData[],
+            locations: LocationData[],
+            categorys: CategoryData[]
+        ): Promise<AssetData[]> => {
+            return Promise.all(
+                assets.map((item) => {
+                    const locationFind = locations.find(
+                        (location) =>
+                            location.asset_location_id === item.location_id
+                    );
+                    const categoryFind = categorys.find(
+                        (category) => category.category_id === item.category_id
+                    );
+
+                    return {
+                        ...item,
+                        location_name: locationFind?.name || '',
+                        category_name: categoryFind?.category_name || ''
+                    };
+                })
+            );
+        },
+        []
+    );
+
     const handleFetchAsset = useCallback(async () => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const response = await GetAssets({
-                    page: 1,
-                    limit: 10
-                });
-                const totalPagesLocation = response?.result?.data?.total;
-                setCountAsset(totalPagesLocation);
-                setListAsset(response?.result?.data?.asset);
+                const [responseAsset, responseLocation, responseCategory] =
+                    await Promise.all([
+                        GetAssets({ page: 1, limit: 10 }),
+                        GetLocation({ page: 1, limit: 1000 }),
+                        GetCategory({ page: 1, limit: 1000 })
+                    ]);
+
+                const listResponseLocation =
+                    responseLocation?.result?.data?.data;
+                const listResponseCategory =
+                    responseCategory?.result?.data?.asset;
+
+                const listAssets = await handleTransformDataAssetOnline(
+                    responseAsset?.result?.data?.asset,
+                    listResponseLocation,
+                    listResponseCategory
+                );
+
+                const totalPagesAsset = responseAsset?.result?.data?.total;
+                setCountAsset(totalPagesAsset);
+                setListAsset(listAssets);
+                setListLocation(listResponseLocation);
+                setListCategory(listResponseCategory);
             } else {
                 const db = await getDBConnection();
                 const countAsset = await getTotalAssets(db);
@@ -63,9 +108,9 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
         } catch (err) {
             setLoading(false);
             setVisibleDialog(true);
-            setContentDialog('Something went wrong fetch location');
+            setContentDialog('Something went wrong fetch asset');
         }
-    }, []);
+    }, [handleTransformDataAssetOnline]);
 
     const handleOnEndReached = async () => {
         try {
@@ -78,10 +123,13 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         limit: 10
                     });
 
-                    setListAsset([
-                        ...listAsset,
-                        ...response?.result?.data?.asset
-                    ]);
+                    const listNewAsset = await handleTransformDataAssetOnline(
+                        response?.result?.data?.asset,
+                        listLocation,
+                        listCategory
+                    );
+
+                    setListAsset([...listAsset, ...listNewAsset]);
                 } else {
                     const db = await getDBConnection();
                     const listAssetDB = await getAsset(db, null, page + 1);
@@ -94,13 +142,14 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
             setStopFetchMore(true);
             setLoading(false);
             setVisibleDialog(true);
-            setContentDialog('Something went wrong fetch more location');
+            setContentDialog('Something went wrong fetch more asset');
         }
     };
 
     useEffect(() => {
         handleFetchAsset();
-    }, [handleFetchAsset]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -147,14 +196,19 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('AssetDetail')
+                                    navigation.navigate('AssetDetail', {
+                                        assetData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >
                                 <AssetCardDetail
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
-                                    assetLocation={item?.location_id.toString()}
+                                    assetLocation={
+                                        item?.location_name ||
+                                        item?.location_id.toString()
+                                    }
                                     imageSource={item?.image}
                                 />
                             </TouchableOpacity>

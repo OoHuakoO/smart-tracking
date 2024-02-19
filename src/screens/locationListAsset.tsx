@@ -6,7 +6,7 @@ import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/masterData';
+import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
@@ -153,15 +153,20 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('AssetDetail')
+                                    navigation.navigate('AssetDetail', {
+                                        assetData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >
                                 <LocationListAssetCard
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
-                                    assetLocation={item?.location_id.toString()}
-                                    imageSource={item?.picture}
+                                    assetLocation={
+                                        item?.location_name ||
+                                        item?.location_id.toString()
+                                    }
+                                    imageSource={item?.image}
                                 />
                             </TouchableOpacity>
                         </View>

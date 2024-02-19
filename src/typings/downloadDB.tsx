@@ -12,6 +12,9 @@ export interface AssetData {
     use_state: string;
     owner: string;
     new_img: boolean;
+    // for inner join
+    location_name?: string;
+    category_name?: string;
 }
 
 export interface GetAssetsData {
@@ -19,6 +22,7 @@ export interface GetAssetsData {
     current_page: number;
     asset: AssetData[];
     total: number;
+    uid: number;
 }
 
 export interface GetAssetsResponse {
@@ -46,6 +50,7 @@ export interface GetLocationResponse {
 }
 
 export interface UseStatusData {
+    id: number;
     name: string;
 }
 
@@ -60,10 +65,6 @@ export interface GetUseStatusResponse {
     success: boolean;
     message: string;
     data: GetUseStatusData;
-}
-
-export interface ReportLocationParams {
-    title: string;
 }
 
 export interface CategoryData {
@@ -83,5 +84,42 @@ export interface GetCategoryData {
 export interface GetCategoryResponse {
     success: boolean;
     message: string;
-    data: GetLocationData;
+    data: GetCategoryData;
+}
+
+export interface ReportAssetData {
+    code: string;
+    name: string;
+    category: number;
+    serial_no: string;
+    location_old: string;
+    location: string;
+    quantity: number;
+    state: string;
+    use_state: string;
+    new_img: boolean;
+    image: string;
+}
+
+export interface ReportData {
+    id: number;
+    state: string;
+    date_order: string;
+    owner: string;
+    owner_id: number;
+    assets: ReportAssetData[];
+}
+
+export interface GetReportData {
+    total_page: number;
+    current_page: number;
+    asset: ReportData[];
+    total: number;
+    uid: number;
+}
+
+export interface GetReportResponse {
+    success: boolean;
+    message: string;
+    data: GetReportData;
 }

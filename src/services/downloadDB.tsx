@@ -3,8 +3,9 @@ import {
     GetAssetsResponse,
     GetCategoryResponse,
     GetLocationResponse,
+    GetReportResponse,
     GetUseStatusResponse
-} from '@src/typings/masterData';
+} from '@src/typings/downloadDB';
 import { Response, post } from '@src/utils/axios';
 
 export function GetAssets(
@@ -16,7 +17,7 @@ export function GetAssets(
 export function GetUseStatus(
     params: GetParams
 ): Promise<Response<GetUseStatusResponse>> {
-    return post<GetUseStatusResponse>('/api/all/status', params);
+    return post<GetUseStatusResponse>('/api/all/use/state', params);
 }
 
 export function GetLocation(
@@ -29,4 +30,10 @@ export function GetCategory(
     params: GetParams
 ): Promise<Response<GetCategoryResponse>> {
     return post<GetCategoryResponse>('/api/all/categorys', params);
+}
+
+export function GetReport(
+    params: GetParams
+): Promise<Response<GetReportResponse>> {
+    return post<GetReportResponse>('/api/all/documents', params);
 }
