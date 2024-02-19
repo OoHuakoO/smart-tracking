@@ -91,14 +91,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             {route?.params?.assetData?.brand_name || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.category_name ||
-                                route?.params?.assetData?.category_id ||
-                                ''}
+                            {route?.params?.assetData?.category || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location_name ||
-                                route?.params?.assetData?.location_id ||
-                                ''}
+                            {route?.params?.assetData?.location || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.owner || ''}

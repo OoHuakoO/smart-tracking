@@ -4,10 +4,12 @@ export interface AssetData {
     name: string;
     description: string;
     category_id: number;
+    category: string;
     serial_no: string;
     brand_name: string;
     quantity: number;
     location_id: number;
+    location: string;
     image: string;
     use_state: string;
     owner: string;

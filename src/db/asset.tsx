@@ -11,10 +11,12 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             name TEXT NOT NULL,
             description TEXT,
             category_id INTEGER,
+            category TEXT,
             serial_no TEXT,
             brand_name TEXT,
             quantity INTEGER NOT NULL,
             location_id INTEGER,
+            location TEXT,
             image TEXT,
             use_state TEXT,
             new_img BOOLEAN,
@@ -55,10 +57,12 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
       name,
       description,
       category_id,
+      category,
       serial_no,
       brand_name,
       quantity,
       location_id,
+      location,
       image,
       use_state,
       new_img,
@@ -72,10 +76,12 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
                     '${item.name}',
                     '${item.description}',
                     ${item.category_id},
+                    '${item.category}',
                     '${item.serial_no}',
                     '${item.brand_name}',
                     ${item.quantity},
                     ${item.location_id},
+                    '${item.location}',
                     '${item.image}',
                     '${item.use_state}',
                     ${item.new_img},
@@ -103,9 +109,7 @@ export const getAsset = async (
     limit: number = 10
 ): Promise<AssetData[]> => {
     const offset = (page - 1) * limit;
-    let query = `SELECT asset.*, location.name AS location_name, category.category_name AS category_name FROM asset`;
-    query += ` INNER JOIN location ON asset.location_id = location.asset_location_id`;
-    query += ` INNER JOIN category ON asset.category_id = category.category_id`;
+    let query = `SELECT * FROM asset`;
 
     const queryParams = [];
     const whereConditions = [];
@@ -119,7 +123,7 @@ export const getAsset = async (
         query += ` WHERE ` + whereConditions.join(' AND ');
     }
 
-    query += ` ORDER BY asset.id LIMIT ? OFFSET ?`;
+    query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
 
     try {
