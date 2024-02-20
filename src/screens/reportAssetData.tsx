@@ -2,6 +2,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetDataCard from '@src/components/views/reportAssetDataCard';
+import { getDBConnection } from '@src/db/config';
+import { getLocations } from '@src/db/location';
+import { getReport } from '@src/db/report';
 import { GetLocation, GetReport } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
 import {
@@ -62,26 +65,23 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
         (
             locationName: string,
             reports: ReportData[],
-            title: string
+            reportAssets: ReportAssetData[],
+            title: string,
+            online: boolean
         ): number => {
-            if (locationName === 'All Location') {
-                return reports.reduce((count, report) => {
-                    const matchingAssets =
-                        report.assets?.filter((asset) =>
-                            handleFilterReport(asset, title)
-                        ) || [];
-                    return count + matchingAssets?.length;
-                }, 0);
+            const filterAssets = (asset) => {
+                const isLocationMatch =
+                    locationName === 'All Location' ||
+                    asset?.location === locationName;
+                return isLocationMatch && handleFilterReport(asset, title);
+            };
+
+            if (online) {
+                return reports
+                    .flatMap((report) => report.assets || [])
+                    .filter(filterAssets).length;
             } else {
-                return reports.reduce((count, report) => {
-                    const matchingAssets =
-                        report.assets?.filter(
-                            (asset) =>
-                                asset?.location === locationName &&
-                                handleFilterReport(asset, title)
-                        ) || [];
-                    return count + matchingAssets?.length;
-                }, 0);
+                return reportAssets.filter(filterAssets).length;
             }
         },
         [handleFilterReport]
@@ -91,43 +91,47 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
         (
             locationName: string,
             reports: ReportData[],
-            title: string
+            reportAssets: ReportAssetData[],
+            title: string,
+            online: boolean
         ): ReportAssetData[] => {
-            if (locationName === 'All Location') {
-                return reports.flatMap((report) => {
-                    return (
-                        report?.assets?.filter((asset) =>
-                            handleFilterReport(asset, title)
-                        ) || []
-                    );
-                });
-            } else {
-                return reports.flatMap((report) => {
-                    return (
-                        report?.assets?.filter(
-                            (asset) =>
-                                asset?.location === locationName &&
-                                handleFilterReport(asset, title)
-                        ) || []
-                    );
-                });
-            }
+            const assets = online
+                ? reports.flatMap((report) => report.assets || [])
+                : reportAssets;
+
+            return assets.filter((asset) => {
+                const isLocationMatch =
+                    locationName === 'All Location' ||
+                    asset?.location === locationName;
+                return isLocationMatch && handleFilterReport(asset, title);
+            });
         },
         [handleFilterReport]
     );
+
     const createLocationDataList = useCallback(
-        (locations: LocationData[], reports: ReportData[], title: string) => {
+        (
+            locations: LocationData[],
+            reports: ReportData[],
+            reportAssets: ReportAssetData[],
+            title: string,
+            online: boolean
+        ): LocationData[] => {
             return locations.map((location) => {
                 const countAssetsInLocation = handleCountAssetInLocation(
                     location?.name,
                     reports,
-                    title
+                    reportAssets,
+                    title,
+                    online
                 );
 
                 const assetInLocation = handleSelectAssetInLocation(
                     location?.name,
                     reports,
-                    title
+                    reportAssets,
+                    title,
+                    online
                 );
 
                 return {
@@ -144,6 +148,8 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
+            let listLocationData: LocationData[];
+
             if (isOnline) {
                 const [locationResponse, reportResponse] = await Promise.all([
                     GetLocation({ page: 1, limit: 1000 }),
@@ -155,14 +161,31 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                     name: 'All Location'
                 });
 
-                const listLocationData = createLocationDataList(
+                listLocationData = createLocationDataList(
                     locationResponse?.result?.data?.data || [],
                     reportResponse?.result?.data?.asset || [],
-                    route?.params?.title
+                    [],
+                    route?.params?.title,
+                    isOnline
                 );
+            } else {
+                const db = await getDBConnection();
+                const listReportDB = await getReport(db);
+                const listLocations = await getLocations(db, 1, 10000);
+                listLocations?.unshift({
+                    asset_location_id: 0,
+                    name: 'All Location'
+                });
 
-                setListLocation(listLocationData);
+                listLocationData = createLocationDataList(
+                    listLocations || [],
+                    [],
+                    listReportDB || [],
+                    route?.params?.title,
+                    isOnline
+                );
             }
+            setListLocation(listLocationData);
             setLoading(false);
         } catch (err) {
             setLoading(false);

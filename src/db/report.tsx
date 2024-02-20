@@ -92,14 +92,11 @@ export const insertReportData = (
 };
 
 export const getReport = async (
-    db: SQLiteDatabase,
-    page: number = 1,
-    limit: number = 10
+    db: SQLiteDatabase
 ): Promise<ReportAssetData[]> => {
-    const offset = (page - 1) * limit;
-    const query = `SELECT * FROM report LIMIT ? OFFSET ?`;
+    const query = `SELECT * FROM report`;
     try {
-        const results = await db.executeSql(query, [limit, offset]);
+        const results = await db.executeSql(query);
         const report = [];
         if (results.length > 0) {
             for (let i = 0; i < results[0].rows.length; i++) {
