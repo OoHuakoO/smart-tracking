@@ -48,7 +48,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
             </View>
             <View style={styles.assetDetailSection}>
                 <View style={styles.assetName}>
-                    <Text variant="headlineLarge" style={styles.textAssetName}>
+                    <Text variant="headlineMedium" style={styles.textAssetName}>
                         {route?.params?.assetData?.name || ''}
                     </Text>
                     <Text variant="headlineSmall">
@@ -90,9 +90,11 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.brand_name || ''}
                         </Text>
+
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.category || ''}
                         </Text>
+
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.location || ''}
                         </Text>
@@ -176,18 +178,18 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 35,
+        marginTop: 30,
         alignItems: 'baseline'
     },
     assetTitle: {
-        fontSize: 18,
+        fontSize: 14,
         marginBottom: 15
     },
     assetDetailDes: {
         marginLeft: 20
     },
     assetDes: {
-        fontSize: 18,
+        fontSize: 14,
         marginBottom: 15
     }
 });
