@@ -238,7 +238,8 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                                     navigation.navigate(
                                         'LocationListReportAsset',
                                         {
-                                            LocationData: item
+                                            LocationData: item,
+                                            title: route?.params?.title
                                         }
                                     )
                                 }

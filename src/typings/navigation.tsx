@@ -32,5 +32,6 @@ export type PrivateStackParamsList = {
     DocumentAssetStatus: undefined;
     LocationListReportAsset: {
         LocationData: LocationData;
+        title: string;
     };
 };

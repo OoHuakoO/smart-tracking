@@ -58,11 +58,13 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <ReportAssetCard
+                                title={route?.params?.title}
                                 imageSource={item?.image}
                                 assetCode={item?.code}
                                 assetName={item?.name}
                                 assetStatus={item?.use_state}
                                 assetLocation={item?.location}
+                                assetOldLocation={item?.location_old}
                             />
                         </View>
                     )}
