@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginTop: 10,
         gap: 20,
-        width: wp('90%')
+        width: wp('90%'),
     }
 });
 

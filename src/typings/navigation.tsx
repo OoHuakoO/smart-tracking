@@ -34,4 +34,7 @@ export type PrivateStackParamsList = {
         LocationData: LocationData;
         title: string;
     };
+
+    DocumentCreate: undefined;
+    DocumentCreateSearch: undefined;
 };
