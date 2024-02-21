@@ -10,9 +10,11 @@ import { RootStackParamsList } from './typings/navigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import { createTableAsset } from './db/asset';
+import { createTableCategory } from './db/category';
 import { dropAllMasterTable } from './db/common';
 import { getDBConnection } from './db/config';
 import { createTableLocation } from './db/location';
+import { createTableReport } from './db/report';
 import { createTableUseStatus } from './db/useStatus';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
@@ -38,6 +40,8 @@ export default function App() {
             await createTableAsset(db);
             await createTableLocation(db);
             await createTableUseStatus(db);
+            await createTableCategory(db);
+            await createTableReport(db);
         } catch (error) {
             console.error(error);
         }

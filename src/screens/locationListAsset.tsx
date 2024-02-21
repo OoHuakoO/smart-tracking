@@ -5,9 +5,11 @@ import LocationListAssetCard from '@src/components/views/locationListAssetCard';
 import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
+import { GetAssetSearch } from '@src/services/asset';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/masterData';
+import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
@@ -45,24 +47,26 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
     const handleFetchAssetLocation = useCallback(async () => {
         try {
             setLoading(true);
-            // const isOnline = await getOnlineMode();
-            // if (isOnline) {
-            //     const response = await GetLocation({
-            //         page: 1,
-            //         limit: 10
-            //     });
-            //     const totalPagesLocation = response?.result?.data?.total;
-            //     setCountLocation(totalPagesLocation);
-            //     setListLocation(response?.result?.data?.data);
-            // }
-            const filter = {
-                location_id: route?.params?.LocationData?.asset_location_id
-            };
-            const db = await getDBConnection();
-            const countAsset = await getTotalAssets(db, filter);
-            const listAssetDB = await getAsset(db, filter);
-            setCountAsset(countAsset);
-            setListAsset(listAssetDB);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetAssetSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: { location: route?.params?.LocationData?.name }
+                });
+                const totalPagesAsset = response?.result?.data?.total;
+                setCountAsset(totalPagesAsset);
+                setListAsset(response?.result?.data?.asset);
+            } else {
+                const filter = {
+                    location_id: route?.params?.LocationData?.asset_location_id
+                };
+                const db = await getDBConnection();
+                const countAsset = await getTotalAssets(db, filter);
+                const listAssetDB = await getAsset(db, filter);
+                setCountAsset(countAsset);
+                setListAsset(listAssetDB);
+            }
 
             setLoading(false);
         } catch (err) {
@@ -70,30 +74,38 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch asset');
         }
-    }, [route?.params?.LocationData?.asset_location_id]);
+    }, [
+        route?.params?.LocationData?.asset_location_id,
+        route?.params?.LocationData?.name
+    ]);
 
     const handleOnEndReached = async () => {
         try {
             setLoading(true);
             if (!stopFetchMore) {
-                // const isOnline = await getOnlineMode();
-                // if (isOnline) {
-                //     const response = await GetLocation({
-                //         page: page + 1,
-                //         limit: 10
-                //     });
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetAssetSearch({
+                        page: page + 1,
+                        limit: 10,
+                        search_term: {
+                            location: route?.params?.LocationData?.name
+                        }
+                    });
 
-                //     setListLocation([
-                //         ...listLocation,
-                //         ...response?.result?.data?.data
-                //     ]);
-                // }
-                const filter = {
-                    location_id: route?.params?.LocationData?.asset_location_id
-                };
-                const db = await getDBConnection();
-                const listAssetDB = await getAsset(db, filter, page + 1);
-                setListAsset([...listAsset, ...listAssetDB]);
+                    setListAsset([
+                        ...listAsset,
+                        ...response?.result?.data?.asset
+                    ]);
+                } else {
+                    const filter = {
+                        location_id:
+                            route?.params?.LocationData?.asset_location_id
+                    };
+                    const db = await getDBConnection();
+                    const listAssetDB = await getAsset(db, filter, page + 1);
+                    setListAsset([...listAsset, ...listAssetDB]);
+                }
             }
             setPage(page + 1);
             setLoading(false);
@@ -153,15 +165,17 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={() =>
-                                    navigation.navigate('AssetDetail')
+                                    navigation.navigate('AssetDetail', {
+                                        assetData: item
+                                    })
                                 }
                                 style={styles.searchButton}
                             >
                                 <LocationListAssetCard
                                     assetCode={item?.default_code}
                                     assetName={item?.name}
-                                    assetLocation={item?.location_id.toString()}
-                                    imageSource={item?.picture}
+                                    assetLocation={item?.location}
+                                    imageSource={item?.image}
                                 />
                             </TouchableOpacity>
                         </View>

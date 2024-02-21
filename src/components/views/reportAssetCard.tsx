@@ -8,23 +8,48 @@ interface ReportAssetCardProps {
     assetName: string;
     assetStatus: string;
     assetLocation: string;
+    assetOldLocation: string;
+    title: string;
 }
 
 const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
-    const { imageSource, assetCode, assetName, assetStatus, assetLocation } =
-        props;
+    const {
+        imageSource,
+        assetCode,
+        assetName,
+        assetStatus,
+        assetLocation,
+        assetOldLocation,
+        title
+    } = props;
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image style={styles.image} source={imageSource} />
+                <Image
+                    style={styles.image}
+                    source={{
+                        uri: `data:image/png;base64,${imageSource}`
+                    }}
+                    resizeMode="cover"
+                />
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
                 <Text variant="bodyLarge">{assetName}</Text>
                 <Text variant="bodyMedium">
-                    Status: {}
-                    <Text style={styles.additionalText}>{assetStatus}</Text>
+                    State: {}
+                    <Text style={styles.additionalText}>
+                        {assetStatus === 'Normal' ? 'ปกติ' : assetStatus}
+                    </Text>
                 </Text>
+                {title === 'Asset Transfer' && (
+                    <Text variant="bodyMedium">
+                        Old Location: {}
+                        <Text style={styles.additionalText}>
+                            {assetOldLocation}
+                        </Text>
+                    </Text>
+                )}
                 <Text variant="bodyMedium">
                     Location: {}
                     <Text style={styles.additionalText}>{assetLocation}</Text>

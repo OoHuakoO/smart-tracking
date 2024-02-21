@@ -1,4 +1,4 @@
-import { LocationData, ReportLocationParams } from './masterData';
+import { AssetData, LocationData } from './downloadDB';
 
 export type RootStackParamsList = {
     PrivateStack: undefined;
@@ -18,15 +18,20 @@ export type PrivateStackParamsList = {
     Document: undefined;
     Upload: undefined;
     Download: undefined;
-    AssetDetail: undefined;
+    AssetDetail: {
+        assetData: AssetData;
+    };
     AssetSearch: undefined;
     LocationListAsset: {
         LocationData: LocationData;
     };
     Report: undefined;
     ReportAssetData: {
-        ReportAssetData: ReportLocationParams;
+        title: string;
     };
     DocumentAssetStatus: undefined;
-    LocationListReportAsset: undefined;
+    LocationListReportAsset: {
+        LocationData: LocationData;
+        title: string;
+    };
 };

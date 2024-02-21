@@ -5,7 +5,7 @@ import SearchButton from '@src/components/views/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
-import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -21,7 +21,7 @@ type LocationListReportAssetProps = NativeStackScreenProps<
 const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     props
 ) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -35,7 +35,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Location-04
+                        {route?.params?.LocationData?.name}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
@@ -50,34 +50,26 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalAsset}>
-                    Total Asset: 3
+                    Total Asset: {route?.params?.LocationData?.total_asset}
                 </Text>
 
-                <View style={styles.wrapDetailList}>
-                    <ReportAssetCard
-                        imageSource={require('../../assets/images/img1.jpg')}
-                        assetCode="RB0001"
-                        assetName="Table"
-                        assetStatus="ปกติ"
-                        assetLocation="H01-th"
-                    />
-
-                    <ReportAssetCard
-                        imageSource={require('../../assets/images/img3.jpg')}
-                        assetCode="RB0001"
-                        assetName="Table"
-                        assetStatus="ปกติ"
-                        assetLocation="H02-th"
-                    />
-
-                    <ReportAssetCard
-                        imageSource={require('../../assets/images/img2.jpg')}
-                        assetCode="RB0001"
-                        assetName="Table"
-                        assetStatus="ปกติ"
-                        assetLocation="H03-th"
-                    />
-                </View>
+                <FlatList
+                    data={route?.params?.LocationData?.report_asset}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <ReportAssetCard
+                                title={route?.params?.title}
+                                imageSource={item?.image}
+                                assetCode={item?.code}
+                                assetName={item?.name}
+                                assetStatus={item?.use_state}
+                                assetLocation={item?.location}
+                                assetOldLocation={item?.location_old}
+                            />
+                        </View>
+                    )}
+                    keyExtractor={(item, index) => index.toString()}
+                />
             </View>
         </SafeAreaView>
     );
@@ -134,7 +126,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         gap: 15,
-
+        marginTop: 20,
         marginBottom: 5
     },
 

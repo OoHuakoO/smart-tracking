@@ -1,4 +1,4 @@
-import { AssetData } from '@src/typings/masterData';
+import { AssetData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableAsset = (db: SQLiteDatabase) => {
@@ -11,10 +11,12 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             name TEXT NOT NULL,
             description TEXT,
             category_id INTEGER,
+            category TEXT,
             serial_no TEXT,
             brand_name TEXT,
             quantity INTEGER NOT NULL,
             location_id INTEGER,
+            location TEXT,
             image TEXT,
             use_state TEXT,
             new_img BOOLEAN,
@@ -55,10 +57,12 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
       name,
       description,
       category_id,
+      category,
       serial_no,
       brand_name,
       quantity,
       location_id,
+      location,
       image,
       use_state,
       new_img,
@@ -72,10 +76,12 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
                     '${item.name}',
                     '${item.description}',
                     ${item.category_id},
+                    '${item.category}',
                     '${item.serial_no}',
                     '${item.brand_name}',
                     ${item.quantity},
                     ${item.location_id},
+                    '${item.location}',
                     '${item.image}',
                     '${item.use_state}',
                     ${item.new_img},
@@ -93,6 +99,7 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
         throw new Error(`Error inserting assets: ${err.message}`);
     }
 };
+
 export const getAsset = async (
     db: SQLiteDatabase,
     filters?: {
@@ -103,11 +110,12 @@ export const getAsset = async (
 ): Promise<AssetData[]> => {
     const offset = (page - 1) * limit;
     let query = `SELECT * FROM asset`;
+
     const queryParams = [];
     const whereConditions = [];
 
     if (filters?.location_id !== undefined) {
-        whereConditions.push(`location_id = ?`);
+        whereConditions.push(`asset.location_id = ?`);
         queryParams.push(filters.location_id);
     }
 
@@ -130,7 +138,7 @@ export const getAsset = async (
 
         return assets;
     } catch (err) {
-        throw new Error(`Error retrieving assets : ${err.message}`);
+        throw new Error(`Error retrieving assets: ${err.message}`);
     }
 };
 

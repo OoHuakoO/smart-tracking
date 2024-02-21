@@ -1,4 +1,4 @@
-import { CategoryData } from '@src/typings/masterData';
+import { CategoryData } from '@src/typings/downloadDB';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
 export const createTableCategory = (db: SQLiteDatabase) => {
@@ -53,7 +53,7 @@ export const insertCategoryData = (
                 (item) =>
                     `(
                   ${item.category_id},
-                 '${item.category_name}'
+                 '${item.category_name}',
                  '${item.category_code}'
                      )`
             )

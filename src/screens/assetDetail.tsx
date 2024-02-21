@@ -18,7 +18,7 @@ type AssetsDetailScreenProps = NativeStackScreenProps<
 >;
 
 const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     return (
         <SafeAreaView>
             <View style={styles.topSectionList}>
@@ -39,19 +39,31 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                 <View style={styles.imagesContainer}>
                     <Image
                         style={styles.image}
-                        source={require('../../assets/images/img1.jpg')}
+                        source={{
+                            uri: `data:image/png;base64,${route?.params?.assetData?.image}`
+                        }}
+                        resizeMode="cover"
                     />
                 </View>
             </View>
             <View style={styles.assetDetailSection}>
                 <View style={styles.assetName}>
                     <Text variant="headlineLarge" style={styles.textAssetName}>
-                        เครื่องคิดเลข EL-782C
+                        {route?.params?.assetData?.name || ''}
                     </Text>
-                    <Text variant="headlineSmall">CFFASDER500012</Text>
+                    <Text variant="headlineSmall">
+                        {route?.params?.assetData?.default_code || ''}
+                    </Text>
                 </View>
                 <View style={styles.assetStatus}>
-                    <AssetTagStatus status={'ปกติ'} />
+                    <AssetTagStatus
+                        status={
+                            route?.params?.assetData?.use_state?.toString() !==
+                            'false'
+                                ? route?.params?.assetData?.use_state
+                                : 'Normal'
+                        }
+                    />
                 </View>
                 <View style={styles.assetDetail}>
                     <View>
@@ -73,19 +85,19 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                     <View style={styles.assetDetailDes}>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            text
+                            {route?.params?.assetData?.serial_no || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            text
+                            {route?.params?.assetData?.brand_name || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            text
+                            {route?.params?.assetData?.category || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            text
+                            {route?.params?.assetData?.location || ''}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            text
+                            {route?.params?.assetData?.owner || ''}
                         </Text>
                     </View>
                 </View>
@@ -118,7 +130,7 @@ const styles = StyleSheet.create({
     imagesContainer: {
         width: '90%',
         height: '100%',
-        backgroundColor: 'gray',
+        backgroundColor: theme.colors.emptyPicture,
         borderRadius: 10,
         position: 'absolute',
         marginLeft: 20,
