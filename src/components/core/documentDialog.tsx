@@ -25,15 +25,14 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                     />
 
                     <View style={styles.searchList}>
-                        <View style={styles.listStyle}>
-                            <Text variant="bodyLarge">H0-10th</Text>
-                        </View>
-                        <View style={styles.listStyle}>
-                            <Text variant="bodyLarge">H0-11th</Text>
-                        </View>
-                        <View style={styles.listStyle}>
-                            <Text variant="bodyLarge">H0-12th</Text>
-                        </View>
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            onPress={() => console.log('Document Create')}
+                        >
+                            <View style={styles.listStyle}>
+                                <Text variant="bodyLarge">H0-10th</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
 
                     <View style={styles.buttonContainer}>
@@ -82,7 +81,6 @@ const styles = StyleSheet.create({
     listStyle: {
         borderBottomWidth: 1,
         borderBottomColor: '#f5f5f5',
-
         paddingVertical: 15
     },
     buttonContainer: {
