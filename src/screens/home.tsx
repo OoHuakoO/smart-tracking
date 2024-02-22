@@ -91,6 +91,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }
             const onlineValue = JSON.parse(online);
             form?.setValue('online', onlineValue);
+            const db = await getDBConnection();
+            await createTableAsset(db);
+            await createTableLocation(db);
+            await createTableUseStatus(db);
+            await createTableCategory(db);
+            await createTableReport(db);
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
@@ -102,6 +108,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setToken('');
             await AsyncStorage.setItem('Token', '');
             await AsyncStorage.setItem('Online', JSON.stringify(true));
+            const db = await getDBConnection();
+            await dropAllMasterTable(db);
             setTimeout(() => {
                 setToast({ open: true, text: 'Logout Successfully' });
             }, 0);
