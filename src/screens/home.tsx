@@ -81,7 +81,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setShowProgressBar(false);
     }, []);
 
-    const handleInitOnline = useCallback(async () => {
+    const handleInitFetch = useCallback(async () => {
         try {
             const online = await AsyncStorage.getItem('Online');
             if (!online) {
@@ -249,7 +249,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load use status');
+                setContentDialog('Something went wrong load category');
                 return [];
             }
         },
@@ -274,7 +274,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load use status');
+                setContentDialog('Something went wrong load report');
                 return [];
             }
         },
@@ -412,8 +412,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, [handleDownload, typeDialog]);
 
     useEffect(() => {
-        handleInitOnline();
-    }, [handleInitOnline]);
+        handleInitFetch();
+    }, [handleInitFetch]);
 
     return (
         <SafeAreaView style={styles.container}>
