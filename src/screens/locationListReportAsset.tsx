@@ -1,7 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
-import SearchButton from '@src/components/views/searchButton';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -44,11 +43,11 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             </LinearGradient>
 
             <View style={styles.listSection}>
-                <View style={styles.searchButtonWrap}>
+                {/* <View style={styles.searchButtonWrap}>
                     <SearchButton
                         handlePress={() => navigation.navigate('AssetSearch')}
                     />
-                </View>
+                </View> */}
                 <Text variant="bodyLarge" style={styles.textTotalAsset}>
                     Total Asset: {route?.params?.LocationData?.total_asset}
                 </Text>

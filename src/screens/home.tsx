@@ -81,7 +81,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setShowProgressBar(false);
     }, []);
 
-    const handleInitOnline = useCallback(async () => {
+    const handleInitFetch = useCallback(async () => {
         try {
             const online = await AsyncStorage.getItem('Online');
             if (!online) {
@@ -91,6 +91,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }
             const onlineValue = JSON.parse(online);
             form?.setValue('online', onlineValue);
+            const db = await getDBConnection();
+            await createTableAsset(db);
+            await createTableLocation(db);
+            await createTableUseStatus(db);
+            await createTableCategory(db);
+            await createTableReport(db);
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
@@ -102,6 +108,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setToken('');
             await AsyncStorage.setItem('Token', '');
             await AsyncStorage.setItem('Online', JSON.stringify(true));
+            const db = await getDBConnection();
+            await dropAllMasterTable(db);
             setTimeout(() => {
                 setToast({ open: true, text: 'Logout Successfully' });
             }, 0);
@@ -241,7 +249,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load use status');
+                setContentDialog('Something went wrong load category');
                 return [];
             }
         },
@@ -266,7 +274,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load use status');
+                setContentDialog('Something went wrong load report');
                 return [];
             }
         },
@@ -404,8 +412,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, [handleDownload, typeDialog]);
 
     useEffect(() => {
-        handleInitOnline();
-    }, [handleInitOnline]);
+        handleInitFetch();
+    }, [handleInitFetch]);
 
     return (
         <SafeAreaView style={styles.container}>
