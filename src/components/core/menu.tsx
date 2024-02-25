@@ -5,6 +5,7 @@ import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface MenuProps {
     icon: IconProp;
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerMenu: {
-        width: 75,
+        width: wp('18%'),
         height: 85,
         display: 'flex',
         justifyContent: 'center',
