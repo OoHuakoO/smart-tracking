@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,16 +12,16 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		1C31191C91634D699F2164C4 /* Sarabun-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */; };
+		2718A5578EE644F6A90983A1 /* Sarabun-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */; };
+		320324B19BB844639CD418AB /* Sarabun-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */; };
+		42175D226B884144AC7090BF /* DMSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */; };
+		48BF90EB295848CB8B68C8FC /* Sarabun-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-SmartTracking-SmartTrackingTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-SmartTracking-SmartTrackingTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		A6495F92BE7A42FBBF2DE0E0 /* DMSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */; };
-		42175D226B884144AC7090BF /* DMSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */; };
 		92215BA98F13444CB693936D /* DMSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */; };
 		A56C71430D2C4357BD394CD6 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */; };
-		2718A5578EE644F6A90983A1 /* Sarabun-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */; };
-		1C31191C91634D699F2164C4 /* Sarabun-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */; };
-		48BF90EB295848CB8B68C8FC /* Sarabun-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */; };
-		320324B19BB844639CD418AB /* Sarabun-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */; };
+		A6495F92BE7A42FBBF2DE0E0 /* DMSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,21 +45,21 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = SmartTracking/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = SmartTracking/main.m; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-SmartTracking-SmartTrackingTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SmartTracking-SmartTrackingTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Sarabun-Light.ttf"; path = "../assets/fonts/Sarabun-Light.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-SmartTracking.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SmartTracking.debug.xcconfig"; path = "Target Support Files/Pods-SmartTracking/Pods-SmartTracking.debug.xcconfig"; sourceTree = "<group>"; };
+		413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Bold.ttf"; path = "../assets/fonts/DMSans-Bold.ttf"; sourceTree = "<group>"; };
+		4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Sarabun-Bold.ttf"; path = "../assets/fonts/Sarabun-Bold.ttf"; sourceTree = "<group>"; };
+		54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Sarabun-Regular.ttf"; path = "../assets/fonts/Sarabun-Regular.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-SmartTracking.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SmartTracking.release.xcconfig"; path = "Target Support Files/Pods-SmartTracking/Pods-SmartTracking.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-SmartTracking-SmartTrackingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SmartTracking-SmartTrackingTests.debug.xcconfig"; path = "Target Support Files/Pods-SmartTracking-SmartTrackingTests/Pods-SmartTracking-SmartTrackingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-SmartTracking.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SmartTracking.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Regular.ttf"; path = "../assets/fonts/DMSans-Regular.ttf"; sourceTree = "<group>"; };
+		705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Sarabun-Medium.ttf"; path = "../assets/fonts/Sarabun-Medium.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SmartTracking/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-SmartTracking-SmartTrackingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SmartTracking-SmartTrackingTests.release.xcconfig"; path = "Target Support Files/Pods-SmartTracking-SmartTrackingTests/Pods-SmartTracking-SmartTrackingTests.release.xcconfig"; sourceTree = "<group>"; };
+		EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Light.ttf"; path = "../assets/fonts/DMSans-Light.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */ = {isa = PBXFileReference; name = "DMSans-Bold.ttf"; path = "../assets/fonts/DMSans-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */ = {isa = PBXFileReference; name = "DMSans-Light.ttf"; path = "../assets/fonts/DMSans-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */ = {isa = PBXFileReference; name = "DMSans-Medium.ttf"; path = "../assets/fonts/DMSans-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */ = {isa = PBXFileReference; name = "DMSans-Regular.ttf"; path = "../assets/fonts/DMSans-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */ = {isa = PBXFileReference; name = "Sarabun-Bold.ttf"; path = "../assets/fonts/Sarabun-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */ = {isa = PBXFileReference; name = "Sarabun-Light.ttf"; path = "../assets/fonts/Sarabun-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */ = {isa = PBXFileReference; name = "Sarabun-Medium.ttf"; path = "../assets/fonts/Sarabun-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */ = {isa = PBXFileReference; name = "Sarabun-Regular.ttf"; path = "../assets/fonts/Sarabun-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "DMSans-Medium.ttf"; path = "../assets/fonts/DMSans-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +122,21 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7C6F9F26F6ED4B889AB9E454 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */,
+				EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */,
+				FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */,
+				6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */,
+				4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */,
+				1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */,
+				705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */,
+				54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,22 +179,6 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
-		};
-		7C6F9F26F6ED4B889AB9E454 /* Resources */ = {
-			isa = "PBXGroup";
-			children = (
-				413AB5137B874BC19CF38931 /* DMSans-Bold.ttf */,
-				EA2F4CF13847425DB62D461D /* DMSans-Light.ttf */,
-				FB03E3ADC5664A60A698B7ED /* DMSans-Medium.ttf */,
-				6D94FF4DB7C1414080A9AAAA /* DMSans-Regular.ttf */,
-				4B9E9EA99754485E99B69241 /* Sarabun-Bold.ttf */,
-				1D6000F2574B4842B37BC889 /* Sarabun-Light.ttf */,
-				705B0694116D4FD6A8FD18B7 /* Sarabun-Medium.ttf */,
-				54FE58F041BB47CC94378C49 /* Sarabun-Regular.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-			path = "";
 		};
 /* End PBXGroup section */
 
@@ -244,7 +243,7 @@
 				};
 			};
 			buildConfigurationList = 83CBB9FA1A601CBA00E9B192 /* Build configuration list for PBXProject "SmartTracking" */;
-			compatibilityVersion = "Xcode 12.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -507,6 +506,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VP39Q7UQRB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = SmartTracking/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -534,6 +534,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = VP39Q7UQRB;
 				INFOPLIST_FILE = SmartTracking/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -585,7 +586,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -613,6 +614,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
@@ -620,7 +622,14 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl",
+					"-ld_classic",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -657,7 +666,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -677,6 +686,7 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
@@ -684,7 +694,14 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-Wl",
+					"-ld_classic",
+				);
+				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
