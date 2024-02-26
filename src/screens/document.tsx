@@ -101,7 +101,11 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     </View>
                 </ScrollView>
             </View>
-            <DocumentDialog visible={dialogVisible} onClose={toggleDialog} />
+            <DocumentDialog
+                visible={dialogVisible}
+                onClose={toggleDialog}
+                pageNavigate={() => navigation.navigate('DocumentCreate')}
+            />
             <TouchableOpacity
                 activeOpacity={0.5}
                 style={styles.Button}

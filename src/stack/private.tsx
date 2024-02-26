@@ -4,6 +4,8 @@ import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
 import DocumentAssetStatus from '@src/screens/documentAssetStatus';
+import DocumentCreate from '@src/screens/documentCreate';
+import DocumentCreateSearch from '@src/screens/documentCreateSearch';
 import HomeScreen from '@src/screens/home';
 import Location from '@src/screens/location';
 import LocationListAsset from '@src/screens/locationListAsset';
@@ -96,6 +98,24 @@ const PrivateStack = () => {
                 }}
                 component={LocationListReportAsset}
             />
+
+            <Stack.Screen
+                name="DocumentCreate"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentCreate}
+            />
+
+            <Stack.Screen
+                name="DocumentCreateSearch"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentCreateSearch}
+            />
+
+
         </Stack.Navigator>
     );
 };
