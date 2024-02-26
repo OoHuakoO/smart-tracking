@@ -16,6 +16,7 @@ import {
 
 import ActionButton from '@src/components/core/actionButton';
 import LinearGradient from 'react-native-linear-gradient';
+import { RFPercentage } from 'react-native-responsive-fontsize';
 import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 25,
+        marginTop: 25,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -186,6 +187,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: '#FFFFFF',
+        fontSize: RFPercentage(5.5),
         fontWeight: '700',
         marginBottom: 5
     },

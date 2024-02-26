@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface DocumentAssetStatusProps {
     imageSource?: any;
@@ -63,7 +64,7 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: 370,
+        width: wp('90%'),
         height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',

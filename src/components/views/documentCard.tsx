@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 interface DocumentScreenProp {
     documentTitle: string;
     locationInfo: string;
@@ -71,7 +72,7 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: 370,
+        width: wp('90%'),
         height: 120,
         backgroundColor: '#EDEDED',
         alignItems: 'center',

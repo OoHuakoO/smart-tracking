@@ -2,6 +2,7 @@ import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface ReportAssetDataCardProps {
     location: string;
@@ -26,7 +27,7 @@ const ReportAssetDataCard: FC<ReportAssetDataCardProps> = (props) => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: 370,
+        width: widthPercentageToDP('90'),
         height: 80,
         backgroundColor: '#f7f7f7',
         paddingVertical: 12,

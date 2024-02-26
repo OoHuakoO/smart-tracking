@@ -4,6 +4,7 @@ import React, { FC, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import RNPickerSelect from 'react-native-picker-select';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface AddAssetCardProps {
     imageSource?: any;
@@ -70,7 +71,7 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: 370,
+        width: widthPercentageToDP('90%'),
         height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',
