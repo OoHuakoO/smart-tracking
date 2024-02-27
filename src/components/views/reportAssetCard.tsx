@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface ReportAssetCardProps {
     imageSource?: any;
@@ -62,7 +63,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: 370,
+        width: widthPercentageToDP('90%'),
         height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',

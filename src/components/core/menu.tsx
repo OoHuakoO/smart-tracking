@@ -5,7 +5,11 @@ import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { RFPercentage } from 'react-native-responsive-fontsize';
+import {
+    heightPercentageToDP as hp,
+    widthPercentageToDP as wp
+} from 'react-native-responsive-screen';
 
 interface MenuProps {
     icon: IconProp;
@@ -33,7 +37,13 @@ const Menu: FC<MenuProps> = (props) => {
                     </View>
                 </LinearGradient>
                 <View>
-                    <Text variant="titleMedium" style={styles.textMenu}>
+                    <Text
+                        variant="titleMedium"
+                        style={[
+                            styles.textMenu,
+                            { fontSize: RFPercentage(2.3) }
+                        ]}
+                    >
                         {menuName}
                     </Text>
                 </View>
@@ -48,13 +58,13 @@ const styles = StyleSheet.create({
     },
     containerMenu: {
         width: wp('18%'),
-        height: 85,
+        height: hp('14%'),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
     },
     gradientBox: {
-        borderRadius: 20
+        borderRadius: wp('5%')
     },
     iconStyle: {
         color: theme.colors.white

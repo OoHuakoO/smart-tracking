@@ -4,6 +4,7 @@ import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface AssetCardDetailProps {
     assetCode: string;
@@ -40,7 +41,7 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: 370,
+        width: wp('90%'),
         height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',

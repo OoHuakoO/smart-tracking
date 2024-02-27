@@ -2,6 +2,7 @@ import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface LocationDetailProps {
     location: string;
@@ -26,7 +27,7 @@ const LocationCardDetail: FC<LocationDetailProps> = (props) => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: 370,
+        width: wp('90%'),
         height: 80,
         backgroundColor: '#f7f7f7',
         paddingVertical: 12,
