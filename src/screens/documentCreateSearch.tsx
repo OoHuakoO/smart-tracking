@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 25,
+        marginVertical: 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',

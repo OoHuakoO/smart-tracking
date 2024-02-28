@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC, useState } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import RNPickerSelect from 'react-native-picker-select';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface AddAssetCardProps {
@@ -45,15 +44,7 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 <Text variant="bodyLarge">{assetName}</Text>
                 <Text variant="bodyMedium">
                     Status {}
-                    {/* <Text style={styles.additionalText}>{assetStatus}</Text> */}
-                    <RNPickerSelect
-                        onValueChange={(value) => setSelectedStatus(value)}
-                        items={[
-                            { label: 'Normal', value: 'ปกติ' },
-                            { label: 'Abnormal', value: 'ไม่ปกติ' }
-                        ]}
-                        value={selectedStatus}
-                    />
+                    <Text style={styles.additionalText}>{assetStatus}</Text>
                 </Text>
                 <Text variant="bodyMedium">
                     Movement {}

@@ -27,7 +27,7 @@ const ReportAssetDataCard: FC<ReportAssetDataCardProps> = (props) => {
 
 const styles = StyleSheet.create({
     cardContainer: {
-        width: widthPercentageToDP('90'),
+        width: widthPercentageToDP('90%'),
         height: 80,
         backgroundColor: '#f7f7f7',
         paddingVertical: 12,

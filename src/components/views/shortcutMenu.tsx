@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     },
     menu: {
         display: 'flex',
+        justifyContent: 'center',
         flexDirection: 'row',
         flexWrap: 'wrap',
         marginTop: 10,

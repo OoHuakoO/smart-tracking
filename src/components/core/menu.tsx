@@ -41,7 +41,7 @@ const Menu: FC<MenuProps> = (props) => {
                         variant="titleMedium"
                         style={[
                             styles.textMenu,
-                            { fontSize: RFPercentage(2.3) }
+                            { fontSize: RFPercentage(2.1) }
                         ]}
                     >
                         {menuName}
@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerMenu: {
-        width: wp('18%'),
-        height: hp('14%'),
+        width: wp('20%'),
+        height: hp('13%'),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
