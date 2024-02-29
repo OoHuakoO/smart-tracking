@@ -138,6 +138,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     <ActionButton icon="plus" color={theme.colors.white} />
                 </TouchableOpacity>
             )}
+
+            {documentStatus === 'draft' && (
+                <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+                    <ActionButton icon="plus" color={theme.colors.white} />
+                </TouchableOpacity>
+            )}
         </SafeAreaView>
     );
 };
