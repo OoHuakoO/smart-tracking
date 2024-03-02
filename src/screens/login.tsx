@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     settingButton: {
+        zIndex: 1,
         position: 'absolute',
         margin: 16,
         right: 0,
