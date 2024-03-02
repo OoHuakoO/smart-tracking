@@ -4,19 +4,23 @@ import AlertDialog from '@src/components/core/alertDialog';
 import AutoComplete from '@src/components/core/autoComplete';
 import InputText from '@src/components/core/inputText';
 import { GetAssetSearch } from '@src/services/asset';
+import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
 import { AssetData } from '@src/typings/asset';
+import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import {
     Keyboard,
-    SafeAreaView,
+    ScrollView,
     StyleSheet,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View
 } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+
 import { Text } from 'react-native-paper';
 
 type AssetsSearchScreenProps = NativeStackScreenProps<
@@ -30,8 +34,24 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     const [searchCode, setSearchCode] = useState<string>('');
     const [listName, setListName] = useState<AssetData[]>([]);
     const [searchName, setSearchName] = useState<string>('');
+    const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
+    const [searchLocation, setSearchLocation] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+
+    const [value, setValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+
+    const data = [
+        { label: 'Item 1', value: '1' },
+        { label: 'Item 2', value: '2' },
+        { label: 'Item 3', value: '3' },
+        { label: 'Item 4', value: '4' },
+        { label: 'Item 5', value: '5' },
+        { label: 'Item 6', value: '6' },
+        { label: 'Item 7', value: '7' },
+        { label: 'Item 8', value: '8' }
+    ];
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -85,6 +105,36 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         }
     }, []);
 
+    const handleOnChangeSearchLocation = useCallback(async (text: string) => {
+        try {
+            setSearchLocation(text);
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetLocationSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: text
+                    });
+                    setListLocation(response?.result?.data?.locations);
+                }
+            } else {
+                setListLocation([]);
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong search location');
+        }
+    }, []);
+
+    const renderItem = (item) => {
+        return (
+            <View style={styles.item}>
+                <Text style={styles.textItem}>{item.label}</Text>
+            </View>
+        );
+    };
+
     return (
         <TouchableWithoutFeedback
             onPress={() => {
@@ -92,7 +142,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                 Keyboard.dismiss();
             }}
         >
-            <SafeAreaView style={styles.container}>
+            <ScrollView style={styles.container}>
                 <AlertDialog
                     textContent={contentDialog}
                     visible={visibleDialog}
@@ -178,19 +228,63 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     </View>
 
                     <Text variant="bodyLarge">Location</Text>
-                    <InputText
-                        returnKeyType="next"
-                        autoCapitalize="none"
-                        textContentType="emailAddress"
-                        keyboardType="email-address"
-                    />
+                    <View style={styles.autoCompleteContainer}>
+                        <View style={styles.autoCompleteBoxLocation}>
+                            <AutoComplete
+                                data={listLocation}
+                                value={searchLocation}
+                                onChangeText={async (text) => {
+                                    handleOnChangeSearchLocation(text);
+                                }}
+                                hideResults={searchLocation === ''}
+                                flatListProps={{
+                                    keyboardShouldPersistTaps: 'always',
+                                    keyExtractor: (item: any) =>
+                                        item.location_id,
+                                    renderItem: ({ item }) => (
+                                        <TouchableOpacity
+                                            style={styles.itemContainer}
+                                            onPress={() => {
+                                                setSearchLocation(
+                                                    item.location_name
+                                                );
+                                                setListLocation([]);
+                                            }}
+                                        >
+                                            <Text style={styles.itemText}>
+                                                {item.location_name}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )
+                                }}
+                            />
+                        </View>
+                    </View>
 
                     <Text variant="bodyLarge">Status</Text>
-                    <InputText
-                        returnKeyType="next"
-                        autoCapitalize="none"
-                        textContentType="emailAddress"
-                        keyboardType="email-address"
+                    <Dropdown
+                        style={[
+                            styles.dropdown,
+                            isFocus && { borderColor: 'blue' }
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={data}
+                        search
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        placeholder={!isFocus ? 'Select item' : '...'}
+                        searchPlaceholder="Search..."
+                        value={value}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={(item) => {
+                            setValue(item.value);
+                            setIsFocus(false);
+                        }}
+                        renderItem={renderItem}
                     />
 
                     <Text variant="bodyLarge">Catagory</Text>
@@ -219,7 +313,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </SafeAreaView>
+            </ScrollView>
         </TouchableWithoutFeedback>
     );
 };
@@ -243,9 +337,17 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        zIndex: 2
+        zIndex: 3
     },
     autoCompleteBoxName: {
+        flex: 1,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 2
+    },
+    autoCompleteBoxLocation: {
         flex: 1,
         left: 0,
         position: 'absolute',
@@ -299,6 +401,54 @@ const styles = StyleSheet.create({
     buttonText: {
         color: theme.colors.white,
         fontWeight: '600'
+    },
+
+    dropdown: {
+        height: 50,
+        borderColor: 'gray',
+        borderWidth: 0.5,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        color: theme.colors.black
+    },
+    item: {
+        padding: 17,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    textItem: {
+        flex: 1,
+        fontSize: 16,
+        color: theme.colors.black
+    },
+    icon: {
+        marginRight: 5
+    },
+    label: {
+        position: 'absolute',
+        backgroundColor: 'white',
+        left: 22,
+        top: 8,
+        zIndex: 999,
+        paddingHorizontal: 8,
+        fontSize: 14
+    },
+    placeholderStyle: {
+        fontSize: 16
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+        color: theme.colors.black
+    },
+    iconStyle: {
+        width: 20,
+        height: 20
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+        color: theme.colors.black
     }
 });
 export default AssetSearch;
