@@ -1,8 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import AutoComplete from '@src/components/core/autoComplete';
-import InputText from '@src/components/core/inputText';
 import { GetAssetSearch } from '@src/services/asset';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
@@ -12,11 +10,11 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useState } from 'react';
 import {
-    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    TouchableWithoutFeedback,
     View
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -36,46 +34,26 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     const [searchName, setSearchName] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const [searchLocation, setSearchLocation] = useState<string>('');
+    const [isFocusCode, setIsFocusCode] = useState<boolean>(false);
+    const [isFocusName, setIsFocusName] = useState<boolean>(false);
+    const [isFocusLocation, setIsFocusLocation] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-
-    const [value, setValue] = useState(null);
-    const [isFocus, setIsFocus] = useState(false);
-
-    const data = [
-        { label: 'Item 1', value: '1' },
-        { label: 'Item 2', value: '2' },
-        { label: 'Item 3', value: '3' },
-        { label: 'Item 4', value: '4' },
-        { label: 'Item 5', value: '5' },
-        { label: 'Item 6', value: '6' },
-        { label: 'Item 7', value: '7' },
-        { label: 'Item 8', value: '8' }
-    ];
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
 
-    const handleClearDropdown = useCallback(() => {
-        setListCode([]);
-    }, []);
-
     const handleOnChangeSearchCode = useCallback(async (text: string) => {
         try {
-            setSearchCode(text);
-            if (text !== '') {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const response = await GetAssetSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: { default_code: text }
-                    });
-                    setListCode(response?.result?.data?.asset);
-                }
-            } else {
-                setListCode([]);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetAssetSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: { default_code: text }
+                });
+                setListCode(response?.result?.data?.asset);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -85,19 +63,14 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleOnChangeSearchName = useCallback(async (text: string) => {
         try {
-            setSearchName(text);
-            if (text !== '') {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const response = await GetAssetSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: { name: text }
-                    });
-                    setListName(response?.result?.data?.asset);
-                }
-            } else {
-                setListName([]);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetAssetSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: { name: text }
+                });
+                setListName(response?.result?.data?.asset);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -107,19 +80,14 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleOnChangeSearchLocation = useCallback(async (text: string) => {
         try {
-            setSearchLocation(text);
-            if (text !== '') {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const response = await GetLocationSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: text
-                    });
-                    setListLocation(response?.result?.data?.locations);
-                }
-            } else {
-                setListLocation([]);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetLocationSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: text
+                });
+                setListLocation(response?.result?.data?.locations);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -127,22 +95,42 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         }
     }, []);
 
-    const renderItem = (item) => {
+    const renderItemCode = (item: AssetData) => {
         return (
-            <View style={styles.item}>
-                <Text style={styles.textItem}>{item.label}</Text>
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.default_code}
+                </Text>
+            </View>
+        );
+    };
+
+    const renderItemName = (item: AssetData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.name}
+                </Text>
+            </View>
+        );
+    };
+
+    const renderItemLocation = (item: LocationSearchData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.location_name}
+                </Text>
             </View>
         );
     };
 
     return (
-        <TouchableWithoutFeedback
-            onPress={() => {
-                handleClearDropdown();
-                Keyboard.dismiss();
-            }}
-        >
-            <ScrollView style={styles.container}>
+        <ScrollView style={styles.container}>
+            <KeyboardAvoidingView
+                style={styles.container}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
                 <AlertDialog
                     textContent={contentDialog}
                     visible={visibleDialog}
@@ -165,135 +153,88 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         Search Asset
                     </Text>
                     <Text variant="bodyLarge">Code</Text>
-                    <View style={styles.autoCompleteContainer}>
-                        <View style={styles.autoCompleteBoxCode}>
-                            <AutoComplete
-                                data={listCode}
-                                value={searchCode}
-                                onChangeText={async (text) => {
-                                    handleOnChangeSearchCode(text);
-                                }}
-                                hideResults={searchCode === ''}
-                                flatListProps={{
-                                    keyboardShouldPersistTaps: 'always',
-                                    keyExtractor: (item: any) => item.asset_id,
-                                    renderItem: ({ item }) => (
-                                        <TouchableOpacity
-                                            style={styles.itemContainer}
-                                            onPress={() => {
-                                                setSearchCode(
-                                                    item.default_code
-                                                );
-                                                setListCode([]);
-                                            }}
-                                        >
-                                            <Text style={styles.itemText}>
-                                                {item.default_code}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }}
-                            />
-                        </View>
-                    </View>
-                    <Text variant="bodyLarge">Name</Text>
-                    <View style={styles.autoCompleteContainer}>
-                        <View style={styles.autoCompleteBoxName}>
-                            <AutoComplete
-                                data={listName}
-                                value={searchName}
-                                onChangeText={async (text) => {
-                                    handleOnChangeSearchName(text);
-                                }}
-                                hideResults={searchName === ''}
-                                flatListProps={{
-                                    keyboardShouldPersistTaps: 'always',
-                                    keyExtractor: (item: any) => item.asset_id,
-                                    renderItem: ({ item }) => (
-                                        <TouchableOpacity
-                                            style={styles.itemContainer}
-                                            onPress={() => {
-                                                setSearchName(item.name);
-                                                setListName([]);
-                                            }}
-                                        >
-                                            <Text style={styles.itemText}>
-                                                {item.name}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }}
-                            />
-                        </View>
-                    </View>
-
-                    <Text variant="bodyLarge">Location</Text>
-                    <View style={styles.autoCompleteContainer}>
-                        <View style={styles.autoCompleteBoxLocation}>
-                            <AutoComplete
-                                data={listLocation}
-                                value={searchLocation}
-                                onChangeText={async (text) => {
-                                    handleOnChangeSearchLocation(text);
-                                }}
-                                hideResults={searchLocation === ''}
-                                flatListProps={{
-                                    keyboardShouldPersistTaps: 'always',
-                                    keyExtractor: (item: any) =>
-                                        item.location_id,
-                                    renderItem: ({ item }) => (
-                                        <TouchableOpacity
-                                            style={styles.itemContainer}
-                                            onPress={() => {
-                                                setSearchLocation(
-                                                    item.location_name
-                                                );
-                                                setListLocation([]);
-                                            }}
-                                        >
-                                            <Text style={styles.itemText}>
-                                                {item.location_name}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    )
-                                }}
-                            />
-                        </View>
-                    </View>
-
-                    <Text variant="bodyLarge">Status</Text>
                     <Dropdown
                         style={[
                             styles.dropdown,
-                            isFocus && { borderColor: 'blue' }
+                            isFocusCode && styles.dropdownSelect
                         ]}
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         inputSearchStyle={styles.inputSearchStyle}
-                        data={data}
+                        data={listCode}
                         search
                         maxHeight={300}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={!isFocus ? 'Select item' : '...'}
-                        searchPlaceholder="Search..."
-                        value={value}
-                        onFocus={() => setIsFocus(true)}
-                        onBlur={() => setIsFocus(false)}
+                        labelField="default_code"
+                        valueField="default_code"
+                        placeholder={'Select Code'}
+                        searchPlaceholder="Search"
+                        value={searchCode}
+                        onFocus={() => setIsFocusCode(true)}
+                        onBlur={() => setIsFocusCode(false)}
                         onChange={(item) => {
-                            setValue(item.value);
-                            setIsFocus(false);
+                            setSearchCode(item?.default_code);
                         }}
-                        renderItem={renderItem}
+                        onChangeText={(text) => handleOnChangeSearchCode(text)}
+                        renderItem={renderItemCode}
+                    />
+                    <Text variant="bodyLarge">Name</Text>
+                    <Dropdown
+                        style={[
+                            styles.dropdown,
+                            isFocusName && styles.dropdownSelect
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={listName}
+                        search
+                        maxHeight={300}
+                        labelField="name"
+                        valueField="name"
+                        placeholder={'Select Name'}
+                        searchPlaceholder="Search"
+                        value={searchName}
+                        onFocus={() => setIsFocusName(true)}
+                        onBlur={() => setIsFocusName(false)}
+                        onChange={(item) => {
+                            setSearchName(item?.name);
+                        }}
+                        onChangeText={(text) => handleOnChangeSearchName(text)}
+                        renderItem={renderItemName}
+                    />
+                    <Text variant="bodyLarge">Location</Text>
+
+                    <Dropdown
+                        style={[
+                            styles.dropdown,
+                            isFocusLocation && styles.dropdownSelect
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={listLocation}
+                        search
+                        maxHeight={300}
+                        labelField="location_name"
+                        valueField="location_name"
+                        placeholder={'Select Location'}
+                        searchPlaceholder="Search"
+                        value={searchLocation}
+                        onFocus={() => setIsFocusLocation(true)}
+                        onBlur={() => setIsFocusLocation(false)}
+                        onChange={(item) => {
+                            setSearchLocation(item?.location_name);
+                        }}
+                        onChangeText={(text) =>
+                            handleOnChangeSearchLocation(text)
+                        }
+                        renderItem={renderItemLocation}
                     />
 
+                    <Text variant="bodyLarge">Status</Text>
+
                     <Text variant="bodyLarge">Catagory</Text>
-                    <InputText
-                        returnKeyType="next"
-                        autoCapitalize="none"
-                        textContentType="emailAddress"
-                        keyboardType="email-address"
-                    />
+
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.buttonClear}
@@ -313,8 +254,8 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </ScrollView>
-        </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </ScrollView>
     );
 };
 
@@ -325,47 +266,9 @@ const styles = StyleSheet.create({
     containerInput: {
         marginHorizontal: 25
     },
-    autoCompleteContainer: {
-        position: 'relative',
-        flex: 1,
-        paddingTop: 50,
-        marginTop: 10
-    },
-    autoCompleteBoxCode: {
-        flex: 1,
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 3
-    },
-    autoCompleteBoxName: {
-        flex: 1,
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 2
-    },
-    autoCompleteBoxLocation: {
-        flex: 1,
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 1
-    },
     textSearchAsset: {
         fontWeight: 'bold',
         marginBottom: 15
-    },
-    itemContainer: {
-        marginVertical: 5,
-        marginLeft: 10
-    },
-    itemText: {
-        fontSize: 15,
-        margin: 2
     },
     navigationContainer: {
         backgroundColor: '#ecf0f1'
@@ -402,44 +305,41 @@ const styles = StyleSheet.create({
         color: theme.colors.white,
         fontWeight: '600'
     },
-
     dropdown: {
         height: 50,
-        borderColor: 'gray',
-        borderWidth: 0.5,
+        borderColor: theme.colors.borderAutocomplete,
+        borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 8,
         color: theme.colors.black
     },
-    item: {
+    dropdownSelect: {
+        borderColor: theme.colors.buttonConfirm
+    },
+    dropdownItem: {
         padding: 17,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-    textItem: {
+    dropdownItemText: {
         flex: 1,
         fontSize: 16,
-        color: theme.colors.black
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
     },
     icon: {
         marginRight: 5
     },
-    label: {
-        position: 'absolute',
-        backgroundColor: 'white',
-        left: 22,
-        top: 8,
-        zIndex: 999,
-        paddingHorizontal: 8,
-        fontSize: 14
-    },
     placeholderStyle: {
-        fontSize: 16
+        fontFamily: 'DMSans-Regular',
+        fontSize: 16,
+        color: theme.colors.textBody
     },
     selectedTextStyle: {
         fontSize: 16,
-        color: theme.colors.black
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
     },
     iconStyle: {
         width: 20,
@@ -448,7 +348,8 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color: theme.colors.black
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
     }
 });
 export default AssetSearch;
