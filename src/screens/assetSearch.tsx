@@ -2,13 +2,15 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import { GetAssetSearch } from '@src/services/asset';
+import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
 import { AssetData } from '@src/typings/asset';
+import { CategoryData, UseStatusData } from '@src/typings/downloadDB';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     KeyboardAvoidingView,
     Platform,
@@ -34,9 +36,16 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     const [searchName, setSearchName] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const [searchLocation, setSearchLocation] = useState<string>('');
+    const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
+    const [searchUseState, setSearchUseState] = useState<string>('');
+    const [listCategory, setListCategory] = useState<CategoryData[]>([]);
+    const [searchCategory, setSearchCategory] =
+        useState<CategoryData>(undefined);
     const [isFocusCode, setIsFocusCode] = useState<boolean>(false);
     const [isFocusName, setIsFocusName] = useState<boolean>(false);
     const [isFocusLocation, setIsFocusLocation] = useState<boolean>(false);
+    const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
+    const [isFocusCategory, setIsFocusCategory] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
 
@@ -125,6 +134,51 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         );
     };
 
+    const renderItemUseState = (item: UseStatusData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.name}
+                </Text>
+            </View>
+        );
+    };
+
+    const renderItemCategory = (item: CategoryData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.category_name}
+                </Text>
+            </View>
+        );
+    };
+
+    const handleInitDropdown = useCallback(async () => {
+        try {
+            const [responseUseStatus, responseCategory] = await Promise.all([
+                GetUseStatus({ page: 1, limit: 1000 }),
+                GetCategory({ page: 1, limit: 1000 })
+            ]);
+            setListUseState(responseUseStatus?.result?.data.data);
+            setListCategory(responseCategory?.result?.data.asset);
+        } catch (err) {
+            setVisibleDialog(true);
+        }
+    }, []);
+
+    const handleClearInput = useCallback(() => {
+        setSearchCode('');
+        setSearchName('');
+        setSearchLocation('');
+        setSearchUseState('');
+        setSearchCategory(undefined);
+    }, []);
+
+    useEffect(() => {
+        handleInitDropdown();
+    }, [handleInitDropdown]);
+
     return (
         <ScrollView style={styles.container}>
             <KeyboardAvoidingView
@@ -153,6 +207,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         Search Asset
                     </Text>
                     <Text variant="bodyLarge">Code</Text>
+
                     <Dropdown
                         style={[
                             styles.dropdown,
@@ -178,6 +233,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         renderItem={renderItemCode}
                     />
                     <Text variant="bodyLarge">Name</Text>
+
                     <Dropdown
                         style={[
                             styles.dropdown,
@@ -231,14 +287,58 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         renderItem={renderItemLocation}
                     />
 
-                    <Text variant="bodyLarge">Status</Text>
+                    <Text variant="bodyLarge">Use State</Text>
+
+                    <Dropdown
+                        style={[
+                            styles.dropdown,
+                            isFocusUseState && styles.dropdownSelect
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={listUseState}
+                        maxHeight={300}
+                        labelField="name"
+                        valueField="name"
+                        placeholder={'Select UseState'}
+                        value={searchUseState}
+                        onFocus={() => setIsFocusUseState(true)}
+                        onBlur={() => setIsFocusUseState(false)}
+                        onChange={(item) => {
+                            setSearchUseState(item?.name);
+                        }}
+                        renderItem={renderItemUseState}
+                    />
 
                     <Text variant="bodyLarge">Catagory</Text>
+
+                    <Dropdown
+                        style={[
+                            styles.dropdown,
+                            isFocusCategory && styles.dropdownSelect
+                        ]}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={listCategory}
+                        maxHeight={300}
+                        labelField="category_name"
+                        valueField="category_name"
+                        placeholder={'Select Category'}
+                        value={searchCategory}
+                        onFocus={() => setIsFocusCategory(true)}
+                        onBlur={() => setIsFocusCategory(false)}
+                        onChange={(item) => {
+                            setSearchCategory(item);
+                        }}
+                        renderItem={renderItemCategory}
+                    />
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.buttonClear}
-                            onPress={() => console.log('Button 1 Pressed')}
+                            onPress={() => handleClearInput()}
                         >
                             <Text variant="bodyLarge" style={styles.buttonText}>
                                 Clear
@@ -246,7 +346,17 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.buttonApply}
-                            onPress={() => console.log('Button 2 Pressed')}
+                            onPress={() =>
+                                navigation.navigate('Assets', {
+                                    assetSearch: {
+                                        default_code: searchCode,
+                                        name: searchName,
+                                        location: searchLocation,
+                                        use_state: searchUseState,
+                                        category_id: searchCategory?.category_id
+                                    }
+                                })
+                            }
                         >
                             <Text variant="bodyLarge" style={styles.buttonText}>
                                 Apply
@@ -309,9 +419,10 @@ const styles = StyleSheet.create({
         height: 50,
         borderColor: theme.colors.borderAutocomplete,
         borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 8,
-        color: theme.colors.black
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        color: theme.colors.black,
+        marginVertical: 8
     },
     dropdownSelect: {
         borderColor: theme.colors.buttonConfirm

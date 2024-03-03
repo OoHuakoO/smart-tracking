@@ -5,3 +5,17 @@ export const getOnlineMode = async (): Promise<boolean> => {
     const onlineValue = JSON.parse(online);
     return onlineValue;
 };
+
+export const removeKeyEmpty = (obj: object) => {
+    if (obj === undefined || null) {
+        return undefined;
+    }
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
+            delete obj[key];
+        }
+    });
+    console.log('obj', obj);
+
+    return obj;
+};

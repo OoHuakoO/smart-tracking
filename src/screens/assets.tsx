@@ -5,11 +5,11 @@ import AssetCardDetail from '@src/components/views/assetCardDetail';
 import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { GetAssets } from '@src/services/downloadDB';
+import { GetAssetSearch } from '@src/services/asset';
 import { theme } from '@src/theme';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -26,7 +26,8 @@ type AssetsScreenProps = NativeStackScreenProps<
 >;
 
 const AssetsScreen: FC<AssetsScreenProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
+
     const [countTotalAsset, setCountAsset] = useState<number>(0);
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -43,8 +44,15 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
             if (isOnline) {
-                const responseAsset = await GetAssets({ page: 1, limit: 10 });
+                const responseAsset = await GetAssetSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: {
+                        ...assetSearch
+                    }
+                });
                 const totalPagesAsset = responseAsset?.result?.data?.total;
                 setCountAsset(totalPagesAsset);
                 setListAsset(responseAsset?.result?.data?.asset);
@@ -61,17 +69,21 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch asset');
         }
-    }, []);
+    }, [route?.params?.assetSearch]);
 
     const handleOnEndReached = async () => {
         try {
             setLoading(true);
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
+                const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
                 if (isOnline) {
-                    const response = await GetAssets({
+                    const response = await GetAssetSearch({
                         page: page + 1,
-                        limit: 10
+                        limit: 10,
+                        search_term: {
+                            ...assetSearch
+                        }
                     });
 
                     setListAsset([
@@ -97,7 +109,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     useEffect(() => {
         handleFetchAsset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [route?.params?.assetSearch]);
 
     return (
         <SafeAreaView style={styles.container}>

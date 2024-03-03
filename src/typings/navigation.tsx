@@ -1,3 +1,4 @@
+import { SearchAsset } from './asset';
 import { AssetData, LocationData } from './downloadDB';
 
 export type RootStackParamsList = {
@@ -13,7 +14,9 @@ export type PublicStackParamsList = {
 export type PrivateStackParamsList = {
     Setting: undefined;
     Home: undefined;
-    Assets: undefined;
+    Assets: {
+        assetSearch: SearchAsset;
+    };
     Location: undefined;
     Document: undefined;
     Upload: undefined;
