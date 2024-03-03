@@ -68,3 +68,31 @@ export const insertCategoryData = (
         throw new Error(`Error inserting category: ${err.message}`);
     }
 };
+
+export const getCategory = async (
+    db: SQLiteDatabase,
+    page: number = 1,
+    limit: number = 10
+): Promise<CategoryData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM category`;
+
+    const queryParams = [];
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const category = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                category.push(results[0]?.rows?.item(i));
+            }
+        }
+        return category;
+    } catch (err) {
+        throw new Error(`Error retrieving category: ${err.message}`);
+    }
+};

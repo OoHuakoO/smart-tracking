@@ -58,8 +58,8 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 setListAsset(responseAsset?.result?.data?.asset);
             } else {
                 const db = await getDBConnection();
-                const countAsset = await getTotalAssets(db);
-                const listAssetDB = await getAsset(db);
+                const countAsset = await getTotalAssets(db, assetSearch);
+                const listAssetDB = await getAsset(db, assetSearch);
                 setCountAsset(countAsset);
                 setListAsset(listAssetDB);
             }
@@ -92,7 +92,11 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     ]);
                 } else {
                     const db = await getDBConnection();
-                    const listAssetDB = await getAsset(db, null, page + 1);
+                    const listAssetDB = await getAsset(
+                        db,
+                        assetSearch,
+                        page + 1
+                    );
                     setListAsset([...listAsset, ...listAssetDB]);
                 }
             }

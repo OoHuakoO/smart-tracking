@@ -104,6 +104,11 @@ export const getAsset = async (
     db: SQLiteDatabase,
     filters?: {
         location_id?: number;
+        default_code?: string;
+        name?: string;
+        category_id?: number;
+        use_state?: string;
+        location?: string;
     },
     page: number = 1,
     limit: number = 10
@@ -117,6 +122,31 @@ export const getAsset = async (
     if (filters?.location_id !== undefined) {
         whereConditions.push(`asset.location_id = ?`);
         queryParams.push(filters.location_id);
+    }
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`asset.location LIKE ?`);
+        queryParams.push(`%${filters.location}%`);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`asset.default_code LIKE ?`);
+        queryParams.push(`%${filters.default_code}%`);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`asset.name LIKE ?`);
+        queryParams.push(`%${filters.name}%`);
+    }
+
+    if (filters?.category_id !== undefined) {
+        whereConditions.push(`asset.category_id = ?`);
+        queryParams.push(filters.category_id);
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`asset.use_state = ?`);
+        queryParams.push(filters.use_state);
     }
 
     if (whereConditions.length > 0) {
@@ -146,6 +176,11 @@ export const getTotalAssets = async (
     db: SQLiteDatabase,
     filters?: {
         location_id?: number;
+        default_code?: string;
+        name?: string;
+        category_id?: number;
+        use_state?: string;
+        location?: string;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM asset`;
@@ -155,6 +190,31 @@ export const getTotalAssets = async (
     if (filters?.location_id !== undefined) {
         whereConditions.push(`location_id = ?`);
         queryParams.push(filters.location_id);
+    }
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`asset.location LIKE ?`);
+        queryParams.push(`%${filters.location}%`);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`asset.default_code LIKE ?`);
+        queryParams.push(`%${filters.default_code}%`);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`asset.name LIKE ?`);
+        queryParams.push(`%${filters.name}%`);
+    }
+
+    if (filters?.category_id !== undefined) {
+        whereConditions.push(`asset.category_id = ?`);
+        queryParams.push(filters.category_id);
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`asset.use_state = ?`);
+        queryParams.push(filters.use_state);
     }
 
     if (whereConditions.length > 0) {

@@ -1,6 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import { getAsset } from '@src/db/asset';
+import { getCategory } from '@src/db/category';
+import { getDBConnection } from '@src/db/config';
+import { getLocations } from '@src/db/location';
+import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetSearch } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
@@ -63,6 +68,13 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     search_term: { default_code: text }
                 });
                 setListCode(response?.result?.data?.asset);
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    default_code: text
+                };
+                const listAssetDB = await getAsset(db, filter);
+                setListCode(listAssetDB);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -80,6 +92,13 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     search_term: { name: text }
                 });
                 setListName(response?.result?.data?.asset);
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    name: text
+                };
+                const listAssetDB = await getAsset(db, filter);
+                setListName(listAssetDB);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -97,6 +116,19 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     search_term: text
                 });
                 setListLocation(response?.result?.data?.locations);
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    name: text
+                };
+                const listLocationDB = await getLocations(db, filter);
+                const listLocationSearch = listLocationDB.map((item) => {
+                    return {
+                        location_id: item?.asset_location_id,
+                        location_name: item?.name
+                    };
+                });
+                setListLocation(listLocationSearch);
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -156,12 +188,23 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleInitDropdown = useCallback(async () => {
         try {
-            const [responseUseStatus, responseCategory] = await Promise.all([
-                GetUseStatus({ page: 1, limit: 1000 }),
-                GetCategory({ page: 1, limit: 1000 })
-            ]);
-            setListUseState(responseUseStatus?.result?.data.data);
-            setListCategory(responseCategory?.result?.data.asset);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const [responseUseStatus, responseCategory] = await Promise.all(
+                    [
+                        GetUseStatus({ page: 1, limit: 1000 }),
+                        GetCategory({ page: 1, limit: 1000 })
+                    ]
+                );
+                setListUseState(responseUseStatus?.result?.data.data);
+                setListCategory(responseCategory?.result?.data.asset);
+            } else {
+                const db = await getDBConnection();
+                const listUseStatusDB = await getUseStatus(db, 1, 1000);
+                const listCategoryDB = await getCategory(db, 1, 1000);
+                setListUseState(listUseStatusDB);
+                setListCategory(listCategoryDB);
+            }
         } catch (err) {
             setVisibleDialog(true);
         }
@@ -439,9 +482,6 @@ const styles = StyleSheet.create({
         color: theme.colors.black,
         fontFamily: 'DMSans-Regular'
     },
-    icon: {
-        marginRight: 5
-    },
     placeholderStyle: {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
@@ -451,10 +491,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: theme.colors.black,
         fontFamily: 'DMSans-Regular'
-    },
-    iconStyle: {
-        width: 20,
-        height: 20
     },
     inputSearchStyle: {
         height: 40,

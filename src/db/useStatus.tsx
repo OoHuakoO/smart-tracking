@@ -65,3 +65,31 @@ export const insertUseStatusData = (
         throw new Error(`Error inserting useStatus: ${err.message}`);
     }
 };
+
+export const getUseStatus = async (
+    db: SQLiteDatabase,
+    page: number = 1,
+    limit: number = 10
+): Promise<UseStatusData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM useStatus`;
+
+    const queryParams = [];
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const useStatus = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                useStatus.push(results[0]?.rows?.item(i));
+            }
+        }
+        return useStatus;
+    } catch (err) {
+        throw new Error(`Error retrieving useStatus: ${err.message}`);
+    }
+};

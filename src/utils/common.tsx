@@ -15,7 +15,6 @@ export const removeKeyEmpty = (obj: object) => {
             delete obj[key];
         }
     });
-    console.log('obj', obj);
 
     return obj;
 };
