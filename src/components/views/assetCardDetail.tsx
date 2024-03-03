@@ -5,7 +5,6 @@ import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-
 interface AssetCardDetailProps {
     assetCode: string;
     assetName: string;
@@ -18,13 +17,21 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={{
-                        uri: `data:image/png;base64,${imageSource}`
-                    }}
-                    resizeMode="cover"
-                />
+                {imageSource ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
@@ -60,7 +67,10 @@ const styles = StyleSheet.create({
         width: 80,
         height: 100,
         backgroundColor: theme.colors.emptyPicture,
-        borderRadius: 10
+        borderRadius: 10,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     image: {
         width: '100%',

@@ -37,13 +37,21 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                 </View>
                 <View style={styles.imagesContainer}>
-                    <Image
-                        style={styles.image}
-                        source={{
-                            uri: `data:image/png;base64,${route?.params?.assetData?.image}`
-                        }}
-                        resizeMode="cover"
-                    />
+                    {route?.params?.assetData?.image ? (
+                        <Image
+                            style={styles.image}
+                            source={{
+                                uri: `data:image/png;base64,${route?.params?.assetData?.image}`
+                            }}
+                            resizeMode="cover"
+                        />
+                    ) : (
+                        <Image
+                            style={styles.image}
+                            source={require('../../assets/images/default_image.jpg')}
+                            resizeMode="cover"
+                        />
+                    )}
                 </View>
             </View>
             <View style={styles.assetDetailSection}>
@@ -137,7 +145,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         marginLeft: 20,
         marginTop: 15,
-        zIndex: 1
+        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center'
     },
     image: {
         width: '100%',
@@ -147,7 +157,7 @@ const styles = StyleSheet.create({
     assetDetailSection: {
         height: hp('70%'),
         width: wp('100%'),
-        marginTop: '70%',
+        marginTop: '75%',
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,

@@ -17,13 +17,21 @@ const LocationListAssetCard: FC<LocationListAssetProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={{
-                        uri: `data:image/png;base64,${imageSource}`
-                    }}
-                    resizeMode="cover"
-                />
+                {imageSource ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
