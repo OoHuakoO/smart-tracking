@@ -11,14 +11,20 @@ import {
 interface InputTextProps extends TextInputProps {
     errorText?: string;
     placeholder?: string;
+    width?: number;
+    borderColor?: string;
 }
 
 const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
-    const { placeholder, errorText } = props;
+    const { placeholder, errorText, width, borderColor } = props;
     return (
         <View style={styles.container}>
             <TextInput
-                style={styles.input}
+                style={[
+                    styles.input,
+                    { width: width || '100%' },
+                    { borderColor: borderColor || 'gray' }
+                ]}
                 placeholder={placeholder}
                 placeholderTextColor={theme.colors.textBody}
                 {...props}
@@ -36,13 +42,14 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     input: {
-        height: 70,
-        borderColor: 'gray',
+        height: 48,
+        // borderColor: 'gray',
         borderWidth: 1,
-        marginVertical: 5,
+        marginTop: 5,
+        marginBottom: 10,
         paddingHorizontal: 10,
-        width: '100%',
-        borderRadius: 20,
+        // width: '100%',
+        borderRadius: 10,
         fontFamily: 'DMSans-Bold',
         color: theme.colors.textBody
     },

@@ -134,13 +134,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 </ScrollView>
             </View>
             {documentStatus === 'draft' && (
-                <TouchableOpacity activeOpacity={0.5} style={styles.button}>
-                    <ActionButton icon="plus" color={theme.colors.white} />
-                </TouchableOpacity>
-            )}
-
-            {documentStatus === 'draft' && (
-                <TouchableOpacity activeOpacity={0.5} style={styles.button}>
+                <TouchableOpacity
+                    activeOpacity={0.5}
+                    style={styles.button}
+                    onPress={() => navigation.navigate('DocumentCreateAsset')}
+                >
                     <ActionButton icon="plus" color={theme.colors.white} />
                 </TouchableOpacity>
             )}

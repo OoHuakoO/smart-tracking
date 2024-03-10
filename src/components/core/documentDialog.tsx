@@ -6,7 +6,7 @@ import { Modal, Searchbar, Text } from 'react-native-paper';
 interface DocumentDialogProp {
     visible: boolean;
     onClose: () => void;
-    pageNavigate: () => void;
+    pageNavigate?: () => void;
 }
 
 const DocumentDialog: FC<DocumentDialogProp> = (props) => {

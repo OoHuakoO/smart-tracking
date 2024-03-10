@@ -39,4 +39,5 @@ export type PrivateStackParamsList = {
     };
     DocumentCreate: undefined;
     DocumentCreateSearch: undefined;
+    DocumentCreateAsset: undefined;
 };
