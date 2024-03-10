@@ -5,6 +5,7 @@ import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
 import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import DocumentCreate from '@src/screens/documentCreate';
+import DocumentCreateAsset from '@src/screens/documentCreateAsset';
 import DocumentCreateSearch from '@src/screens/documentCreateSearch';
 import HomeScreen from '@src/screens/home';
 import Location from '@src/screens/location';
@@ -115,7 +116,13 @@ const PrivateStack = () => {
                 component={DocumentCreateSearch}
             />
 
-
+            <Stack.Screen
+                name="DocumentCreateAsset"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentCreateAsset}
+            />
         </Stack.Navigator>
     );
 };

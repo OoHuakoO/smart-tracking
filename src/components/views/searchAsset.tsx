@@ -25,7 +25,7 @@ const SearchAsset: FC<DrawerAssetProps> = (props) => {
                         backgroundColor={theme.colors.white}
                     />
                 </TouchableOpacity>
-                <View style={{ marginHorizontal: 25 }}>
+                <View style={{ paddingHorizontal: 25 }}>
                     <Text
                         variant="displaySmall"
                         style={{ fontWeight: 'bold', marginBottom: 15 }}
