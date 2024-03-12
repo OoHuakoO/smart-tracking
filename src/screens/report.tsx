@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetStatusButton from '@src/components/views/reportAssetStatusButton';
+import { REPORT_TYPE } from '@src/constant';
 
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -46,34 +47,34 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                 <ScrollView>
                     <View style={styles.wrapDetailList}>
                         <ReportAssetStatusButton
-                            buttonText="Asset New"
+                            buttonText={REPORT_TYPE.New}
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    title: 'Asset New'
+                                    title: `${REPORT_TYPE.New}`
                                 })
                             }
                         />
                         <ReportAssetStatusButton
-                            buttonText="Asset Found"
+                            buttonText={REPORT_TYPE.Found}
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    title: 'Asset Found'
+                                    title: `${REPORT_TYPE.Found}`
                                 })
                             }
                         />
-                        {/* <ReportAssetStatusButton
-                            buttonText="Asset Not Found"
+                        <ReportAssetStatusButton
+                            buttonText={REPORT_TYPE.NotFound}
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    title: 'Asset Not Found'
+                                    title: `${REPORT_TYPE.NotFound}`
                                 })
                             }
-                        /> */}
+                        />
                         <ReportAssetStatusButton
-                            buttonText="Asset Transfer"
+                            buttonText={REPORT_TYPE.Transfer}
                             handlePress={() =>
                                 navigation.navigate('ReportAssetData', {
-                                    title: 'Asset Transfer'
+                                    title: `${REPORT_TYPE.Transfer}`
                                 })
                             }
                         />

@@ -9,7 +9,7 @@ interface ReportAssetCardProps {
     assetName: string;
     assetStatus: string;
     assetLocation: string;
-    assetOldLocation: string;
+    assetOldLocation?: string;
     title: string;
 }
 

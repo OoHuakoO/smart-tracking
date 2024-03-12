@@ -92,11 +92,27 @@ export const insertReportData = (
 };
 
 export const getReport = async (
-    db: SQLiteDatabase
+    db: SQLiteDatabase,
+    filters?: {
+        location?: string;
+    }
 ): Promise<ReportAssetData[]> => {
-    const query = `SELECT * FROM report`;
+    let query = `SELECT * FROM report`;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`report.location LIKE ?`);
+        queryParams.push(`%${filters.location}%`);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
     try {
-        const results = await db.executeSql(query);
+        const results = await db.executeSql(query, queryParams);
         const report = [];
         if (results.length > 0) {
             for (let i = 0; i < results[0].rows.length; i++) {
