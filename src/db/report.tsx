@@ -82,9 +82,19 @@ export const insertReportData = (
             .join(',');
 
     try {
-        db.transaction((tx) => {
-            tx.executeSql(queryInsert);
-        });
+        db.transaction(
+            (tx) => {
+                tx.executeSql(queryInsert);
+            },
+            (error) => {
+                console.log('Transaction insertReportData error:', error);
+            },
+            () => {
+                console.log(
+                    'Transaction insertReportData completed successfully'
+                );
+            }
+        );
         console.log('All report inserted successfully');
     } catch (err) {
         throw new Error(`Error inserting report: ${err.message}`);

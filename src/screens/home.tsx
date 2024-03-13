@@ -40,7 +40,6 @@ import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { Toast } from '@src/typings/common';
 import {
-    AssetData,
     CategoryData,
     LocationData,
     ReportAssetData,
@@ -168,28 +167,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
-    const handleLoadAsset = useCallback(
-        async (totalPages: number): Promise<AssetData[]> => {
-            try {
-                const promises = Array.from({ length: totalPages }, (_, i) =>
-                    GetAssets({ page: i + 1, limit: 1000 })
-                );
-                const results = await Promise.all(promises);
-                const assets = results.flatMap(
-                    (result) => result?.result?.data?.asset ?? []
-                );
-                return assets;
-            } catch (err) {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load asset');
-                return [];
-            }
-        },
-        [clearStateDialog]
-    );
-
     const handleLoadLocation = useCallback(
         async (totalPages: number): Promise<LocationData[]> => {
             try {
@@ -292,7 +269,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseCategory,
                 initialResponseReport
             ] = await Promise.all([
-                GetAssets({ page: 1, limit: 1000 }),
+                GetAssets({ page: 1, limit: 200 }),
                 GetLocation({ page: 1, limit: 1000 }),
                 GetUseStatus({ page: 1, limit: 1000 }),
                 GetCategory({ page: 1, limit: 1000 }),
@@ -336,38 +313,40 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const totalPagesReport =
                 initialResponseReport?.result?.data?.total_page;
 
-            const [
-                listAssets,
-                listLocation,
-                listUseStatus,
-                listCategory,
-                listReport
-            ] = await Promise.all([
-                handleLoadAsset(totalPagesAssets),
-                handleLoadLocation(totalPagesLocation),
-                handleLoadUseStatus(totalPagesUseStatus),
-                handleLoadCategory(totalPagesCategory),
-                handleLoadReport(totalPagesReport)
-            ]);
+            const [listLocation, listUseStatus, listCategory, listReport] =
+                await Promise.all([
+                    handleLoadLocation(totalPagesLocation),
+                    handleLoadUseStatus(totalPagesUseStatus),
+                    handleLoadCategory(totalPagesCategory),
+                    handleLoadReport(totalPagesReport)
+                ]);
+
+            const db = await getDBConnection();
+            await dropAllMasterTable(db);
+            await createTableAsset(db);
+
+            for (let index = 0; index < totalPagesAssets; index++) {
+                const result = await GetAssets({
+                    page: index + 1,
+                    limit: 200
+                });
+                await insertAssetData(db, result?.result?.data?.asset);
+            }
 
             if (
-                listAssets?.length > 0 &&
                 listLocation?.length > 0 &&
                 listUseStatus?.length > 0 &&
-                listCategory?.length > 0 &&
-                listReport?.length > 0
+                listCategory?.length > 0
             ) {
-                const db = await getDBConnection();
-                await dropAllMasterTable(db);
-                await createTableAsset(db);
                 await createTableLocation(db);
                 await createTableUseStatus(db);
                 await createTableCategory(db);
-                await createTableReport(db);
-                await insertAssetData(db, listAssets);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
                 await insertCategoryData(db, listCategory);
+            }
+            if (listReport?.length > 0) {
+                await createTableReport(db);
                 await insertReportData(db, listReport);
             }
             setTimeout(() => {
@@ -375,6 +354,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }, 0);
             clearStateDialog();
         } catch (err) {
+            console.log(err);
             clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog(WARNING);
@@ -383,7 +363,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [
         clearStateDialog,
-        handleLoadAsset,
         handleLoadCategory,
         handleLoadLocation,
         handleLoadReport,

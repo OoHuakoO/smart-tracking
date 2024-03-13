@@ -91,9 +91,19 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
             .join(',');
 
     try {
-        db.transaction((tx) => {
-            tx.executeSql(queryInsert);
-        });
+        db.transaction(
+            (tx) => {
+                tx.executeSql(queryInsert);
+            },
+            (error) => {
+                console.log('Transaction insertAssetData error:', error);
+            },
+            () => {
+                console.log(
+                    'Transaction insertAssetData completed successfully'
+                );
+            }
+        );
         console.log('All assets inserted successfully');
     } catch (err) {
         throw new Error(`Error inserting assets: ${err.message}`);
