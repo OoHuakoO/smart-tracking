@@ -26,13 +26,21 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={{
-                        uri: `data:image/png;base64,${imageSource}`
-                    }}
-                    resizeMode="cover"
-                />
+                {imageSource ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
@@ -40,7 +48,9 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     State: {}
                     <Text style={styles.additionalText}>
-                        {assetStatus === 'Normal' ? 'ปกติ' : assetStatus}
+                        {assetStatus === 'Normal' || !assetStatus
+                            ? 'ปกติ'
+                            : assetStatus}
                     </Text>
                 </Text>
                 {title === 'Asset Transfer' && (

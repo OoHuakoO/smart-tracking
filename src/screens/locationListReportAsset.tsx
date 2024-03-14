@@ -110,7 +110,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     (listAssetItem) => listAssetItem.code === asset.default_code
                 )
         );
-        console.log('filterAsset', filterAsset);
+
         return filterAsset;
     };
 
@@ -177,40 +177,27 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             const locationName = route?.params?.LocationData?.name;
             let listAsset = [];
 
-            if (route?.params?.title !== REPORT_TYPE.NotFound) {
-                if (isOnline) {
-                    const documentSearchResponse = await fetchDocumentSearch(
-                        locationName
-                    );
+            if (isOnline) {
+                const documentSearchResponse = await fetchDocumentSearch(
+                    locationName
+                );
+                if (route?.params?.title !== REPORT_TYPE.NotFound) {
                     listAsset = createAssetList(
                         documentSearchResponse?.result?.data?.documents,
                         [],
                         route?.params?.title,
                         isOnline
                     );
-                } else {
-                    const listReportDB = await fetchReportAssetFromDB(
-                        locationName
-                    );
-                    listAsset = createAssetList(
-                        [],
-                        listReportDB,
-                        route?.params?.title,
-                        isOnline
-                    );
                 }
-            }
-            if (route?.params?.title === REPORT_TYPE.NotFound) {
-                if (isOnline) {
+                if (route?.params?.title === REPORT_TYPE.NotFound) {
                     let pageCount = 1;
-                    let endLoop = false;
+                    let isCountListAssetMoreThanSix = false;
                     if (route?.params?.LocationData?.total_asset > 0) {
-                        while (!endLoop) {
-                            const [documentSearchResponse, assetResponse] =
-                                await Promise.all([
-                                    fetchDocumentSearch(locationName),
-                                    fetchAssetsFromAPI(locationName, pageCount)
-                                ]);
+                        while (!isCountListAssetMoreThanSix) {
+                            const assetResponse = await fetchAssetsFromAPI(
+                                locationName,
+                                pageCount
+                            );
 
                             const listLoadDocument = await handleLoadDocument(
                                 documentSearchResponse?.result?.data?.total_page
@@ -232,24 +219,37 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                                 listAssetReport
                             );
 
-                            if (filteredAssets.length <= 6) {
+                            if (listAsset.length <= 6) {
                                 pageCount++;
                                 listAsset = [
                                     ...listAsset,
-                                    convertToReportAssetData(filteredAssets)
+                                    ...convertToReportAssetData(filteredAssets)
                                 ];
                             }
-                            if (filteredAssets.length > 6) {
+                            if (listAsset.length > 6) {
                                 listAsset = [
                                     ...listAsset,
-                                    convertToReportAssetData(filteredAssets)
+                                    ...convertToReportAssetData(filteredAssets)
                                 ];
-                                endLoop = true;
+                                isCountListAssetMoreThanSix = true;
                                 setPage(pageCount);
                             }
                         }
                     }
-                } else {
+                }
+            } else {
+                if (route?.params?.title !== REPORT_TYPE.NotFound) {
+                    const listReportDB = await fetchReportAssetFromDB(
+                        locationName
+                    );
+                    listAsset = createAssetList(
+                        [],
+                        listReportDB,
+                        route?.params?.title,
+                        isOnline
+                    );
+                }
+                if (route?.params?.title === REPORT_TYPE.NotFound) {
                     const [listReportDB, listAssetDB] = await Promise.all([
                         fetchReportAssetFromDB(locationName),
                         fetchAssetsFromDB(locationName)
@@ -272,7 +272,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     listAsset = convertToReportAssetData(filteredAssets);
                 }
             }
-            console.log(page);
+
             setListReportAsset(listAsset);
             setLoading(false);
         } catch (err) {
@@ -284,7 +284,6 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     }, [
         createAssetList,
         handleLoadDocument,
-        page,
         route?.params?.LocationData?.name,
         route?.params?.LocationData?.total_asset,
         route?.params?.title
