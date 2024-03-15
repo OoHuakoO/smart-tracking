@@ -1,6 +1,10 @@
+import { LoginState } from '@src/typings/common';
 import { atom, RecoilState } from 'recoil';
 
-export const authState: RecoilState<string> = atom({
+export const loginState: RecoilState<LoginState> = atom({
     key: 'Token',
-    default: ''
+    default: {
+        session_id: '',
+        uid: ''
+    }
 });

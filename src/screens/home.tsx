@@ -35,10 +35,10 @@ import {
     GetReport,
     GetUseStatus
 } from '@src/services/downloadDB';
-import { authState, useSetRecoilState } from '@src/store';
+import { loginState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
-import { Toast } from '@src/typings/common';
+import { LoginState, Toast } from '@src/typings/common';
 import {
     CategoryData,
     LocationData,
@@ -59,7 +59,7 @@ type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
     const form = useForm<SettingParams>({});
-    const setToken = useSetRecoilState<string>(authState);
+    const setLogin = useSetRecoilState<LoginState>(loginState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -104,8 +104,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleLogout = useCallback(async () => {
         try {
-            setToken('');
-            await AsyncStorage.setItem('Token', '');
+            setLogin({ session_id: '', uid: '' });
+            await AsyncStorage.setItem('Login', '');
             await AsyncStorage.setItem('Online', JSON.stringify(true));
             const db = await getDBConnection();
             await dropAllMasterTable(db);
@@ -113,10 +113,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 setToast({ open: true, text: 'Logout Successfully' });
             }, 0);
         } catch (err) {
+            console.log(err);
             clearStateDialog();
             setVisibleDialog(true);
         }
-    }, [clearStateDialog, setToast, setToken]);
+    }, [clearStateDialog, setLogin, setToast]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);

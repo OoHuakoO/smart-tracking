@@ -10,10 +10,10 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
 import { Login } from '@src/services/login';
-import { authState, useSetRecoilState } from '@src/store';
+import { loginState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
-import { Toast } from '@src/typings/common';
+import { LoginState, Toast } from '@src/typings/common';
 import { LoginParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
@@ -24,7 +24,7 @@ type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
     const { navigation } = props;
-    const setToken = useSetRecoilState<string>(authState);
+    const setLogin = useSetRecoilState<LoginState>(loginState);
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -46,20 +46,22 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     setContentDialog('Email Or Password Incorrect');
                     return;
                 }
-                setToken(response?.result?.session_id || '');
-                await AsyncStorage.setItem(
-                    'Token',
-                    response?.result?.session_id || ''
-                );
+                const loginObj = {
+                    session_id: response?.result?.session_id,
+                    uid: response?.result?.uid
+                };
+                setLogin(loginObj);
+                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);
             } catch (err) {
+                console.log(err);
                 setVisibleDialog(true);
                 setContentDialog(`Something went wrong login`);
             }
         },
-        [setToast, setToken]
+        [setLogin, setToast]
     );
 
     const handleCloseDialog = () => {

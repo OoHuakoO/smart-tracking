@@ -8,3 +8,8 @@ export interface Toast {
     open: boolean;
     text: string;
 }
+
+export interface LoginState {
+    session_id: string;
+    uid: string;
+}
