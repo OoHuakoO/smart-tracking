@@ -26,7 +26,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                {imageSource ? (
+                {imageSource?.toString() !== 'false' ? (
                     <Image
                         style={styles.image}
                         source={{

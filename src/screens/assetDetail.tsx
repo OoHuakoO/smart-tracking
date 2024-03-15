@@ -37,7 +37,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                 </View>
                 <View style={styles.imagesContainer}>
-                    {route?.params?.assetData?.image ? (
+                    {route?.params?.assetData?.image?.toString() !== 'false' ? (
                         <Image
                             style={styles.image}
                             source={{

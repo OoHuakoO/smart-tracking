@@ -155,7 +155,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                 );
             } else {
                 const db = await getDBConnection();
-                const listReportDB = await getReport(db);
+                const listReportDB = await getReport(db, null, false);
                 const listLocations = await getLocations(db, null, 1, 1000);
                 listLocations?.unshift({
                     asset_location_id: 0,

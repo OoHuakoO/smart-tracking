@@ -105,7 +105,11 @@ export const getReport = async (
     db: SQLiteDatabase,
     filters?: {
         location?: string;
-    }
+        state?: string;
+    },
+    isPagination: boolean = true,
+    page: number = 1,
+    limit: number = 10
 ): Promise<ReportAssetData[]> => {
     let query = `SELECT * FROM report`;
 
@@ -117,8 +121,19 @@ export const getReport = async (
         queryParams.push(`%${filters.location}%`);
     }
 
+    if (filters?.state !== undefined) {
+        whereConditions.push(`report.state LIKE ?`);
+        queryParams.push(`%${filters.state}%`);
+    }
+
     if (whereConditions.length > 0) {
         query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    if (isPagination) {
+        const offset = (page - 1) * limit;
+        query += ` LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
     }
 
     try {
