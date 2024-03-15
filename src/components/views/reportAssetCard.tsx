@@ -2,7 +2,7 @@ import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface ReportAssetCardProps {
     imageSource?: any;
@@ -44,8 +44,14 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text variant="bodyLarge">{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text variant="bodyLarge" style={styles.assetName}>
+                        {assetName}
+                    </Text>
+                </View>
                 <Text variant="bodyMedium">
                     State: {}
                     <Text style={styles.additionalText}>
@@ -76,8 +82,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: widthPercentageToDP('90%'),
-        height: 130,
+        width: wp('90%'),
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -103,13 +108,18 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#404040'
+        color: '#404040',
+        width: 0,
+        flexGrow: 1,
+        flex: 1
     },
+    assetName: { width: 0, flexGrow: 1, flex: 1 },
     additionalText: {
         fontSize: 14,
         color: '#777'
@@ -118,6 +128,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         top: 15
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 
