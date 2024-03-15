@@ -3,6 +3,7 @@ import BackButton from '@src/components/core/backButton';
 import InputText from '@src/components/core/inputText';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -75,7 +76,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img1.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />
@@ -84,7 +85,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img2.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />
@@ -93,7 +94,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img3.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />

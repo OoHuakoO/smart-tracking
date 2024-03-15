@@ -1,3 +1,4 @@
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -48,8 +49,10 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     State: {}
                     <Text style={styles.additionalText}>
-                        {assetStatus === 'Normal' || !assetStatus
-                            ? 'ปกติ'
+                        {assetStatus === 'Normal' ||
+                        !assetStatus ||
+                        assetStatus === 'false'
+                            ? MOVEMENT_ASSET_NORMAL_TH
                             : assetStatus}
                     </Text>
                 </Text>

@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import LinearGradient from 'react-native-linear-gradient';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import {
@@ -100,7 +101,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             imageSource={require('../../assets/images/img1.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                             documentStatus="draft"
@@ -110,7 +111,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             imageSource={require('../../assets/images/img2.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                             documentStatus="draft"
@@ -120,7 +121,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             imageSource={require('../../assets/images/img3.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                             documentStatus="draft"

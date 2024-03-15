@@ -411,7 +411,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                             locationName,
                             title,
                             true,
-                            1
+                            page + 1
                         );
 
                         listAsset = createReportAssetList(

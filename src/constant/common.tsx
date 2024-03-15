@@ -17,6 +17,8 @@ export const WARNING = 'Warning';
 
 export const ALL_LOCATION = 'All Location';
 
+export const MOVEMENT_ASSET_NORMAL_TH = 'ปกติ';
+
 export const MOVEMENT_ASSET = {
     Normal: '0',
     New: '1',

@@ -1,3 +1,4 @@
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -28,7 +29,8 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <Text variant="titleMedium" style={styles.statusText}>
-                สถานะ : {status === 'Normal' ? 'ปกติ' : status}
+                สถานะ :{' '}
+                {status === 'Normal' ? MOVEMENT_ASSET_NORMAL_TH : status}
             </Text>
         </View>
     );
