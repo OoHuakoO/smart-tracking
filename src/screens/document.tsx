@@ -1,15 +1,23 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
+import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import DocumentDialog from '@src/components/core/documentDialog';
 import DocumentCard from '@src/components/views/documentCard';
 import SearchButton from '@src/components/views/searchButton';
+import { STATE_DOCUMENT_NAME, STATE_DOCUMENT_VALUE } from '@src/constant';
+import { GetDocumentSearch } from '@src/services/document';
+import { loginState } from '@src/store';
 import { theme } from '@src/theme';
+import { LoginState } from '@src/typings/common';
+import { DocumentData } from '@src/typings/document';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC, useState } from 'react';
+import { getOnlineMode } from '@src/utils/common';
+import { parseDateString } from '@src/utils/time-manager';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    FlatList,
     SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View
@@ -20,6 +28,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useRecoilValue } from 'recoil';
 
 type DocumentScreenProp = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -29,12 +38,114 @@ type DocumentScreenProp = NativeStackScreenProps<
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation } = props;
     const [dialogVisible, setDialogVisible] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [countTotalDocument, setCountDocument] = useState<number>(0);
+    const [listDocument, setListDocument] = useState<DocumentData[]>([]);
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+    const loginValue = useRecoilValue<LoginState>(loginState);
+    const [page, setPage] = useState<number>(1);
+    const [online, setLogin] = useState<boolean>(false);
+
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
     };
 
+    const handleMapStateValue = useCallback((state: string): string => {
+        switch (state) {
+            case STATE_DOCUMENT_VALUE.Draft:
+                return STATE_DOCUMENT_NAME.Draft;
+            case STATE_DOCUMENT_VALUE.Check:
+                return STATE_DOCUMENT_NAME.Check;
+            case STATE_DOCUMENT_VALUE.Done:
+                return STATE_DOCUMENT_NAME.Done;
+            case STATE_DOCUMENT_VALUE.Cancel:
+                return STATE_DOCUMENT_NAME.Cancel;
+            default:
+                return STATE_DOCUMENT_NAME.Draft;
+        }
+    }, []);
+
+    const handleFetchDocument = useCallback(async () => {
+        try {
+            setLoading(true);
+            const isOnline = await getOnlineMode();
+            setLogin(isOnline);
+
+            if (isOnline) {
+                const response = await GetDocumentSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: {
+                        owner_id: loginValue?.uid
+                    }
+                });
+                response?.result?.data?.documents?.map((item) => {
+                    item.state = handleMapStateValue(item?.state);
+                    item.date_order = parseDateString(item?.date_order);
+                });
+                const totalPagesDocument = response?.result?.data?.total;
+                setCountDocument(totalPagesDocument);
+                setListDocument(response?.result?.data?.documents);
+            }
+            setLoading(false);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch document');
+        }
+    }, [handleMapStateValue, loginValue?.uid]);
+
+    const handleOnEndReached = async () => {
+        try {
+            setLoading(true);
+            if (!stopFetchMore) {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetDocumentSearch({
+                        page: page + 1,
+                        limit: 10,
+                        search_term: {
+                            owner_id: loginValue?.uid
+                        }
+                    });
+                    response?.result?.data?.documents?.map((item) => {
+                        item.state = handleMapStateValue(item?.state);
+                        item.date_order = parseDateString(item?.date_order);
+                    });
+                    setListDocument([
+                        ...listDocument,
+                        ...response?.result?.data?.documents
+                    ]);
+                }
+            }
+            setPage(page + 1);
+            setLoading(false);
+        } catch (err) {
+            setStopFetchMore(true);
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch more asset');
+        }
+    };
+
+    useEffect(() => {
+        handleFetchDocument();
+    }, [handleFetchDocument]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -62,44 +173,38 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         handlePress={() => navigation.navigate('Home')}
                     />
                 </View>
-                <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                        Total Document : 3
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
-                            onPress={() =>
-                                navigation.navigate('DocumentAssetStatus')
-                            }
-                        >
-                            <DocumentCard
-                                documentTitle={'Document Draft'}
-                                locationInfo={'H0-10th'}
-                                dateInfo={'01/01/2567'}
-                                documentStatus={'draft'}
-                            />
-                        </TouchableOpacity>
-                        <DocumentCard
-                            documentTitle={'Document 001'}
-                            locationInfo={'H0-11th'}
-                            dateInfo={'01/01/2567'}
-                            documentStatus={'inprogress'}
-                        />
-                        <DocumentCard
-                            documentTitle={'Document 002'}
-                            locationInfo={'H0-12th'}
-                            dateInfo={'01/01/2567'}
-                            documentStatus={'done'}
-                        />
-                        <DocumentCard
-                            documentTitle={'Document 004'}
-                            locationInfo={'H0-12th'}
-                            dateInfo={'01/01/2567'}
-                            documentStatus={'canceled'}
-                        />
-                    </View>
-                </ScrollView>
+                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                    Total Document : {countTotalDocument}
+                </Text>
+                <FlatList
+                    data={listDocument}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('DocumentAssetStatus', {
+                                        documentAssetList: item?.assets
+                                    })
+                                }
+                            >
+                                <DocumentCard
+                                    online={online}
+                                    documentTitle={`Document ${item?.id}`}
+                                    locationInfo={item?.location}
+                                    dateInfo={item?.date_order}
+                                    documentStatus={item?.state}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.id}
+                    onRefresh={() => console.log('refreshing')}
+                    refreshing={loading}
+                    onEndReached={handleOnEndReached}
+                    onEndReachedThreshold={0.5}
+                    onScrollBeginDrag={() => setStopFetchMore(false)}
+                />
             </View>
             <DocumentDialog
                 visible={dialogVisible}
@@ -175,7 +280,8 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     },
     drawer: {
         width: '80%' // Adjust the width as needed

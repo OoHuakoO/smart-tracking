@@ -1,8 +1,15 @@
-export const STATUS_DOCUMENT = {
+export const STATE_DOCUMENT_VALUE = {
+    Draft: 'draft',
+    Check: 'open',
+    Done: 'done',
+    Cancel: 'cancel'
+};
+
+export const STATE_DOCUMENT_NAME = {
     Draft: 'Draft',
-    Inprogress: 'Inprogress',
+    Check: 'Check',
     Done: 'Done',
-    Cancel: 'Cancel'
+    Cancel: 'Cancelled'
 };
 
 export const STATUS_ASSET = {
