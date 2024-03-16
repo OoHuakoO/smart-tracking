@@ -184,7 +184,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                 activeOpacity={0.9}
                                 onPress={() =>
                                     navigation.navigate('DocumentAssetStatus', {
-                                        documentAssetList: item?.assets
+                                        id: item?.id,
+                                        state: item?.state,
+                                        location: item?.location
                                     })
                                 }
                             >
@@ -198,7 +200,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.id.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                     onEndReached={handleOnEndReached}

@@ -12,11 +12,13 @@ export const STATE_DOCUMENT_NAME = {
     Cancel: 'Cancelled'
 };
 
-export const STATUS_ASSET = {
-    New: 'New',
+export const USE_STATE_ASSET = {
+    Normal: 'ปกติ',
     Damaged: 'ชำรุด',
     Repair: 'รอส่งซ่อม'
 };
+
+export const USE_STATE_ASSET_NORMAL_EN = 'Normal';
 
 export const SOMETHING_WENT_WRONG = 'Something went wrong! Try Again';
 
@@ -30,6 +32,12 @@ export const MOVEMENT_ASSET = {
     Normal: '0',
     New: '1',
     Transfer: '2'
+};
+
+export const MOVEMENT_ASSET_EN = {
+    Normal: 'Normal',
+    New: 'New',
+    Transfer: 'Transfer'
 };
 
 export const REPORT_TYPE = {

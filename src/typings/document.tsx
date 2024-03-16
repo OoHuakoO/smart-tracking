@@ -1,4 +1,5 @@
 export interface DocumentAssetData {
+    asset_id: number;
     code: string;
     name: string;
     category: number;
@@ -10,10 +11,11 @@ export interface DocumentAssetData {
     use_state: string;
     new_img: boolean;
     image: string;
+    date_check: string;
 }
 
 export interface DocumentData {
-    id: string;
+    id: number;
     location_id: number;
     location: string;
     state: string;
@@ -35,4 +37,15 @@ export interface GetDocumentSearchResponse {
     success: boolean;
     message: string;
     data: GetDocumentSearchData;
+}
+
+export interface GetDocumentByIdData {
+    asset: DocumentData;
+    uid: number;
+}
+
+export interface GetDocumentByIdResponse {
+    success: boolean;
+    message: string;
+    data: GetDocumentByIdData;
 }

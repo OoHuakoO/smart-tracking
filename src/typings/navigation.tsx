@@ -1,5 +1,4 @@
 import { SearchAsset } from './asset';
-import { DocumentAssetData } from './document';
 import { AssetData, LocationData } from './downloadDB';
 
 export type RootStackParamsList = {
@@ -34,7 +33,9 @@ export type PrivateStackParamsList = {
         title: string;
     };
     DocumentAssetStatus: {
-        documentAssetList: DocumentAssetData[];
+        id: number;
+        state: string;
+        location: string;
     };
     LocationListReportAsset: {
         LocationData: LocationData;
