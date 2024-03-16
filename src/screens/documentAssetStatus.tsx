@@ -4,7 +4,7 @@ import DocumentAssetStatusCard from '@src/components/views/documentAssetStatusCa
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Portal, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import {
     FlatList,
@@ -69,6 +69,9 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             break;
         case STATE_DOCUMENT_NAME.Cancel:
             backgroundColor = '#F0787A';
+            break;
+        default:
+            backgroundColor = '#2E67A6';
             break;
     }
 
@@ -175,15 +178,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
     return (
         <SafeAreaView style={styles.container}>
-            <Portal>
-                <AlertDialog
-                    textTitle={titleDialog}
-                    textContent={contentDialog}
-                    visible={visibleDialog}
-                    handleClose={handleCloseDialog}
-                    handleConfirm={handleConfirmDialog}
-                />
-            </Portal>
+            <AlertDialog
+                textTitle={titleDialog}
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleConfirmDialog}
+            />
+
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -214,7 +216,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </Text>
                     <View style={[styles.statusIndicator, { backgroundColor }]}>
                         <Text variant="labelSmall" style={styles.statusText}>
-                            {route?.params?.state}
+                            {route?.params?.state || STATE_DOCUMENT_NAME.Draft}
                         </Text>
                     </View>
                 </View>

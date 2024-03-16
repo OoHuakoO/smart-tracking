@@ -1,4 +1,4 @@
-import { GetParams } from '@src/typings/common';
+import { Params } from '@src/typings/common';
 import {
     GetAssetsResponse,
     GetCategoryResponse,
@@ -9,31 +9,31 @@ import {
 import { Response, post } from '@src/utils/axios';
 
 export function GetAssets(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetAssetsResponse>> {
     return post<GetAssetsResponse>('/api/all/assets', params);
 }
 
 export function GetUseStatus(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetUseStatusResponse>> {
     return post<GetUseStatusResponse>('/api/all/use/state', params);
 }
 
 export function GetLocation(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetLocationResponse>> {
     return post<GetLocationResponse>('/api/all/locations', params);
 }
 
 export function GetCategory(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetCategoryResponse>> {
     return post<GetCategoryResponse>('/api/all/categorys', params);
 }
 
 export function GetReport(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetReportResponse>> {
     return post<GetReportResponse>('/api/all/documents', params);
 }

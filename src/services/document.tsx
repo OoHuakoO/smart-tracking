@@ -1,5 +1,6 @@
-import { GetParams } from '@src/typings/common';
+import { Params } from '@src/typings/common';
 import {
+    CreateDocumentResponse,
     DeleteDocumentLineResponse,
     GetDocumentByIdResponse,
     GetDocumentSearchResponse
@@ -7,7 +8,7 @@ import {
 import { Response, post, postDelete } from '@src/utils/axios';
 
 export function GetDocumentSearch(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetDocumentSearchResponse>> {
     return post<GetDocumentSearchResponse>(`/api/document/search`, params);
 }
@@ -19,10 +20,19 @@ export function GetDocumentById(
 }
 
 export function DeleteDocumentLine(
-    params: GetParams
+    params: Params
 ): Promise<Response<DeleteDocumentLineResponse>> {
     return postDelete<DeleteDocumentLineResponse>(
         `/api/delete/document/line`,
+        params
+    );
+}
+
+export function CreateDocument(
+    params: Params
+): Promise<Response<CreateDocumentResponse>> {
+    return post<CreateDocumentResponse>(
+        `/api/document/tracking/create/`,
         params
     );
 }

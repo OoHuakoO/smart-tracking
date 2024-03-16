@@ -1,5 +1,5 @@
 import { GetAssetByCodeResponse } from '@src/typings/asset';
-import { GetParams } from '@src/typings/common';
+import { Params } from '@src/typings/common';
 import { GetAssetsResponse } from '@src/typings/downloadDB';
 import { Response, post } from '@src/utils/axios';
 
@@ -10,7 +10,7 @@ export function GetAssetByCode(
 }
 
 export function GetAssetSearch(
-    params: GetParams
+    params: Params
 ): Promise<Response<GetAssetsResponse>> {
     return post<GetAssetsResponse>(`/api/asset/search`, params);
 }

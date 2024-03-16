@@ -1,10 +1,11 @@
 interface assetID {
     id: number;
 }
-export interface GetParams {
+export interface Params {
     page?: number;
     limit?: number;
     search_term?: any;
+    location_id?: number;
     asset_tracking_id?: number;
     asset_ids?: assetID[];
 }

@@ -54,3 +54,15 @@ export interface DeleteDocumentLineResponse {
     success: boolean;
     message: string;
 }
+
+export interface SampleDateCreateDocument {
+    location_id: number;
+    date_order: string;
+    user_id: number;
+}
+export interface CreateDocumentResponse {
+    success: boolean;
+    message: string;
+    asset_tracking_id: number;
+    sample_data: SampleDateCreateDocument;
+}

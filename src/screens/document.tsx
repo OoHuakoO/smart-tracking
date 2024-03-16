@@ -6,11 +6,13 @@ import DocumentDialog from '@src/components/core/documentDialog';
 import DocumentCard from '@src/components/views/documentCard';
 import SearchButton from '@src/components/views/searchButton';
 import { STATE_DOCUMENT_NAME, STATE_DOCUMENT_VALUE } from '@src/constant';
-import { GetDocumentSearch } from '@src/services/document';
+import { CreateDocument, GetDocumentSearch } from '@src/services/document';
+import { GetLocationSearch } from '@src/services/location';
 import { loginState } from '@src/store';
 import { theme } from '@src/theme';
 import { LoginState } from '@src/typings/common';
 import { DocumentData } from '@src/typings/document';
+import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
@@ -47,14 +49,16 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const loginValue = useRecoilValue<LoginState>(loginState);
     const [page, setPage] = useState<number>(1);
     const [online, setLogin] = useState<boolean>(false);
+    const [locationSearch, setLocationSearch] = useState<string>('');
+    const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
 
-    const toggleDialog = () => {
+    const toggleDialog = useCallback(() => {
         setDialogVisible(!dialogVisible);
-    };
+    }, [dialogVisible]);
 
     const handleMapStateValue = useCallback((state: string): string => {
         switch (state) {
@@ -68,6 +72,49 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 return STATE_DOCUMENT_NAME.Cancel;
             default:
                 return STATE_DOCUMENT_NAME.Draft;
+        }
+    }, []);
+
+    const handleSearchLocation = useCallback(async (text: string) => {
+        try {
+            setLocationSearch(text);
+            const response = await GetLocationSearch({
+                page: 1,
+                limit: 10,
+                search_term: text
+            });
+            if (response?.error) {
+                setLoading(false);
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong fetch location');
+                return;
+            }
+            setListLocation(response?.result?.data?.locations);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch location');
+        }
+    }, []);
+
+    const handleFetchLocation = useCallback(async () => {
+        try {
+            const response = await GetLocationSearch({
+                page: 1,
+                limit: 10,
+                search_term: ''
+            });
+            if (response?.error) {
+                setLoading(false);
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong fetch location');
+                return;
+            }
+            setListLocation(response?.result?.data?.locations);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch location');
         }
     }, []);
 
@@ -134,9 +181,41 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         }
     };
 
+    const handleSelectLocation = useCallback(
+        async (location: LocationSearchData) => {
+            try {
+                const response = await CreateDocument({
+                    location_id: location?.location_id,
+                    asset_ids: []
+                });
+                if (response?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong fetch location');
+                    return;
+                }
+                toggleDialog();
+                navigation.navigate('DocumentAssetStatus', {
+                    id: response?.result?.asset_tracking_id,
+                    state: STATE_DOCUMENT_NAME.Draft,
+                    location: location?.location_name
+                });
+                await handleFetchDocument();
+                await handleFetchLocation();
+            } catch (err) {
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong fetch location');
+            }
+        },
+        [handleFetchDocument, handleFetchLocation, navigation, toggleDialog]
+    );
+
     useEffect(() => {
         handleFetchDocument();
     }, [handleFetchDocument]);
+
+    useEffect(() => {
+        handleFetchLocation();
+    }, [handleFetchLocation]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -177,6 +256,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     Total Document : {countTotalDocument}
                 </Text>
                 <FlatList
+                    style={styles.flatListStyle}
                     data={listDocument}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
@@ -209,9 +289,12 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 />
             </View>
             <DocumentDialog
+                locationSearch={locationSearch}
                 visible={dialogVisible}
                 onClose={toggleDialog}
-                pageNavigate={() => navigation.navigate('DocumentCreate')}
+                handleSearchLocation={handleSearchLocation}
+                listLocation={listLocation}
+                handleSelectLocation={handleSelectLocation}
             />
             <TouchableOpacity
                 activeOpacity={0.5}
@@ -266,9 +349,8 @@ const styles = StyleSheet.create({
     wrapDetailList: {
         display: 'flex',
         alignItems: 'center',
-        gap: 15,
         marginTop: 20,
-        marginBottom: 5
+        marginBottom: 10
     },
     searchButtonWrap: {
         position: 'absolute',
@@ -293,6 +375,9 @@ const styles = StyleSheet.create({
         margin: 16,
         right: 0,
         bottom: 0
+    },
+    flatListStyle: {
+        marginBottom: 30
     }
 });
 

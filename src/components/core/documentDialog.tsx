@@ -1,19 +1,30 @@
 import { theme } from '@src/theme';
+import { LocationSearchData } from '@src/typings/location';
 import React, { FC } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Modal, Searchbar, Text } from 'react-native-paper';
 
 interface DocumentDialogProp {
     visible: boolean;
     onClose: () => void;
-    pageNavigate?: () => void;
+    locationSearch: string;
+    listLocation: LocationSearchData[];
+    handleSearchLocation: (text: string) => void;
+    handleSelectLocation: (location: LocationSearchData) => void;
 }
 
 const DocumentDialog: FC<DocumentDialogProp> = (props) => {
-    const { visible, onClose, pageNavigate } = props;
+    const {
+        visible,
+        onClose,
+        locationSearch,
+        listLocation,
+        handleSearchLocation,
+        handleSelectLocation
+    } = props;
 
     return (
-        <Modal visible={visible}>
+        <Modal visible={visible} onDismiss={onClose}>
             <View style={styles.container}>
                 <View style={styles.elementContainer}>
                     <Text variant="titleMedium" style={styles.dialogTitle}>
@@ -22,17 +33,25 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                     <Searchbar
                         placeholder="Search"
                         style={styles.searchBar}
-                        value=""
+                        value={locationSearch}
+                        onChangeText={(text) => handleSearchLocation(text)}
                     />
 
-                    <View style={styles.searchList}>
-                        <TouchableOpacity
-                            style={styles.listStyle}
-                            onPress={pageNavigate}
-                        >
-                            <Text variant="bodyLarge">H0-10th</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <FlatList
+                        style={styles.flatListStyle}
+                        data={listLocation}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                style={styles.listStyle}
+                                onPress={() => handleSelectLocation(item)}
+                            >
+                                <Text variant="bodyLarge">
+                                    {item?.location_name}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                        keyExtractor={(item) => item.location_id.toString()}
+                    />
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
@@ -59,7 +78,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 12,
         marginHorizontal: 20,
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         zIndex: 1
     },
     elementContainer: {
@@ -73,14 +92,13 @@ const styles = StyleSheet.create({
     searchBar: {
         borderWidth: 1,
         borderColor: '#A1A1A1',
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         borderRadius: 10
     },
     searchList: {},
     listStyle: {
         borderBottomWidth: 1,
         borderBottomColor: '#f5f5f5',
-
         paddingVertical: 15
     },
     buttonContainer: {
@@ -93,7 +111,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         borderRadius: 15,
         alignItems: 'center'
-    }
+    },
+    flatListStyle: { height: 250, marginTop: 30 }
 });
 
 export default DocumentDialog;
