@@ -46,3 +46,6 @@ export const REPORT_TYPE = {
     NotFound: 'Asset Not Found',
     Transfer: 'Asset Transfer'
 };
+
+export const RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND =
+    'Asset data not found';

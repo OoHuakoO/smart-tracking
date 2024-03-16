@@ -82,3 +82,24 @@ export async function post<T = any>(
     const res = await apiInstances.post<Response<T>>(url, convertData, config);
     return res.data;
 }
+
+export async function postDelete<T = any>(
+    url: string,
+    data?: any
+): Promise<Response<T>> {
+    const settings = await AsyncStorage.getItem('Settings');
+    const jsonSettings: SettingParams = JSON.parse(settings);
+    const convertData = {
+        jsonrpc: '2.0',
+        params: {
+            ...data,
+            db: jsonSettings?.db,
+            login: data?.login ? data?.login : jsonSettings?.login,
+            password: data?.password ? data?.password : jsonSettings?.password
+        }
+    };
+    const res = await apiInstances.delete<Response<T>>(url, {
+        data: convertData
+    });
+    return res.data;
+}

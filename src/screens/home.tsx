@@ -144,14 +144,15 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTypeDialog('download');
             setShowCancelDialog(false);
             return;
+        } else {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(
+                `Online mode is close, please open online mode to download`
+            );
+            setTypeDialog('warning');
         }
-        clearStateDialog();
-        setVisibleDialog(true);
-        setTitleDialog(WARNING);
-        setContentDialog(
-            `Online mode is close, please open online mode to download`
-        );
-        setTypeDialog('warning');
     }, [clearStateDialog]);
 
     const handleResponseError = useCallback(

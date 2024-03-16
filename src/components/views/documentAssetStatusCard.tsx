@@ -8,12 +8,14 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface DocumentAssetStatusProps {
     imageSource?: any;
+    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetMovement: string;
     assetDate: string;
     documentStatus: string;
+    handleRemoveAsset: (id: number) => void;
 }
 
 const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
@@ -24,7 +26,9 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
         assetStatus,
         assetMovement,
         assetDate,
-        documentStatus
+        documentStatus,
+        handleRemoveAsset,
+        assetId
     } = props;
 
     return (
@@ -32,7 +36,7 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
             <View style={styles.deleteIconContainer}>
                 {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                     <TouchableOpacity
-                        onPress={() => console.log('Delete')}
+                        onPress={() => handleRemoveAsset(assetId)}
                         activeOpacity={0.5}
                     >
                         <FontAwesomeIcon icon={faTrash} color="#F0787A" />

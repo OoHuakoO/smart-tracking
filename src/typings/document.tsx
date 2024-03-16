@@ -49,3 +49,8 @@ export interface GetDocumentByIdResponse {
     message: string;
     data: GetDocumentByIdData;
 }
+
+export interface DeleteDocumentLineResponse {
+    success: boolean;
+    message: string;
+}

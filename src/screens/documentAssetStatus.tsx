@@ -4,7 +4,7 @@ import DocumentAssetStatusCard from '@src/components/views/documentAssetStatusCa
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { Text } from 'react-native-paper';
+import { Portal, Text } from 'react-native-paper';
 
 import {
     FlatList,
@@ -19,11 +19,12 @@ import AlertDialog from '@src/components/core/alertDialog';
 import {
     MOVEMENT_ASSET,
     MOVEMENT_ASSET_EN,
+    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     STATE_DOCUMENT_NAME,
     USE_STATE_ASSET,
     USE_STATE_ASSET_NORMAL_EN
 } from '@src/constant';
-import { GetDocumentById } from '@src/services/document';
+import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
@@ -44,12 +45,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 ) => {
     const { navigation, route } = props;
     const [loading, setLoading] = useState<boolean>(false);
+    const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [totalAssetDocument, setTotalAssetDocument] = useState<number>(0);
     const [listAssetDocument, setListAssetDocument] = useState<
         DocumentAssetData[]
     >([]);
+    const [idAsset, setIdAsset] = useState<number>(0);
 
     let backgroundColor = 'black';
     let documentStatus = STATE_DOCUMENT_NAME.Draft;
@@ -112,18 +115,75 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         }
     }, [handleMapStateValue, route?.params?.id]);
 
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+    }, []);
+
+    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm');
+        setContentDialog('Do you want to remove this asset ?');
+        setIdAsset(id);
+    }, []);
+
+    const handleRemoveAsset = useCallback(async () => {
+        try {
+            clearStateDialog();
+            const response = await DeleteDocumentLine({
+                asset_tracking_id: route?.params?.id,
+                asset_ids: [{ id: idAsset }]
+            });
+            if (
+                response?.result?.message ===
+                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+            ) {
+                setVisibleDialog(true);
+                setContentDialog('Something went Asset data not found');
+                return;
+            }
+            setListAssetDocument((prev) => {
+                const listAssetFilter = prev.filter(
+                    (item) => item?.asset_id !== idAsset
+                );
+                setTotalAssetDocument(listAssetFilter.length);
+                return listAssetFilter;
+            });
+            await handleFetchDocumentById();
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong remove asset');
+        }
+    }, [clearStateDialog, handleFetchDocumentById, idAsset, route?.params?.id]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (titleDialog) {
+            case 'Confirm':
+                await handleRemoveAsset();
+                break;
+            default:
+                handleCloseDialog();
+                break;
+        }
+    }, [handleCloseDialog, handleRemoveAsset, titleDialog]);
+
     useEffect(() => {
         handleFetchDocumentById();
     }, [handleFetchDocumentById]);
 
     return (
         <SafeAreaView style={styles.container}>
-            <AlertDialog
-                textContent={contentDialog}
-                visible={visibleDialog}
-                handleClose={handleCloseDialog}
-                handleConfirm={handleCloseDialog}
-            />
+            <Portal>
+                <AlertDialog
+                    textTitle={titleDialog}
+                    textContent={contentDialog}
+                    visible={visibleDialog}
+                    handleClose={handleCloseDialog}
+                    handleConfirm={handleConfirmDialog}
+                />
+            </Portal>
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -169,6 +229,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <DocumentAssetStatusCard
+                                assetId={item?.asset_id}
                                 imageSource={item?.image}
                                 assetCode={item?.code}
                                 assetName={item?.name}
@@ -176,6 +237,9 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                 assetMovement={item?.state}
                                 assetDate={item?.date_check}
                                 documentStatus={route?.params?.state}
+                                handleRemoveAsset={
+                                    handleOpenDialogConfirmRemoveAsset
+                                }
                             />
                         </View>
                     )}
@@ -183,11 +247,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                 />
-                {documentStatus === STATE_DOCUMENT_NAME.Draft && (
+                {/* {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                     <TouchableOpacity style={styles.saveButton}>
                         <Text style={styles.buttonText}>Save</Text>
                     </TouchableOpacity>
-                )}
+                )} */}
             </View>
             {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity
@@ -309,4 +373,5 @@ const styles = StyleSheet.create({
         color: '#F0787A'
     }
 });
+
 export default DocumentAssetStatusScreen;
