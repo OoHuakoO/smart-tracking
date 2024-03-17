@@ -2,9 +2,11 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetDataCard from '@src/components/views/reportAssetDataCard';
+import { ALL_LOCATION, MOVEMENT_ASSET, REPORT_TYPE } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { getLocations } from '@src/db/location';
 import { getReport } from '@src/db/report';
+import { GetAssetSearch } from '@src/services/asset';
 import { GetLocation, GetReport } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
 import {
@@ -24,7 +26,6 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
-
 import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
@@ -48,12 +49,14 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     const handleFilterReport = useCallback(
         (asset: ReportAssetData, title: string): boolean => {
             switch (title) {
-                case 'Asset New':
-                    return asset.state === '1';
-                case 'Asset Found':
+                case REPORT_TYPE.New:
+                    return asset.state === MOVEMENT_ASSET.New;
+                case REPORT_TYPE.Transfer:
+                    return asset.state === MOVEMENT_ASSET.Transfer;
+                case REPORT_TYPE.Found:
                     return true;
-                case 'Asset Transfer':
-                    return asset.state === '2';
+                case REPORT_TYPE.NotFound:
+                    return true;
                 default:
                     return false;
             }
@@ -64,47 +67,16 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     const handleCountAssetInLocation = useCallback(
         (
             locationName: string,
-            reports: ReportData[],
             reportAssets: ReportAssetData[],
-            title: string,
-            online: boolean
+            title: string
         ): number => {
             const filterAssets = (asset) => {
                 const isLocationMatch =
-                    locationName === 'All Location' ||
+                    locationName === ALL_LOCATION ||
                     asset?.location === locationName;
                 return isLocationMatch && handleFilterReport(asset, title);
             };
-
-            if (online) {
-                return reports
-                    .flatMap((report) => report.assets || [])
-                    .filter(filterAssets).length;
-            } else {
-                return reportAssets.filter(filterAssets).length;
-            }
-        },
-        [handleFilterReport]
-    );
-
-    const handleSelectAssetInLocation = useCallback(
-        (
-            locationName: string,
-            reports: ReportData[],
-            reportAssets: ReportAssetData[],
-            title: string,
-            online: boolean
-        ): ReportAssetData[] => {
-            const assets = online
-                ? reports.flatMap((report) => report.assets || [])
-                : reportAssets;
-
-            return assets.filter((asset) => {
-                const isLocationMatch =
-                    locationName === 'All Location' ||
-                    asset?.location === locationName;
-                return isLocationMatch && handleFilterReport(asset, title);
-            });
+            return reportAssets?.filter(filterAssets).length;
         },
         [handleFilterReport]
     );
@@ -112,41 +84,52 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     const createLocationDataList = useCallback(
         (
             locations: LocationData[],
-            reports: ReportData[],
             reportAssets: ReportAssetData[],
-            title: string,
-            online: boolean
+            title: string
         ): LocationData[] => {
             return locations.map((location) => {
                 const countAssetsInLocation = handleCountAssetInLocation(
                     location?.name,
-                    reports,
                     reportAssets,
-                    title,
-                    online
-                );
-
-                const assetInLocation = handleSelectAssetInLocation(
-                    location?.name,
-                    reports,
-                    reportAssets,
-                    title,
-                    online
+                    title
                 );
 
                 return {
                     ...location,
-                    total_asset: countAssetsInLocation,
-                    report_asset: assetInLocation
+                    total_asset: countAssetsInLocation
                 };
             });
         },
-        [handleCountAssetInLocation, handleSelectAssetInLocation]
+        [handleCountAssetInLocation]
+    );
+
+    const handleLoadReport = useCallback(
+        async (totalPages: number): Promise<ReportAssetData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetReport({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const report = results.flatMap(
+                    (result) =>
+                        result?.result?.data?.asset?.flatMap(
+                            (reportData: ReportData) => reportData?.assets
+                        ) ?? []
+                );
+                return report;
+            } catch (err) {
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong load report');
+                return [];
+            }
+        },
+        []
     );
 
     const handleInitFetch = useCallback(async () => {
         try {
             setLoading(true);
+
             const isOnline = await getOnlineMode();
             let listLocationData: LocationData[];
 
@@ -156,35 +139,55 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                     GetReport({ page: 1, limit: 1000 })
                 ]);
 
+                const listReport = await handleLoadReport(
+                    reportResponse?.result?.data?.total_page
+                );
+
                 locationResponse?.result?.data?.data?.unshift({
                     asset_location_id: 0,
-                    name: 'All Location'
+                    name: ALL_LOCATION
                 });
 
                 listLocationData = createLocationDataList(
                     locationResponse?.result?.data?.data || [],
-                    reportResponse?.result?.data?.asset || [],
-                    [],
-                    route?.params?.title,
-                    isOnline
+                    listReport,
+                    route?.params?.title
                 );
             } else {
                 const db = await getDBConnection();
-                const listReportDB = await getReport(db);
-                const listLocations = await getLocations(db, 1, 10000);
+                const listReportDB = await getReport(db, null, false);
+                const listLocations = await getLocations(db, null, 1, 1000);
                 listLocations?.unshift({
                     asset_location_id: 0,
-                    name: 'All Location'
+                    name: ALL_LOCATION
                 });
 
                 listLocationData = createLocationDataList(
-                    listLocations || [],
-                    [],
-                    listReportDB || [],
-                    route?.params?.title,
-                    isOnline
+                    listLocations,
+                    listReportDB,
+                    route?.params?.title
                 );
             }
+
+            if (route?.params?.title === REPORT_TYPE.NotFound) {
+                await Promise.all(
+                    listLocationData.map(async (item) => {
+                        const response = await GetAssetSearch({
+                            page: 1,
+                            limit: 10,
+                            search_term: {
+                                location:
+                                    item?.name === ALL_LOCATION
+                                        ? ''
+                                        : item?.name
+                            }
+                        });
+                        item.total_asset =
+                            response?.result?.data?.total - item.total_asset;
+                    })
+                );
+            }
+
             setListLocation(listLocationData);
             setLoading(false);
         } catch (err) {
@@ -192,7 +195,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');
         }
-    }, [createLocationDataList, route?.params?.title]);
+    }, [createLocationDataList, handleLoadReport, route?.params?.title]);
 
     useEffect(() => {
         handleInitFetch();

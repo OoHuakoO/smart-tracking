@@ -68,14 +68,32 @@ export const insertLocationData = (
 
 export const getLocations = async (
     db: SQLiteDatabase,
+    filters?: {
+        name?: string;
+    },
     page: number = 1,
     limit: number = 10
 ): Promise<LocationData[]> => {
     const offset = (page - 1) * limit;
-    const query = `SELECT * FROM location LIMIT ? OFFSET ?`;
+    let query = `SELECT * FROM location`;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`location.name LIKE ?`);
+        queryParams.push(`%${filters.name}%`);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
 
     try {
-        const results = await db.executeSql(query, [limit, offset]);
+        const results = await db.executeSql(query, queryParams);
         const locations = [];
 
         if (results.length > 0) {

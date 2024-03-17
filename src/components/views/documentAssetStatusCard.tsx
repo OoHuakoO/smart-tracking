@@ -1,5 +1,6 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { STATE_DOCUMENT_NAME } from '@src/constant';
 import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -7,12 +8,14 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface DocumentAssetStatusProps {
     imageSource?: any;
+    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetMovement: string;
     assetDate: string;
     documentStatus: string;
+    handleRemoveAsset: (id: number) => void;
 }
 
 const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
@@ -23,15 +26,17 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
         assetStatus,
         assetMovement,
         assetDate,
-        documentStatus
+        documentStatus,
+        handleRemoveAsset,
+        assetId
     } = props;
 
     return (
         <View style={styles.cardContainer}>
             <View style={styles.deleteIconContainer}>
-                {documentStatus === 'draft' && (
+                {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                     <TouchableOpacity
-                        onPress={() => console.log('Delete')}
+                        onPress={() => handleRemoveAsset(assetId)}
                         activeOpacity={0.5}
                     >
                         <FontAwesomeIcon icon={faTrash} color="#F0787A" />
@@ -39,7 +44,21 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
                 )}
             </View>
             <View style={styles.imagesContainer}>
-                <Image style={styles.image} source={imageSource} />
+                {imageSource?.toString() !== 'false' ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>

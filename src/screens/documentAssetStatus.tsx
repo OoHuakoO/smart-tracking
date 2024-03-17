@@ -3,18 +3,31 @@ import BackButton from '@src/components/core/backButton';
 import DocumentAssetStatusCard from '@src/components/views/documentAssetStatusCard';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Text } from 'react-native-paper';
 
 import {
+    FlatList,
     SafeAreaView,
-    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View
 } from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
+import AlertDialog from '@src/components/core/alertDialog';
+import {
+    MOVEMENT_ASSET,
+    MOVEMENT_ASSET_EN,
+    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    STATE_DOCUMENT_NAME,
+    USE_STATE_ASSET,
+    USE_STATE_ASSET_NORMAL_EN
+} from '@src/constant';
+import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
+import { DocumentAssetData } from '@src/typings/document';
+import { getOnlineMode } from '@src/utils/common';
+import { parseDateString } from '@src/utils/time-manager';
 import LinearGradient from 'react-native-linear-gradient';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import {
@@ -30,24 +43,148 @@ type DocumentAssetStatusScreenProps = NativeStackScreenProps<
 const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     props
 ) => {
-    const { navigation } = props;
-    let documentStatus = 'draft';
+    const { navigation, route } = props;
+    const [loading, setLoading] = useState<boolean>(false);
+    const [titleDialog, setTitleDialog] = useState<string>('');
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [totalAssetDocument, setTotalAssetDocument] = useState<number>(0);
+    const [listAssetDocument, setListAssetDocument] = useState<
+        DocumentAssetData[]
+    >([]);
+    const [idAsset, setIdAsset] = useState<number>(0);
+
     let backgroundColor = 'black';
 
-    switch (documentStatus) {
-        case 'draft':
+    switch (route?.params?.state) {
+        case STATE_DOCUMENT_NAME.Draft:
             backgroundColor = '#2E67A6';
             break;
-        case 'done':
+        case STATE_DOCUMENT_NAME.Check:
+            backgroundColor = '#F8A435';
+            break;
+        case STATE_DOCUMENT_NAME.Done:
             backgroundColor = '#63CA7F';
             break;
-        case 'canceled':
+        case STATE_DOCUMENT_NAME.Cancel:
             backgroundColor = '#F0787A';
+            break;
+        default:
+            backgroundColor = '#2E67A6';
             break;
     }
 
+    const handleMapStateValue = useCallback((state: string): string => {
+        switch (state) {
+            case MOVEMENT_ASSET.Normal:
+                return MOVEMENT_ASSET_EN.Normal;
+            case MOVEMENT_ASSET.New:
+                return MOVEMENT_ASSET_EN.New;
+            case MOVEMENT_ASSET.Transfer:
+                return MOVEMENT_ASSET_EN.Transfer;
+            default:
+                return MOVEMENT_ASSET_EN.Normal;
+        }
+    }, []);
+
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
+    const handleFetchDocumentById = useCallback(async () => {
+        try {
+            setLoading(true);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetDocumentById(route?.params?.id);
+                response?.result?.data?.asset?.assets?.map((item) => {
+                    if (item?.use_state === USE_STATE_ASSET_NORMAL_EN) {
+                        item.use_state = USE_STATE_ASSET.Normal;
+                    }
+                    item.state = handleMapStateValue(item?.state);
+                    item.date_check = parseDateString(item?.date_check);
+                });
+                setTotalAssetDocument(
+                    response?.result?.data?.asset?.assets?.length
+                );
+                setListAssetDocument(response?.result?.data?.asset?.assets);
+            }
+            setLoading(false);
+        } catch (err) {
+            setLoading(false);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong fetch document');
+        }
+    }, [handleMapStateValue, route?.params?.id]);
+
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+    }, []);
+
+    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm');
+        setContentDialog('Do you want to remove this asset ?');
+        setIdAsset(id);
+    }, []);
+
+    const handleRemoveAsset = useCallback(async () => {
+        try {
+            clearStateDialog();
+            const response = await DeleteDocumentLine({
+                asset_tracking_id: route?.params?.id,
+                asset_ids: [{ id: idAsset }]
+            });
+            if (
+                response?.result?.message ===
+                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+            ) {
+                setVisibleDialog(true);
+                setContentDialog('Something went Asset data not found');
+                return;
+            }
+            setListAssetDocument((prev) => {
+                const listAssetFilter = prev.filter(
+                    (item) => item?.asset_id !== idAsset
+                );
+                setTotalAssetDocument(listAssetFilter.length);
+                return listAssetFilter;
+            });
+            await handleFetchDocumentById();
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong remove asset');
+        }
+    }, [clearStateDialog, handleFetchDocumentById, idAsset, route?.params?.id]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (titleDialog) {
+            case 'Confirm':
+                await handleRemoveAsset();
+                break;
+            default:
+                handleCloseDialog();
+                break;
+        }
+    }, [handleCloseDialog, handleRemoveAsset, titleDialog]);
+
+    useEffect(() => {
+        handleFetchDocumentById();
+    }, [handleFetchDocumentById]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textTitle={titleDialog}
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleConfirmDialog}
+            />
+
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -59,85 +196,75 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         handlePress={() => navigation.navigate('Document')}
                     />
                 </View>
-                {documentStatus === 'canceled' && (
+                {route?.params?.state === STATE_DOCUMENT_NAME.Cancel && (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.resetCancel}
                     >
-                        <Text
-                            variant="bodySmall"
-                            style={{
-                                fontWeight: 'bold',
-                                color: '#F0787A'
-                            }}
-                        >
+                        <Text variant="bodySmall" style={styles.textReset}>
                             Reset to Inprogress
                         </Text>
                     </TouchableOpacity>
                 )}
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Document
+                        Document : {route?.params?.id}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location:
+                        Location: {route?.params?.location}
                     </Text>
                     <View style={[styles.statusIndicator, { backgroundColor }]}>
                         <Text variant="labelSmall" style={styles.statusText}>
-                            {documentStatus}
+                            {route?.params?.state || STATE_DOCUMENT_NAME.Draft}
                         </Text>
                     </View>
                 </View>
             </LinearGradient>
 
             <View style={styles.listSection}>
-                <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                        Total Document : 3
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <DocumentAssetStatusCard
-                            imageSource={require('../../assets/images/img1.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus="ปกติ"
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                            documentStatus="draft"
-                        />
-
-                        <DocumentAssetStatusCard
-                            imageSource={require('../../assets/images/img2.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus="ปกติ"
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                            documentStatus="draft"
-                        />
-
-                        <DocumentAssetStatusCard
-                            imageSource={require('../../assets/images/img3.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus="ปกติ"
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                            documentStatus="draft"
-                        />
-                        {documentStatus === 'draft' && (
-                            <TouchableOpacity style={styles.summitButton}>
-                                <Text style={styles.buttonText}>Summit</Text>
-                            </TouchableOpacity>
-                        )}
-                    </View>
-                </ScrollView>
+                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                    Total Document : {totalAssetDocument}
+                </Text>
+                <FlatList
+                    data={listAssetDocument}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <DocumentAssetStatusCard
+                                assetId={item?.asset_id}
+                                imageSource={item?.image}
+                                assetCode={item?.code}
+                                assetName={item?.name}
+                                assetStatus={item?.use_state}
+                                assetMovement={item?.state}
+                                assetDate={item?.date_check}
+                                documentStatus={route?.params?.state}
+                                handleRemoveAsset={
+                                    handleOpenDialogConfirmRemoveAsset
+                                }
+                            />
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.asset_id.toString()}
+                    onRefresh={() => console.log('refreshing')}
+                    refreshing={loading}
+                />
+                {/* {documentStatus === STATE_DOCUMENT_NAME.Draft && (
+                    <TouchableOpacity style={styles.saveButton}>
+                        <Text style={styles.buttonText}>Save</Text>
+                    </TouchableOpacity>
+                )} */}
             </View>
-            {documentStatus === 'draft' && (
+            {route?.params?.state === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity
                     activeOpacity={0.5}
                     style={styles.button}
-                    onPress={() => navigation.navigate('DocumentCreateAsset')}
+                    onPress={() =>
+                        navigation.navigate('DocumentCreate', {
+                            id: route?.params?.id,
+                            location: route?.params?.location,
+                            assetDocumentList: listAssetDocument
+                        })
+                    }
                 >
                     <ActionButton icon="plus" color={theme.colors.white} />
                 </TouchableOpacity>
@@ -180,7 +307,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 5,
         borderRadius: 25,
-        marginTop: 5,
+        marginTop: 10,
         flexDirection: 'row'
     },
     statusText: {
@@ -191,7 +318,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: '#FFFFFF',
-        fontSize: RFPercentage(5.5),
+        fontSize: RFPercentage(4),
         fontWeight: '700',
         marginBottom: 5
     },
@@ -220,29 +347,38 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     },
     button: {
         position: 'absolute',
-        margin: 16,
+        margin: 20,
         right: 0,
         bottom: 0
     },
 
-    summitButton: {
+    saveButton: {
         backgroundColor: '#2983BC',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 10
+        marginTop: 20,
+        marginBottom: 20,
+        alignSelf: 'center'
     },
 
     buttonText: {
         color: 'white',
         fontWeight: '600',
         fontSize: 16
+    },
+
+    textReset: {
+        fontWeight: 'bold',
+        color: '#F0787A'
     }
 });
+
 export default DocumentAssetStatusScreen;

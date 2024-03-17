@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -63,14 +64,14 @@ const DocumentCreateSearchScreen: FC<DocumentCreateSearchProps> = (props) => {
                         imageSource={require('../../assets/images/img1.jpg')}
                         assetCode="RB0001"
                         assetName="Table"
-                        assetStatus="ปกติ"
+                        assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                         assetLocation="H01-th"
                     />
                     <ReportAssetCard
                         imageSource={require('../../assets/images/img3.jpg')}
                         assetCode="RB0001"
                         assetName="Table"
-                        assetStatus="ปกติ"
+                        assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                         assetLocation="H02-th"
                     />
                 </View>

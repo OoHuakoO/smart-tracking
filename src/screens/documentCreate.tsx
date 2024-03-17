@@ -1,8 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
-import InputText from '@src/components/core/inputText';
+import Button from '@src/components/core/button';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -10,6 +11,7 @@ import {
     SafeAreaView,
     ScrollView,
     StyleSheet,
+    TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -26,7 +28,7 @@ type DocumentCreateProps = NativeStackScreenProps<
 >;
 
 const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
@@ -37,7 +39,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             >
                 <View style={styles.backToPrevious}>
                     <BackButton
-                        handlePress={() => navigation.navigate('Document')}
+                        handlePress={() =>
+                            navigation.navigate('DocumentAssetStatus')
+                        }
                     />
                 </View>
 
@@ -46,17 +50,34 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No: 00004
+                        Document No: {route?.params?.id}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location:
+                        Location:{route?.params?.location}
                     </Text>
                 </View>
             </LinearGradient>
 
             <View style={styles.listSection}>
                 <View style={styles.searchContainer}>
-                    <InputText placeholder="Input Or Search Asset" />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Input Or Scan Asset"
+                        placeholderTextColor={theme.colors.textBody}
+                    />
+                    <TouchableOpacity onPress={() => console.log('ok')}>
+                        <Button
+                            style={styles.dialogActionConfirm}
+                            onPress={() => console.log('ok')}
+                        >
+                            <Text
+                                style={styles.textActionConfirm}
+                                variant="bodyLarge"
+                            >
+                                Search
+                            </Text>
+                        </Button>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.searchButtonWrap}>
@@ -75,7 +96,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img1.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />
@@ -84,7 +105,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img2.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />
@@ -93,7 +114,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             imageSource={require('../../assets/images/img3.jpg')}
                             assetCode="RB0001"
                             assetName="Table"
-                            assetStatus="ปกติ"
+                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
                             assetMovement="Normal"
                             assetDate="01/01/2567"
                         />
@@ -132,8 +153,12 @@ const styles = StyleSheet.create({
     },
 
     searchContainer: {
-        marginTop: 20,
-        marginHorizontal: 20
+        marginTop: 30,
+        marginLeft: 20,
+        marginRight: 20,
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center'
     },
     statusText: {
         color: '#FFFFFF'
@@ -173,12 +198,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 15
     },
-    button: {
-        position: 'absolute',
-        margin: 16,
-        right: 0,
-        bottom: 0
-    },
 
     saveButton: {
         backgroundColor: '#2983BC',
@@ -194,6 +213,26 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: '600',
         fontSize: 16
+    },
+    dialogActionConfirm: {
+        paddingVertical: 2,
+        backgroundColor: theme.colors.buttonConfirm,
+        borderRadius: 10,
+        height: 48
+    },
+    textActionConfirm: {
+        fontFamily: 'DMSans-Medium',
+        color: theme.colors.white
+    },
+    input: {
+        height: 48,
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        fontFamily: 'DMSans-Bold',
+        color: theme.colors.textBody,
+        width: '65%',
+        marginRight: 10
     }
 });
 export default DocumentCreateScreen;

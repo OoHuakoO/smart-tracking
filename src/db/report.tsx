@@ -82,9 +82,19 @@ export const insertReportData = (
             .join(',');
 
     try {
-        db.transaction((tx) => {
-            tx.executeSql(queryInsert);
-        });
+        db.transaction(
+            (tx) => {
+                tx.executeSql(queryInsert);
+            },
+            (error) => {
+                console.log('Transaction insertReportData error:', error);
+            },
+            () => {
+                console.log(
+                    'Transaction insertReportData completed successfully'
+                );
+            }
+        );
         console.log('All report inserted successfully');
     } catch (err) {
         throw new Error(`Error inserting report: ${err.message}`);
@@ -92,11 +102,42 @@ export const insertReportData = (
 };
 
 export const getReport = async (
-    db: SQLiteDatabase
+    db: SQLiteDatabase,
+    filters?: {
+        location?: string;
+        state?: string;
+    },
+    isPagination: boolean = true,
+    page: number = 1,
+    limit: number = 10
 ): Promise<ReportAssetData[]> => {
-    const query = `SELECT * FROM report`;
+    let query = `SELECT * FROM report`;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`report.location LIKE ?`);
+        queryParams.push(`%${filters.location}%`);
+    }
+
+    if (filters?.state !== undefined) {
+        whereConditions.push(`report.state LIKE ?`);
+        queryParams.push(`%${filters.state}%`);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    if (isPagination) {
+        const offset = (page - 1) * limit;
+        query += ` LIMIT ? OFFSET ?`;
+        queryParams.push(limit, offset);
+    }
+
     try {
-        const results = await db.executeSql(query);
+        const results = await db.executeSql(query, queryParams);
         const report = [];
         if (results.length > 0) {
             for (let i = 0; i < results[0].rows.length; i++) {

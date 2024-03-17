@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import PrivateStack from '@src/stack/private';
 import PublicStack from '@src/stack/public';
-import { authState, useRecoilState } from '@src/store';
+import { loginState, useRecoilState } from '@src/store';
 import React, { useCallback, useEffect } from 'react';
 import { RootStackParamsList } from './typings/navigation';
 
@@ -15,22 +15,23 @@ import { getDBConnection } from './db/config';
 import { createTableLocation } from './db/location';
 import { createTableReport } from './db/report';
 import { createTableUseStatus } from './db/useStatus';
+import { LoginState } from './typings/common';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function App() {
-    const [token, setToken] = useRecoilState<string>(authState);
+    const [login, setLogin] = useRecoilState<LoginState>(loginState);
 
-    const getUserToken = useCallback(async () => {
+    const getUserLogin = useCallback(async () => {
         try {
-            const tokenValue = await AsyncStorage.getItem('Token');
-            if (tokenValue !== null && tokenValue !== '') {
-                setToken(tokenValue);
+            const loginValue = await AsyncStorage.getItem('Login');
+            if (loginValue !== null && loginValue !== '') {
+                setLogin(JSON.parse(loginValue));
             }
         } catch (err) {
             console.log(err);
         }
-    }, [setToken]);
+    }, [setLogin]);
 
     const loadDataDB = useCallback(async () => {
         try {
@@ -52,8 +53,8 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        getUserToken();
-    }, [getUserToken, loadDataDB]);
+        getUserLogin();
+    }, [getUserLogin, loadDataDB]);
 
     useEffect(() => {
         loadDataDB();
@@ -66,7 +67,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                {token !== '' ? (
+                {login?.session_id !== '' ? (
                     <Stack.Screen
                         options={{
                             headerShown: false

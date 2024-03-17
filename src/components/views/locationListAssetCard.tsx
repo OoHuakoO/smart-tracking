@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface LocationListAssetProps {
     assetCode: string;
@@ -17,17 +17,29 @@ const LocationListAssetCard: FC<LocationListAssetProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={{
-                        uri: `data:image/png;base64,${imageSource}`
-                    }}
-                    resizeMode="cover"
-                />
+                {imageSource?.toString() !== 'false' ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text style={styles.additionalText}>{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text style={styles.additionalText}>{assetName}</Text>
+                </View>
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faLocationDot} color="#DC3E3F" />
                     <Text style={styles.locationText}>{assetLocation}</Text>
@@ -40,8 +52,7 @@ const LocationListAssetCard: FC<LocationListAssetProps> = (props) => {
 const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
-        width: widthPercentageToDP('90%'),
-        height: 130,
+        width: wp('90%'),
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -67,7 +78,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
@@ -88,6 +100,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignContent: 'center',
         margin: 5
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 

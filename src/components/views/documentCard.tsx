@@ -1,5 +1,6 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { STATE_DOCUMENT_NAME } from '@src/constant';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -9,25 +10,27 @@ interface DocumentScreenProp {
     locationInfo: string;
     dateInfo: string;
     documentStatus: string;
+    online: boolean;
 }
 const DocumentCard: FC<DocumentScreenProp> = (props) => {
-    const { documentTitle, locationInfo, dateInfo, documentStatus } = props;
+    const { documentTitle, locationInfo, dateInfo, documentStatus, online } =
+        props;
     let backgroundColor = 'black';
     let borderColor = 'black';
     switch (documentStatus) {
-        case 'draft':
+        case STATE_DOCUMENT_NAME.Draft:
             backgroundColor = '#2E67A6';
             borderColor = '#2E67A6';
             break;
-        case 'inprogress':
+        case STATE_DOCUMENT_NAME.Check:
             backgroundColor = '#F8A435';
             borderColor = '#F8A435';
             break;
-        case 'done':
+        case STATE_DOCUMENT_NAME.Done:
             backgroundColor = '#63CA7F';
             borderColor = '#63CA7F';
             break;
-        case 'canceled':
+        case STATE_DOCUMENT_NAME.Cancel:
             backgroundColor = '#F0787A';
             borderColor = '#F0787A';
             break;
@@ -36,7 +39,7 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
     return (
         <View style={[styles.cardContainer, { borderColor }]}>
             <View style={styles.deleteIconContainer}>
-                {documentStatus === 'draft' && (
+                {documentStatus === STATE_DOCUMENT_NAME.Draft && !online && (
                     <TouchableOpacity
                         onPress={() => console.log('Delete')}
                         activeOpacity={0.5}
@@ -49,14 +52,14 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                 <Text style={styles.documentTitle}>{documentTitle}</Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>
                     <Text variant="bodyMedium" style={styles.primitiveText}>
-                        Location:{' '}
+                        Location : {''}
                     </Text>
                     {locationInfo}
                 </Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>
                     <Text variant="bodyMedium" style={styles.primitiveText}>
-                        Date:{' '}
-                    </Text>{' '}
+                        Date : {''}
+                    </Text>
                     {dateInfo}
                 </Text>
                 <View style={[styles.statusContainer, { backgroundColor }]}>

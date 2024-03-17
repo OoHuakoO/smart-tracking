@@ -37,22 +37,30 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                 </View>
                 <View style={styles.imagesContainer}>
-                    <Image
-                        style={styles.image}
-                        source={{
-                            uri: `data:image/png;base64,${route?.params?.assetData?.image}`
-                        }}
-                        resizeMode="cover"
-                    />
+                    {route?.params?.assetData?.image?.toString() !== 'false' ? (
+                        <Image
+                            style={styles.image}
+                            source={{
+                                uri: `data:image/png;base64,${route?.params?.assetData?.image}`
+                            }}
+                            resizeMode="cover"
+                        />
+                    ) : (
+                        <Image
+                            style={styles.image}
+                            source={require('../../assets/images/default_image.jpg')}
+                            resizeMode="cover"
+                        />
+                    )}
                 </View>
             </View>
             <View style={styles.assetDetailSection}>
                 <View style={styles.assetName}>
                     <Text variant="headlineMedium" style={styles.textAssetName}>
-                        {route?.params?.assetData?.name || ''}
+                        {route?.params?.assetData?.name || '-'}
                     </Text>
                     <Text variant="headlineSmall">
-                        {route?.params?.assetData?.default_code || ''}
+                        {route?.params?.assetData?.default_code || '-'}
                     </Text>
                 </View>
                 <View style={styles.assetStatus}>
@@ -85,21 +93,21 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                     <View style={styles.assetDetailDes}>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.serial_no || ''}
+                            {route?.params?.assetData?.serial_no || '-'}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.brand_name || ''}
-                        </Text>
-
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.category || ''}
+                            {route?.params?.assetData?.brand_name || '-'}
                         </Text>
 
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location || ''}
+                            {route?.params?.assetData?.category || '-'}
+                        </Text>
+
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            {route?.params?.assetData?.location || '-'}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.owner || ''}
+                            {route?.params?.assetData?.owner || '-'}
                         </Text>
                     </View>
                 </View>
@@ -113,11 +121,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: hp('40%'),
+        height: hp('30%'),
         width: wp('100%'),
         position: 'absolute',
         display: 'flex',
-        backgroundColor: theme.colors.background
+        backgroundColor: theme.colors.background,
+        alignItems: 'center'
     },
     containerButton: {
         display: 'flex',
@@ -130,14 +139,16 @@ const styles = StyleSheet.create({
         marginHorizontal: 15
     },
     imagesContainer: {
-        width: '90%',
+        width: '60%',
         height: '100%',
         backgroundColor: theme.colors.emptyPicture,
         borderRadius: 10,
         position: 'absolute',
         marginLeft: 20,
         marginTop: 15,
-        zIndex: 1
+        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center'
     },
     image: {
         width: '100%',
@@ -147,7 +158,7 @@ const styles = StyleSheet.create({
     assetDetailSection: {
         height: hp('70%'),
         width: wp('100%'),
-        marginTop: '70%',
+        marginTop: '55%',
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -166,7 +177,7 @@ const styles = StyleSheet.create({
     },
     textAssetName: {
         fontFamily: 'Sarabun-Regular',
-        lineHeight: 60
+        lineHeight: 40
     },
     assetStatus: {
         display: 'flex',

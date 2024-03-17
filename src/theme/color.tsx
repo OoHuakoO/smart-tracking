@@ -10,9 +10,11 @@ export const colorConfig = {
     textPrimary: '#404040',
     textBody: '#828282',
     white: '#F7F7F7',
+    pureWhite: '#FFFFFF',
     disableSwitch: '#767577',
     black: '#121212',
     buttonCancel: '#FF6C6C',
     buttonConfirm: '#386BA9',
-    emptyPicture: '#ACACAC'
+    emptyPicture: '#ACACAC',
+    borderAutocomplete: '#A1A1A1'
 };
