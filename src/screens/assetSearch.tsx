@@ -16,14 +16,7 @@ import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
 import { Text } from 'react-native-paper';
@@ -60,21 +53,23 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleOnChangeSearchCode = useCallback(async (text: string) => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const response = await GetAssetSearch({
-                    page: 1,
-                    limit: 10,
-                    search_term: { default_code: text }
-                });
-                setListCode(response?.result?.data?.asset);
-            } else {
-                const db = await getDBConnection();
-                const filter = {
-                    default_code: text
-                };
-                const listAssetDB = await getAsset(db, filter);
-                setListCode(listAssetDB);
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetAssetSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: { default_code: text }
+                    });
+                    setListCode(response?.result?.data?.asset);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        default_code: text
+                    };
+                    const listAssetDB = await getAsset(db, filter);
+                    setListCode(listAssetDB);
+                }
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -84,21 +79,23 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleOnChangeSearchName = useCallback(async (text: string) => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const response = await GetAssetSearch({
-                    page: 1,
-                    limit: 10,
-                    search_term: { name: text }
-                });
-                setListName(response?.result?.data?.asset);
-            } else {
-                const db = await getDBConnection();
-                const filter = {
-                    name: text
-                };
-                const listAssetDB = await getAsset(db, filter);
-                setListName(listAssetDB);
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetAssetSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: { name: text }
+                    });
+                    setListName(response?.result?.data?.asset);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        name: text
+                    };
+                    const listAssetDB = await getAsset(db, filter);
+                    setListName(listAssetDB);
+                }
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -108,27 +105,29 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     const handleOnChangeSearchLocation = useCallback(async (text: string) => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const response = await GetLocationSearch({
-                    page: 1,
-                    limit: 10,
-                    search_term: text
-                });
-                setListLocation(response?.result?.data?.locations);
-            } else {
-                const db = await getDBConnection();
-                const filter = {
-                    name: text
-                };
-                const listLocationDB = await getLocations(db, filter);
-                const listLocationSearch = listLocationDB.map((item) => {
-                    return {
-                        location_id: item?.asset_location_id,
-                        location_name: item?.name
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetLocationSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: text
+                    });
+                    setListLocation(response?.result?.data?.locations);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        name: text
                     };
-                });
-                setListLocation(listLocationSearch);
+                    const listLocationDB = await getLocations(db, filter);
+                    const listLocationSearch = listLocationDB.map((item) => {
+                        return {
+                            location_id: item?.asset_location_id,
+                            location_name: item?.name
+                        };
+                    });
+                    setListLocation(listLocationSearch);
+                }
             }
         } catch (err) {
             setVisibleDialog(true);
@@ -190,18 +189,51 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         try {
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const [responseUseStatus, responseCategory] = await Promise.all(
-                    [
-                        GetUseStatus({ page: 1, limit: 1000 }),
-                        GetCategory({ page: 1, limit: 1000 })
-                    ]
-                );
+                const [
+                    responseAsset,
+                    responseLocation,
+                    responseUseStatus,
+                    responseCategory
+                ] = await Promise.all([
+                    GetAssetSearch({
+                        page: 1,
+                        limit: 10
+                    }),
+                    GetLocationSearch({
+                        page: 1,
+                        limit: 10
+                    }),
+                    GetUseStatus({ page: 1, limit: 1000 }),
+                    GetCategory({ page: 1, limit: 1000 })
+                ]);
+                setListName(responseAsset?.result?.data?.asset);
+                setListCode(responseAsset?.result?.data?.asset);
+                setListLocation(responseLocation?.result?.data?.locations);
                 setListUseState(responseUseStatus?.result?.data.data);
                 setListCategory(responseCategory?.result?.data.asset);
             } else {
                 const db = await getDBConnection();
-                const listUseStatusDB = await getUseStatus(db, 1, 1000);
-                const listCategoryDB = await getCategory(db, 1, 1000);
+                const [
+                    listUseStatusDB,
+                    listCategoryDB,
+                    listLocationDB,
+                    listAssetDB
+                ] = await Promise.all([
+                    getUseStatus(db, 1, 1000),
+                    getCategory(db, 1, 1000),
+                    getLocations(db),
+                    getAsset(db)
+                ]);
+
+                const listLocationSearch = listLocationDB.map((item) => {
+                    return {
+                        location_id: item?.asset_location_id,
+                        location_name: item?.name
+                    };
+                });
+                setListLocation(listLocationSearch);
+                setListCode(listAssetDB);
+                setListName(listAssetDB);
                 setListUseState(listUseStatusDB);
                 setListCategory(listCategoryDB);
             }
@@ -224,190 +256,182 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
 
     return (
         <ScrollView style={styles.container}>
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
+            <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={() => navigation.goBack()}
+                style={styles.closeButton}
             >
-                <AlertDialog
-                    textContent={contentDialog}
-                    visible={visibleDialog}
-                    handleClose={handleCloseDialog}
-                    handleConfirm={handleCloseDialog}
+                <ActionButton
+                    icon={'close'}
+                    size="small"
+                    backgroundColor={theme.colors.white}
                 />
-                <TouchableOpacity
-                    activeOpacity={0.5}
-                    onPress={() => navigation.goBack()}
-                    style={styles.closeButton}
-                >
-                    <ActionButton
-                        icon={'close'}
-                        size="small"
-                        backgroundColor={theme.colors.white}
-                    />
-                </TouchableOpacity>
-                <View style={styles.containerInput}>
-                    <Text variant="displaySmall" style={styles.textSearchAsset}>
-                        Search Asset
-                    </Text>
-                    <Text variant="bodyLarge">Code</Text>
+            </TouchableOpacity>
+            <View style={styles.containerInput}>
+                <Text variant="displaySmall" style={styles.textSearchAsset}>
+                    Search Asset
+                </Text>
+                <Text variant="bodyLarge">Code</Text>
 
-                    <Dropdown
-                        style={[
-                            styles.dropdown,
-                            isFocusCode && styles.dropdownSelect
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={listCode}
-                        search
-                        maxHeight={300}
-                        labelField="default_code"
-                        valueField="default_code"
-                        placeholder={'Select Code'}
-                        searchPlaceholder="Search"
-                        value={searchCode}
-                        onFocus={() => setIsFocusCode(true)}
-                        onBlur={() => setIsFocusCode(false)}
-                        onChange={(item) => {
-                            setSearchCode(item?.default_code);
-                        }}
-                        onChangeText={(text) => handleOnChangeSearchCode(text)}
-                        renderItem={renderItemCode}
-                    />
-                    <Text variant="bodyLarge">Name</Text>
+                <Dropdown
+                    style={[
+                        styles.dropdown,
+                        isFocusCode && styles.dropdownSelect
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={listCode}
+                    search
+                    maxHeight={300}
+                    labelField="default_code"
+                    valueField="default_code"
+                    placeholder={'Select Code'}
+                    searchPlaceholder="Search"
+                    value={searchCode}
+                    onFocus={() => setIsFocusCode(true)}
+                    onBlur={() => setIsFocusCode(false)}
+                    onChange={(item) => {
+                        setSearchCode(item?.default_code);
+                    }}
+                    onChangeText={(text) => handleOnChangeSearchCode(text)}
+                    renderItem={renderItemCode}
+                />
+                <Text variant="bodyLarge">Name</Text>
 
-                    <Dropdown
-                        style={[
-                            styles.dropdown,
-                            isFocusName && styles.dropdownSelect
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={listName}
-                        search
-                        maxHeight={300}
-                        labelField="name"
-                        valueField="name"
-                        placeholder={'Select Name'}
-                        searchPlaceholder="Search"
-                        value={searchName}
-                        onFocus={() => setIsFocusName(true)}
-                        onBlur={() => setIsFocusName(false)}
-                        onChange={(item) => {
-                            setSearchName(item?.name);
-                        }}
-                        onChangeText={(text) => handleOnChangeSearchName(text)}
-                        renderItem={renderItemName}
-                    />
-                    <Text variant="bodyLarge">Location</Text>
+                <Dropdown
+                    style={[
+                        styles.dropdown,
+                        isFocusName && styles.dropdownSelect
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={listName}
+                    search
+                    maxHeight={300}
+                    labelField="name"
+                    valueField="name"
+                    placeholder={'Select Name'}
+                    searchPlaceholder="Search"
+                    value={searchName}
+                    onFocus={() => setIsFocusName(true)}
+                    onBlur={() => setIsFocusName(false)}
+                    onChange={(item) => {
+                        setSearchName(item?.name);
+                    }}
+                    onChangeText={(text) => handleOnChangeSearchName(text)}
+                    renderItem={renderItemName}
+                />
+                <Text variant="bodyLarge">Location</Text>
 
-                    <Dropdown
-                        style={[
-                            styles.dropdown,
-                            isFocusLocation && styles.dropdownSelect
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={listLocation}
-                        search
-                        maxHeight={300}
-                        labelField="location_name"
-                        valueField="location_name"
-                        placeholder={'Select Location'}
-                        searchPlaceholder="Search"
-                        value={searchLocation}
-                        onFocus={() => setIsFocusLocation(true)}
-                        onBlur={() => setIsFocusLocation(false)}
-                        onChange={(item) => {
-                            setSearchLocation(item?.location_name);
-                        }}
-                        onChangeText={(text) =>
-                            handleOnChangeSearchLocation(text)
+                <Dropdown
+                    style={[
+                        styles.dropdown,
+                        isFocusLocation && styles.dropdownSelect
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={listLocation}
+                    search
+                    maxHeight={300}
+                    labelField="location_name"
+                    valueField="location_name"
+                    placeholder={'Select Location'}
+                    searchPlaceholder="Search"
+                    value={searchLocation}
+                    onFocus={() => setIsFocusLocation(true)}
+                    onBlur={() => setIsFocusLocation(false)}
+                    onChange={(item) => {
+                        setSearchLocation(item?.location_name);
+                    }}
+                    onChangeText={(text) => handleOnChangeSearchLocation(text)}
+                    renderItem={renderItemLocation}
+                />
+
+                <Text variant="bodyLarge">Use State</Text>
+
+                <Dropdown
+                    style={[
+                        styles.dropdown,
+                        isFocusUseState && styles.dropdownSelect
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={listUseState}
+                    maxHeight={300}
+                    labelField="name"
+                    valueField="name"
+                    placeholder={'Select UseState'}
+                    value={searchUseState}
+                    onFocus={() => setIsFocusUseState(true)}
+                    onBlur={() => setIsFocusUseState(false)}
+                    onChange={(item) => {
+                        setSearchUseState(item?.name);
+                    }}
+                    renderItem={renderItemUseState}
+                />
+
+                <Text variant="bodyLarge">Catagory</Text>
+
+                <Dropdown
+                    style={[
+                        styles.dropdown,
+                        isFocusCategory && styles.dropdownSelect
+                    ]}
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    inputSearchStyle={styles.inputSearchStyle}
+                    data={listCategory}
+                    labelField="category_name"
+                    valueField="category_name"
+                    placeholder={'Select Category'}
+                    value={searchCategory}
+                    onFocus={() => setIsFocusCategory(true)}
+                    onBlur={() => setIsFocusCategory(false)}
+                    onChange={(item) => {
+                        setSearchCategory(item);
+                    }}
+                    renderItem={renderItemCategory}
+                />
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={styles.buttonClear}
+                        onPress={() => handleClearInput()}
+                    >
+                        <Text variant="bodyLarge" style={styles.buttonText}>
+                            Clear
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.buttonApply}
+                        onPress={() =>
+                            navigation.navigate('Assets', {
+                                assetSearch: {
+                                    default_code: searchCode,
+                                    name: searchName,
+                                    location: searchLocation,
+                                    use_state: searchUseState,
+                                    category_id: searchCategory?.category_id
+                                }
+                            })
                         }
-                        renderItem={renderItemLocation}
-                    />
-
-                    <Text variant="bodyLarge">Use State</Text>
-
-                    <Dropdown
-                        style={[
-                            styles.dropdown,
-                            isFocusUseState && styles.dropdownSelect
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={listUseState}
-                        maxHeight={300}
-                        labelField="name"
-                        valueField="name"
-                        placeholder={'Select UseState'}
-                        value={searchUseState}
-                        onFocus={() => setIsFocusUseState(true)}
-                        onBlur={() => setIsFocusUseState(false)}
-                        onChange={(item) => {
-                            setSearchUseState(item?.name);
-                        }}
-                        renderItem={renderItemUseState}
-                    />
-
-                    <Text variant="bodyLarge">Catagory</Text>
-
-                    <Dropdown
-                        style={[
-                            styles.dropdown,
-                            isFocusCategory && styles.dropdownSelect
-                        ]}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={listCategory}
-                        maxHeight={300}
-                        labelField="category_name"
-                        valueField="category_name"
-                        placeholder={'Select Category'}
-                        value={searchCategory}
-                        onFocus={() => setIsFocusCategory(true)}
-                        onBlur={() => setIsFocusCategory(false)}
-                        onChange={(item) => {
-                            setSearchCategory(item);
-                        }}
-                        renderItem={renderItemCategory}
-                    />
-
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity
-                            style={styles.buttonClear}
-                            onPress={() => handleClearInput()}
-                        >
-                            <Text variant="bodyLarge" style={styles.buttonText}>
-                                Clear
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.buttonApply}
-                            onPress={() =>
-                                navigation.navigate('Assets', {
-                                    assetSearch: {
-                                        default_code: searchCode,
-                                        name: searchName,
-                                        location: searchLocation,
-                                        use_state: searchUseState,
-                                        category_id: searchCategory?.category_id
-                                    }
-                                })
-                            }
-                        >
-                            <Text variant="bodyLarge" style={styles.buttonText}>
-                                Apply
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
+                    >
+                        <Text variant="bodyLarge" style={styles.buttonText}>
+                            Apply
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-            </KeyboardAvoidingView>
+            </View>
         </ScrollView>
     );
 };

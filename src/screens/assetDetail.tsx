@@ -57,10 +57,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
             <View style={styles.assetDetailSection}>
                 <View style={styles.assetName}>
                     <Text variant="headlineMedium" style={styles.textAssetName}>
-                        {route?.params?.assetData?.name || ''}
+                        {route?.params?.assetData?.name || '-'}
                     </Text>
                     <Text variant="headlineSmall">
-                        {route?.params?.assetData?.default_code || ''}
+                        {route?.params?.assetData?.default_code || '-'}
                     </Text>
                 </View>
                 <View style={styles.assetStatus}>
@@ -93,21 +93,21 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                     <View style={styles.assetDetailDes}>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.serial_no || ''}
+                            {route?.params?.assetData?.serial_no || '-'}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.brand_name || ''}
-                        </Text>
-
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.category || ''}
+                            {route?.params?.assetData?.brand_name || '-'}
                         </Text>
 
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location || ''}
+                            {route?.params?.assetData?.category || '-'}
+                        </Text>
+
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            {route?.params?.assetData?.location || '-'}
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.owner || ''}
+                            {route?.params?.assetData?.owner || '-'}
                         </Text>
                     </View>
                 </View>
@@ -121,11 +121,12 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: hp('40%'),
+        height: hp('30%'),
         width: wp('100%'),
         position: 'absolute',
         display: 'flex',
-        backgroundColor: theme.colors.background
+        backgroundColor: theme.colors.background,
+        alignItems: 'center'
     },
     containerButton: {
         display: 'flex',
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15
     },
     imagesContainer: {
-        width: '90%',
+        width: '60%',
         height: '100%',
         backgroundColor: theme.colors.emptyPicture,
         borderRadius: 10,
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     assetDetailSection: {
         height: hp('70%'),
         width: wp('100%'),
-        marginTop: '75%',
+        marginTop: '55%',
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     },
     textAssetName: {
         fontFamily: 'Sarabun-Regular',
-        lineHeight: 60
+        lineHeight: 40
     },
     assetStatus: {
         display: 'flex',

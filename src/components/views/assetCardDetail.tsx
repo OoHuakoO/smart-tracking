@@ -34,8 +34,12 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
                 )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text style={styles.additionalText}>{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text style={styles.additionalText}>{assetName}</Text>
+                </View>
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faLocationDot} color="#DC3E3F" />
                     <Text style={styles.locationText}>{assetLocation}</Text>
@@ -49,7 +53,6 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: wp('90%'),
-        height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -78,16 +81,23 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#404040'
+        color: '#404040',
+        width: 0,
+        flexGrow: 1,
+        flex: 1
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
+        color: '#777',
+        width: 0,
+        flexGrow: 1,
+        flex: 1
     },
     iconContainer: {
         display: 'flex',
@@ -99,6 +109,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignContent: 'center',
         margin: 5
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 
