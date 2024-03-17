@@ -1,4 +1,5 @@
 import { SearchAsset } from './asset';
+import { DocumentAssetData } from './document';
 import { AssetData, LocationData } from './downloadDB';
 
 export type RootStackParamsList = {
@@ -32,16 +33,21 @@ export type PrivateStackParamsList = {
     ReportAssetData: {
         title: string;
     };
+
+    LocationListReportAsset: {
+        LocationData: LocationData;
+        title: string;
+    };
     DocumentAssetStatus: {
         id: number;
         state: string;
         location: string;
     };
-    LocationListReportAsset: {
-        LocationData: LocationData;
-        title: string;
+    DocumentCreate: {
+        id: number;
+        location: string;
+        assetDocumentList: DocumentAssetData[];
     };
-    DocumentCreate: undefined;
     DocumentCreateSearch: undefined;
     DocumentCreateAsset: undefined;
 };

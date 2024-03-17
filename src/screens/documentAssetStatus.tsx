@@ -55,7 +55,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const [idAsset, setIdAsset] = useState<number>(0);
 
     let backgroundColor = 'black';
-    let documentStatus = STATE_DOCUMENT_NAME.Draft;
 
     switch (route?.params?.state) {
         case STATE_DOCUMENT_NAME.Draft:
@@ -255,11 +254,17 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </TouchableOpacity>
                 )} */}
             </View>
-            {documentStatus === STATE_DOCUMENT_NAME.Draft && (
+            {route?.params?.state === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity
                     activeOpacity={0.5}
                     style={styles.button}
-                    onPress={() => navigation.navigate('DocumentCreateAsset')}
+                    onPress={() =>
+                        navigation.navigate('DocumentCreate', {
+                            id: route?.params?.id,
+                            location: route?.params?.location,
+                            assetDocumentList: listAssetDocument
+                        })
+                    }
                 >
                     <ActionButton icon="plus" color={theme.colors.white} />
                 </TouchableOpacity>
