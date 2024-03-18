@@ -13,6 +13,12 @@ export const STATE_DOCUMENT_NAME = {
 };
 
 export const USE_STATE_ASSET = {
+    Normal: 2,
+    Damaged: 3,
+    Repair: 4
+};
+
+export const USE_STATE_ASSET_TH = {
     Normal: 'ปกติ',
     Damaged: 'ชำรุด',
     Repair: 'รอส่งซ่อม'

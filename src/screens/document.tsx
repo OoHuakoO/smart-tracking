@@ -197,7 +197,8 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 navigation.navigate('DocumentAssetStatus', {
                     id: response?.result?.asset_tracking_id,
                     state: STATE_DOCUMENT_NAME.Draft,
-                    location: location?.location_name
+                    location: location?.location_name,
+                    location_id: location?.location_id
                 });
                 await handleFetchDocument();
                 await handleFetchLocation();
@@ -266,7 +267,8 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                     navigation.navigate('DocumentAssetStatus', {
                                         id: item?.id,
                                         state: item?.state,
-                                        location: item?.location
+                                        location: item?.location,
+                                        location_id: item?.location_id
                                     })
                                 }
                             >

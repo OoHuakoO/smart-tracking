@@ -1,18 +1,4 @@
-export interface AssetData {
-    asset_id: number;
-    default_code: string;
-    name: string;
-    description: string;
-    category_id: number;
-    serial_no: string;
-    brand_name: string;
-    quantity: number;
-    location_id: number;
-    image: string;
-    use_state: string;
-    owner: string;
-    new_img: boolean;
-}
+import { AssetData } from './downloadDB';
 
 export interface GetAssetData {
     total_page: number;

@@ -1,6 +1,6 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
@@ -11,20 +11,11 @@ interface AddAssetCardProps {
     assetName: string;
     assetStatus: string;
     assetMovement: string;
-    assetDate: string;
 }
 
 const AddAssetCard: FC<AddAssetCardProps> = (props) => {
-    const {
-        imageSource,
-        assetCode,
-        assetName,
-        assetStatus,
-        assetMovement,
-        assetDate
-    } = props;
-
-    const [selectedStatus, setSelectedStatus] = useState(assetStatus);
+    const { imageSource, assetCode, assetName, assetStatus, assetMovement } =
+        props;
 
     return (
         <View style={styles.cardContainer}>
@@ -37,7 +28,21 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 </TouchableOpacity>
             </View>
             <View style={styles.imagesContainer}>
-                <Image style={styles.image} source={imageSource} />
+                {imageSource?.toString() !== 'false' ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
                 <Text style={styles.assetCode}>{assetCode}</Text>
@@ -49,10 +54,6 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     Movement {}
                     <Text style={styles.additionalText}>{assetMovement}</Text>
-                </Text>
-                <Text variant="bodyMedium">
-                    Date {}
-                    <Text style={styles.additionalText}>{assetDate}</Text>
                 </Text>
             </View>
         </View>

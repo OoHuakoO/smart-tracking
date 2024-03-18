@@ -42,10 +42,13 @@ export type PrivateStackParamsList = {
         id: number;
         state: string;
         location: string;
+        location_id: number;
     };
     DocumentCreate: {
         id: number;
         location: string;
+        location_id: number;
+        state: string;
         assetDocumentList: DocumentAssetData[];
     };
     DocumentCreateSearch: undefined;
