@@ -13,7 +13,15 @@ interface PopUpDialogProp {
 
 const PopUpDialog: FC<PopUpDialogProp> = (props) => {
     const { visible, onClose, openImagePicker, handleCameraLaunch } = props;
+    const handleImageSelection = () => {
+        onClose();
+        openImagePicker();
+    };
 
+    const handleCameraLaunchAndClose = () => {
+        onClose();
+        handleCameraLaunch();
+    };
     return (
         <Modal visible={visible}>
             <View style={styles.container}>
@@ -25,9 +33,12 @@ const PopUpDialog: FC<PopUpDialogProp> = (props) => {
                 <View style={styles.wraper}>
                     <Button
                         title="Choose from Device"
-                        onPress={openImagePicker}
+                        onPress={handleImageSelection}
                     />
-                    <Button title="Open Camera" onPress={handleCameraLaunch} />
+                    <Button
+                        title="Open Camera"
+                        onPress={handleCameraLaunchAndClose}
+                    />
                 </View>
             </View>
         </Modal>

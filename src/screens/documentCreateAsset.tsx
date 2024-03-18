@@ -7,7 +7,13 @@ import PopUpDialog from '@src/components/views/popUpDialog';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useState } from 'react';
-import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import {
     MediaType,
     launchCamera,
@@ -27,7 +33,7 @@ type DocumentCreateAssetProps = NativeStackScreenProps<
 
 const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
     const { navigation } = props;
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [dialogVisible, setDialogVisible] = useState(false);
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
@@ -47,7 +53,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
             } else if (response.errorCode) {
                 console.log('Image picker error: ', response.errorMessage);
             } else {
-                let imageUri = response.assets || response.assets?.[0]?.uri;
+                let imageUri = response.assets?.[0]?.uri;
                 setSelectedImage(imageUri);
             }
         });
@@ -68,8 +74,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
             } else if (response.errorCode) {
                 console.log('Camera Error: ', response.errorMessage);
             } else {
-                // Process the captured image
-                let imageUri = response.assets || response.assets?.[0]?.uri;
+                let imageUri = response.assets?.[0]?.uri;
                 setSelectedImage(imageUri);
                 console.log(imageUri);
             }
@@ -109,7 +114,24 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
                     activeOpacity={0.8}
                     onPress={toggleDialog}
                 >
-                    <FontAwesomeIcon icon={faCamera} size={34} />
+                    {selectedImage ? (
+                        <View style={styles.imageContainer}>
+                            <Image
+                                source={{ uri: selectedImage }}
+                                style={styles.selectedImage}
+                            />
+                            <TouchableOpacity
+                                onPress={() => setSelectedImage(null)}
+                                style={styles.deselectButton}
+                            >
+                                <Text style={styles.deselectText}>
+                                    Deselect
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    ) : (
+                        <FontAwesomeIcon icon={faCamera} size={34} />
+                    )}
                 </TouchableOpacity>
 
                 <View style={styles.inputWraper}>
@@ -238,6 +260,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#F1F1F1',
         marginTop: 25,
         borderRadius: 12
+    },
+    selectedImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 17
+    },
+    imageContainer: {
+        position: 'relative'
+    },
+    deselectButton: {
+        position: 'absolute',
+        bottom: -10,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 4
+    },
+    deselectText: {
+        color: 'white',
+        fontSize: 12
     },
 
     inputWraper: {
