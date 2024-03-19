@@ -5,6 +5,7 @@ export interface Params {
     location_id?: number;
     asset_tracking_id?: number;
     asset_ids?: any[];
+    asset_data?: any;
 }
 
 export interface Toast {

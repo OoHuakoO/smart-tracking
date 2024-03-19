@@ -15,9 +15,7 @@ export interface AssetData {
     use_state: string;
     owner: string;
     new_img: boolean;
-    // for inner join
-    location_name?: string;
-    category_name?: string;
+    purchase_price: number;
 }
 
 export interface GetAssetsData {

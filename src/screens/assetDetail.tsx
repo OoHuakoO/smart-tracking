@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     assetDetailSection: {
-        height: hp('70%'),
+        height: hp('100%'),
         width: wp('100%'),
         marginTop: '55%',
         backgroundColor: theme.colors.background,

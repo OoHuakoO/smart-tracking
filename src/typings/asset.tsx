@@ -21,3 +21,13 @@ export interface SearchAsset {
     use_state: string;
     category_id: number;
 }
+
+export interface CreateAssetData {
+    id: number;
+    asset: AssetData;
+}
+export interface CreateAssetResponse {
+    success: boolean;
+    message: string;
+    data: GetAssetData;
+}

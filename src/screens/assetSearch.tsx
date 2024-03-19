@@ -10,8 +10,11 @@ import { GetAssetSearch } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
-import { AssetData } from '@src/typings/asset';
-import { CategoryData, UseStatusData } from '@src/typings/downloadDB';
+import {
+    AssetData,
+    CategoryData,
+    UseStatusData
+} from '@src/typings/downloadDB';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
@@ -486,7 +489,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderColor: theme.colors.borderAutocomplete,
         borderWidth: 1,
-        borderRadius: 20,
+        borderRadius: 10,
         paddingHorizontal: 10,
         color: theme.colors.black,
         marginVertical: 8

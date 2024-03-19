@@ -46,6 +46,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
+    const [assetCodeNew, setAssetCodeNew] = useState<string>('');
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -62,6 +63,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         switch (titleDialog) {
             case 'Asset not found in Master':
                 setVisibleDialog(false);
+                navigation.navigate('DocumentCreateAsset', {
+                    id: route?.params?.id,
+                    state: route?.params?.state,
+                    location: route?.params?.location,
+                    location_id: route?.params?.location_id,
+                    code: assetCodeNew
+                });
                 break;
             case 'Asset Transfer':
                 setVisibleDialog(false);
@@ -74,7 +82,15 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setVisibleDialog(false);
                 break;
         }
-    }, [titleDialog]);
+    }, [
+        assetCodeNew,
+        navigation,
+        route?.params?.id,
+        route?.params?.location,
+        route?.params?.location_id,
+        route?.params?.state,
+        titleDialog
+    ]);
 
     const handleMapUseStateThToValue = useCallback((state: string): number => {
         switch (state) {
@@ -184,6 +200,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 }
 
                 if (response?.result?.message === 'Asset not found') {
+                    setAssetCodeNew(assetSearch);
                     setVisibleDialog(true);
                     setTitleDialog('Asset not found in Master');
                     setContentDialog('Do you want to add new asset?');
