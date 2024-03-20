@@ -1,4 +1,4 @@
-import { SearchAsset } from './asset';
+import { AssetDataForPassParamsDocumentCreate, SearchAsset } from './asset';
 import { DocumentAssetData } from './document';
 import { AssetData, LocationData } from './downloadDB';
 
@@ -58,5 +58,6 @@ export type PrivateStackParamsList = {
         location: string;
         location_id: number;
         code: string;
+        onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };
 };

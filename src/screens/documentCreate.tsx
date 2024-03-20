@@ -15,11 +15,13 @@ import {
 import { GetAssetByCode } from '@src/services/asset';
 import { AddDocumentLine } from '@src/services/document';
 import { theme } from '@src/theme';
+import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useCallback, useState } from 'react';
 import {
     FlatList,
+    LogBox,
     SafeAreaView,
     StyleSheet,
     TextInput,
@@ -39,6 +41,9 @@ type DocumentCreateProps = NativeStackScreenProps<
 >;
 
 const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state'
+    ]);
     const { navigation, route } = props;
     const [assetSearch, setAssetSearch] = useState('');
     const [listAssetCreate, setListAssetCreate] = useState<AssetData[]>([]);
@@ -68,7 +73,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     state: route?.params?.state,
                     location: route?.params?.location,
                     location_id: route?.params?.location_id,
-                    code: assetCodeNew
+                    code: assetCodeNew,
+                    onGoBack: (
+                        assetData: AssetDataForPassParamsDocumentCreate
+                    ) => {
+                        setListAssetCreate((prev) => {
+                            return [assetData as AssetData, ...prev];
+                        });
+                    }
                 });
                 break;
             case 'Asset Transfer':

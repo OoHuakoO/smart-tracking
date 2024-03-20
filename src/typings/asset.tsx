@@ -1,5 +1,15 @@
 import { AssetData } from './downloadDB';
 
+export interface AssetDataForPassParamsDocumentCreate {
+    asset_id: number;
+    default_code: string;
+    name: string;
+    state: string;
+    use_state: string;
+    image?: string | boolean;
+    new_img?: boolean;
+}
+
 export interface GetAssetData {
     total_page: number;
     current_page: number;
@@ -29,5 +39,5 @@ export interface CreateAssetData {
 export interface CreateAssetResponse {
     success: boolean;
     message: string;
-    data: GetAssetData;
+    data: CreateAssetData;
 }

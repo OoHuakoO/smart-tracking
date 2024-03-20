@@ -6,6 +6,7 @@ import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import InputText from '@src/components/core/inputText';
 import PopUpDialog from '@src/components/views/popUpDialog';
+import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { loginState, useRecoilValue } from '@src/store';
@@ -130,32 +131,49 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
     const handleSaveAsset = useCallback(
         async (data: AssetData) => {
             try {
-                if (selectedImage) {
-                    const response = await CreateAsset({
-                        asset_data: {
-                            default_code: data?.default_code,
-                            name: data?.name,
-                            category_id: searchCategory?.category_id,
-                            quantity: 1,
-                            location_id: route?.params?.location_id,
-                            user_id: loginValue?.uid,
-                            purchase_price: 0,
-                            image: selectedImage,
-                            new_img: true
-                        }
+                const assetData = {
+                    default_code: data?.default_code,
+                    name: data?.name,
+                    category_id: searchCategory?.category_id,
+                    quantity: 1,
+                    location_id: route?.params?.location_id,
+                    user_id: loginValue?.uid,
+                    purchase_price: 0,
+                    ...(selectedImage && {
+                        image: selectedImage,
+                        new_img: true
+                    })
+                };
+
+                const response = await CreateAsset({
+                    asset_data: assetData
+                });
+
+                if (response?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong save asset');
+                    return;
+                }
+                if (
+                    response?.result?.message === 'Asset created successfully'
+                ) {
+                    route?.params?.onGoBack({
+                        asset_id: response?.result?.data?.id,
+                        default_code: data?.default_code,
+                        name: data?.name,
+                        use_state: searchUseState,
+                        state: MOVEMENT_ASSET_EN.New,
+                        ...(selectedImage
+                            ? {
+                                  image: selectedImage,
+                                  new_img: true
+                              }
+                            : {
+                                  image: false,
+                                  new_img: false
+                              })
                     });
-                } else {
-                    const response = await CreateAsset({
-                        asset_data: {
-                            default_code: data?.default_code,
-                            name: data?.name,
-                            category_id: searchCategory?.category_id,
-                            quantity: 1,
-                            location_id: route?.params?.location_id,
-                            user_id: loginValue?.uid,
-                            purchase_price: 0
-                        }
-                    });
+                    navigation.goBack();
                 }
             } catch (err) {
                 setVisibleDialog(true);
@@ -164,8 +182,10 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
         },
         [
             loginValue?.uid,
-            route?.params?.location_id,
+            navigation,
+            route?.params,
             searchCategory?.category_id,
+            searchUseState,
             selectedImage
         ]
     );
@@ -244,7 +264,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
                                 style={styles.deSelectButton}
                             >
                                 <Text style={styles.deselectText}>
-                                    Deselect
+                                    เลือกภาพใหม่
                                 </Text>
                             </TouchableOpacity>
                         </View>
