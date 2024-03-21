@@ -14,7 +14,7 @@ import { loginState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
-import { LoginParams } from '@src/typings/login';
+import { LoginParams, SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
@@ -52,6 +52,18 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 };
                 setLogin(loginObj);
                 await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
+
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
+                await AsyncStorage.setItem(
+                    'Settings',
+                    JSON.stringify({
+                        ...jsonSettings,
+                        login: data?.login,
+                        password: data?.password
+                    })
+                );
+
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);

@@ -2,7 +2,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
-import { ALL_LOCATION, MOVEMENT_ASSET, REPORT_TYPE } from '@src/constant';
+import {
+    ALL_LOCATION,
+    MOVEMENT_ASSET,
+    REPORT_TYPE,
+    USE_STATE_ASSET_NORMAL_EN
+} from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { getReport } from '@src/db/report';
@@ -161,7 +166,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             serial_no: item.serial_no,
             location_old: item.location,
             quantity: item.quantity,
-            state: 'Normal',
+            state: USE_STATE_ASSET_NORMAL_EN,
             new_img: item.new_img
         }));
     };

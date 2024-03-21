@@ -27,7 +27,6 @@ type AssetsScreenProps = NativeStackScreenProps<
 
 const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const { navigation, route } = props;
-
     const [countTotalAsset, setCountAsset] = useState<number>(0);
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -58,8 +57,10 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 setListAsset(responseAsset?.result?.data?.asset);
             } else {
                 const db = await getDBConnection();
-                const countAsset = await getTotalAssets(db, assetSearch);
-                const listAssetDB = await getAsset(db, assetSearch);
+                const [countAsset, listAssetDB] = await Promise.all([
+                    getTotalAssets(db, assetSearch),
+                    getAsset(db, assetSearch)
+                ]);
                 setCountAsset(countAsset);
                 setListAsset(listAssetDB);
             }

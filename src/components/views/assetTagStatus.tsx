@@ -1,4 +1,8 @@
-import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
+import {
+    MOVEMENT_ASSET_NORMAL_TH,
+    USE_STATE_ASSET_NORMAL_EN,
+    USE_STATE_ASSET_TH
+} from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -12,13 +16,13 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     let backgroundColor = '#63CA7F';
 
     switch (status) {
-        case 'ชำรุด':
+        case USE_STATE_ASSET_TH.Damaged:
             backgroundColor = '#F0787A';
             break;
-        case 'รอส่งซ่อม':
+        case USE_STATE_ASSET_TH.Repair:
             backgroundColor = '#F8A435';
             break;
-        case 'Normal':
+        case USE_STATE_ASSET_NORMAL_EN:
             backgroundColor = '#63CA7F';
             break;
         default:
@@ -30,7 +34,9 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
         <View style={[styles.container, { backgroundColor }]}>
             <Text variant="titleMedium" style={styles.statusText}>
                 สถานะ :{' '}
-                {status === 'Normal' ? MOVEMENT_ASSET_NORMAL_TH : status}
+                {status === USE_STATE_ASSET_NORMAL_EN
+                    ? MOVEMENT_ASSET_NORMAL_TH
+                    : status}
             </Text>
         </View>
     );

@@ -63,7 +63,7 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                             <TouchableOpacity onPress={handleClose}>
                                 <Button style={styles.dialogActionCancel}>
                                     <Text
-                                        style={styles.textActionCancel}
+                                        style={styles.text}
                                         variant="bodyLarge"
                                     >
                                         Cancel
@@ -73,10 +73,7 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                         )}
                         <TouchableOpacity onPress={handleConfirm}>
                             <Button style={styles.dialogActionConfirm}>
-                                <Text
-                                    style={styles.textActionConfirm}
-                                    variant="bodyLarge"
-                                >
+                                <Text style={styles.text} variant="bodyLarge">
                                     Confirm
                                 </Text>
                             </Button>
@@ -105,7 +102,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.buttonCancel,
         borderRadius: 10
     },
-    textActionCancel: {
+    text: {
         fontFamily: 'DMSans-Medium',
         color: theme.colors.white
     },
@@ -114,10 +111,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         backgroundColor: theme.colors.buttonConfirm,
         borderRadius: 10
-    },
-    textActionConfirm: {
-        fontFamily: 'DMSans-Medium',
-        color: theme.colors.white
     },
     progressBar: {
         width: '80%',

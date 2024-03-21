@@ -1,5 +1,6 @@
 import { Params } from '@src/typings/common';
 import {
+    AddDocumentLineResponse,
     CreateDocumentResponse,
     DeleteDocumentLineResponse,
     GetDocumentByIdResponse,
@@ -33,6 +34,15 @@ export function CreateDocument(
 ): Promise<Response<CreateDocumentResponse>> {
     return post<CreateDocumentResponse>(
         `/api/document/tracking/create/`,
+        params
+    );
+}
+
+export function AddDocumentLine(
+    params: Params
+): Promise<Response<AddDocumentLineResponse>> {
+    return postDelete<AddDocumentLineResponse>(
+        `/api/add/document/line`,
         params
     );
 }

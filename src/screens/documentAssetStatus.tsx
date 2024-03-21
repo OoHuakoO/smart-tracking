@@ -21,8 +21,8 @@ import {
     MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     STATE_DOCUMENT_NAME,
-    USE_STATE_ASSET,
-    USE_STATE_ASSET_NORMAL_EN
+    USE_STATE_ASSET_NORMAL_EN,
+    USE_STATE_ASSET_TH
 } from '@src/constant';
 import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
 import { DocumentAssetData } from '@src/typings/document';
@@ -99,7 +99,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 const response = await GetDocumentById(route?.params?.id);
                 response?.result?.data?.asset?.assets?.map((item) => {
                     if (item?.use_state === USE_STATE_ASSET_NORMAL_EN) {
-                        item.use_state = USE_STATE_ASSET.Normal;
+                        item.use_state = USE_STATE_ASSET_TH.Normal;
                     }
                     item.state = handleMapStateValue(item?.state);
                     item.date_check = parseDateString(item?.date_check);
@@ -227,6 +227,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 </Text>
                 <FlatList
                     data={listAssetDocument}
+                    style={styles.flatListStyle}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <DocumentAssetStatusCard
@@ -262,6 +263,8 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         navigation.navigate('DocumentCreate', {
                             id: route?.params?.id,
                             location: route?.params?.location,
+                            location_id: route?.params?.location_id,
+                            state: route?.params?.state,
                             assetDocumentList: listAssetDocument
                         })
                     }
@@ -328,12 +331,12 @@ const styles = StyleSheet.create({
     },
     listSection: {
         flex: 1,
-        height: hp('30%'),
+        height: hp('100%'),
         width: wp('100%'),
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%'
+        marginTop: '52%'
     },
     wrapDetailList: {
         display: 'flex',
@@ -378,6 +381,9 @@ const styles = StyleSheet.create({
     textReset: {
         fontWeight: 'bold',
         color: '#F0787A'
+    },
+    flatListStyle: {
+        marginBottom: 30
     }
 });
 

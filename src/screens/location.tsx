@@ -88,7 +88,11 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                     ]);
                 } else {
                     const db = await getDBConnection();
-                    const listLocationDB = await getLocations(db, page + 1);
+                    const listLocationDB = await getLocations(
+                        db,
+                        null,
+                        page + 1
+                    );
                     setListLocation([...listLocation, ...listLocationDB]);
                 }
             }

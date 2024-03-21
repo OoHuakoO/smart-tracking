@@ -1,47 +1,65 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface AddAssetCardProps {
     imageSource?: any;
+    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetMovement: string;
-    assetDate: string;
+    handleRemoveAsset: (id: number) => void;
 }
 
 const AddAssetCard: FC<AddAssetCardProps> = (props) => {
     const {
         imageSource,
+        assetId,
         assetCode,
         assetName,
         assetStatus,
         assetMovement,
-        assetDate
+        handleRemoveAsset
     } = props;
-
-    const [selectedStatus, setSelectedStatus] = useState(assetStatus);
 
     return (
         <View style={styles.cardContainer}>
             <View style={styles.deleteIconContainer}>
                 <TouchableOpacity
-                    onPress={() => console.log('Delete')}
+                    onPress={() => handleRemoveAsset(assetId)}
                     activeOpacity={0.5}
                 >
                     <FontAwesomeIcon icon={faTrash} color="#F0787A" />
                 </TouchableOpacity>
             </View>
             <View style={styles.imagesContainer}>
-                <Image style={styles.image} source={imageSource} />
+                {imageSource?.toString() !== 'false' ? (
+                    <Image
+                        style={styles.image}
+                        source={{
+                            uri: `data:image/png;base64,${imageSource}`
+                        }}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        style={styles.image}
+                        source={require('../../../assets/images/default_image.jpg')}
+                        resizeMode="cover"
+                    />
+                )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text variant="bodyLarge">{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text variant="bodyLarge">{assetName}</Text>
+                </View>
                 <Text variant="bodyMedium">
                     Status {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
@@ -49,10 +67,6 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     Movement {}
                     <Text style={styles.additionalText}>{assetMovement}</Text>
-                </Text>
-                <Text variant="bodyMedium">
-                    Date {}
-                    <Text style={styles.additionalText}>{assetDate}</Text>
                 </Text>
             </View>
         </View>
@@ -63,7 +77,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: widthPercentageToDP('90%'),
-        height: 130,
+
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -89,7 +103,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
@@ -104,6 +119,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         top: 15
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 

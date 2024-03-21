@@ -1,15 +1,28 @@
+/* eslint-disable react-native/no-inline-styles */
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
-import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
-import { theme } from '@src/theme';
-import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
 import {
+    MOVEMENT_ASSET,
+    MOVEMENT_ASSET_EN,
+    USE_STATE_ASSET,
+    USE_STATE_ASSET_NORMAL_EN,
+    USE_STATE_ASSET_TH
+} from '@src/constant';
+import { GetAssetByCode } from '@src/services/asset';
+import { AddDocumentLine } from '@src/services/document';
+import { theme } from '@src/theme';
+import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
+import { AssetData } from '@src/typings/downloadDB';
+import { PrivateStackParamsList } from '@src/typings/navigation';
+import React, { FC, useCallback, useState } from 'react';
+import {
+    FlatList,
+    LogBox,
     SafeAreaView,
-    ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -28,9 +41,272 @@ type DocumentCreateProps = NativeStackScreenProps<
 >;
 
 const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state'
+    ]);
     const { navigation, route } = props;
+    const [assetSearch, setAssetSearch] = useState('');
+    const [listAssetCreate, setListAssetCreate] = useState<AssetData[]>([]);
+    const [titleDialog, setTitleDialog] = useState<string>('');
+    const [contentDialog, setContentDialog] = useState<string>('');
+    const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
+    const [assetCodeNew, setAssetCodeNew] = useState<string>('');
+    const [idAsset, setIdAsset] = useState<number>(0);
+
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+        setShowCancelDialog(true);
+    }, []);
+
+    const handleRemoveAsset = useCallback(async () => {
+        try {
+            setListAssetCreate((prev) => {
+                const listAssetFilter = prev.filter(
+                    (item) => item?.asset_id !== idAsset
+                );
+                return listAssetFilter;
+            });
+            clearStateDialog();
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong remove asset');
+        }
+    }, [clearStateDialog, idAsset]);
+
+    const handleCloseDialog = useCallback(() => {
+        clearStateDialog();
+    }, [clearStateDialog]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (titleDialog) {
+            case 'Asset not found in Master':
+                setVisibleDialog(false);
+                navigation.navigate('DocumentCreateAsset', {
+                    id: route?.params?.id,
+                    state: route?.params?.state,
+                    location: route?.params?.location,
+                    location_id: route?.params?.location_id,
+                    code: assetCodeNew,
+                    onGoBack: (
+                        assetData: AssetDataForPassParamsDocumentCreate
+                    ) => {
+                        setListAssetCreate((prev) => {
+                            return [assetData as AssetData, ...prev];
+                        });
+                    }
+                });
+                break;
+            case 'Asset Transfer':
+                setVisibleDialog(false);
+                break;
+            case 'Duplicate Asset':
+                setShowCancelDialog(false);
+                setVisibleDialog(false);
+                break;
+            case 'Confirm':
+                await handleRemoveAsset();
+                break;
+            default:
+                setVisibleDialog(false);
+                break;
+        }
+    }, [
+        assetCodeNew,
+        handleRemoveAsset,
+        navigation,
+        route?.params?.id,
+        route?.params?.location,
+        route?.params?.location_id,
+        route?.params?.state,
+        titleDialog
+    ]);
+
+    const handleMapUseStateThToValue = useCallback((state: string): number => {
+        switch (state) {
+            case USE_STATE_ASSET_TH.Normal:
+                return USE_STATE_ASSET.Normal;
+            case USE_STATE_ASSET_TH.Damaged:
+                return USE_STATE_ASSET.Damaged;
+            case USE_STATE_ASSET_TH.Repair:
+                return USE_STATE_ASSET.Repair;
+            default:
+                return USE_STATE_ASSET.Normal;
+        }
+    }, []);
+
+    const handleMapStateThToValue = useCallback((state: string): string => {
+        switch (state) {
+            case MOVEMENT_ASSET_EN.Normal:
+                return MOVEMENT_ASSET.Normal;
+            case MOVEMENT_ASSET_EN.Transfer:
+                return MOVEMENT_ASSET.Transfer;
+            case MOVEMENT_ASSET_EN.New:
+                return MOVEMENT_ASSET.New;
+            default:
+                return MOVEMENT_ASSET.Normal;
+        }
+    }, []);
+
+    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm');
+        setContentDialog('Do you want to remove this asset ?');
+        setIdAsset(id);
+    }, []);
+
+    const handleSaveAsset = useCallback(async () => {
+        try {
+            const assetList = listAssetCreate.map((item) => {
+                return {
+                    id: item?.asset_id,
+                    state: handleMapStateThToValue(item?.state),
+                    use_state: handleMapUseStateThToValue(item?.use_state),
+                    image: item?.image,
+                    new_img: false
+                };
+            });
+            const response = await AddDocumentLine({
+                location_id: route?.params?.location_id,
+                asset_tracking_id: route?.params?.id,
+                asset_ids: assetList
+            });
+            if (response?.error) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong save asset');
+                return;
+            }
+            if (response?.result?.error) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong save asset');
+                return;
+            }
+            navigation.replace('DocumentAssetStatus', {
+                id: route?.params?.id,
+                state: route?.params?.state,
+                location: route?.params?.location,
+                location_id: route?.params?.location_id
+            });
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong save asset');
+        }
+    }, [
+        clearStateDialog,
+        handleMapStateThToValue,
+        handleMapUseStateThToValue,
+        listAssetCreate,
+        navigation,
+        route?.params?.id,
+        route?.params?.location,
+        route?.params?.location_id,
+        route?.params?.state
+    ]);
+
+    const handleSearchAsset = useCallback(async () => {
+        try {
+            setAssetSearch('');
+            if (assetSearch !== '') {
+                if (
+                    route?.params?.assetDocumentList?.filter(
+                        (item) => item?.code === assetSearch
+                    ).length > 0 ||
+                    listAssetCreate.filter(
+                        (item) => item?.default_code === assetSearch
+                    ).length > 0
+                ) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setTitleDialog('Duplicate Asset');
+                    setContentDialog(
+                        `${assetSearch} is duplicate in Document ${route?.params?.id}`
+                    );
+                    setShowCancelDialog(false);
+                    return;
+                }
+
+                const response = await GetAssetByCode(assetSearch);
+
+                if (response?.error) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong search asset');
+                    return;
+                }
+
+                if (response?.result?.message === 'Asset not found') {
+                    clearStateDialog();
+                    setAssetCodeNew(assetSearch);
+                    setVisibleDialog(true);
+                    setTitleDialog('Asset not found in Master');
+                    setContentDialog('Do you want to add new asset?');
+                    return;
+                }
+
+                if (
+                    response?.result?.data?.asset?.use_state ===
+                        USE_STATE_ASSET_NORMAL_EN ||
+                    !response?.result?.data?.asset?.use_state
+                ) {
+                    response.result.data.asset.use_state =
+                        USE_STATE_ASSET_TH.Normal;
+                }
+
+                if (
+                    response?.result?.data?.asset?.location !==
+                    route?.params?.location
+                ) {
+                    setVisibleDialog(true);
+                    setTitleDialog('Asset Transfer');
+                    setContentDialog(
+                        `Asset transfer from ${response?.result?.data?.asset?.location} to ${route?.params?.location}`
+                    );
+                    setShowCancelDialog(false);
+                    response.result.data.asset.state =
+                        MOVEMENT_ASSET_EN.Transfer;
+                    setListAssetCreate((prev) => {
+                        return [response?.result?.data?.asset, ...prev];
+                    });
+
+                    return;
+                }
+
+                response.result.data.asset.state = MOVEMENT_ASSET_EN.Normal;
+                setListAssetCreate((prev) => {
+                    return [response?.result?.data?.asset, ...prev];
+                });
+                clearStateDialog();
+            }
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong search asset');
+        }
+    }, [
+        assetSearch,
+        clearStateDialog,
+        listAssetCreate,
+        route?.params?.assetDocumentList,
+        route?.params?.id,
+        route?.params?.location
+    ]);
+
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textTitle={titleDialog}
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleConfirmDialog}
+                showCloseDialog={showCancelDialog}
+            />
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}
@@ -39,9 +315,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             >
                 <View style={styles.backToPrevious}>
                     <BackButton
-                        handlePress={() =>
-                            navigation.navigate('DocumentAssetStatus')
-                        }
+                        handlePress={() => {
+                            navigation.goBack();
+                        }}
                     />
                 </View>
 
@@ -50,10 +326,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No: {route?.params?.id}
+                        Document No : {route?.params?.id}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location:{route?.params?.location}
+                        Location : {route?.params?.location}
                     </Text>
                 </View>
             </LinearGradient>
@@ -62,14 +338,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 <View style={styles.searchContainer}>
                     <TextInput
                         style={styles.input}
+                        value={assetSearch}
+                        onChangeText={(text) => setAssetSearch(text)}
                         placeholder="Input Or Scan Asset"
                         placeholderTextColor={theme.colors.textBody}
+                        onSubmitEditing={() => {
+                            handleSearchAsset();
+                        }}
                     />
-                    <TouchableOpacity onPress={() => console.log('ok')}>
-                        <Button
-                            style={styles.dialogActionConfirm}
-                            onPress={() => console.log('ok')}
-                        >
+                    <TouchableOpacity onPress={() => handleSearchAsset()}>
+                        <Button style={styles.dialogActionConfirm}>
                             <Text
                                 style={styles.textActionConfirm}
                                 variant="bodyLarge"
@@ -87,42 +365,43 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         }
                     />
                 </View>
-                <ScrollView>
-                    <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                        Total Document : 3
-                    </Text>
-                    <View style={styles.wrapDetailList}>
-                        <AddAssetCard
-                            imageSource={require('../../assets/images/img1.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                        />
-
-                        <AddAssetCard
-                            imageSource={require('../../assets/images/img2.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                        />
-
-                        <AddAssetCard
-                            imageSource={require('../../assets/images/img3.jpg')}
-                            assetCode="RB0001"
-                            assetName="Table"
-                            assetStatus={MOVEMENT_ASSET_NORMAL_TH}
-                            assetMovement="Normal"
-                            assetDate="01/01/2567"
-                        />
-                        <TouchableOpacity style={styles.saveButton}>
-                            <Text style={styles.buttonText}>Save</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
+                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                    Total Document : {listAssetCreate?.length}
+                </Text>
+                <FlatList
+                    data={listAssetCreate}
+                    renderItem={({ item }) => (
+                        <View style={styles.wrapDetailList}>
+                            <AddAssetCard
+                                imageSource={item?.image}
+                                assetCode={item?.default_code}
+                                assetName={item?.name}
+                                assetStatus={item?.use_state}
+                                assetMovement={item?.state}
+                                assetId={item?.asset_id}
+                                handleRemoveAsset={
+                                    handleOpenDialogConfirmRemoveAsset
+                                }
+                            />
+                        </View>
+                    )}
+                    keyExtractor={(item) => item.asset_id.toString()}
+                />
+                <TouchableOpacity
+                    style={[
+                        styles.saveButton,
+                        {
+                            backgroundColor:
+                                listAssetCreate?.length > 0
+                                    ? '#2983BC'
+                                    : theme.colors.disableSwitch
+                        }
+                    ]}
+                    onPress={() => handleSaveAsset()}
+                    disabled={listAssetCreate?.length === 0}
+                >
+                    <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -194,19 +473,21 @@ const styles = StyleSheet.create({
 
     textTotalDocument: {
         marginLeft: 20,
-        marginTop: 20,
+        marginTop: 10,
         fontWeight: '700',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 20
     },
 
     saveButton: {
-        backgroundColor: '#2983BC',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 10
+        alignSelf: 'center',
+        marginTop: 20,
+        marginBottom: 20
     },
 
     buttonText: {

@@ -66,3 +66,9 @@ export interface CreateDocumentResponse {
     asset_tracking_id: number;
     sample_data: SampleDateCreateDocument;
 }
+
+export interface AddDocumentLineResponse {
+    success: boolean;
+    message: string;
+    error: string;
+}

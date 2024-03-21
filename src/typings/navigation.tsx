@@ -1,4 +1,4 @@
-import { SearchAsset } from './asset';
+import { AssetDataForPassParamsDocumentCreate, SearchAsset } from './asset';
 import { DocumentAssetData } from './document';
 import { AssetData, LocationData } from './downloadDB';
 
@@ -42,12 +42,22 @@ export type PrivateStackParamsList = {
         id: number;
         state: string;
         location: string;
+        location_id: number;
     };
     DocumentCreate: {
         id: number;
         location: string;
+        location_id: number;
+        state: string;
         assetDocumentList: DocumentAssetData[];
     };
     DocumentCreateSearch: undefined;
-    DocumentCreateAsset: undefined;
+    DocumentCreateAsset: {
+        id: number;
+        state: string;
+        location: string;
+        location_id: number;
+        code: string;
+        onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
+    };
 };

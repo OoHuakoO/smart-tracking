@@ -1,17 +1,13 @@
-export interface AssetData {
+import { AssetData } from './downloadDB';
+
+export interface AssetDataForPassParamsDocumentCreate {
     asset_id: number;
     default_code: string;
     name: string;
-    description: string;
-    category_id: number;
-    serial_no: string;
-    brand_name: string;
-    quantity: number;
-    location_id: number;
-    image: string;
+    state: string;
     use_state: string;
-    owner: string;
-    new_img: boolean;
+    image?: string | boolean;
+    new_img?: boolean;
 }
 
 export interface GetAssetData {
@@ -34,4 +30,14 @@ export interface SearchAsset {
     location: string;
     use_state: string;
     category_id: number;
+}
+
+export interface CreateAssetData {
+    id: number;
+    asset: AssetData;
+}
+export interface CreateAssetResponse {
+    success: boolean;
+    message: string;
+    data: CreateAssetData;
 }
