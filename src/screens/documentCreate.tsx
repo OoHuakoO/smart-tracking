@@ -221,6 +221,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         (item) => item?.default_code === assetSearch
                     ).length > 0
                 ) {
+                    clearStateDialog();
                     setVisibleDialog(true);
                     setTitleDialog('Duplicate Asset');
                     setContentDialog(
@@ -240,6 +241,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 }
 
                 if (response?.result?.message === 'Asset not found') {
+                    clearStateDialog();
                     setAssetCodeNew(assetSearch);
                     setVisibleDialog(true);
                     setTitleDialog('Asset not found in Master');
