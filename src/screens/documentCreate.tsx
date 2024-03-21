@@ -52,6 +52,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
+    const [idAsset, setIdAsset] = useState<number>(0);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -59,6 +60,22 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         setContentDialog('');
         setShowCancelDialog(true);
     }, []);
+
+    const handleRemoveAsset = useCallback(async () => {
+        try {
+            setListAssetCreate((prev) => {
+                const listAssetFilter = prev.filter(
+                    (item) => item?.asset_id !== idAsset
+                );
+                return listAssetFilter;
+            });
+            clearStateDialog();
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong remove asset');
+        }
+    }, [clearStateDialog, idAsset]);
 
     const handleCloseDialog = useCallback(() => {
         clearStateDialog();
@@ -90,12 +107,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setShowCancelDialog(false);
                 setVisibleDialog(false);
                 break;
+            case 'Confirm':
+                await handleRemoveAsset();
+                break;
             default:
                 setVisibleDialog(false);
                 break;
         }
     }, [
         assetCodeNew,
+        handleRemoveAsset,
         navigation,
         route?.params?.id,
         route?.params?.location,
@@ -128,6 +149,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             default:
                 return MOVEMENT_ASSET.Normal;
         }
+    }, []);
+
+    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm');
+        setContentDialog('Do you want to remove this asset ?');
+        setIdAsset(id);
     }, []);
 
     const handleSaveAsset = useCallback(async () => {
@@ -286,12 +314,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 <View style={styles.backToPrevious}>
                     <BackButton
                         handlePress={() => {
-                            navigation.navigate('DocumentAssetStatus', {
-                                id: route?.params?.id,
-                                state: route?.params?.state,
-                                location: route?.params?.location,
-                                location_id: route?.params?.location_id
-                            });
+                            navigation.goBack();
                         }}
                     />
                 </View>
@@ -353,6 +376,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 assetName={item?.name}
                                 assetStatus={item?.use_state}
                                 assetMovement={item?.state}
+                                assetId={item?.asset_id}
+                                handleRemoveAsset={
+                                    handleOpenDialogConfirmRemoveAsset
+                                }
                             />
                         </View>
                     )}

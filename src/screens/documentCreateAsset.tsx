@@ -259,14 +259,13 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
                                     uri: `data:image/png;base64,${selectedImage}`
                                 }}
                             />
-                            <TouchableOpacity
-                                onPress={() => setSelectedImage(null)}
-                                style={styles.deSelectButton}
-                            >
-                                <Text style={styles.deselectText}>
-                                    เลือกภาพใหม่
-                                </Text>
-                            </TouchableOpacity>
+                            <View style={styles.deSelectButton}>
+                                <FontAwesomeIcon
+                                    icon={faCamera}
+                                    size={15}
+                                    color={theme.colors.white}
+                                />
+                            </View>
                         </View>
                     ) : (
                         <FontAwesomeIcon icon={faCamera} size={34} />
@@ -444,6 +443,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         position: 'relative',
+        alignItems: 'center',
         width: 80,
         height: 100
     },
@@ -451,12 +451,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: -10,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        borderRadius: 10,
-        paddingHorizontal: 8,
-        paddingVertical: 4
+        borderRadius: 60,
+        width: 30,
+        height: 30,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     deselectText: {
-        color: 'white',
+        color: theme.colors.white,
         fontSize: 12
     },
 

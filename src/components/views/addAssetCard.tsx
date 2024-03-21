@@ -7,21 +7,30 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface AddAssetCardProps {
     imageSource?: any;
+    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetMovement: string;
+    handleRemoveAsset: (id: number) => void;
 }
 
 const AddAssetCard: FC<AddAssetCardProps> = (props) => {
-    const { imageSource, assetCode, assetName, assetStatus, assetMovement } =
-        props;
+    const {
+        imageSource,
+        assetId,
+        assetCode,
+        assetName,
+        assetStatus,
+        assetMovement,
+        handleRemoveAsset
+    } = props;
 
     return (
         <View style={styles.cardContainer}>
             <View style={styles.deleteIconContainer}>
                 <TouchableOpacity
-                    onPress={() => console.log('Delete')}
+                    onPress={() => handleRemoveAsset(assetId)}
                     activeOpacity={0.5}
                 >
                     <FontAwesomeIcon icon={faTrash} color="#F0787A" />
@@ -45,8 +54,12 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text variant="bodyLarge">{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text variant="bodyLarge">{assetName}</Text>
+                </View>
                 <Text variant="bodyMedium">
                     Status {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
@@ -64,7 +77,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: widthPercentageToDP('90%'),
-        height: 130,
+
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -90,7 +103,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
@@ -105,6 +119,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         top: 15
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 

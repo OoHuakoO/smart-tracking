@@ -61,8 +61,12 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
                 )}
             </View>
             <View style={styles.textContainer}>
-                <Text style={styles.assetCode}>{assetCode}</Text>
-                <Text variant="bodyLarge">{assetName}</Text>
+                <View style={styles.rowText}>
+                    <Text style={styles.assetCode}>{assetCode}</Text>
+                </View>
+                <View style={styles.rowText}>
+                    <Text variant="bodyLarge">{assetName}</Text>
+                </View>
                 <Text variant="bodyMedium">
                     Status {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
@@ -84,7 +88,6 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: wp('90%'),
-        height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         padding: 15,
@@ -110,7 +113,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     textContainer: {
-        marginLeft: 20
+        marginLeft: 20,
+        width: '60%'
     },
     assetCode: {
         fontSize: 18,
@@ -125,6 +129,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         top: 15
+    },
+    rowText: {
+        flexDirection: 'row'
     }
 });
 
