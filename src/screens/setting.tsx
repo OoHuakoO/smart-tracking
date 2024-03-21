@@ -63,51 +63,10 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView style={styles.scrollView}>
-                {/* <View>
-                    <Text variant="headlineLarge" style={styles.textHeader}>
-                        Document
-                    </Text>
-                    <InputText
-                        placeholder="Setting 1"
-                        value={settingValues.input6}
-                        onChangeText={(text) =>
-                            handleInputChange('input6', text)
-                        }
-                    />
-                </View> */}
                 <View>
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Odoo Config
                     </Text>
-                    {/* <View style={styles.modeSection}>
-                        <View style={styles.statusTag}>
-                            <Text variant="bodyLarge">Mode</Text>
-                            <StatusTag status={'Online'} />
-                        </View>
-                        <View>
-                            <Controller
-                                name="online"
-                                defaultValue={false}
-                                control={form?.control}
-                                render={({ field }) => (
-                                    <Switch
-                                        {...field}
-                                        trackColor={{
-                                            false: '#767577',
-                                            true: '#81b0ff'
-                                        }}
-                                        thumbColor={
-                                            field?.value ? '#f5dd4b' : '#f4f3f4'
-                                        }
-                                        ios_backgroundColor="#3e3e3e"
-                                        onValueChange={(value) =>
-                                            field?.onChange(value)
-                                        }
-                                    />
-                                )}
-                            />
-                        </View>
-                    </View> */}
                     <Controller
                         name="server"
                         defaultValue=""
