@@ -331,12 +331,12 @@ const styles = StyleSheet.create({
     },
     listSection: {
         flex: 1,
-        height: hp('30%'),
+        height: hp('100%'),
         width: wp('100%'),
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%'
+        marginTop: '52%'
     },
     wrapDetailList: {
         display: 'flex',
