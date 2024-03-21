@@ -63,7 +63,10 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                     {dateInfo}
                 </Text>
                 <View style={[styles.statusContainer, { backgroundColor }]}>
-                    <Text variant="bodyMedium" style={{ color: '#ffff' }}>
+                    <Text
+                        variant="bodyMedium"
+                        style={styles.documentStatusText}
+                    >
                         {documentStatus}
                     </Text>
                 </View>
@@ -121,6 +124,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 20,
         top: 15
+    },
+    documentStatusText: {
+        color: '#ffffff'
     }
 });
 

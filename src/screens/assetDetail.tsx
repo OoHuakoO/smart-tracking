@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AssetTagStatus from '@src/components/views/assetTagStatus';
+import { USE_STATE_ASSET_NORMAL_EN } from '@src/constant';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
@@ -69,7 +70,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             route?.params?.assetData?.use_state?.toString() !==
                             'false'
                                 ? route?.params?.assetData?.use_state
-                                : 'Normal'
+                                : USE_STATE_ASSET_NORMAL_EN
                         }
                     />
                 </View>
