@@ -34,6 +34,8 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { BarcodeFormat, useScanBarcodes } from 'vision-camera-code-scanner';
 
 type DocumentCreateProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -53,6 +55,27 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
     const [idAsset, setIdAsset] = useState<number>(0);
+
+    const [hasPermission, setHasPermission] = React.useState(false);
+    const devices = useCameraDevices();
+    devices.filter((device) => device.position === 'back'); // return array of back cameras
+
+    // Here is where useScanBarcodes() hook is called.
+    // Specify your barcode format inside.
+    // Detected barcodes are assigned into the 'barcodes' variable.
+    const [frameProcessor, barcodes] = useScanBarcodes(
+        [BarcodeFormat.QR_CODE],
+        {
+            checkInverted: true
+        }
+    );
+
+    React.useEffect(() => {
+        (async () => {
+            const status = await Camera.requestCameraPermission();
+            setHasPermission(status === 'granted');
+        })();
+    }, []);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -320,7 +343,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         }}
                     />
                 </View>
-
                 <View style={styles.containerText}>
                     <Text variant="headlineSmall" style={styles.textHeader}>
                         Add Asset
@@ -332,6 +354,23 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Location : {route?.params?.location}
                     </Text>
                 </View>
+                {devices != null && hasPermission && (
+                    <>
+                        <Camera
+                            style={StyleSheet.absoluteFill}
+                            devices={devices}
+                            isActive={true}
+                            frameProcessorFps={5}
+                        />
+                        {barcodes.map((barcode, idx) => (
+                            <View key={idx} style={{ padding: 50 }}>
+                                <Text style={styles.barcodeTextURL}>
+                                    {barcode.displayValue}
+                                </Text>
+                            </View>
+                        ))}
+                    </>
+                )}
             </LinearGradient>
 
             <View style={styles.listSection}>
@@ -424,6 +463,13 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'flex-start',
         alignSelf: 'stretch'
+    },
+
+    barcodeTextURL: {
+        fontSize: 20,
+        color: 'white',
+        fontWeight: 'bold',
+        backgroundColor: 'red'
     },
     searchButtonWrap: {
         position: 'absolute',

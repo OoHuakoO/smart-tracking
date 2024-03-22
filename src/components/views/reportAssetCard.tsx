@@ -11,7 +11,7 @@ interface ReportAssetCardProps {
     assetStatus: string;
     assetLocation: string;
     assetOldLocation?: string;
-    title: string;
+    title?: string;
 }
 
 const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {

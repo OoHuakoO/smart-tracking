@@ -17,5 +17,13 @@ module.exports = {
             }
         ],
         'jest-hoist'
+    ],
+    plugins: [
+        [
+            'react-native-reanimated/plugin',
+            {
+                globals: ['__scanCodes']
+            }
+        ]
     ]
 };
