@@ -16,9 +16,7 @@ module.exports = {
                 }
             }
         ],
-        'jest-hoist'
-    ],
-    plugins: [
+        'jest-hoist',
         [
             'react-native-reanimated/plugin',
             {

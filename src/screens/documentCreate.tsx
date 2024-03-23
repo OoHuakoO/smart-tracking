@@ -58,7 +58,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     const [hasPermission, setHasPermission] = React.useState(false);
     const devices = useCameraDevices();
-    devices.filter((device) => device.position === 'back'); // return array of back cameras
+
+    // return array of back cameras
+    devices.filter((device) => device.position === 'back');
 
     // Here is where useScanBarcodes() hook is called.
     // Specify your barcode format inside.
