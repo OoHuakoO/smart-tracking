@@ -3,6 +3,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
+import ScanButton from '@src/components/core/scanButton';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
 import {
@@ -319,6 +320,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             navigation.goBack();
                         }}
                     />
+                    <ScanButton
+                        handlePress={() => {
+                            navigation.goBack();
+                        }}
+                    />
                 </View>
 
                 <View style={styles.containerText}>
@@ -421,9 +427,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginHorizontal: 15,
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        alignSelf: 'stretch'
+        flexDirection: 'row',
+        alignSelf: 'stretch',
+        justifyContent: 'space-between'
     },
     searchButtonWrap: {
         position: 'absolute',
