@@ -362,6 +362,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             style={StyleSheet.absoluteFill}
                             devices={devices}
                             isActive={true}
+                            frameProcessor={frameProcessor}
                             frameProcessorFps={5}
                         />
                         {barcodes.map((barcode, idx) => (
