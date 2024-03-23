@@ -34,8 +34,6 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-import { Camera, useCameraDevices } from 'react-native-vision-camera';
-import { BarcodeFormat, useScanBarcodes } from 'vision-camera-code-scanner';
 
 type DocumentCreateProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -56,28 +54,28 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
     const [idAsset, setIdAsset] = useState<number>(0);
 
-    const [hasPermission, setHasPermission] = React.useState(false);
-    const devices = useCameraDevices();
+    // const [hasPermission, setHasPermission] = React.useState(false);
+    // const devices = useCameraDevices();
 
     // return array of back cameras
-    devices.filter((device) => device.position === 'back');
+    // devices.filter((device) => device.position === 'back');
 
     // Here is where useScanBarcodes() hook is called.
     // Specify your barcode format inside.
     // Detected barcodes are assigned into the 'barcodes' variable.
-    const [frameProcessor, barcodes] = useScanBarcodes(
-        [BarcodeFormat.QR_CODE],
-        {
-            checkInverted: true
-        }
-    );
+    // const [frameProcessor, barcodes] = useScanBarcodes(
+    //     [BarcodeFormat.QR_CODE],
+    //     {
+    //         checkInverted: true
+    //     }
+    // );
 
-    React.useEffect(() => {
-        (async () => {
-            const status = await Camera.requestCameraPermission();
-            setHasPermission(status === 'granted');
-        })();
-    }, []);
+    // React.useEffect(() => {
+    //     (async () => {
+    //         const status = await Camera.requestCameraPermission();
+    //         setHasPermission(status === 'granted');
+    //     })();
+    // }, []);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -356,7 +354,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Location : {route?.params?.location}
                     </Text>
                 </View>
-                {devices != null && hasPermission && (
+                {/* {devices != null && hasPermission && (
                     <>
                         <Camera
                             style={StyleSheet.absoluteFill}
@@ -373,7 +371,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             </View>
                         ))}
                     </>
-                )}
+                )} */}
             </LinearGradient>
 
             <View style={styles.listSection}>
