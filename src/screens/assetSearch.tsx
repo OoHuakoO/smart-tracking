@@ -142,7 +142,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         return (
             <View style={styles.dropdownItem}>
                 <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    {item?.default_code}
+                    [{item?.default_code}] {item?.name}
                 </Text>
             </View>
         );
@@ -182,7 +182,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         return (
             <View style={styles.dropdownItem}>
                 <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    {item?.category_name}
+                    [{item?.category_code}] {item?.category_name}
                 </Text>
             </View>
         );
@@ -301,7 +301,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     onFocus={() => setIsFocusCode(true)}
                     onBlur={() => setIsFocusCode(false)}
                     onChange={(item) => {
-                        setSearchCode(item?.default_code);
+                        setSearchCode(`${item?.default_code}`);
                     }}
                     onChangeText={(text) => handleOnChangeSearchCode(text)}
                     renderItem={renderItemCode}
