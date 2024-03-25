@@ -1,14 +1,14 @@
+import { theme } from '@src/theme';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 const StatusTag = ({ status }) => {
-    let tagColor = '#21CA50'; // default color (green)
+    let tagColor = theme.colors.toggleOnline;
 
-    // Set different colors based on the status
     if (status === 'Online') {
-        tagColor = '#21CA50'; // Green
+        tagColor = theme.colors.toggleOnline;
     } else if (status === 'Offline') {
-        tagColor = '#47ABE9'; // blue
+        tagColor = theme.colors.toggleOffline;
     }
 
     return (

@@ -16,5 +16,8 @@ export const colorConfig = {
     buttonCancel: '#FF6C6C',
     buttonConfirm: '#386BA9',
     emptyPicture: '#ACACAC',
-    borderAutocomplete: '#A1A1A1'
+    borderAutocomplete: '#A1A1A1',
+    toggleOnline: '#21CA50',
+    toggleOffline: '#47ABE9',
+    divider: '#d4d2d2'
 };

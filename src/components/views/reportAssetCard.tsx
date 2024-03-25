@@ -55,8 +55,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     State: {}
                     <Text style={styles.additionalText}>
-                        {assetStatus.toString() === 'Normal' ||
-                        assetStatus.toString() === 'false'
+                        {assetStatus.toString() === 'false'
                             ? MOVEMENT_ASSET_NORMAL_TH
                             : assetStatus}
                     </Text>

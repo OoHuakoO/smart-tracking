@@ -20,9 +20,7 @@ import {
     MOVEMENT_ASSET,
     MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
-    STATE_DOCUMENT_NAME,
-    USE_STATE_ASSET_NORMAL_EN,
-    USE_STATE_ASSET_TH
+    STATE_DOCUMENT_NAME
 } from '@src/constant';
 import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
 import { DocumentAssetData } from '@src/typings/document';
@@ -98,9 +96,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             if (isOnline) {
                 const response = await GetDocumentById(route?.params?.id);
                 response?.result?.data?.asset?.assets?.map((item) => {
-                    if (item?.use_state === USE_STATE_ASSET_NORMAL_EN) {
-                        item.use_state = USE_STATE_ASSET_TH.Normal;
-                    }
                     item.state = handleMapStateValue(item?.state);
                     item.date_check = parseDateString(item?.date_check);
                 });
@@ -234,7 +229,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                 activeOpacity={0.9}
                                 onPress={() =>
                                     navigation.navigate('DocumentAssetDetail', {
-                                        assetData: item
+                                        assetData: item,
+                                        state: route?.params?.state,
+                                        documentID: route?.params?.id,
+                                        location: route?.params?.location,
+                                        locationID: route?.params?.location_id
                                     })
                                 }
                                 style={styles.searchButton}
@@ -371,7 +370,7 @@ const styles = StyleSheet.create({
     },
 
     saveButton: {
-        backgroundColor: '#2983BC',
+        backgroundColor: theme.colors.primary,
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 10,

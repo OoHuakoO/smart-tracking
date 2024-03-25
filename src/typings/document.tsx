@@ -67,7 +67,7 @@ export interface CreateDocumentResponse {
     sample_data: SampleDateCreateDocument;
 }
 
-export interface AddDocumentLineResponse {
+export interface PostPutDocumentLineResponse {
     success: boolean;
     message: string;
     error: string;

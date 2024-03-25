@@ -83,6 +83,26 @@ export async function post<T = any>(
     return res.data;
 }
 
+export async function put<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig<any> | undefined
+): Promise<Response<T>> {
+    const settings = await AsyncStorage.getItem('Settings');
+    const jsonSettings: SettingParams = JSON.parse(settings);
+    const convertData = {
+        jsonrpc: '2.0',
+        params: {
+            ...data,
+            db: jsonSettings?.db,
+            login: data?.login ? data?.login : jsonSettings?.login,
+            password: data?.password ? data?.password : jsonSettings?.password
+        }
+    };
+    const res = await apiInstances.put<Response<T>>(url, convertData, config);
+    return res.data;
+}
+
 export async function postDelete<T = any>(
     url: string,
     data?: any

@@ -42,7 +42,13 @@ export type PrivateStackParamsList = {
         LocationData: LocationData;
         title: string;
     };
-    DocumentAssetDetail: { assetData: DocumentAssetData };
+    DocumentAssetDetail: {
+        assetData: DocumentAssetData;
+        state: string;
+        documentID: number;
+        location: string;
+        locationID: number;
+    };
     DocumentSearch: undefined;
     DocumentAssetStatus: {
         id: number;

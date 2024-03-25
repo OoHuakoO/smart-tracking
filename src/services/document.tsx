@@ -1,12 +1,12 @@
 import { Params } from '@src/typings/common';
 import {
-    AddDocumentLineResponse,
     CreateDocumentResponse,
     DeleteDocumentLineResponse,
     GetDocumentByIdResponse,
-    GetDocumentSearchResponse
+    GetDocumentSearchResponse,
+    PostPutDocumentLineResponse
 } from '@src/typings/document';
-import { Response, post, postDelete } from '@src/utils/axios';
+import { Response, post, postDelete, put } from '@src/utils/axios';
 
 export function GetDocumentSearch(
     params: Params
@@ -40,9 +40,19 @@ export function CreateDocument(
 
 export function AddDocumentLine(
     params: Params
-): Promise<Response<AddDocumentLineResponse>> {
-    return postDelete<AddDocumentLineResponse>(
+): Promise<Response<PostPutDocumentLineResponse>> {
+    return postDelete<PostPutDocumentLineResponse>(
         `/api/add/document/line`,
+        params
+    );
+}
+
+export function UpdateDocumentLine(
+    params: Params
+): Promise<Response<PostPutDocumentLineResponse>> {
+    console.log(params);
+    return put<PostPutDocumentLineResponse>(
+        `/api/update/document/line`,
         params
     );
 }

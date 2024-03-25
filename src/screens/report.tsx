@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     },
 
     summitButton: {
-        backgroundColor: '#2983BC',
+        backgroundColor: theme.colors.primary,
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 10,

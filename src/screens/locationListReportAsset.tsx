@@ -6,7 +6,7 @@ import {
     ALL_LOCATION,
     MOVEMENT_ASSET,
     REPORT_TYPE,
-    USE_STATE_ASSET_NORMAL_EN
+    USE_STATE_ASSET_TH
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
@@ -166,7 +166,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             serial_no: item.serial_no,
             location_old: item.location,
             quantity: item.quantity,
-            state: USE_STATE_ASSET_NORMAL_EN,
+            state: USE_STATE_ASSET_TH.Normal,
             new_img: item.new_img
         }));
     };

@@ -28,7 +28,7 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
             backgroundColor = '#63CA7F';
             break;
         default:
-            backgroundColor = '#2983BC';
+            backgroundColor = theme.colors.primary;
             break;
     }
 

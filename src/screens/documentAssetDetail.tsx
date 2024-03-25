@@ -1,12 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import AssetTagStatus from '@src/components/views/assetTagStatus';
 import PopUpDialog from '@src/components/views/popUpDialog';
-import { USE_STATE_ASSET_NORMAL_EN } from '@src/constant';
+import { MOVEMENT_ASSET, MOVEMENT_ASSET_EN } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import { getUseStatus } from '@src/db/useStatus';
+import { UpdateDocumentLine } from '@src/services/document';
+import { GetUseStatus } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
+import { UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC, useCallback, useState } from 'react';
+import { getOnlineMode } from '@src/utils/common';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     Image,
     PermissionsAndroid,
@@ -14,6 +19,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 import {
     MediaType,
     launchCamera,
@@ -37,6 +43,11 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
+    const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
+    const [searchUseState, setSearchUseState] = useState<string>(
+        route?.params?.assetData?.use_state
+    );
 
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
@@ -45,6 +56,16 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
+
+    const renderItemUseState = (item: UseStatusData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    {item?.name}
+                </Text>
+            </View>
+        );
+    };
 
     const openImagePicker = async () => {
         try {
@@ -69,6 +90,19 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
             setContentDialog('Something went wrong image library launch');
         }
     };
+
+    const handleMapStateThToValue = useCallback((state: string): string => {
+        switch (state) {
+            case MOVEMENT_ASSET_EN.Normal:
+                return MOVEMENT_ASSET.Normal;
+            case MOVEMENT_ASSET_EN.Transfer:
+                return MOVEMENT_ASSET.Transfer;
+            case MOVEMENT_ASSET_EN.New:
+                return MOVEMENT_ASSET.New;
+            default:
+                return MOVEMENT_ASSET.Normal;
+        }
+    }, []);
 
     const handleCameraLaunch = async () => {
         try {
@@ -109,6 +143,115 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         }
     };
 
+    const getImage = useCallback((): string => {
+        if (
+            route?.params?.assetData?.image.toString() !== 'false' &&
+            selectedImage
+        ) {
+            return selectedImage;
+        }
+        if (
+            route?.params?.assetData?.image.toString() === 'false' &&
+            selectedImage
+        ) {
+            return selectedImage;
+        }
+        if (
+            route?.params?.assetData?.image.toString() !== 'false' &&
+            !selectedImage
+        ) {
+            return route?.params?.assetData?.image;
+        }
+        if (
+            route?.params?.assetData?.image.toString() === 'false' &&
+            !selectedImage
+        ) {
+            return 'false';
+        }
+    }, [route?.params?.assetData?.image, selectedImage]);
+
+    const handleSave = useCallback(async () => {
+        try {
+            const filterUseStatus = listUseState.filter(
+                (item) => searchUseState === item?.name
+            );
+            const response = await UpdateDocumentLine({
+                location_id: route?.params?.locationID,
+                asset_tracking_id: route?.params?.documentID,
+                asset_ids: [
+                    {
+                        id: route?.params?.assetData?.asset_id,
+                        state: handleMapStateThToValue(
+                            route?.params?.assetData?.state
+                        ),
+                        ...(filterUseStatus?.length > 0 && {
+                            use_state: filterUseStatus[0]?.id
+                        }),
+                        ...(getImage() !== 'false' && {
+                            image: getImage()
+                        }),
+                        ...(getImage() !== 'false' && { new_image: true })
+                    }
+                ]
+            });
+            if (response?.error) {
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong save asset');
+                return;
+            }
+            if (response?.result?.error) {
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong save asset');
+                return;
+            }
+            navigation.replace('DocumentAssetStatus', {
+                id: route?.params?.documentID,
+                state: route?.params?.state,
+                location: route?.params?.location,
+                location_id: route?.params?.locationID
+            });
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong save asset');
+        }
+    }, [
+        getImage,
+        handleMapStateThToValue,
+        listUseState,
+        navigation,
+        route?.params?.assetData?.asset_id,
+        route?.params?.assetData?.state,
+        route?.params?.documentID,
+        route?.params?.location,
+        route?.params?.locationID,
+        route?.params?.state,
+        searchUseState
+    ]);
+
+    const handleInitFetch = useCallback(async () => {
+        try {
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const responseUseStatus = await GetUseStatus({
+                    page: 1,
+                    limit: 1000
+                });
+
+                setListUseState(responseUseStatus?.result?.data.data);
+            } else {
+                const db = await getDBConnection();
+                const listUseStatusDB = await getUseStatus(db, 1, 1000);
+                setListUseState(listUseStatusDB);
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        handleInitFetch();
+    }, [handleInitFetch]);
+
     return (
         <SafeAreaView>
             <AlertDialog
@@ -146,7 +289,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 </View>
 
                 <View style={styles.imagesContainer}>
-                    {route?.params?.assetData?.image?.toString() !== 'false' ? (
+                    {route?.params?.assetData?.image?.toString() !== 'false' ||
+                    selectedImage ? (
                         <Image
                             style={styles.image}
                             source={{
@@ -176,18 +320,12 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         {route?.params?.assetData?.code || '-'}
                     </Text>
                 </View>
-                <View style={styles.assetStatus}>
-                    <AssetTagStatus
-                        status={
-                            route?.params?.assetData?.use_state?.toString() !==
-                            'false'
-                                ? route?.params?.assetData?.use_state
-                                : USE_STATE_ASSET_NORMAL_EN
-                        }
-                    />
-                </View>
+
                 <View style={styles.assetDetail}>
                     <View>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Use State
+                        </Text>
                         <Text variant="titleMedium" style={styles.assetTitle}>
                             Serial Number
                         </Text>
@@ -205,6 +343,26 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         </Text> */}
                     </View>
                     <View style={styles.assetDetailDes}>
+                        <Dropdown
+                            style={[
+                                styles.dropdown,
+                                isFocusUseState && styles.dropdownSelect
+                            ]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            data={listUseState}
+                            maxHeight={300}
+                            labelField="name"
+                            valueField="name"
+                            value={searchUseState}
+                            onFocus={() => setIsFocusUseState(true)}
+                            onBlur={() => setIsFocusUseState(false)}
+                            onChange={(item) => {
+                                setSearchUseState(item?.name);
+                            }}
+                            renderItem={renderItemUseState}
+                        />
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.serial_no || '-'}
                         </Text>
@@ -224,6 +382,17 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         </Text> */}
                     </View>
                 </View>
+                <TouchableOpacity
+                    style={[
+                        styles.saveButton,
+                        {
+                            backgroundColor: theme.colors.primary
+                        }
+                    ]}
+                    onPress={() => handleSave()}
+                >
+                    <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
             </View>
             <PopUpDialog
                 visible={dialogVisible}
@@ -279,13 +448,13 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     assetDetailSection: {
-        height: hp('100%'),
+        height: hp('80%'),
         width: wp('100%'),
         marginTop: '55%',
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
-        shadowColor: '#000',
+        shadowColor: '#00000',
         shadowOffset: {
             width: 0,
             height: 5
@@ -296,7 +465,10 @@ const styles = StyleSheet.create({
     },
     assetName: {
         marginHorizontal: 20,
-        marginVertical: 15
+        marginVertical: 15,
+        borderBottomWidth: 1,
+        paddingBottom: 10,
+        borderBottomColor: theme.colors.divider
     },
     textAssetName: {
         fontFamily: 'Sarabun-Regular',
@@ -312,7 +484,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 30,
+        marginTop: 10,
         alignItems: 'baseline'
     },
     assetTitle: {
@@ -325,6 +497,68 @@ const styles = StyleSheet.create({
     assetDes: {
         fontSize: 14,
         marginBottom: 15
+    },
+    dropdown: {
+        height: 35,
+        borderColor: theme.colors.borderAutocomplete,
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        color: theme.colors.black,
+        marginBottom: 11,
+        width: '100%'
+    },
+    dropdownSelect: {
+        borderColor: theme.colors.buttonConfirm
+    },
+    placeholderStyle: {
+        fontFamily: 'DMSans-Regular',
+        fontSize: 16,
+        color: theme.colors.textBody
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
+    },
+    dropdownItem: {
+        padding: 17,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+    dropdownItemText: {
+        flex: 1,
+        fontSize: 16,
+        color: theme.colors.black,
+        fontFamily: 'DMSans-Regular'
+    },
+    useStateDetail: {
+        width: wp('80%'),
+        alignSelf: 'center',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    saveButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        marginTop: 20,
+        marginBottom: 20
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontWeight: '600',
+        fontSize: 16
     }
 });
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
@@ -9,7 +8,6 @@ import {
     MOVEMENT_ASSET,
     MOVEMENT_ASSET_EN,
     USE_STATE_ASSET,
-    USE_STATE_ASSET_NORMAL_EN,
     USE_STATE_ASSET_TH
 } from '@src/constant';
 import { GetAssetByCode } from '@src/services/asset';
@@ -272,11 +270,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     return;
                 }
 
-                if (
-                    response?.result?.data?.asset?.use_state ===
-                        USE_STATE_ASSET_NORMAL_EN ||
-                    !response?.result?.data?.asset?.use_state
-                ) {
+                if (!response?.result?.data?.asset?.use_state) {
                     response.result.data.asset.use_state =
                         USE_STATE_ASSET_TH.Normal;
                 }
@@ -433,7 +427,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         {
                             backgroundColor:
                                 listAssetCreate?.length > 0
-                                    ? '#2983BC'
+                                    ? theme.colors.primary
                                     : theme.colors.disableSwitch
                         }
                     ]}

@@ -357,7 +357,10 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        style={[styles.button, { backgroundColor: '#2983BC' }]}
+                        style={[
+                            styles.button,
+                            { backgroundColor: theme.colors.primary }
+                        ]}
                         onPress={form?.handleSubmit(handleSaveAsset)}
                         activeOpacity={0.8}
                     >

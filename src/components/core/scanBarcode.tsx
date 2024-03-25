@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react'; // Import useEffect
 import { StyleSheet, View } from 'react-native'; // Import StyleSheet
 import {
-  Camera,
-  useCameraDevice,
-  useCameraPermission,
-  useCodeScanner
+    Camera,
+    useCameraDevice,
+    useCameraPermission,
+    useCodeScanner
 } from 'react-native-vision-camera';
 
 export default function ScanBarcode() {
