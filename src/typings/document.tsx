@@ -72,3 +72,15 @@ export interface AddDocumentLineResponse {
     message: string;
     error: string;
 }
+
+export interface State {
+    label: string;
+    value: string;
+}
+
+export interface SearchDocument {
+    location: string;
+    state: string;
+    start_date: string;
+    end_date: string;
+}

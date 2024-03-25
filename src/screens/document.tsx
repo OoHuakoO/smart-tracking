@@ -14,7 +14,7 @@ import { LoginState } from '@src/typings/common';
 import { DocumentData } from '@src/typings/document';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
@@ -38,7 +38,7 @@ type DocumentScreenProp = NativeStackScreenProps<
 >;
 
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
-    const { navigation } = props;
+    const { navigation, route } = props;
     const [dialogVisible, setDialogVisible] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [countTotalDocument, setCountDocument] = useState<number>(0);
@@ -122,14 +122,18 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
+            const documentSearch = removeKeyEmpty(
+                route?.params?.documentSearch
+            );
+            console.log(documentSearch);
             setLogin(isOnline);
-
             if (isOnline) {
                 const response = await GetDocumentSearch({
                     page: 1,
                     limit: 10,
                     search_term: {
-                        owner_id: loginValue?.uid
+                        owner_id: loginValue?.uid,
+                        ...documentSearch
                     }
                 });
                 response?.result?.data?.documents?.map((item) => {
@@ -146,19 +150,23 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [handleMapStateValue, loginValue?.uid]);
+    }, [handleMapStateValue, loginValue?.uid, route?.params?.documentSearch]);
 
     const handleOnEndReached = async () => {
         try {
             setLoading(true);
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
+                const documentSearch = removeKeyEmpty(
+                    route?.params?.documentSearch
+                );
                 if (isOnline) {
                     const response = await GetDocumentSearch({
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            owner_id: loginValue?.uid
+                            owner_id: loginValue?.uid,
+                            ...documentSearch
                         }
                     });
                     response?.result?.data?.documents?.map((item) => {
@@ -250,7 +258,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             <View style={styles.listSection}>
                 <View style={styles.searchButtonWrap}>
                     <SearchButton
-                        handlePress={() => navigation.navigate('Home')}
+                        handlePress={() =>
+                            navigation.navigate('DocumentSearch')
+                        }
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>

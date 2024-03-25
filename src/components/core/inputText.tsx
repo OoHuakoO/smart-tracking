@@ -43,12 +43,11 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 48,
-        // borderColor: 'gray',
+        borderColor: theme.colors.borderAutocomplete,
         borderWidth: 1,
         marginTop: 5,
         marginBottom: 10,
         paddingHorizontal: 10,
-        // width: '100%',
         borderRadius: 10,
         fontFamily: 'DMSans-Bold',
         color: theme.colors.textBody

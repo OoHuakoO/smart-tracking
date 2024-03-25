@@ -7,6 +7,7 @@ import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import DocumentCreate from '@src/screens/documentCreate';
 import DocumentCreateAsset from '@src/screens/documentCreateAsset';
 import DocumentCreateSearch from '@src/screens/documentCreateSearch';
+import DocumentSearch from '@src/screens/documentSearch';
 import HomeScreen from '@src/screens/home';
 import Location from '@src/screens/location';
 import LocationAssetSearch from '@src/screens/locationAssetSearch';
@@ -62,6 +63,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={Document}
+            />
+            <Stack.Screen
+                name="DocumentSearch"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentSearch}
             />
             <Stack.Screen
                 name="LocationListAsset"
