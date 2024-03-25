@@ -14,7 +14,6 @@ interface AssetTagStatusProps {
 
 const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     let backgroundColor = '#63CA7F';
-
     switch (status) {
         case USE_STATE_ASSET_TH.Damaged:
             backgroundColor = '#F0787A';
@@ -23,6 +22,9 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
             backgroundColor = '#F8A435';
             break;
         case USE_STATE_ASSET_NORMAL_EN:
+            backgroundColor = '#63CA7F';
+            break;
+        case USE_STATE_ASSET_TH.Normal:
             backgroundColor = '#63CA7F';
             break;
         default:

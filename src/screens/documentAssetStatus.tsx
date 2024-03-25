@@ -230,19 +230,29 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     style={styles.flatListStyle}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
-                            <DocumentAssetStatusCard
-                                assetId={item?.asset_id}
-                                imageSource={item?.image}
-                                assetCode={item?.code}
-                                assetName={item?.name}
-                                assetStatus={item?.use_state}
-                                assetMovement={item?.state}
-                                assetDate={item?.date_check}
-                                documentStatus={route?.params?.state}
-                                handleRemoveAsset={
-                                    handleOpenDialogConfirmRemoveAsset
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('DocumentAssetDetail', {
+                                        assetData: item
+                                    })
                                 }
-                            />
+                                style={styles.searchButton}
+                            >
+                                <DocumentAssetStatusCard
+                                    assetId={item?.asset_id}
+                                    imageSource={item?.image}
+                                    assetCode={item?.code}
+                                    assetName={item?.name}
+                                    assetStatus={item?.use_state}
+                                    assetMovement={item?.state}
+                                    assetDate={item?.date_check}
+                                    documentStatus={route?.params?.state}
+                                    handleRemoveAsset={
+                                        handleOpenDialogConfirmRemoveAsset
+                                    }
+                                />
+                            </TouchableOpacity>
                         </View>
                     )}
                     keyExtractor={(item) => item.asset_id.toString()}
@@ -384,6 +394,9 @@ const styles = StyleSheet.create({
     },
     flatListStyle: {
         marginBottom: 30
+    },
+    searchButton: {
+        zIndex: 2
     }
 });
 

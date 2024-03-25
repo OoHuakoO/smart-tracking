@@ -3,6 +3,7 @@ import AssetDetail from '@src/screens/assetDetail';
 import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
+import DocumentAssetDetail from '@src/screens/documentAssetDetail';
 import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import DocumentCreate from '@src/screens/documentCreate';
 import DocumentCreateAsset from '@src/screens/documentCreateAsset';
@@ -63,6 +64,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={Document}
+            />
+            <Stack.Screen
+                name="DocumentAssetDetail"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentAssetDetail}
             />
             <Stack.Screen
                 name="DocumentSearch"
