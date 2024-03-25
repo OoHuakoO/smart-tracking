@@ -11,7 +11,6 @@ import { Response, post, postDelete } from '@src/utils/axios';
 export function GetDocumentSearch(
     params: Params
 ): Promise<Response<GetDocumentSearchResponse>> {
-    console.log('GetDocumentSearch', params);
     return post<GetDocumentSearchResponse>(`/api/document/search`, params);
 }
 

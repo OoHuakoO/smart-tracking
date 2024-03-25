@@ -125,7 +125,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             const documentSearch = removeKeyEmpty(
                 route?.params?.documentSearch
             );
-            console.log(documentSearch);
             setLogin(isOnline);
             if (isOnline) {
                 const response = await GetDocumentSearch({
