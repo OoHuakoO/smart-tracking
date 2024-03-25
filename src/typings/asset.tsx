@@ -27,7 +27,7 @@ export interface GetAssetByCodeResponse {
 export interface SearchAsset {
     default_code: string;
     name: string;
-    location: string;
+    location?: string;
     use_state: string;
     category_id: number;
 }

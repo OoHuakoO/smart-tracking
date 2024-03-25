@@ -9,7 +9,7 @@ import { GetAssetSearch } from '@src/services/asset';
 import { theme } from '@src/theme';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
@@ -48,18 +48,23 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
             if (isOnline) {
                 const response = await GetAssetSearch({
                     page: 1,
                     limit: 10,
-                    search_term: { location: route?.params?.LocationData?.name }
+                    search_term: {
+                        location: route?.params?.LocationData?.name,
+                        ...(assetSearch && { ...assetSearch })
+                    }
                 });
                 const totalPagesAsset = response?.result?.data?.total;
                 setCountAsset(totalPagesAsset);
                 setListAsset(response?.result?.data?.asset);
             } else {
                 const filter = {
-                    location_id: route?.params?.LocationData?.asset_location_id
+                    location_id: route?.params?.LocationData?.asset_location_id,
+                    ...(assetSearch && { ...assetSearch })
                 };
                 const db = await getDBConnection();
                 const countAsset = await getTotalAssets(db, filter);
@@ -76,7 +81,8 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
         }
     }, [
         route?.params?.LocationData?.asset_location_id,
-        route?.params?.LocationData?.name
+        route?.params?.LocationData?.name,
+        route?.params?.assetSearch
     ]);
 
     const handleOnEndReached = async () => {
@@ -84,12 +90,14 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
             setLoading(true);
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
+                const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
                 if (isOnline) {
                     const response = await GetAssetSearch({
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            location: route?.params?.LocationData?.name
+                            location: route?.params?.LocationData?.name,
+                            ...(assetSearch && { ...assetSearch })
                         }
                     });
 
@@ -100,7 +108,8 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                 } else {
                     const filter = {
                         location_id:
-                            route?.params?.LocationData?.asset_location_id
+                            route?.params?.LocationData?.asset_location_id,
+                        ...(assetSearch && { ...assetSearch })
                     };
                     const db = await getDBConnection();
                     const listAssetDB = await getAsset(db, filter, page + 1);
@@ -119,7 +128,8 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
 
     useEffect(() => {
         handleFetchAssetLocation();
-    }, [handleFetchAssetLocation]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route?.params?.assetSearch]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -151,7 +161,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
             <View style={styles.listSection}>
                 <View style={styles.searchButtonWrap}>
                     <SearchButton
-                        handlePress={() => navigation.navigate('AssetSearch')}
+                        handlePress={() =>
+                            navigation.navigate('LocationAssetSearch', {
+                                LocationData: route?.params?.LocationData
+                            })
+                        }
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalAsset}>

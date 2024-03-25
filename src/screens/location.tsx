@@ -151,7 +151,8 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                                 activeOpacity={0.9}
                                 onPress={() =>
                                     navigation.navigate('LocationListAsset', {
-                                        LocationData: item
+                                        LocationData: item,
+                                        assetSearch: null
                                     })
                                 }
                                 style={styles.searchButton}

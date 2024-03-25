@@ -7,7 +7,7 @@ export const getOnlineMode = async (): Promise<boolean> => {
 };
 
 export const removeKeyEmpty = (obj: object) => {
-    if (obj === undefined || null) {
+    if (obj === undefined || obj === null) {
         return undefined;
     }
     Object.keys(obj).forEach((key) => {
