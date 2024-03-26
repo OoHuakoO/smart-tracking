@@ -292,7 +292,6 @@ const styles = StyleSheet.create({
         zIndex: 1,
         marginBottom: 20
     },
-
     wrapDetailList: {
         display: 'flex',
         alignItems: 'center',
@@ -300,7 +299,6 @@ const styles = StyleSheet.create({
         marginTop: 30,
         marginBottom: 5
     },
-
     searchButton: {
         zIndex: 2
     },
@@ -308,13 +306,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 10
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     }
 });
 

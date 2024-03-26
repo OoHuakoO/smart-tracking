@@ -13,19 +13,19 @@ interface AssetTagStatusProps {
 }
 
 const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
-    let backgroundColor = '#63CA7F';
+    let backgroundColor = theme.colors.documentDone;
     switch (status) {
         case USE_STATE_ASSET_TH.Damaged:
-            backgroundColor = '#F0787A';
+            backgroundColor = theme.colors.documentCancel;
             break;
         case USE_STATE_ASSET_TH.Repair:
-            backgroundColor = '#F8A435';
+            backgroundColor = theme.colors.documentCheck;
             break;
         case USE_STATE_ASSET_NORMAL_EN:
-            backgroundColor = '#63CA7F';
+            backgroundColor = theme.colors.documentDone;
             break;
         case USE_STATE_ASSET_TH.Normal:
-            backgroundColor = '#63CA7F';
+            backgroundColor = theme.colors.documentDone;
             break;
         default:
             backgroundColor = theme.colors.primary;
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#000',
+        shadowColor: theme.colors.black,
         shadowOffset: {
             width: 0,
             height: 1

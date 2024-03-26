@@ -357,9 +357,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 15
     },
-    navigationContainer: {
-        backgroundColor: '#ecf0f1'
-    },
     closeButton: {
         marginVertical: 20,
         alignSelf: 'flex-end',
@@ -386,7 +383,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 10,
-        backgroundColor: '#FF6C6C'
+        backgroundColor: theme.colors.buttonCancel
     },
     buttonText: {
         color: theme.colors.white,
@@ -398,7 +395,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         paddingHorizontal: 10,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         marginVertical: 8
     },
     dropdownSelect: {
@@ -413,7 +410,7 @@ const styles = StyleSheet.create({
     dropdownItemText: {
         flex: 1,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     placeholderStyle: {
@@ -423,13 +420,13 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     }
 });

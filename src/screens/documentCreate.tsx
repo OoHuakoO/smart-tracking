@@ -160,7 +160,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, []);
 
-    const handleMapStateThToValue = useCallback((state: string): string => {
+    const handleMapMovementStateValue = useCallback((state: string): string => {
         switch (state) {
             case MOVEMENT_ASSET_EN.Normal:
                 return MOVEMENT_ASSET.Normal;
@@ -203,7 +203,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             const assetList = listAssetCreate.map((item) => {
                 return {
                     id: item?.asset_id,
-                    state: handleMapStateThToValue(item?.state),
+                    state: handleMapMovementStateValue(item?.state),
                     use_state: handleMapUseStateThToValue(item?.use_state),
                     image: item?.image,
                     new_img: false
@@ -239,7 +239,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, [
         clearStateDialog,
-        handleMapStateThToValue,
+        handleMapMovementStateValue,
         handleMapUseStateThToValue,
         listAssetCreate,
         navigation,
@@ -360,10 +360,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No : {route?.params?.id}
+                        Document No : {route?.params?.id || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location : {route?.params?.location}
+                        Location : {route?.params?.location || '-'}
                     </Text>
                 </View>
                 {/* {devices != null && hasPermission && (
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
 
     barcodeTextURL: {
         fontSize: 20,
-        color: 'white',
+        color: theme.colors.pureWhite,
         fontWeight: 'bold',
         backgroundColor: 'red'
     },
@@ -527,19 +527,19 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     statusText: {
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     containerText: {
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 5
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,
@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
     },
 
     buttonText: {
-        color: 'white',
+        color: theme.colors.pureWhite,
         fontWeight: '600',
         fontSize: 16
     },

@@ -87,7 +87,7 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
 
 const styles = StyleSheet.create({
     dialogContainer: {
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.pureWhite,
         padding: 5,
         display: 'flex',
         justifyContent: 'center'

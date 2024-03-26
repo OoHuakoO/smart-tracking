@@ -1,3 +1,4 @@
+import { theme } from '@src/theme';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Swiper from 'react-native-swiper';
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
         borderRadius: 20
     },
     text: {
-        color: '#fff',
+        color: theme.colors.pureWhite,
         fontSize: 30,
         fontWeight: 'bold'
     },

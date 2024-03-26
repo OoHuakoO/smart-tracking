@@ -1,5 +1,6 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     locationText: {
-        color: 'black',
+        color: theme.colors.black,
         fontWeight: 'bold',
         fontSize: 18,
         marginLeft: 5

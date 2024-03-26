@@ -243,7 +243,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     page: 1,
                     limit: 1000
                 });
-
                 setListUseState(responseUseStatus?.result?.data.data);
             } else {
                 const db = await getDBConnection();
@@ -296,26 +295,22 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 </View>
 
                 <View style={styles.imagesContainer}>
-                    {route?.params?.assetData?.image?.toString() !== 'false' ||
-                    selectedImage ? (
-                        <Image
-                            style={styles.image}
-                            source={{
-                                uri: `data:image/png;base64,${
-                                    selectedImage
-                                        ? selectedImage
-                                        : route?.params?.assetData?.image
-                                }`
-                            }}
-                            resizeMode="cover"
-                        />
-                    ) : (
-                        <Image
-                            style={styles.image}
-                            source={require('../../assets/images/default_image.jpg')}
-                            resizeMode="cover"
-                        />
-                    )}
+                    <Image
+                        style={styles.image}
+                        source={
+                            route?.params?.assetData?.image?.toString() !==
+                                'false' || selectedImage
+                                ? {
+                                      uri: `data:image/png;base64,${
+                                          selectedImage
+                                              ? selectedImage
+                                              : route?.params?.assetData?.image
+                                      }`
+                                  }
+                                : require('../../assets/images/default_image.jpg')
+                        }
+                        resizeMode="cover"
+                    />
                 </View>
             </View>
             <View style={styles.assetDetailSection}>
@@ -461,7 +456,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
-        shadowColor: '#00000',
+        shadowColor: theme.colors.black,
         shadowOffset: {
             width: 0,
             height: 5
@@ -514,7 +509,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         paddingHorizontal: 10,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         marginBottom: 11,
         width: '100%'
     },
@@ -528,13 +523,13 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     dropdownItem: {
@@ -546,7 +541,7 @@ const styles = StyleSheet.create({
     dropdownItemText: {
         flex: 1,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     useStateDetail: {
@@ -566,7 +561,7 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     buttonText: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '600',
         fontSize: 16
     }

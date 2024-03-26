@@ -1,5 +1,6 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
@@ -33,8 +34,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 20,
         borderRadius: 15,
-        shadowColor: '#000',
-
+        shadowColor: theme.colors.black,
         shadowOffset: {
             width: 0,
             height: 2
@@ -65,15 +65,15 @@ const styles = StyleSheet.create({
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#404040'
+        color: theme.colors.textPrimary
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
+        color: theme.colors.additionalText
     },
 
     locationText: {
-        color: 'black',
+        color: theme.colors.black,
         fontWeight: 'bold',
         fontSize: 18,
         marginLeft: 5

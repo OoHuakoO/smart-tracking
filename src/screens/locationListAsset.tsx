@@ -31,7 +31,6 @@ type LocationListAssetProps = NativeStackScreenProps<
 
 const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
     const { navigation, route } = props;
-
     const [countTotalAsset, setCountAsset] = useState<number>(0);
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -228,13 +227,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 10
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,
@@ -252,7 +251,6 @@ const styles = StyleSheet.create({
         right: 25,
         top: -20
     },
-
     wrapDetailList: {
         display: 'flex',
         alignItems: 'center',
@@ -260,11 +258,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginBottom: 5
     },
-
     searchButton: {
         zIndex: 2
     },
-
     textTotalAsset: {
         marginLeft: 20,
         marginTop: 20,

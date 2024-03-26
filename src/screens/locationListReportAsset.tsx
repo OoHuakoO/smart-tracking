@@ -162,9 +162,9 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             name: item.name,
             use_state: item.use_state,
             location: item.location,
-            category: item.category_id,
-            serial_no: item.serial_no,
             location_old: item.location,
+            category: item.category,
+            serial_no: item.serial_no,
             quantity: item.quantity,
             state: USE_STATE_ASSET_TH.Normal,
             new_img: item.new_img

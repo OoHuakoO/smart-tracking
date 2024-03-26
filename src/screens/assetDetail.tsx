@@ -38,21 +38,18 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                 </View>
                 <View style={styles.imagesContainer}>
-                    {route?.params?.assetData?.image?.toString() !== 'false' ? (
-                        <Image
-                            style={styles.image}
-                            source={{
-                                uri: `data:image/png;base64,${route?.params?.assetData?.image}`
-                            }}
-                            resizeMode="cover"
-                        />
-                    ) : (
-                        <Image
-                            style={styles.image}
-                            source={require('../../assets/images/default_image.jpg')}
-                            resizeMode="cover"
-                        />
-                    )}
+                    <Image
+                        style={styles.image}
+                        source={
+                            route?.params?.assetData?.image?.toString() !==
+                            'false'
+                                ? {
+                                      uri: `data:image/png;base64,${route?.params?.assetData?.image}`
+                                  }
+                                : require('../../assets/images/default_image.jpg')
+                        }
+                        resizeMode="cover"
+                    />
                 </View>
             </View>
             <View style={styles.assetDetailSection}>
@@ -99,11 +96,9 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.brand_name || '-'}
                         </Text>
-
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.category || '-'}
                         </Text>
-
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.location || '-'}
                         </Text>
@@ -163,7 +158,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
-        shadowColor: '#000',
+        shadowColor: '#00000',
         shadowOffset: {
             width: 0,
             height: 5

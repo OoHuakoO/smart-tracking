@@ -52,15 +52,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [locationSearch, setLocationSearch] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
 
-    const handleCloseDialog = useCallback(() => {
-        setVisibleDialog(false);
-    }, []);
-
-    const toggleDialog = useCallback(() => {
-        setDialogVisible(!dialogVisible);
-    }, [dialogVisible]);
-
-    const handleMapStateValue = useCallback((state: string): string => {
+    const handleMapDocumentStateValue = useCallback((state: string): string => {
         switch (state) {
             case STATE_DOCUMENT_VALUE.Draft:
                 return STATE_DOCUMENT_NAME.Draft;
@@ -75,6 +67,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         }
     }, []);
 
+    const handleCloseDialog = useCallback(() => {
+        setVisibleDialog(false);
+    }, []);
+
+    const toggleDialog = useCallback(() => {
+        setDialogVisible(!dialogVisible);
+    }, [dialogVisible]);
+
     const handleSearchLocation = useCallback(async (text: string) => {
         try {
             setLocationSearch(text);
@@ -86,14 +86,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             if (response?.error) {
                 setLoading(false);
                 setVisibleDialog(true);
-                setContentDialog('Something went wrong fetch location');
+                setContentDialog('Something went wrong search location');
                 return;
             }
             setListLocation(response?.result?.data?.locations);
         } catch (err) {
             setLoading(false);
             setVisibleDialog(true);
-            setContentDialog('Something went wrong fetch location');
+            setContentDialog('Something went wrong search location');
         }
     }, []);
 
@@ -136,7 +136,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     }
                 });
                 response?.result?.data?.documents?.map((item) => {
-                    item.state = handleMapStateValue(item?.state);
+                    item.state = handleMapDocumentStateValue(item?.state);
                     item.date_order = parseDateString(item?.date_order);
                 });
                 const totalPagesDocument = response?.result?.data?.total;
@@ -149,7 +149,11 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [handleMapStateValue, loginValue?.uid, route?.params?.documentSearch]);
+    }, [
+        handleMapDocumentStateValue,
+        loginValue?.uid,
+        route?.params?.documentSearch
+    ]);
 
     const handleOnEndReached = async () => {
         try {
@@ -169,7 +173,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         }
                     });
                     response?.result?.data?.documents?.map((item) => {
-                        item.state = handleMapStateValue(item?.state);
+                        item.state = handleMapDocumentStateValue(item?.state);
                         item.date_order = parseDateString(item?.date_order);
                     });
                     setListDocument([
@@ -184,7 +188,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setStopFetchMore(true);
             setLoading(false);
             setVisibleDialog(true);
-            setContentDialog('Something went wrong fetch more asset');
+            setContentDialog('Something went wrong fetch more document');
         }
     };
 
@@ -197,7 +201,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 });
                 if (response?.error) {
                     setVisibleDialog(true);
-                    setContentDialog('Something went wrong fetch location');
+                    setContentDialog('Something went wrong create document');
                     return;
                 }
                 toggleDialog();
@@ -211,7 +215,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 await handleFetchLocation();
             } catch (err) {
                 setVisibleDialog(true);
-                setContentDialog('Something went wrong fetch location');
+                setContentDialog('Something went wrong create document');
             }
         },
         [handleFetchDocument, handleFetchLocation, navigation, toggleDialog]
@@ -340,13 +344,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 10
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,
@@ -379,7 +383,7 @@ const styles = StyleSheet.create({
         marginBottom: 20
     },
     drawer: {
-        width: '80%' // Adjust the width as needed
+        width: '80%'
     },
     Button: {
         position: 'absolute',

@@ -112,20 +112,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     statusText: {
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     containerText: {
         marginHorizontal: 20,
         width: wp('60%')
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 5
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,

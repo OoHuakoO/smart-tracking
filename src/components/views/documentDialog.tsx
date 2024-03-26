@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 12,
         marginHorizontal: 20,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: theme.colors.pureWhite,
         zIndex: 1
     },
     elementContainer: {
@@ -91,8 +91,8 @@ const styles = StyleSheet.create({
     },
     searchBar: {
         borderWidth: 1,
-        borderColor: '#A1A1A1',
-        backgroundColor: '#FFFFFF',
+        borderColor: theme.colors.borderAutocomplete,
+        backgroundColor: theme.colors.pureWhite,
         borderRadius: 10
     },
     searchList: {},
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     },
     button: {
         alignSelf: 'flex-end',
-        backgroundColor: '#FF6C6C',
+        backgroundColor: theme.colors.buttonCancel,
         paddingVertical: 6,
         paddingHorizontal: 15,
         borderRadius: 15,

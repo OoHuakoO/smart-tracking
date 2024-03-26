@@ -94,9 +94,9 @@ export interface GetCategoryResponse {
 export interface ReportAssetData {
     code: string;
     name: string;
-    category: number;
+    category: string;
     serial_no: string;
-    location_old: string;
+    location_old?: string;
     location: string;
     quantity: number;
     state: string;

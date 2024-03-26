@@ -1,5 +1,6 @@
 import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     locationText: {
-        color: 'black',
+        color: theme.colors.black,
         fontWeight: 'bold',
         alignContent: 'center',
         margin: 5

@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         height: 200,
         borderRadius: 20,
         marginHorizontal: 20,
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.pureWhite,
         zIndex: 1,
         justifyContent: 'center'
     },

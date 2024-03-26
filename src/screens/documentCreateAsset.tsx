@@ -407,14 +407,13 @@ const styles = StyleSheet.create({
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontWeight: '700',
         marginBottom: 10
     },
-
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,
@@ -425,16 +424,14 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         marginTop: '50%',
         marginBottom: 2
-        // alignItems: 'center'
     },
-
     containerMenu: {
         width: 105,
         height: 112,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#F1F1F1',
+        backgroundColor: theme.colors.greySoft,
         marginTop: 25,
         borderRadius: 12
     },
@@ -475,7 +472,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: 'blue',
+        backgroundColor: theme.colors.primary,
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 10,
@@ -493,7 +490,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         paddingHorizontal: 10,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         marginVertical: 8
     },
     dropdownItem: {
@@ -505,7 +502,7 @@ const styles = StyleSheet.create({
     dropdownItemText: {
         flex: 1,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     dropdownSelect: {
@@ -518,13 +515,13 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     },
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color: theme.colors.black,
+        color: theme.colors.blackGray,
         fontFamily: 'DMSans-Regular'
     }
 });

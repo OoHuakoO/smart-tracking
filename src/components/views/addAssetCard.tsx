@@ -1,5 +1,6 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -77,12 +78,11 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: widthPercentageToDP('90%'),
-
-        backgroundColor: '#EDEDED',
+        backgroundColor: theme.colors.cardContainer,
         alignItems: 'center',
         padding: 15,
         borderRadius: 10,
-        shadowColor: '#000',
+        shadowColor: theme.colors.black,
         shadowOffset: {
             width: 0,
             height: 1
@@ -109,11 +109,11 @@ const styles = StyleSheet.create({
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#404040'
+        color: theme.colors.textPrimary
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
+        color: theme.colors.additionalText
     },
     deleteIconContainer: {
         position: 'absolute',

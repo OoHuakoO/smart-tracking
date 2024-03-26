@@ -52,27 +52,27 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
 
-    let backgroundColor = 'black';
+    let backgroundColor = theme.colors.documentDraft;
 
     switch (route?.params?.state) {
         case STATE_DOCUMENT_NAME.Draft:
-            backgroundColor = '#2E67A6';
+            backgroundColor = theme.colors.documentDraft;
             break;
         case STATE_DOCUMENT_NAME.Check:
-            backgroundColor = '#F8A435';
+            backgroundColor = theme.colors.documentCheck;
             break;
         case STATE_DOCUMENT_NAME.Done:
-            backgroundColor = '#63CA7F';
+            backgroundColor = theme.colors.documentDone;
             break;
         case STATE_DOCUMENT_NAME.Cancel:
-            backgroundColor = '#F0787A';
+            backgroundColor = theme.colors.documentCancel;
             break;
         default:
-            backgroundColor = '#2E67A6';
+            backgroundColor = theme.colors.documentDraft;
             break;
     }
 
-    const handleMapStateValue = useCallback((state: string): string => {
+    const handleMapMovementStateValue = useCallback((state: string): string => {
         switch (state) {
             case MOVEMENT_ASSET.Normal:
                 return MOVEMENT_ASSET_EN.Normal;
@@ -96,7 +96,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             if (isOnline) {
                 const response = await GetDocumentById(route?.params?.id);
                 response?.result?.data?.asset?.assets?.map((item) => {
-                    item.state = handleMapStateValue(item?.state);
+                    item.state = handleMapMovementStateValue(item?.state);
                     item.date_check = parseDateString(item?.date_check);
                 });
                 setTotalAssetDocument(
@@ -110,7 +110,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [handleMapStateValue, route?.params?.id]);
+    }, [handleMapMovementStateValue, route?.params?.id]);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -203,10 +203,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 )}
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Document : {route?.params?.id}
+                        Document : {route?.params?.id || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location: {route?.params?.location}
+                        Location: {route?.params?.location || '-'}
                     </Text>
                     <View style={[styles.statusIndicator, { backgroundColor }]}>
                         <Text variant="labelSmall" style={styles.statusText}>
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
         right: 15,
         top: 30,
         borderWidth: 2,
-        borderColor: '#F0787A',
+        borderColor: theme.colors.documentCancel,
         backgroundColor: theme.colors.white,
         borderRadius: 25,
         paddingVertical: 5,
@@ -324,20 +324,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     statusText: {
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     containerText: {
         marginHorizontal: 20
     },
     textHeader: {
-        color: '#FFFFFF',
+        color: theme.colors.pureWhite,
         fontSize: RFPercentage(4),
         fontWeight: '700',
         marginBottom: 5
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: '#FFFFFF'
+        color: theme.colors.pureWhite
     },
     listSection: {
         flex: 1,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
 
     textReset: {
         fontWeight: 'bold',
-        color: '#F0787A'
+        color: theme.colors.documentCancel
     },
     flatListStyle: {
         marginBottom: 30

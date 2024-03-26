@@ -1,6 +1,7 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { STATE_DOCUMENT_NAME } from '@src/constant';
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -15,8 +16,8 @@ interface DocumentScreenProp {
 const DocumentCard: FC<DocumentScreenProp> = (props) => {
     const { documentTitle, locationInfo, dateInfo, documentStatus, online } =
         props;
-    let backgroundColor = 'black';
-    let borderColor = 'black';
+    let backgroundColor = theme.colors.black;
+    let borderColor = theme.colors.black;
     switch (documentStatus) {
         case STATE_DOCUMENT_NAME.Draft:
             backgroundColor = '#2E67A6';

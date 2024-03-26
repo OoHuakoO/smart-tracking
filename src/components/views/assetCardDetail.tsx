@@ -35,14 +35,18 @@ const AssetCardDetail: FC<AssetCardDetailProps> = (props) => {
             </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
-                    <Text style={styles.assetCode}>{assetCode}</Text>
+                    <Text style={styles.assetCode}>{assetCode || '-'}</Text>
                 </View>
                 <View style={styles.rowText}>
-                    <Text style={styles.additionalText}>{assetName}</Text>
+                    <Text style={styles.additionalText}>
+                        {assetName || '-'}
+                    </Text>
                 </View>
                 <View style={styles.iconContainer}>
                     <FontAwesomeIcon icon={faLocationDot} color="#DC3E3F" />
-                    <Text style={styles.locationText}>{assetLocation}</Text>
+                    <Text style={styles.locationText}>
+                        {assetLocation || '-'}
+                    </Text>
                 </View>
             </View>
         </View>
@@ -53,11 +57,11 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: wp('90%'),
-        backgroundColor: '#EDEDED',
+        backgroundColor: theme.colors.cardContainer,
         alignItems: 'center',
         padding: 15,
         borderRadius: 10,
-        shadowColor: '#000',
+        shadowColor: theme.colors.black,
         shadowOffset: {
             width: 0,
             height: 1
@@ -87,14 +91,14 @@ const styles = StyleSheet.create({
     assetCode: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#404040',
+        color: theme.colors.textPrimary,
         width: 0,
         flexGrow: 1,
         flex: 1
     },
     additionalText: {
         fontSize: 14,
-        color: '#777',
+        color: theme.colors.additionalText,
         width: 0,
         flexGrow: 1,
         flex: 1
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     locationText: {
-        color: 'black',
+        color: theme.colors.black,
         fontWeight: 'bold',
         alignContent: 'center',
         margin: 5
