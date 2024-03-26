@@ -29,7 +29,6 @@ import {
     View
 } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-
 import {
     MediaType,
     launchCamera,

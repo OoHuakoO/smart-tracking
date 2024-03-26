@@ -48,6 +48,8 @@ export type PrivateStackParamsList = {
         documentID: number;
         location: string;
         locationID: number;
+        routeBefore: string;
+        onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };
     DocumentSearch: undefined;
     DocumentAssetStatus: {

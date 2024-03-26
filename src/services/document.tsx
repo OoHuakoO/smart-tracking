@@ -50,7 +50,6 @@ export function AddDocumentLine(
 export function UpdateDocumentLine(
     params: Params
 ): Promise<Response<PostPutDocumentLineResponse>> {
-    console.log(params);
     return put<PostPutDocumentLineResponse>(
         `/api/update/document/line`,
         params

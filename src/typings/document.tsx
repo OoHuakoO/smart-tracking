@@ -2,16 +2,16 @@ export interface DocumentAssetData {
     asset_id: number;
     code: string;
     name: string;
-    category: number;
+    category: string;
     serial_no: string;
-    location_old: string;
+    location_old?: string;
     location: string;
     quantity: number;
     state: string;
     use_state: string;
     new_img: boolean;
     image: string;
-    date_check: string;
+    date_check?: string;
 }
 
 export interface DocumentData {

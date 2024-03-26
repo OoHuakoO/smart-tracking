@@ -8,6 +8,7 @@ import {
     MOVEMENT_ASSET,
     MOVEMENT_ASSET_EN,
     USE_STATE_ASSET,
+    USE_STATE_ASSET_NORMAL_EN,
     USE_STATE_ASSET_TH
 } from '@src/constant';
 import { GetAssetByCode } from '@src/services/asset';
@@ -179,6 +180,24 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         setIdAsset(id);
     }, []);
 
+    const handleGoBack = useCallback(
+        (assetData: AssetDataForPassParamsDocumentCreate) => {
+            setListAssetCreate((prev) => {
+                return prev.map((item) => {
+                    if (item?.asset_id === assetData?.asset_id) {
+                        return {
+                            ...item,
+                            image: assetData?.image as string,
+                            use_state: assetData?.use_state
+                        };
+                    }
+                    return item;
+                });
+            });
+        },
+        []
+    );
+
     const handleSaveAsset = useCallback(async () => {
         try {
             const assetList = listAssetCreate.map((item) => {
@@ -272,7 +291,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
                 if (!response?.result?.data?.asset?.use_state) {
                     response.result.data.asset.use_state =
-                        USE_STATE_ASSET_TH.Normal;
+                        USE_STATE_ASSET_NORMAL_EN;
                 }
 
                 if (
@@ -290,7 +309,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     setListAssetCreate((prev) => {
                         return [response?.result?.data?.asset, ...prev];
                     });
-
                     return;
                 }
 
@@ -406,17 +424,45 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     data={listAssetCreate}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
-                            <AddAssetCard
-                                imageSource={item?.image}
-                                assetCode={item?.default_code}
-                                assetName={item?.name}
-                                assetStatus={item?.use_state}
-                                assetMovement={item?.state}
-                                assetId={item?.asset_id}
-                                handleRemoveAsset={
-                                    handleOpenDialogConfirmRemoveAsset
+                            <TouchableOpacity
+                                activeOpacity={0.9}
+                                onPress={() =>
+                                    navigation.navigate('DocumentAssetDetail', {
+                                        assetData: {
+                                            asset_id: item?.asset_id,
+                                            code: item?.default_code,
+                                            name: item?.name,
+                                            category: item?.category,
+                                            serial_no: item?.serial_no,
+                                            location: item?.location,
+                                            quantity: item?.quantity,
+                                            state: item?.state,
+                                            use_state: item?.use_state,
+                                            new_img: item?.new_img,
+                                            image: item?.image
+                                        },
+                                        state: route?.params?.state,
+                                        documentID: route?.params?.id,
+                                        location: route?.params?.location,
+                                        locationID: route?.params?.location_id,
+                                        routeBefore: route?.name,
+                                        onGoBack: handleGoBack
+                                    })
                                 }
-                            />
+                                style={styles.searchButton}
+                            >
+                                <AddAssetCard
+                                    imageSource={item?.image}
+                                    assetCode={item?.default_code}
+                                    assetName={item?.name}
+                                    assetStatus={item?.use_state}
+                                    assetMovement={item?.state}
+                                    assetId={item?.asset_id}
+                                    handleRemoveAsset={
+                                        handleOpenDialogConfirmRemoveAsset
+                                    }
+                                />
+                            </TouchableOpacity>
                         </View>
                     )}
                     keyExtractor={(item) => item.asset_id.toString()}
@@ -555,6 +601,9 @@ const styles = StyleSheet.create({
         color: theme.colors.textBody,
         width: '65%',
         marginRight: 10
+    },
+    searchButton: {
+        zIndex: 2
     }
 });
 export default DocumentCreateScreen;

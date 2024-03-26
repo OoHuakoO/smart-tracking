@@ -233,7 +233,8 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                         state: route?.params?.state,
                                         documentID: route?.params?.id,
                                         location: route?.params?.location,
-                                        locationID: route?.params?.location_id
+                                        locationID: route?.params?.location_id,
+                                        routeBefore: route?.name
                                     })
                                 }
                                 style={styles.searchButton}

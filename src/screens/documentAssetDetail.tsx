@@ -190,7 +190,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         ...(getImage() !== 'false' && {
                             image: getImage()
                         }),
-                        ...(getImage() !== 'false' && { new_image: true })
+                        ...(getImage() !== 'false' && { new_img: true })
                     }
                 ]
             });
@@ -204,12 +204,24 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 setContentDialog('Something went wrong save asset');
                 return;
             }
-            navigation.replace('DocumentAssetStatus', {
-                id: route?.params?.documentID,
-                state: route?.params?.state,
-                location: route?.params?.location,
-                location_id: route?.params?.locationID
+            if (route?.params?.routeBefore === 'DocumentAssetStatus') {
+                navigation.replace('DocumentAssetStatus', {
+                    id: route?.params?.documentID,
+                    state: route?.params?.state,
+                    location: route?.params?.location,
+                    location_id: route?.params?.locationID
+                });
+            }
+            route?.params?.onGoBack({
+                asset_id: route?.params?.assetData?.asset_id,
+                default_code: route?.params?.assetData?.code,
+                name: route?.params?.assetData?.name,
+                use_state: searchUseState,
+                state: route?.params?.assetData?.state,
+                image: getImage() !== 'false' ? getImage() : false,
+                new_img: getImage() !== 'false'
             });
+            navigation.goBack();
         } catch (err) {
             setVisibleDialog(true);
             setContentDialog('Something went wrong save asset');
@@ -219,12 +231,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         handleMapStateThToValue,
         listUseState,
         navigation,
-        route?.params?.assetData?.asset_id,
-        route?.params?.assetData?.state,
-        route?.params?.documentID,
-        route?.params?.location,
-        route?.params?.locationID,
-        route?.params?.state,
+        route?.params,
         searchUseState
     ]);
 
@@ -322,7 +329,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 </View>
 
                 <View style={styles.assetDetail}>
-                    <View>
+                    <View style={styles.assetDetailTitle}>
                         <Text variant="titleMedium" style={styles.assetTitle}>
                             Use State
                         </Text>
@@ -492,7 +499,10 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     assetDetailDes: {
-        marginLeft: 20
+        width: '60%'
+    },
+    assetDetailTitle: {
+        width: '40%'
     },
     assetDes: {
         fontSize: 14,
