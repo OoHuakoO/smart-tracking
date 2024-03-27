@@ -28,21 +28,17 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <View style={styles.imagesContainer}>
-                {imageSource?.toString() !== 'false' ? (
-                    <Image
-                        style={styles.image}
-                        source={{
-                            uri: `data:image/png;base64,${imageSource}`
-                        }}
-                        resizeMode="cover"
-                    />
-                ) : (
-                    <Image
-                        style={styles.image}
-                        source={require('../../../assets/images/default_image.jpg')}
-                        resizeMode="cover"
-                    />
-                )}
+                <Image
+                    style={styles.image}
+                    source={
+                        imageSource?.toString() !== 'false'
+                            ? {
+                                  uri: `data:image/png;base64,${imageSource}`
+                              }
+                            : require('../../../assets/images/default_image.jpg')
+                    }
+                    resizeMode="cover"
+                />
             </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
