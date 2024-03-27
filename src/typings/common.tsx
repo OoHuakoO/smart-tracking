@@ -17,3 +17,10 @@ export interface LoginState {
     session_id: string;
     uid: string;
 }
+
+export interface DocumentState {
+    id: number;
+    state: string;
+    location: string;
+    location_id: number;
+}

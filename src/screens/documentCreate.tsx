@@ -13,11 +13,14 @@ import {
 } from '@src/constant';
 import { GetAssetByCode } from '@src/services/asset';
 import { AddDocumentLine } from '@src/services/document';
+import { documentAssetListState, documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
+import { DocumentState } from '@src/typings/common';
+import { DocumentAssetData } from '@src/typings/document';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
     LogBox,
@@ -33,6 +36,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useRecoilValue } from 'recoil';
 
 type DocumentCreateProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -52,6 +56,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
     const [idAsset, setIdAsset] = useState<number>(0);
+    const documentValue = useRecoilValue<DocumentState>(documentState);
+    const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
+        documentAssetListState
+    );
 
     // const [hasPermission, setHasPermission] = React.useState(false);
     // const devices = useCameraDevices();
@@ -108,10 +116,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             case 'Asset not found in Master':
                 setVisibleDialog(false);
                 navigation.navigate('DocumentCreateAsset', {
-                    id: route?.params?.id,
-                    state: route?.params?.state,
-                    location: route?.params?.location,
-                    location_id: route?.params?.location_id,
                     code: assetCodeNew,
                     onGoBack: (
                         assetData: AssetDataForPassParamsDocumentCreate
@@ -136,16 +140,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setVisibleDialog(false);
                 break;
         }
-    }, [
-        assetCodeNew,
-        handleRemoveAsset,
-        navigation,
-        route?.params?.id,
-        route?.params?.location,
-        route?.params?.location_id,
-        route?.params?.state,
-        titleDialog
-    ]);
+    }, [assetCodeNew, handleRemoveAsset, navigation, titleDialog]);
 
     const handleMapUseStateThToValue = useCallback((state: string): number => {
         switch (state) {
@@ -180,7 +175,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         setIdAsset(id);
     }, []);
 
-    const handleGoBack = useCallback(
+    const handleGoBackDocumentAssetDetail = useCallback(
         (assetData: AssetDataForPassParamsDocumentCreate) => {
             setListAssetCreate((prev) => {
                 return prev.map((item) => {
@@ -210,8 +205,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 };
             });
             const response = await AddDocumentLine({
-                location_id: route?.params?.location_id,
-                asset_tracking_id: route?.params?.id,
+                location_id: documentValue?.location_id,
+                asset_tracking_id: documentValue?.id,
                 asset_ids: assetList
             });
             if (response?.error) {
@@ -226,12 +221,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setContentDialog('Something went wrong save asset');
                 return;
             }
-            navigation.replace('DocumentAssetStatus', {
-                id: route?.params?.id,
-                state: route?.params?.state,
-                location: route?.params?.location,
-                location_id: route?.params?.location_id
-            });
+            navigation.replace('DocumentAssetStatus');
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
@@ -239,98 +229,110 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, [
         clearStateDialog,
+        documentValue?.id,
+        documentValue?.location_id,
         handleMapMovementStateValue,
         handleMapUseStateThToValue,
         listAssetCreate,
-        navigation,
-        route?.params?.id,
-        route?.params?.location,
-        route?.params?.location_id,
-        route?.params?.state
+        navigation
     ]);
 
-    const handleSearchAsset = useCallback(async () => {
-        try {
-            setAssetSearch('');
-            if (assetSearch !== '') {
-                if (
-                    route?.params?.assetDocumentList?.filter(
-                        (item) => item?.code === assetSearch
-                    ).length > 0 ||
-                    listAssetCreate.filter(
-                        (item) => item?.default_code === assetSearch
-                    ).length > 0
-                ) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setTitleDialog('Duplicate Asset');
-                    setContentDialog(
-                        `${assetSearch} is duplicate in Document ${route?.params?.id}`
-                    );
-                    setShowCancelDialog(false);
-                    return;
+    const handleSearchAsset = useCallback(
+        async (codeAssetFromSearchAsset?: string) => {
+            try {
+                setAssetSearch('');
+                let newAssetSearch = assetSearch;
+
+                if (codeAssetFromSearchAsset) {
+                    newAssetSearch = codeAssetFromSearchAsset;
                 }
 
-                const response = await GetAssetByCode(assetSearch);
+                if (newAssetSearch !== '') {
+                    if (
+                        documentAssetListValue?.filter(
+                            (item) => item?.code === newAssetSearch
+                        ).length > 0 ||
+                        listAssetCreate.filter(
+                            (item) => item?.default_code === newAssetSearch
+                        ).length > 0
+                    ) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setTitleDialog('Duplicate Asset');
+                        setContentDialog(
+                            `${newAssetSearch} is duplicate in Document ${documentValue?.id}`
+                        );
+                        setShowCancelDialog(false);
+                        return;
+                    }
 
-                if (response?.error) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong search asset');
-                    return;
-                }
+                    const response = await GetAssetByCode(newAssetSearch);
 
-                if (response?.result?.message === 'Asset not found') {
-                    clearStateDialog();
-                    setAssetCodeNew(assetSearch);
-                    setVisibleDialog(true);
-                    setTitleDialog('Asset not found in Master');
-                    setContentDialog('Do you want to add new asset?');
-                    return;
-                }
+                    if (response?.error) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setContentDialog('Something went wrong search asset');
+                        return;
+                    }
 
-                if (!response?.result?.data?.asset?.use_state) {
-                    response.result.data.asset.use_state =
-                        USE_STATE_ASSET_NORMAL_EN;
-                }
+                    if (response?.result?.message === 'Asset not found') {
+                        clearStateDialog();
+                        setAssetCodeNew(newAssetSearch);
+                        setVisibleDialog(true);
+                        setTitleDialog('Asset not found in Master');
+                        setContentDialog('Do you want to add new asset?');
+                        return;
+                    }
 
-                if (
-                    response?.result?.data?.asset?.location !==
-                    route?.params?.location
-                ) {
-                    setVisibleDialog(true);
-                    setTitleDialog('Asset Transfer');
-                    setContentDialog(
-                        `Asset transfer from ${response?.result?.data?.asset?.location} to ${route?.params?.location}`
-                    );
-                    setShowCancelDialog(false);
-                    response.result.data.asset.state =
-                        MOVEMENT_ASSET_EN.Transfer;
+                    if (!response?.result?.data?.asset?.use_state) {
+                        response.result.data.asset.use_state =
+                            USE_STATE_ASSET_NORMAL_EN;
+                    }
+
+                    if (
+                        response?.result?.data?.asset?.location !==
+                        documentValue?.location
+                    ) {
+                        setVisibleDialog(true);
+                        setTitleDialog('Asset Transfer');
+                        setContentDialog(
+                            `Asset transfer from ${response?.result?.data?.asset?.location} to ${documentValue?.location}`
+                        );
+                        setShowCancelDialog(false);
+                        response.result.data.asset.state =
+                            MOVEMENT_ASSET_EN.Transfer;
+                        setListAssetCreate((prev) => {
+                            return [response?.result?.data?.asset, ...prev];
+                        });
+                        return;
+                    }
+
+                    response.result.data.asset.state = MOVEMENT_ASSET_EN.Normal;
                     setListAssetCreate((prev) => {
                         return [response?.result?.data?.asset, ...prev];
                     });
-                    return;
+                    clearStateDialog();
                 }
-
-                response.result.data.asset.state = MOVEMENT_ASSET_EN.Normal;
-                setListAssetCreate((prev) => {
-                    return [response?.result?.data?.asset, ...prev];
-                });
+            } catch (err) {
                 clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong search asset');
             }
-        } catch (err) {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong search asset');
-        }
-    }, [
-        assetSearch,
-        clearStateDialog,
-        listAssetCreate,
-        route?.params?.assetDocumentList,
-        route?.params?.id,
-        route?.params?.location
-    ]);
+        },
+        [
+            assetSearch,
+            clearStateDialog,
+            documentAssetListValue,
+            documentValue?.id,
+            documentValue?.location,
+            listAssetCreate
+        ]
+    );
+
+    useEffect(() => {
+        handleSearchAsset(route?.params?.codeFromAssetSearch);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route?.params?.codeFromAssetSearch]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -360,10 +362,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No : {route?.params?.id || '-'}
+                        Document No : {documentValue?.id || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location : {route?.params?.location || '-'}
+                        Location : {documentValue?.location || '-'}
                     </Text>
                 </View>
                 {/* {devices != null && hasPermission && (
@@ -413,7 +415,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 <View style={styles.searchButtonWrap}>
                     <SearchButton
                         handlePress={() =>
-                            console.log('search on DocumentCreate')
+                            navigation.navigate('DocumentAssetSearch')
                         }
                     />
                 </View>
@@ -441,12 +443,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                             new_img: item?.new_img,
                                             image: item?.image
                                         },
-                                        state: route?.params?.state,
-                                        documentID: route?.params?.id,
-                                        location: route?.params?.location,
-                                        locationID: route?.params?.location_id,
                                         routeBefore: route?.name,
-                                        onGoBack: handleGoBack
+                                        onGoBack:
+                                            handleGoBackDocumentAssetDetail
                                     })
                                 }
                                 style={styles.searchButton}

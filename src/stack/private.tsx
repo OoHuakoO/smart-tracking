@@ -4,12 +4,13 @@ import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
 import Document from '@src/screens/document';
 import DocumentAssetDetail from '@src/screens/documentAssetDetail';
+import DocumentAssetSearch from '@src/screens/documentAssetSearch';
 import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import DocumentCreate from '@src/screens/documentCreate';
 import DocumentCreateAsset from '@src/screens/documentCreateAsset';
-import DocumentCreateSearch from '@src/screens/documentCreateSearch';
+import DocumentCreateSearch from '@src/screens/documentCreateSelectSearch';
 import DocumentSearch from '@src/screens/documentSearch';
-import HomeScreen from '@src/screens/home';
+import Home from '@src/screens/home';
 import Location from '@src/screens/location';
 import LocationAssetSearch from '@src/screens/locationAssetSearch';
 import LocationListAsset from '@src/screens/locationListAsset';
@@ -28,7 +29,7 @@ const PrivateStack = () => {
                 options={{
                     headerShown: false
                 }}
-                component={HomeScreen}
+                component={Home}
             />
             <Stack.Screen
                 name="Assets"
@@ -78,6 +79,13 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={DocumentSearch}
+            />
+            <Stack.Screen
+                name="DocumentAssetSearch"
+                options={{
+                    headerShown: false
+                }}
+                component={DocumentAssetSearch}
             />
             <Stack.Screen
                 name="LocationListAsset"
@@ -133,7 +141,7 @@ const PrivateStack = () => {
             />
 
             <Stack.Screen
-                name="DocumentCreateSearch"
+                name="DocumentCreateSelectSearch"
                 options={{
                     headerShown: false
                 }}

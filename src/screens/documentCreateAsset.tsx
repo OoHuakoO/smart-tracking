@@ -9,9 +9,9 @@ import PopUpDialog from '@src/components/views/popUpDialog';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
-import { loginState, useRecoilValue } from '@src/store';
+import { documentState, loginState, useRecoilValue } from '@src/store';
 import { theme } from '@src/theme';
-import { LoginState } from '@src/typings/common';
+import { DocumentState, LoginState } from '@src/typings/common';
 import {
     AssetData,
     CategoryData,
@@ -60,6 +60,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
+    const documentValue = useRecoilValue<DocumentState>(documentState);
     const form = useForm<AssetData>({});
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
@@ -135,7 +136,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
                     name: data?.name,
                     category_id: searchCategory?.category_id,
                     quantity: 1,
-                    location_id: route?.params?.location_id,
+                    location_id: documentValue?.location_id,
                     user_id: loginValue?.uid,
                     purchase_price: 0,
                     ...(selectedImage && {
@@ -180,6 +181,7 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
             }
         },
         [
+            documentValue?.location_id,
             loginValue?.uid,
             navigation,
             route?.params,
@@ -233,10 +235,10 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
                         Add Asset New
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No : {route?.params?.id}
+                        Document No : {documentValue?.id || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location : {route?.params?.location}
+                        Location : {documentValue?.location || '-'}
                     </Text>
                 </View>
             </LinearGradient>

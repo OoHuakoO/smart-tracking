@@ -23,6 +23,13 @@ import {
     STATE_DOCUMENT_NAME
 } from '@src/constant';
 import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
+import {
+    documentAssetListState,
+    documentState,
+    useRecoilValue,
+    useSetRecoilState
+} from '@src/store';
+import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
@@ -51,10 +58,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         DocumentAssetData[]
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
+    const documentValue = useRecoilValue<DocumentState>(documentState);
+    const setDocumentAssetList = useSetRecoilState<DocumentAssetData[]>(
+        documentAssetListState
+    );
 
     let backgroundColor = theme.colors.documentDraft;
 
-    switch (route?.params?.state) {
+    switch (documentValue?.state) {
         case STATE_DOCUMENT_NAME.Draft:
             backgroundColor = theme.colors.documentDraft;
             break;
@@ -94,7 +105,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setLoading(true);
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const response = await GetDocumentById(route?.params?.id);
+                const response = await GetDocumentById(documentValue?.id);
                 response?.result?.data?.asset?.assets?.map((item) => {
                     item.state = handleMapMovementStateValue(item?.state);
                     item.date_check = parseDateString(item?.date_check);
@@ -110,7 +121,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [handleMapMovementStateValue, route?.params?.id]);
+    }, [documentValue?.id, handleMapMovementStateValue]);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -129,7 +140,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         try {
             clearStateDialog();
             const response = await DeleteDocumentLine({
-                asset_tracking_id: route?.params?.id,
+                asset_tracking_id: documentValue?.id,
                 asset_ids: [{ id: idAsset }]
             });
             if (
@@ -153,7 +164,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong remove asset');
         }
-    }, [clearStateDialog, handleFetchDocumentById, idAsset, route?.params?.id]);
+    }, [clearStateDialog, documentValue?.id, handleFetchDocumentById, idAsset]);
 
     const handleConfirmDialog = useCallback(async () => {
         switch (titleDialog) {
@@ -168,7 +179,8 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
     useEffect(() => {
         handleFetchDocumentById();
-    }, [handleFetchDocumentById]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route?.params?.isReFresh]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -191,7 +203,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         handlePress={() => navigation.navigate('Document')}
                     />
                 </View>
-                {route?.params?.state === STATE_DOCUMENT_NAME.Cancel && (
+                {documentValue?.state === STATE_DOCUMENT_NAME.Cancel && (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.resetCancel}
@@ -203,14 +215,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 )}
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Document : {route?.params?.id || '-'}
+                        Document : {documentValue?.id || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Location: {route?.params?.location || '-'}
+                        Location: {documentValue?.location || '-'}
                     </Text>
                     <View style={[styles.statusIndicator, { backgroundColor }]}>
                         <Text variant="labelSmall" style={styles.statusText}>
-                            {route?.params?.state || STATE_DOCUMENT_NAME.Draft}
+                            {documentValue?.state || STATE_DOCUMENT_NAME.Draft}
                         </Text>
                     </View>
                 </View>
@@ -230,10 +242,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                 onPress={() =>
                                     navigation.navigate('DocumentAssetDetail', {
                                         assetData: item,
-                                        state: route?.params?.state,
-                                        documentID: route?.params?.id,
-                                        location: route?.params?.location,
-                                        locationID: route?.params?.location_id,
                                         routeBefore: route?.name
                                     })
                                 }
@@ -247,7 +255,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                     assetStatus={item?.use_state}
                                     assetMovement={item?.state}
                                     assetDate={item?.date_check}
-                                    documentStatus={route?.params?.state}
+                                    documentStatus={documentValue?.state}
                                     handleRemoveAsset={
                                         handleOpenDialogConfirmRemoveAsset
                                     }
@@ -265,19 +273,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </TouchableOpacity>
                 )} */}
             </View>
-            {route?.params?.state === STATE_DOCUMENT_NAME.Draft && (
+            {documentValue?.state === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity
                     activeOpacity={0.5}
                     style={styles.button}
-                    onPress={() =>
-                        navigation.navigate('DocumentCreate', {
-                            id: route?.params?.id,
-                            location: route?.params?.location,
-                            location_id: route?.params?.location_id,
-                            state: route?.params?.state,
-                            assetDocumentList: listAssetDocument
-                        })
-                    }
+                    onPress={() => {
+                        navigation.navigate('DocumentCreate');
+                        setDocumentAssetList(listAssetDocument);
+                    }}
                 >
                     <ActionButton icon="plus" color={theme.colors.white} />
                 </TouchableOpacity>

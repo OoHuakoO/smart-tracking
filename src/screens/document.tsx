@@ -8,9 +8,9 @@ import SearchButton from '@src/components/views/searchButton';
 import { STATE_DOCUMENT_NAME, STATE_DOCUMENT_VALUE } from '@src/constant';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocationSearch } from '@src/services/location';
-import { loginState } from '@src/store';
+import { documentState, loginState } from '@src/store';
 import { theme } from '@src/theme';
-import { LoginState } from '@src/typings/common';
+import { DocumentState, LoginState } from '@src/typings/common';
 import { DocumentData } from '@src/typings/document';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -30,7 +30,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 type DocumentScreenProp = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -51,6 +51,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [online, setLogin] = useState<boolean>(false);
     const [locationSearch, setLocationSearch] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
+    const setDocument = useSetRecoilState<DocumentState>(documentState);
 
     const handleMapDocumentStateValue = useCallback((state: string): string => {
         switch (state) {
@@ -205,12 +206,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     return;
                 }
                 toggleDialog();
-                navigation.navigate('DocumentAssetStatus', {
+                const documentObj = {
                     id: response?.result?.asset_tracking_id,
                     state: STATE_DOCUMENT_NAME.Draft,
                     location: location?.location_name,
                     location_id: location?.location_id
-                });
+                };
+                setDocument(documentObj);
+                navigation.navigate('DocumentAssetStatus');
                 await handleFetchDocument();
                 await handleFetchLocation();
             } catch (err) {
@@ -218,7 +221,13 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 setContentDialog('Something went wrong create document');
             }
         },
-        [handleFetchDocument, handleFetchLocation, navigation, toggleDialog]
+        [
+            handleFetchDocument,
+            handleFetchLocation,
+            navigation,
+            setDocument,
+            toggleDialog
+        ]
     );
 
     useEffect(() => {
@@ -276,14 +285,16 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         <View style={styles.wrapDetailList}>
                             <TouchableOpacity
                                 activeOpacity={0.9}
-                                onPress={() =>
-                                    navigation.navigate('DocumentAssetStatus', {
+                                onPress={() => {
+                                    const documentObj = {
                                         id: item?.id,
                                         state: item?.state,
                                         location: item?.location,
                                         location_id: item?.location_id
-                                    })
-                                }
+                                    };
+                                    setDocument(documentObj);
+                                    navigation.navigate('DocumentAssetStatus');
+                                }}
                             >
                                 <DocumentCard
                                     online={online}

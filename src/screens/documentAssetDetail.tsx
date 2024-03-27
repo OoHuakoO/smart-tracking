@@ -7,7 +7,9 @@ import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
 import { UpdateDocumentLine } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
+import { documentState, useRecoilValue } from '@src/store';
 import { theme } from '@src/theme';
+import { DocumentState } from '@src/typings/common';
 import { UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
@@ -48,6 +50,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const [searchUseState, setSearchUseState] = useState<string>(
         route?.params?.assetData?.use_state
     );
+    const documentValue = useRecoilValue<DocumentState>(documentState);
 
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
@@ -176,8 +179,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 (item) => searchUseState === item?.name
             );
             const response = await UpdateDocumentLine({
-                location_id: route?.params?.locationID,
-                asset_tracking_id: route?.params?.documentID,
+                location_id: documentValue?.location_id,
+                asset_tracking_id: documentValue?.id,
                 asset_ids: [
                     {
                         id: route?.params?.assetData?.asset_id,
@@ -205,12 +208,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 return;
             }
             if (route?.params?.routeBefore === 'DocumentAssetStatus') {
-                navigation.replace('DocumentAssetStatus', {
-                    id: route?.params?.documentID,
-                    state: route?.params?.state,
-                    location: route?.params?.location,
-                    location_id: route?.params?.locationID
-                });
+                navigation.replace('DocumentAssetStatus');
             }
             route?.params?.onGoBack({
                 asset_id: route?.params?.assetData?.asset_id,
@@ -227,6 +225,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
             setContentDialog('Something went wrong save asset');
         }
     }, [
+        documentValue?.id,
+        documentValue?.location_id,
         getImage,
         handleMapStateThToValue,
         listUseState,

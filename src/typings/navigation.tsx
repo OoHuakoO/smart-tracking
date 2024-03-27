@@ -37,40 +37,27 @@ export type PrivateStackParamsList = {
     ReportAssetData: {
         title: string;
     };
-
     LocationListReportAsset: {
         LocationData: LocationData;
         title: string;
     };
     DocumentAssetDetail: {
         assetData: DocumentAssetData;
-        state: string;
-        documentID: number;
-        location: string;
-        locationID: number;
         routeBefore: string;
         onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };
     DocumentSearch: undefined;
+    DocumentAssetSearch: undefined;
     DocumentAssetStatus: {
-        id: number;
-        state: string;
-        location: string;
-        location_id: number;
+        isReFresh?: boolean;
     };
     DocumentCreate: {
-        id: number;
-        location: string;
-        location_id: number;
-        state: string;
-        assetDocumentList: DocumentAssetData[];
+        codeFromAssetSearch?: string;
     };
-    DocumentCreateSearch: undefined;
+    DocumentCreateSelectSearch: {
+        assetSearch: SearchAsset;
+    };
     DocumentCreateAsset: {
-        id: number;
-        state: string;
-        location: string;
-        location_id: number;
         code: string;
         onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };
