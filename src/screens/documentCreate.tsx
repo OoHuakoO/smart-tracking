@@ -2,7 +2,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
-import CameraScan from '@src/components/core/cameraScan';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
 import {
@@ -334,7 +333,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             navigation.goBack();
                         }}
                     />
-                    <CameraScan />
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => <BarcodeScreenExample />}
+                    >
+                        <Text style={styles.buttonText}>Barcode Scanner</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineSmall" style={styles.textHeader}>
@@ -565,6 +569,14 @@ const styles = StyleSheet.create({
     },
     searchButton: {
         zIndex: 2
+    },
+    button: {
+        height: 60,
+        borderRadius: 30,
+        marginVertical: 12,
+        width: '100%',
+        backgroundColor: '#dddddd',
+        justifyContent: 'center'
     }
 });
 export default DocumentCreateScreen;
