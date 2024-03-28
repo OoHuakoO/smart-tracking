@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
+import CameraScan from '@src/components/core/cameraScan';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import SearchButton from '@src/components/views/searchButton';
 import {
@@ -60,29 +61,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
         documentAssetListState
     );
-
-    // const [hasPermission, setHasPermission] = React.useState(false);
-    // const devices = useCameraDevices();
-
-    // return array of back cameras
-    // devices.filter((device) => device.position === 'back');
-
-    // Here is where useScanBarcodes() hook is called.
-    // Specify your barcode format inside.
-    // Detected barcodes are assigned into the 'barcodes' variable.
-    // const [frameProcessor, barcodes] = useScanBarcodes(
-    //     [BarcodeFormat.QR_CODE],
-    //     {
-    //         checkInverted: true
-    //     }
-    // );
-
-    // React.useEffect(() => {
-    //     (async () => {
-    //         const status = await Camera.requestCameraPermission();
-    //         setHasPermission(status === 'granted');
-    //     })();
-    // }, []);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -356,6 +334,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             navigation.goBack();
                         }}
                     />
+                    <CameraScan />
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineSmall" style={styles.textHeader}>
@@ -368,24 +347,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Location : {documentValue?.location || '-'}
                     </Text>
                 </View>
-                {/* {devices != null && hasPermission && (
-                    <>
-                        <Camera
-                            style={StyleSheet.absoluteFill}
-                            devices={devices}
-                            isActive={true}
-                            frameProcessor={frameProcessor}
-                            frameProcessorFps={5}
-                        />
-                        {barcodes.map((barcode, idx) => (
-                            <View key={idx} style={{ padding: 50 }}>
-                                <Text style={styles.barcodeTextURL}>
-                                    {barcode.displayValue}
-                                </Text>
-                            </View>
-                        ))}
-                    </>
-                )} */}
             </LinearGradient>
 
             <View style={styles.listSection}>
@@ -500,9 +461,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginHorizontal: 15,
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'flex-start',
-        alignSelf: 'stretch'
+        alignSelf: 'stretch',
+        justifyContent: 'space-around'
     },
 
     barcodeTextURL: {

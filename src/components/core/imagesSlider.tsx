@@ -15,19 +15,19 @@ const ImageSlider = () => {
                 <View style={styles.slide1}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/10103065.jpg')}
+                        source={require('../../../assets/images/rbs4-28032024.jpg')}
                     />
                 </View>
                 <View style={styles.slide2}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/img1.jpg')}
+                        source={require('../../../assets/images/rbs5-28032024.jpg')}
                     />
                 </View>
                 <View style={styles.slide3}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/img3.jpg')}
+                        source={require('../../../assets/images/rbs6-28032024.jpg')}
                     />
                 </View>
             </Swiper>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'gray',
         overflow: 'hidden',
-        borderRadius: 20
+        borderRadius: 10
     },
     slide2: {
         flex: 1,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#97CAE5',
         overflow: 'hidden',
-        borderRadius: 20
+        borderRadius: 10
     },
     slide3: {
         flex: 1,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#92BBD9',
         overflow: 'hidden',
-        borderRadius: 20
+        borderRadius: 10
     },
     text: {
         color: theme.colors.pureWhite,
@@ -70,8 +70,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     image: {
-        width: 500,
-        height: 200,
+        width: 400,
+        height: 150,
         objectFit: 'fill'
     }
 });

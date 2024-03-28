@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
-    "android-release" :"react-native run-android --mode=release",
+    "android-release": "react-native run-android --mode=release",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
@@ -26,6 +26,7 @@
     "react": "18.2.0",
     "react-hook-form": "^7.49.3",
     "react-native": "0.73.1",
+    "react-native-camera-kit": "^13.0.0",
     "react-native-date-picker": "^5.0.0",
     "react-native-element-dropdown": "^2.10.1",
     "react-native-gesture-handler": "^2.14.1",
