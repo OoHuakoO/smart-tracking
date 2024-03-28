@@ -1,14 +1,6 @@
 import BackButton from '@src/components/core/backButton';
 import React, { useState } from 'react';
-import {
-  Alert,
-  PermissionsAndroid,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { Alert, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 // import CameraScreen
 import { CameraScreen } from 'react-native-camera-kit';
@@ -17,74 +9,78 @@ const CameraScan = () => {
     const [isPermitted, setIsPermitted] = useState(false);
     const [captureImages, setCaptureImages] = useState([]);
 
-    const requestCameraPermission = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA,
-                {
-                    title: 'Camera Permission',
-                    message: 'App needs camera permission',
-                    buttonPositive: 'OK' // Add this property
-                }
-            );
-            // If CAMERA Permission is granted
-            return granted === PermissionsAndroid.RESULTS.GRANTED;
-        } catch (err) {
-            console.warn(err);
-            return false;
-        }
-    };
+    // const requestCameraPermission = async () => {
+    //     try {
+    //         const granted = await PermissionsAndroid.request(
+    //             PermissionsAndroid.PERMISSIONS.CAMERA,
+    //             {
+    //                 title: 'Camera Permission',
+    //                 message: 'App needs camera permission',
+    //                 buttonPositive: 'OK' // Add this property
+    //             }
+    //         );
+    //         // If CAMERA Permission is granted
+    //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+    //     } catch (err) {
+    //         console.warn(err);
+    //         return false;
+    //     }
+    // };
 
-    const requestExternalWritePermission = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                {
-                    title: 'External Storage Write Permission',
-                    message: 'App needs write permission',
-                    buttonPositive: 'OK'
-                }
-            );
-            // If WRITE_EXTERNAL_STORAGE Permission is granted
-            return granted === PermissionsAndroid.RESULTS.GRANTED;
-        } catch (err) {
-            console.warn(err);
-            alert('Write permission err');
-        }
-        return false;
-    };
+    // const requestExternalWritePermission = async () => {
+    //     try {
+    //         const granted = await PermissionsAndroid.request(
+    //             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    //             {
+    //                 title: 'External Storage Write Permission',
+    //                 message: 'App needs write permission',
+    //                 buttonPositive: 'OK'
+    //             }
+    //         );
+    //         // If WRITE_EXTERNAL_STORAGE Permission is granted
+    //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+    //     } catch (err) {
+    //         console.warn(err);
+    //         alert('Write permission err');
+    //     }
+    //     return false;
+    // };
 
-    const requestExternalReadPermission = async () => {
-        try {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                    title: 'Read Storage Permission',
-                    message: 'App needs Read Storage Permission',
-                    buttonPositive: 'OK'
-                }
-            );
-            // If READ_EXTERNAL_STORAGE Permission is granted
-            return granted === PermissionsAndroid.RESULTS.GRANTED;
-        } catch (err) {
-            console.warn(err);
-            alert('Read permission err');
-        }
-        return false;
-    };
+    // const requestExternalReadPermission = async () => {
+    //     try {
+    //         const granted = await PermissionsAndroid.request(
+    //             PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    //             {
+    //                 title: 'Read Storage Permission',
+    //                 message: 'App needs Read Storage Permission',
+    //                 buttonPositive: 'OK'
+    //             }
+    //         );
+    //         // If READ_EXTERNAL_STORAGE Permission is granted
+    //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+    //     } catch (err) {
+    //         console.warn(err);
+    //         alert('Read permission err');
+    //     }
+    //     return false;
+    // };
 
-    const openCamera = async () => {
-        if (Platform.OS === 'android') {
-            if (await requestCameraPermission()) {
-                if (await requestExternalWritePermission()) {
-                    if (await requestExternalReadPermission()) {
-                        setIsPermitted(true);
-                    } else alert('READ_EXTERNAL_STORAGE permission denied');
-                } else alert('WRITE_EXTERNAL_STORAGE permission denied');
-            } else alert('CAMERA permission denied');
-        } else {
-            setIsPermitted(true);
-        }
+    // const openCamera = async () => {
+    //     if (Platform.OS === 'android') {
+    //         if (await requestCameraPermission()) {
+    //             if (await requestExternalWritePermission()) {
+    //                 if (await requestExternalReadPermission()) {
+    //                     setIsPermitted(true);
+    //                 } else alert('READ_EXTERNAL_STORAGE permission denied');
+    //             } else alert('WRITE_EXTERNAL_STORAGE permission denied');
+    //         } else alert('CAMERA permission denied');
+    //     } else {
+    //         setIsPermitted(true);
+    //     }
+    // };
+
+    const clickOpenCamera = () => {
+        setIsPermitted(true);
     };
 
     const onBottomButtonPressed = (event) => {
@@ -139,7 +135,7 @@ const CameraScan = () => {
                     {/* <TouchableHighlight onPress={openCamera}>
                         <Text>Open Camera</Text>
                     </TouchableHighlight> */}
-                    <BackButton handlePress={openCamera} />
+                    <BackButton handlePress={clickOpenCamera} />
                 </View>
             )}
         </SafeAreaView>

@@ -15,19 +15,19 @@ const ImageSlider = () => {
                 <View style={styles.slide1}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/rbs4-28032024.jpg')}
+                        source={require('../../../assets/images/Ads1.jpg')}
                     />
                 </View>
                 <View style={styles.slide2}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/rbs5-28032024.jpg')}
+                        source={require('../../../assets/images/Ads2.jpg')}
                     />
                 </View>
                 <View style={styles.slide3}>
                     <Image
                         style={styles.image}
-                        source={require('../../../assets/images/rbs6-28032024.jpg')}
+                        source={require('../../../assets/images/Ads3.jpg')}
                     />
                 </View>
             </Swiper>
