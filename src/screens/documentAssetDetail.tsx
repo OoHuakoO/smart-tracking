@@ -203,16 +203,18 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 navigation.replace('DocumentAssetStatus');
                 return;
             }
-            route?.params?.onGoBack({
-                asset_id: route?.params?.assetData?.asset_id,
-                default_code: route?.params?.assetData?.code,
-                name: route?.params?.assetData?.name,
-                use_state: searchUseState,
-                state: route?.params?.assetData?.state,
-                image: getImage() !== 'false' ? getImage() : false,
-                new_img: getImage() !== 'false'
-            });
-            navigation.goBack();
+            if (route?.params?.routeBefore === 'DocumentCreate') {
+                route?.params?.onGoBack({
+                    asset_id: route?.params?.assetData?.asset_id,
+                    default_code: route?.params?.assetData?.code,
+                    name: route?.params?.assetData?.name,
+                    use_state: searchUseState,
+                    state: route?.params?.assetData?.state,
+                    image: getImage() !== 'false' ? getImage() : false,
+                    new_img: getImage() !== 'false'
+                });
+                navigation.goBack();
+            }
         } catch (err) {
             setVisibleDialog(true);
             setContentDialog('Something went wrong save asset');

@@ -3,7 +3,7 @@ import BackButton from '@src/components/core/backButton';
 import DocumentAssetStatusCard from '@src/components/views/documentAssetStatusCard';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text } from 'react-native-paper';
 
 import {
@@ -17,8 +17,6 @@ import {
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
-    MOVEMENT_ASSET,
-    MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     STATE_DOCUMENT_NAME
 } from '@src/constant';
@@ -31,7 +29,7 @@ import {
 } from '@src/store';
 import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, handleMapMovementStateEN } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
 import LinearGradient from 'react-native-linear-gradient';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -63,38 +61,20 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         documentAssetListState
     );
 
-    let backgroundColor = theme.colors.documentDraft;
-
-    switch (documentValue?.state) {
-        case STATE_DOCUMENT_NAME.Draft:
-            backgroundColor = theme.colors.documentDraft;
-            break;
-        case STATE_DOCUMENT_NAME.Check:
-            backgroundColor = theme.colors.documentCheck;
-            break;
-        case STATE_DOCUMENT_NAME.Done:
-            backgroundColor = theme.colors.documentDone;
-            break;
-        case STATE_DOCUMENT_NAME.Cancel:
-            backgroundColor = theme.colors.documentCancel;
-            break;
-        default:
-            backgroundColor = theme.colors.documentDraft;
-            break;
-    }
-
-    const handleMapMovementStateValue = useCallback((state: string): string => {
-        switch (state) {
-            case MOVEMENT_ASSET.Normal:
-                return MOVEMENT_ASSET_EN.Normal;
-            case MOVEMENT_ASSET.New:
-                return MOVEMENT_ASSET_EN.New;
-            case MOVEMENT_ASSET.Transfer:
-                return MOVEMENT_ASSET_EN.Transfer;
+    const colorStateTag = useMemo((): string => {
+        switch (documentValue?.state) {
+            case STATE_DOCUMENT_NAME.Draft:
+                return theme.colors.documentDraft;
+            case STATE_DOCUMENT_NAME.Check:
+                return theme.colors.documentCheck;
+            case STATE_DOCUMENT_NAME.Done:
+                return theme.colors.documentDone;
+            case STATE_DOCUMENT_NAME.Cancel:
+                return theme.colors.documentCancel;
             default:
-                return MOVEMENT_ASSET_EN.Normal;
+                return theme.colors.documentDraft;
         }
-    }, []);
+    }, [documentValue?.state]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -107,7 +87,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             if (isOnline) {
                 const response = await GetDocumentById(documentValue?.id);
                 response?.result?.data?.asset?.assets?.map((item) => {
-                    item.state = handleMapMovementStateValue(item?.state);
+                    item.state = handleMapMovementStateEN(item?.state);
                     item.date_check = parseDateString(item?.date_check);
                 });
                 setTotalAssetDocument(
@@ -121,7 +101,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [documentValue?.id, handleMapMovementStateValue]);
+    }, [documentValue?.id]);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -148,7 +128,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
             ) {
                 setVisibleDialog(true);
-                setContentDialog('Something went Asset data not found');
+                setContentDialog('Something went wrong asset data not found');
                 return;
             }
             setListAssetDocument((prev) => {
@@ -220,7 +200,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}
                     </Text>
-                    <View style={[styles.statusIndicator, { backgroundColor }]}>
+                    <View
+                        style={[
+                            styles.statusIndicator,
+                            { backgroundColor: colorStateTag }
+                        ]}
+                    >
                         <Text variant="labelSmall" style={styles.statusText}>
                             {documentValue?.state || STATE_DOCUMENT_NAME.Draft}
                         </Text>
@@ -267,11 +252,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                 />
-                {/* {documentStatus === STATE_DOCUMENT_NAME.Draft && (
-                    <TouchableOpacity style={styles.saveButton}>
-                        <Text style={styles.buttonText}>Save</Text>
-                    </TouchableOpacity>
-                )} */}
             </View>
             {documentValue?.state === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity

@@ -492,24 +492,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Location : {documentValue?.location || '-'}
                     </Text>
                 </View>
-                {/* {devices != null && hasPermission && (
-                    <>
-                        <Camera
-                            style={StyleSheet.absoluteFill}
-                            devices={devices}
-                            isActive={true}
-                            frameProcessor={frameProcessor}
-                            frameProcessorFps={5}
-                        />
-                        {barcodes.map((barcode, idx) => (
-                            <View key={idx} style={{ padding: 50 }}>
-                                <Text style={styles.barcodeTextURL}>
-                                    {barcode.displayValue}
-                                </Text>
-                            </View>
-                        ))}
-                    </>
-                )} */}
             </LinearGradient>
 
             <View style={styles.listSection}>

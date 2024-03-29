@@ -32,3 +32,16 @@ export const handleMapMovementStateValue = (state: string): string => {
             return MOVEMENT_ASSET.Normal;
     }
 };
+
+export const handleMapMovementStateEN = (state: string): string => {
+    switch (state) {
+        case MOVEMENT_ASSET.Normal:
+            return MOVEMENT_ASSET_EN.Normal;
+        case MOVEMENT_ASSET.New:
+            return MOVEMENT_ASSET_EN.New;
+        case MOVEMENT_ASSET.Transfer:
+            return MOVEMENT_ASSET_EN.Transfer;
+        default:
+            return MOVEMENT_ASSET_EN.Normal;
+    }
+};
