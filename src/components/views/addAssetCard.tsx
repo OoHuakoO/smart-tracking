@@ -1,5 +1,6 @@
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -13,6 +14,8 @@ interface AddAssetCardProps {
     assetName: string;
     assetStatus: string;
     assetMovement: string;
+    assetLocation: string;
+    assetNewLocation: string;
     handleRemoveAsset: (id: number) => void;
 }
 
@@ -24,6 +27,8 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
         assetName,
         assetStatus,
         assetMovement,
+        assetLocation,
+        assetNewLocation,
         handleRemoveAsset
     } = props;
 
@@ -65,6 +70,18 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                     Movement {}
                     <Text style={styles.additionalText}>{assetMovement}</Text>
                 </Text>
+                <Text variant="bodyMedium">
+                    Location {}
+                    <Text style={styles.additionalText}>{assetLocation}</Text>
+                </Text>
+                {assetMovement === MOVEMENT_ASSET_EN.Transfer && (
+                    <Text variant="bodyMedium">
+                        New Location {}
+                        <Text style={styles.additionalText}>
+                            {assetNewLocation}
+                        </Text>
+                    </Text>
+                )}
             </View>
         </View>
     );

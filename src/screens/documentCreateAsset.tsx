@@ -22,6 +22,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
     Image,
+    PermissionsAndroid,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -71,41 +72,66 @@ const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
     }, []);
 
     const openImagePicker = () => {
-        const options = {
-            mediaType: 'photo' as MediaType,
-            includeBase64: true,
-            maxHeight: 2000,
-            maxWidth: 2000
-        };
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 2000,
+                maxWidth: 2000
+            };
 
-        launchImageLibrary(options, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.log('Image picker error: ', response.errorMessage);
-            } else {
-                setSelectedImage(response?.assets?.[0]?.base64);
-            }
-        });
+            launchImageLibrary(options, (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.errorCode) {
+                    console.log('Image picker error: ', response.errorMessage);
+                } else {
+                    setSelectedImage(response?.assets?.[0]?.base64);
+                }
+            });
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong image library launch');
+        }
     };
 
-    const handleCameraLaunch = () => {
-        const options = {
-            mediaType: 'photo' as MediaType,
-            includeBase64: true,
-            maxHeight: 2000,
-            maxWidth: 2000
-        };
+    const handleCameraLaunch = async () => {
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 2000,
+                maxWidth: 2000
+            };
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+                {
+                    title: 'App Camera Permission',
+                    message: 'App needs access to your camera ',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK'
+                }
+            );
 
-        launchCamera(options, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled camera');
-            } else if (response.errorCode) {
-                console.log('Camera Error: ', response.errorMessage);
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('Camera permission given');
+                launchCamera(options, (response) => {
+                    if (response.didCancel) {
+                        console.log('User cancelled camera');
+                    } else if (response.errorCode) {
+                        console.log('Camera Error: ', response.errorMessage);
+                    } else {
+                        setSelectedImage(response?.assets?.[0]?.base64);
+                    }
+                });
             } else {
-                setSelectedImage(response?.assets?.[0]?.base64);
+                console.log('Camera permission denied');
             }
-        });
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong camera launch');
+        }
     };
 
     const renderItemCategory = (item: CategoryData) => {

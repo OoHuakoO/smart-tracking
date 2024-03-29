@@ -72,35 +72,42 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     />
                 </View>
                 <View style={styles.assetDetail}>
-                    <View>
+                    <View style={styles.rowText}>
                         <Text variant="titleMedium" style={styles.assetTitle}>
                             Serial Number
                         </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Brand Name
-                        </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Category
-                        </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Location
-                        </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Owner
-                        </Text>
-                    </View>
-                    <View style={styles.assetDetailDes}>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.serial_no || '-'}
+                        </Text>
+                    </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Brand Name
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.brand_name || '-'}
                         </Text>
+                    </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Category
+                        </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.category || '-'}
                         </Text>
+                    </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Location
+                        </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.location || '-'}
+                        </Text>
+                    </View>
+
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Owner
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.owner || '-'}
@@ -184,20 +191,21 @@ const styles = StyleSheet.create({
         width: wp('80%'),
         alignSelf: 'center',
         display: 'flex',
-        flexDirection: 'row',
-        marginTop: 30,
-        alignItems: 'baseline'
+        marginTop: 30
     },
     assetTitle: {
         fontSize: 14,
-        marginBottom: 15
-    },
-    assetDetailDes: {
-        marginLeft: 20
+        marginBottom: 15,
+        width: '40%'
     },
     assetDes: {
         fontSize: 14,
-        marginBottom: 15
+        marginBottom: 15,
+        width: '60%'
+    },
+    rowText: {
+        flexDirection: 'row',
+        width: '100%'
     }
 });
 

@@ -36,6 +36,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     const [dateEnd, setDateEnd] = useState<Date>(null);
     const [openDateStart, setOpenStart] = useState<boolean>(false);
     const [openDateEnd, setOpenEnd] = useState<boolean>(false);
+
     const stateList: State[] = [
         { label: 'Draft', value: 'draft' },
         { label: 'Check', value: 'open' },
@@ -99,7 +100,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
         );
     };
 
-    const handleInitDropdown = useCallback(async () => {
+    const handleInitFetch = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
             if (isOnline) {
@@ -122,8 +123,8 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     }, []);
 
     useEffect(() => {
-        handleInitDropdown();
-    }, [handleInitDropdown]);
+        handleInitFetch();
+    }, [handleInitFetch]);
 
     return (
         <View style={styles.container}>

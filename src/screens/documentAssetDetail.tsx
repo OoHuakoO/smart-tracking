@@ -1,8 +1,13 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import AssetTagStatus from '@src/components/views/assetTagStatus';
 import PopUpDialog from '@src/components/views/popUpDialog';
-import { MOVEMENT_ASSET, MOVEMENT_ASSET_EN } from '@src/constant';
+import {
+    MOVEMENT_ASSET_EN,
+    STATE_DOCUMENT_NAME,
+    USE_STATE_ASSET_NORMAL_EN
+} from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
 import { UpdateDocumentLine } from '@src/services/document';
@@ -12,7 +17,7 @@ import { theme } from '@src/theme';
 import { DocumentState } from '@src/typings/common';
 import { UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     Image,
@@ -94,19 +99,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         }
     };
 
-    const handleMapStateThToValue = useCallback((state: string): string => {
-        switch (state) {
-            case MOVEMENT_ASSET_EN.Normal:
-                return MOVEMENT_ASSET.Normal;
-            case MOVEMENT_ASSET_EN.Transfer:
-                return MOVEMENT_ASSET.Transfer;
-            case MOVEMENT_ASSET_EN.New:
-                return MOVEMENT_ASSET.New;
-            default:
-                return MOVEMENT_ASSET.Normal;
-        }
-    }, []);
-
     const handleCameraLaunch = async () => {
         try {
             const options = {
@@ -173,53 +165,56 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         }
     }, [route?.params?.assetData?.image, selectedImage]);
 
-    const handleSave = useCallback(async () => {
+    const handleSaveEditAsset = useCallback(async () => {
         try {
-            const filterUseStatus = listUseState.filter(
-                (item) => searchUseState === item?.name
-            );
-            const response = await UpdateDocumentLine({
-                location_id: documentValue?.location_id,
-                asset_tracking_id: documentValue?.id,
-                asset_ids: [
-                    {
-                        id: route?.params?.assetData?.asset_id,
-                        state: handleMapStateThToValue(
-                            route?.params?.assetData?.state
-                        ),
-                        ...(filterUseStatus?.length > 0 && {
-                            use_state: filterUseStatus[0]?.id
-                        }),
-                        ...(getImage() !== 'false' && {
-                            image: getImage()
-                        }),
-                        ...(getImage() !== 'false' && { new_img: true })
-                    }
-                ]
-            });
-            if (response?.error) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong save asset');
-                return;
-            }
-            if (response?.result?.error) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong save asset');
-                return;
-            }
             if (route?.params?.routeBefore === 'DocumentAssetStatus') {
+                const filterUseStatus = listUseState.filter(
+                    (item) => searchUseState === item?.name
+                );
+                const response = await UpdateDocumentLine({
+                    location_id: documentValue?.location_id,
+                    asset_tracking_id: documentValue?.id,
+                    asset_ids: [
+                        {
+                            id: route?.params?.assetData?.asset_id,
+                            state: handleMapMovementStateValue(
+                                route?.params?.assetData?.state
+                            ),
+                            ...(filterUseStatus?.length > 0 && {
+                                use_state: filterUseStatus[0]?.id
+                            }),
+                            ...(getImage() !== 'false' && {
+                                image: getImage()
+                            }),
+                            ...(getImage() !== 'false' && { new_img: true })
+                        }
+                    ]
+                });
+                if (response?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong save asset');
+                    return;
+                }
+                if (response?.result?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong save asset');
+                    return;
+                }
                 navigation.replace('DocumentAssetStatus');
+                return;
             }
-            route?.params?.onGoBack({
-                asset_id: route?.params?.assetData?.asset_id,
-                default_code: route?.params?.assetData?.code,
-                name: route?.params?.assetData?.name,
-                use_state: searchUseState,
-                state: route?.params?.assetData?.state,
-                image: getImage() !== 'false' ? getImage() : false,
-                new_img: getImage() !== 'false'
-            });
-            navigation.goBack();
+            if (route?.params?.routeBefore === 'DocumentCreate') {
+                route?.params?.onGoBack({
+                    asset_id: route?.params?.assetData?.asset_id,
+                    default_code: route?.params?.assetData?.code,
+                    name: route?.params?.assetData?.name,
+                    use_state: searchUseState,
+                    state: route?.params?.assetData?.state,
+                    image: getImage() !== 'false' ? getImage() : false,
+                    new_img: getImage() !== 'false'
+                });
+                navigation.goBack();
+            }
         } catch (err) {
             setVisibleDialog(true);
             setContentDialog('Something went wrong save asset');
@@ -228,7 +223,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         documentValue?.id,
         documentValue?.location_id,
         getImage,
-        handleMapStateThToValue,
         listUseState,
         navigation,
         route?.params,
@@ -280,18 +274,20 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                             />
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.buttonCamera}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={toggleDialog}
-                        >
-                            <ActionButton
-                                icon={'camera'}
-                                size="small"
-                                backgroundColor={theme.colors.white}
-                            />
-                        </TouchableOpacity>
-                    </View>
+                    {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
+                        <View style={styles.buttonCamera}>
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={toggleDialog}
+                            >
+                                <ActionButton
+                                    icon={'camera'}
+                                    size="small"
+                                    backgroundColor={theme.colors.white}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
 
                 <View style={styles.imagesContainer}>
@@ -322,79 +318,105 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         {route?.params?.assetData?.code || '-'}
                     </Text>
                 </View>
+                {documentValue?.state !== STATE_DOCUMENT_NAME?.Draft && (
+                    <View style={styles.assetStatus}>
+                        <AssetTagStatus
+                            status={
+                                route?.params?.assetData?.use_state?.toString() !==
+                                'false'
+                                    ? route?.params?.assetData?.use_state
+                                    : USE_STATE_ASSET_NORMAL_EN
+                            }
+                        />
+                    </View>
+                )}
 
                 <View style={styles.assetDetail}>
-                    <View style={styles.assetDetailTitle}>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Use State
-                        </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Serial Number
-                        </Text>
-                        {/* <Text variant="titleMedium" style={styles.assetTitle}>
-                            Brand Name
-                        </Text> */}
+                    {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
+                        <View style={styles.rowText}>
+                            <Text
+                                variant="titleMedium"
+                                style={styles.assetTitle}
+                            >
+                                Use State
+                            </Text>
+                            <Dropdown
+                                style={[
+                                    styles.dropdown,
+                                    isFocusUseState && styles.dropdownSelect
+                                ]}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={listUseState}
+                                maxHeight={300}
+                                labelField="name"
+                                valueField="name"
+                                value={searchUseState}
+                                onFocus={() => setIsFocusUseState(true)}
+                                onBlur={() => setIsFocusUseState(false)}
+                                onChange={(item) => {
+                                    setSearchUseState(item?.name);
+                                }}
+                                renderItem={renderItemUseState}
+                            />
+                        </View>
+                    )}
+
+                    <View style={styles.rowText}>
                         <Text variant="titleMedium" style={styles.assetTitle}>
                             Category
                         </Text>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Location
-                        </Text>
-                        {/* <Text variant="titleMedium" style={styles.assetTitle}>
-                            Owner
-                        </Text> */}
-                    </View>
-                    <View style={styles.assetDetailDes}>
-                        <Dropdown
-                            style={[
-                                styles.dropdown,
-                                isFocusUseState && styles.dropdownSelect
-                            ]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            data={listUseState}
-                            maxHeight={300}
-                            labelField="name"
-                            valueField="name"
-                            value={searchUseState}
-                            onFocus={() => setIsFocusUseState(true)}
-                            onBlur={() => setIsFocusUseState(false)}
-                            onChange={(item) => {
-                                setSearchUseState(item?.name);
-                            }}
-                            renderItem={renderItemUseState}
-                        />
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.serial_no || '-'}
-                        </Text>
-                        {/* <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.brand_name || '-'}
-                        </Text> */}
-
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.category || '-'}
                         </Text>
-
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location || '-'}
-                        </Text>
-                        {/* <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.owner || '-'}
-                        </Text> */}
                     </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Movement
+                        </Text>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            {route?.params?.assetData?.state || '-'}
+                        </Text>
+                    </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Location
+                        </Text>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            {route?.params?.assetData?.location_old ||
+                                route?.params?.assetData?.location ||
+                                '-'}
+                        </Text>
+                    </View>
+                    {route?.params?.assetData?.state ===
+                        MOVEMENT_ASSET_EN.Transfer && (
+                        <View style={styles.rowText}>
+                            <Text
+                                variant="titleMedium"
+                                style={styles.assetTitle}
+                            >
+                                New Location
+                            </Text>
+                            <Text variant="bodyLarge" style={styles.assetDes}>
+                                {documentValue?.location || '-'}
+                            </Text>
+                        </View>
+                    )}
                 </View>
-                <TouchableOpacity
-                    style={[
-                        styles.saveButton,
-                        {
-                            backgroundColor: theme.colors.primary
-                        }
-                    ]}
-                    onPress={() => handleSave()}
-                >
-                    <Text style={styles.buttonText}>Save</Text>
-                </TouchableOpacity>
+                {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
+                    <TouchableOpacity
+                        style={[
+                            styles.saveButton,
+                            {
+                                backgroundColor: theme.colors.primary
+                            }
+                        ]}
+                        onPress={() => handleSaveEditAsset()}
+                    >
+                        <Text style={styles.buttonText}>Save</Text>
+                    </TouchableOpacity>
+                )}
             </View>
             <PopUpDialog
                 visible={dialogVisible}
@@ -478,30 +500,24 @@ const styles = StyleSheet.create({
     },
     assetStatus: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 20
     },
     assetDetail: {
-        height: hp('30%'),
         width: wp('80%'),
         alignSelf: 'center',
         display: 'flex',
-        flexDirection: 'row',
-        marginTop: 10,
-        alignItems: 'baseline'
+        marginTop: 30
     },
     assetTitle: {
         fontSize: 14,
-        marginBottom: 15
-    },
-    assetDetailDes: {
-        width: '60%'
-    },
-    assetDetailTitle: {
+        marginBottom: 15,
         width: '40%'
     },
     assetDes: {
         fontSize: 14,
-        marginBottom: 15
+        marginBottom: 15,
+        width: '60%'
     },
     dropdown: {
         height: 35,
@@ -511,7 +527,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: theme.colors.blackGray,
         marginBottom: 11,
-        width: '100%'
+        width: '60%'
     },
     dropdownSelect: {
         borderColor: theme.colors.buttonConfirm
@@ -564,6 +580,10 @@ const styles = StyleSheet.create({
         color: theme.colors.pureWhite,
         fontWeight: '600',
         fontSize: 16
+    },
+    rowText: {
+        flexDirection: 'row',
+        width: '100%'
     }
 });
 
