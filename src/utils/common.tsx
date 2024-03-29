@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MOVEMENT_ASSET, MOVEMENT_ASSET_EN } from '@src/constant';
 
 export const getOnlineMode = async (): Promise<boolean> => {
     const online = await AsyncStorage.getItem('Online');
@@ -17,4 +18,17 @@ export const removeKeyEmpty = (obj: object) => {
     });
 
     return obj;
+};
+
+export const handleMapMovementStateValue = (state: string): string => {
+    switch (state) {
+        case MOVEMENT_ASSET_EN.Normal:
+            return MOVEMENT_ASSET.Normal;
+        case MOVEMENT_ASSET_EN.Transfer:
+            return MOVEMENT_ASSET.Transfer;
+        case MOVEMENT_ASSET_EN.New:
+            return MOVEMENT_ASSET.New;
+        default:
+            return MOVEMENT_ASSET.Normal;
+    }
 };

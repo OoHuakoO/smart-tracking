@@ -3,33 +3,43 @@ import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
 import AddAssetCard from '@src/components/views/addAssetCard';
+import PopupScanAsset from '@src/components/views/popupScanAsset';
 import SearchButton from '@src/components/views/searchButton';
 import {
-    MOVEMENT_ASSET,
     MOVEMENT_ASSET_EN,
     USE_STATE_ASSET,
     USE_STATE_ASSET_NORMAL_EN,
     USE_STATE_ASSET_TH
 } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetByCode } from '@src/services/asset';
 import { AddDocumentLine } from '@src/services/document';
+import { GetUseStatus } from '@src/services/downloadDB';
 import { documentAssetListState, documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
-import { AssetData } from '@src/typings/downloadDB';
+import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
     LogBox,
+    PermissionsAndroid,
     SafeAreaView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
     View
 } from 'react-native';
+import {
+    MediaType,
+    launchCamera,
+    launchImageLibrary
+} from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -60,29 +70,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
         documentAssetListState
     );
+    const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
+    const [searchUseState, setSearchUseState] = useState<string>('');
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
+    const [visiblePopupScanAsset, setVisiblePopupScanAsset] =
+        useState<boolean>(false);
+    const [visibleDialogCamera, setVisibleDialogCamera] =
+        useState<boolean>(false);
 
-    // const [hasPermission, setHasPermission] = React.useState(false);
-    // const devices = useCameraDevices();
-
-    // return array of back cameras
-    // devices.filter((device) => device.position === 'back');
-
-    // Here is where useScanBarcodes() hook is called.
-    // Specify your barcode format inside.
-    // Detected barcodes are assigned into the 'barcodes' variable.
-    // const [frameProcessor, barcodes] = useScanBarcodes(
-    //     [BarcodeFormat.QR_CODE],
-    //     {
-    //         checkInverted: true
-    //     }
-    // );
-
-    // React.useEffect(() => {
-    //     (async () => {
-    //         const status = await Camera.requestCameraPermission();
-    //         setHasPermission(status === 'granted');
-    //     })();
-    // }, []);
+    const [scanAssetData, setScanAssetData] = useState<AssetData>();
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -111,6 +108,30 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         clearStateDialog();
     }, [clearStateDialog]);
 
+    const toggleDialogCamera = () => {
+        setVisibleDialogCamera(!visibleDialogCamera);
+    };
+
+    const handleCloseDialogCamera = useCallback(() => {
+        setVisibleDialogCamera(false);
+    }, []);
+
+    const handleClosePopupScanAsset = useCallback(() => {
+        setVisiblePopupScanAsset(false);
+    }, []);
+
+    const handleSetTrueIsFocusUseState = useCallback(() => {
+        setIsFocusUseState(true);
+    }, []);
+
+    const handleSetFalseIsFocusUseState = useCallback(() => {
+        setIsFocusUseState(false);
+    }, []);
+
+    const handleSetSearchUseState = useCallback((name: string) => {
+        setSearchUseState(name);
+    }, []);
+
     const handleConfirmDialog = useCallback(async () => {
         switch (titleDialog) {
             case 'Asset not found in Master':
@@ -126,9 +147,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     }
                 });
                 break;
-            case 'Asset Transfer':
-                setVisibleDialog(false);
-                break;
+
             case 'Duplicate Asset':
                 setShowCancelDialog(false);
                 setVisibleDialog(false);
@@ -155,25 +174,75 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, []);
 
-    const handleMapMovementStateValue = useCallback((state: string): string => {
-        switch (state) {
-            case MOVEMENT_ASSET_EN.Normal:
-                return MOVEMENT_ASSET.Normal;
-            case MOVEMENT_ASSET_EN.Transfer:
-                return MOVEMENT_ASSET.Transfer;
-            case MOVEMENT_ASSET_EN.New:
-                return MOVEMENT_ASSET.New;
-            default:
-                return MOVEMENT_ASSET.Normal;
-        }
-    }, []);
-
     const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
         setVisibleDialog(true);
         setTitleDialog('Confirm');
         setContentDialog('Do you want to remove this asset ?');
         setIdAsset(id);
     }, []);
+
+    const openImagePicker = async () => {
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 2000,
+                maxWidth: 2000
+            };
+
+            launchImageLibrary(options, (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.errorCode) {
+                    console.log('Image picker error: ', response.errorMessage);
+                } else {
+                    setSelectedImage(response?.assets?.[0]?.base64);
+                }
+            });
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong image library launch');
+        }
+    };
+
+    const handleCameraLaunch = async () => {
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 2000,
+                maxWidth: 2000
+            };
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+                {
+                    title: 'App Camera Permission',
+                    message: 'App needs access to your camera ',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK'
+                }
+            );
+
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('Camera permission given');
+                launchCamera(options, (response) => {
+                    if (response.didCancel) {
+                        console.log('User cancelled camera');
+                    } else if (response.errorCode) {
+                        console.log('Camera Error: ', response.errorMessage);
+                    } else {
+                        setSelectedImage(response?.assets?.[0]?.base64);
+                    }
+                });
+            } else {
+                console.log('Camera permission denied');
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong camera launch');
+        }
+    };
 
     const handleGoBackDocumentAssetDetail = useCallback(
         (assetData: AssetDataForPassParamsDocumentCreate) => {
@@ -231,7 +300,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         clearStateDialog,
         documentValue?.id,
         documentValue?.location_id,
-        handleMapMovementStateValue,
         handleMapUseStateThToValue,
         listAssetCreate,
         navigation
@@ -293,24 +361,20 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         response?.result?.data?.asset?.location !==
                         documentValue?.location
                     ) {
-                        setVisibleDialog(true);
-                        setTitleDialog('Asset Transfer');
-                        setContentDialog(
-                            `Asset transfer from ${response?.result?.data?.asset?.location} to ${documentValue?.location}`
-                        );
-                        setShowCancelDialog(false);
                         response.result.data.asset.state =
                             MOVEMENT_ASSET_EN.Transfer;
-                        setListAssetCreate((prev) => {
-                            return [response?.result?.data?.asset, ...prev];
-                        });
+                        setScanAssetData(response?.result?.data?.asset);
+                        setSearchUseState(
+                            response?.result?.data?.asset?.use_state
+                        );
+                        setVisiblePopupScanAsset(true);
+                        clearStateDialog();
                         return;
                     }
-
                     response.result.data.asset.state = MOVEMENT_ASSET_EN.Normal;
-                    setListAssetCreate((prev) => {
-                        return [response?.result?.data?.asset, ...prev];
-                    });
+                    setScanAssetData(response.result.data.asset);
+                    setSearchUseState(response?.result?.data?.asset?.use_state);
+                    setVisiblePopupScanAsset(true);
                     clearStateDialog();
                 }
             } catch (err) {
@@ -329,10 +393,70 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         ]
     );
 
+    const getImage = useCallback((): string => {
+        if (scanAssetData?.image.toString() !== 'false' && selectedImage) {
+            return selectedImage;
+        }
+        if (scanAssetData?.image.toString() === 'false' && selectedImage) {
+            return selectedImage;
+        }
+        if (scanAssetData?.image.toString() !== 'false' && !selectedImage) {
+            return scanAssetData?.image;
+        }
+        if (scanAssetData?.image.toString() === 'false' && !selectedImage) {
+            return 'false';
+        }
+    }, [scanAssetData?.image, selectedImage]);
+
+    const handleSaveEditAsset = useCallback(async () => {
+        try {
+            const updatedScanAssetData = {
+                ...scanAssetData,
+                use_state: searchUseState,
+                image: getImage() !== 'false' ? getImage() : false,
+                new_img: getImage() !== 'false'
+            };
+
+            setListAssetCreate((prev) => {
+                return [updatedScanAssetData as AssetData, ...prev];
+            });
+            setVisiblePopupScanAsset(false);
+            setScanAssetData(null);
+        } catch (err) {
+            setVisiblePopupScanAsset(false);
+            setScanAssetData(null);
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong save asset');
+        }
+    }, [getImage, scanAssetData, searchUseState]);
+
+    const handleInitFetch = useCallback(async () => {
+        try {
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const responseUseStatus = await GetUseStatus({
+                    page: 1,
+                    limit: 1000
+                });
+                setListUseState(responseUseStatus?.result?.data.data);
+            } else {
+                const db = await getDBConnection();
+                const listUseStatusDB = await getUseStatus(db, 1, 1000);
+                setListUseState(listUseStatusDB);
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+        }
+    }, []);
+
     useEffect(() => {
         handleSearchAsset(route?.params?.codeFromAssetSearch);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route?.params?.codeFromAssetSearch]);
+
+    useEffect(() => {
+        handleInitFetch();
+    }, [handleInitFetch]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -456,7 +580,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                     assetName={item?.name}
                                     assetStatus={item?.use_state}
                                     assetMovement={item?.state}
+                                    assetLocation={item?.location}
                                     assetId={item?.asset_id}
+                                    assetNewLocation={documentValue?.location}
                                     handleRemoveAsset={
                                         handleOpenDialogConfirmRemoveAsset
                                     }
@@ -481,6 +607,27 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 >
                     <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity>
+                <PopupScanAsset
+                    visiblePopupScanAsset={visiblePopupScanAsset}
+                    visibleDialogCamera={visibleDialogCamera}
+                    onClosePopupScanAsset={handleClosePopupScanAsset}
+                    onCloseDialogCamera={handleCloseDialogCamera}
+                    toggleDialogCamera={toggleDialogCamera}
+                    openImagePicker={openImagePicker}
+                    handleCameraLaunch={handleCameraLaunch}
+                    selectedImage={selectedImage}
+                    listUseState={listUseState}
+                    searchUseState={searchUseState}
+                    isFocusUseState={isFocusUseState}
+                    handleSetTrueIsFocusUseState={handleSetTrueIsFocusUseState}
+                    handleSetFalseIsFocusUseState={
+                        handleSetFalseIsFocusUseState
+                    }
+                    handleSetSearchUseState={handleSetSearchUseState}
+                    handleSaveEditAsset={handleSaveEditAsset}
+                    scanAssetData={scanAssetData}
+                    locationNew={documentValue?.location}
+                />
             </View>
         </SafeAreaView>
     );
@@ -505,14 +652,9 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch'
     },
 
-    barcodeTextURL: {
-        fontSize: 20,
-        color: theme.colors.pureWhite,
-        fontWeight: 'bold',
-        backgroundColor: 'red'
-    },
     searchButtonWrap: {
         position: 'absolute',
+        zIndex: 0,
         right: 25,
         top: -20
     },
