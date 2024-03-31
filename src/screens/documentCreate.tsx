@@ -6,12 +6,7 @@ import Button from '@src/components/core/button';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import PopupScanAsset from '@src/components/views/popupScanAsset';
 import SearchButton from '@src/components/views/searchButton';
-import {
-    MOVEMENT_ASSET_EN,
-    USE_STATE_ASSET,
-    USE_STATE_ASSET_NORMAL_EN,
-    USE_STATE_ASSET_TH
-} from '@src/constant';
+import { MOVEMENT_ASSET_EN, USE_STATE_ASSET_NORMAL_EN } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetByCode } from '@src/services/asset';
@@ -167,19 +162,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         titleDialog
     ]);
 
-    const handleMapUseStateThToValue = useCallback((state: string): number => {
-        switch (state) {
-            case USE_STATE_ASSET_TH.Normal:
-                return USE_STATE_ASSET.Normal;
-            case USE_STATE_ASSET_TH.Damaged:
-                return USE_STATE_ASSET.Damaged;
-            case USE_STATE_ASSET_TH.Repair:
-                return USE_STATE_ASSET.Repair;
-            default:
-                return USE_STATE_ASSET.Normal;
-        }
-    }, []);
-
     const handleOpenDialogConfirmRemoveAsset = useCallback(
         (id: number) => {
             setVisibleDialog(true);
@@ -274,12 +256,15 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     const handleSaveAsset = useCallback(async () => {
         try {
-            const assetList = listAssetCreate.map((item) => {
+            const assetList = listAssetCreate.map((assetCreate) => {
+                listUseState.filter(
+                    (item) => item?.name === assetCreate?.use_state
+                );
                 return {
-                    id: item?.asset_id,
-                    state: handleMapMovementStateValue(item?.state),
-                    use_state: handleMapUseStateThToValue(item?.use_state),
-                    image: item?.image,
+                    id: assetCreate?.asset_id,
+                    state: handleMapMovementStateValue(assetCreate?.state),
+                    use_state: listUseState.length > 0 ? listUseState[0].id : 2,
+                    image: assetCreate?.image,
                     new_img: false
                 };
             });
@@ -310,8 +295,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         clearStateDialog,
         documentValue?.id,
         documentValue?.location_id,
-        handleMapUseStateThToValue,
         listAssetCreate,
+        listUseState,
         navigation
     ]);
 
