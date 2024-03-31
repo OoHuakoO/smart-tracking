@@ -480,12 +480,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             navigation.goBack();
                         }}
                     />
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => <BarcodeScreenExample />}
-                    >
-                        <Text style={styles.buttonText}>Barcode Scanner</Text>
-                    </TouchableOpacity>
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineSmall" style={styles.textHeader}>

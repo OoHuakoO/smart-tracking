@@ -6020,11 +6020,6 @@ react-native-vector-icons@^10.0.3:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native-vision-camera@^3.9.1:
-  version "3.9.2"
-  resolved "https://registry.npmjs.org/react-native-vision-camera/-/react-native-vision-camera-3.9.2.tgz"
-  integrity sha512-watHRWbeH7CBYq/5sPj2fpZj87V8J5nGdmYO61aYsDLuJ2Pkij7anAzBf8B8oZiyoSUuYpAzX4lIIi+LjWVedA==
-
 react-native@0.73.1:
   version "0.73.1"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.73.1.tgz"
