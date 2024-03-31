@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import Button from '@src/components/core/button';
@@ -58,12 +59,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         'Non-serializable values were found in the navigation state'
     ]);
     const { navigation, route } = props;
-    const [assetSearch, setAssetSearch] = useState('');
+    const [assetCode, setAssetCode] = useState('');
     const [listAssetCreate, setListAssetCreate] = useState<AssetData[]>([]);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(true);
+    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
     const [idAsset, setIdAsset] = useState<number>(0);
     const documentValue = useRecoilValue<DocumentState>(documentState);
@@ -85,7 +86,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         setVisibleDialog(false);
         setTitleDialog('');
         setContentDialog('');
-        setShowCancelDialog(true);
+        setShowCancelDialog(false);
     }, []);
 
     const handleRemoveAsset = useCallback(async () => {
@@ -135,7 +136,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleConfirmDialog = useCallback(async () => {
         switch (titleDialog) {
             case 'Asset not found in Master':
-                setVisibleDialog(false);
+                clearStateDialog();
                 navigation.navigate('DocumentCreateAsset', {
                     code: assetCodeNew,
                     onGoBack: (
@@ -149,17 +150,22 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 break;
 
             case 'Duplicate Asset':
-                setShowCancelDialog(false);
-                setVisibleDialog(false);
+                clearStateDialog();
                 break;
             case 'Confirm':
                 await handleRemoveAsset();
                 break;
             default:
-                setVisibleDialog(false);
+                clearStateDialog();
                 break;
         }
-    }, [assetCodeNew, handleRemoveAsset, navigation, titleDialog]);
+    }, [
+        assetCodeNew,
+        clearStateDialog,
+        handleRemoveAsset,
+        navigation,
+        titleDialog
+    ]);
 
     const handleMapUseStateThToValue = useCallback((state: string): number => {
         switch (state) {
@@ -174,12 +180,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, []);
 
-    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
-        setVisibleDialog(true);
-        setTitleDialog('Confirm');
-        setContentDialog('Do you want to remove this asset ?');
-        setIdAsset(id);
-    }, []);
+    const handleOpenDialogConfirmRemoveAsset = useCallback(
+        (id: number) => {
+            setVisibleDialog(true);
+            setTitleDialog('Confirm');
+            setContentDialog('Do you want to remove this asset ?');
+            setIdAsset(id);
+            clearStateDialog();
+        },
+        [clearStateDialog]
+    );
 
     const openImagePicker = async () => {
         try {
@@ -306,35 +316,31 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     ]);
 
     const handleSearchAsset = useCallback(
-        async (codeAssetFromSearchAsset?: string) => {
+        async (code: string) => {
             try {
-                setAssetSearch('');
-                let newAssetSearch = assetSearch;
-
-                if (codeAssetFromSearchAsset) {
-                    newAssetSearch = codeAssetFromSearchAsset;
-                }
-
-                if (newAssetSearch !== '') {
+                setAssetCode('');
+                console.log(code);
+                if (code !== '' && code !== undefined) {
                     if (
                         documentAssetListValue?.filter(
-                            (item) => item?.code === newAssetSearch
+                            (item) => item?.code === code
                         ).length > 0 ||
                         listAssetCreate.filter(
-                            (item) => item?.default_code === newAssetSearch
+                            (item) => item?.default_code === code
                         ).length > 0
                     ) {
                         clearStateDialog();
                         setVisibleDialog(true);
                         setTitleDialog('Duplicate Asset');
+                        setShowCancelDialog(true);
                         setContentDialog(
-                            `${newAssetSearch} is duplicate in Document ${documentValue?.id}`
+                            `${code} is duplicate in Document ${documentValue?.id}`
                         );
                         setShowCancelDialog(false);
                         return;
                     }
 
-                    const response = await GetAssetByCode(newAssetSearch);
+                    const response = await GetAssetByCode(code);
 
                     if (response?.error) {
                         clearStateDialog();
@@ -345,8 +351,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
                     if (response?.result?.message === 'Asset not found') {
                         clearStateDialog();
-                        setAssetCodeNew(newAssetSearch);
+                        setAssetCodeNew(code);
                         setVisibleDialog(true);
+                        setShowCancelDialog(true);
                         setTitleDialog('Asset not found in Master');
                         setContentDialog('Do you want to add new asset?');
                         return;
@@ -384,7 +391,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             }
         },
         [
-            assetSearch,
             clearStateDialog,
             documentAssetListValue,
             documentValue?.id,
@@ -496,17 +502,35 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
             <View style={styles.listSection}>
                 <View style={styles.searchContainer}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            navigation.navigate('DocumentScanAsset', {
+                                onGoBack: (code: string) => {
+                                    handleSearchAsset(code);
+                                }
+                            });
+                        }}
+                        activeOpacity={0.5}
+                    >
+                        <ActionButton
+                            icon="barcode-scan"
+                            size="small"
+                            backgroundColor={theme.colors.white}
+                        />
+                    </TouchableOpacity>
                     <TextInput
                         style={styles.input}
-                        value={assetSearch}
-                        onChangeText={(text) => setAssetSearch(text)}
+                        value={assetCode}
+                        onChangeText={(text) => setAssetCode(text)}
                         placeholder="Input Or Scan Asset"
                         placeholderTextColor={theme.colors.textBody}
                         onSubmitEditing={() => {
-                            handleSearchAsset();
+                            handleSearchAsset(assetCode);
                         }}
                     />
-                    <TouchableOpacity onPress={() => handleSearchAsset()}>
+                    <TouchableOpacity
+                        onPress={() => handleSearchAsset(assetCode)}
+                    >
                         <Button style={styles.dialogActionConfirm}>
                             <Text
                                 style={styles.textActionConfirm}
@@ -629,10 +653,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginHorizontal: 15,
         display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        alignSelf: 'stretch',
-        justifyContent: 'space-around'
+        flexDirection: 'row'
     },
 
     searchButtonWrap: {
@@ -723,8 +744,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         fontFamily: 'DMSans-Bold',
         color: theme.colors.textBody,
-        width: '65%',
-        marginRight: 10
+        width: '50%',
+        marginRight: 10,
+        marginLeft: 10
     },
     searchButton: {
         zIndex: 2

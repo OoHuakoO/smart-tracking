@@ -61,4 +61,7 @@ export type PrivateStackParamsList = {
         code: string;
         onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };
+    DocumentScanAsset: {
+        onGoBack?: (code: string) => void;
+    };
 };
