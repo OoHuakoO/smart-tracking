@@ -27,10 +27,6 @@ const DocumentScanAsset: FC<DocumentScanAssetProps> = (props) => {
                     scanBarcode
                     showFrame
                     onReadCode={(event) => {
-                        console.log(
-                            'barcode',
-                            event.nativeEvent.codeStringValue
-                        );
                         route?.params?.onGoBack(
                             event.nativeEvent.codeStringValue
                         );
