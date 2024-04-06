@@ -6,6 +6,9 @@ import DocumentCard from '@src/components/views/documentCard';
 import DocumentDialog from '@src/components/views/documentDialog';
 import SearchButton from '@src/components/views/searchButton';
 import { STATE_DOCUMENT_NAME, STATE_DOCUMENT_VALUE } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import { getTotalDocument, insertDocumentData } from '@src/db/document';
+import { getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocationSearch } from '@src/services/location';
 import { documentState, loginState } from '@src/store';
@@ -79,18 +82,34 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const handleSearchLocation = useCallback(async (text: string) => {
         try {
             setLocationSearch(text);
-            const response = await GetLocationSearch({
-                page: 1,
-                limit: 10,
-                search_term: text
-            });
-            if (response?.error) {
-                setLoading(false);
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong search location');
-                return;
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetLocationSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: text
+                });
+                if (response?.error) {
+                    setLoading(false);
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong search location');
+                    return;
+                }
+                setListLocation(response?.result?.data?.locations);
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    name: text
+                };
+                const listLocationDB = await getLocations(db, filter);
+                const listLocationSearch = listLocationDB.map((item) => {
+                    return {
+                        location_id: item?.asset_location_id,
+                        location_name: item?.name
+                    };
+                });
+                setListLocation(listLocationSearch);
             }
-            setListLocation(response?.result?.data?.locations);
         } catch (err) {
             setLoading(false);
             setVisibleDialog(true);
@@ -100,18 +119,31 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
 
     const handleFetchLocation = useCallback(async () => {
         try {
-            const response = await GetLocationSearch({
-                page: 1,
-                limit: 10,
-                search_term: ''
-            });
-            if (response?.error) {
-                setLoading(false);
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong fetch location');
-                return;
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await GetLocationSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: {}
+                });
+                if (response?.error) {
+                    setLoading(false);
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong fetch location');
+                    return;
+                }
+                setListLocation(response?.result?.data?.locations);
+            } else {
+                const db = await getDBConnection();
+                const listLocationDB = await getLocations(db);
+                const listLocationSearch = listLocationDB.map((item) => {
+                    return {
+                        location_id: item?.asset_location_id,
+                        location_name: item?.name
+                    };
+                });
+                setListLocation(listLocationSearch);
             }
-            setListLocation(response?.result?.data?.locations);
         } catch (err) {
             setLoading(false);
             setVisibleDialog(true);
@@ -196,23 +228,39 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const handleSelectLocation = useCallback(
         async (location: LocationSearchData) => {
             try {
-                const response = await CreateDocument({
-                    location_id: location?.location_id,
-                    asset_ids: []
-                });
-                if (response?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong create document');
-                    return;
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await CreateDocument({
+                        location_id: location?.location_id,
+                        asset_ids: []
+                    });
+                    if (response?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            'Something went wrong create document'
+                        );
+                        return;
+                    }
+                    toggleDialog();
+                    const documentObj = {
+                        id: response?.result?.asset_tracking_id,
+                        state: STATE_DOCUMENT_NAME.Draft,
+                        location: location?.location_name,
+                        location_id: location?.location_id
+                    };
+                    setDocument(documentObj);
+                } else {
+                    const db = await getDBConnection();
+                    const totalDocument = await getTotalDocument(db);
+                    const documentObj = {
+                        id: totalDocument + 1,
+                        state: STATE_DOCUMENT_NAME.Draft,
+                        location: location?.location_name,
+                        location_id: location?.location_id
+                    };
+                    await insertDocumentData(db, documentObj as DocumentData);
+                    setDocument(documentObj);
                 }
-                toggleDialog();
-                const documentObj = {
-                    id: response?.result?.asset_tracking_id,
-                    state: STATE_DOCUMENT_NAME.Draft,
-                    location: location?.location_name,
-                    location_id: location?.location_id
-                };
-                setDocument(documentObj);
                 navigation.navigate('DocumentAssetStatus');
                 await handleFetchDocument();
                 await handleFetchLocation();

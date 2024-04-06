@@ -12,6 +12,7 @@ import SplashScreen from 'react-native-splash-screen';
 import { createTableAsset } from './db/asset';
 import { createTableCategory } from './db/category';
 import { getDBConnection } from './db/config';
+import { createTableDocument } from './db/document';
 import { createTableLocation } from './db/location';
 import { createTableReport } from './db/report';
 import { createTableUseStatus } from './db/useStatus';
@@ -41,6 +42,7 @@ export default function App() {
             await createTableUseStatus(db);
             await createTableCategory(db);
             await createTableReport(db);
+            await createTableDocument(db);
         } catch (error) {
             console.error(error);
         }
