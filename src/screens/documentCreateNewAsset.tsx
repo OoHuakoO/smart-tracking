@@ -76,8 +76,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
 
             launchImageLibrary(options, (response) => {
@@ -100,8 +100,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.CAMERA,

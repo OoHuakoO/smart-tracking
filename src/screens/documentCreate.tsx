@@ -145,12 +145,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     }
                 });
                 break;
-
             case 'Duplicate Asset':
                 clearStateDialog();
                 break;
             case 'Confirm':
-                await handleRemoveAsset();
+                handleRemoveAsset();
                 break;
             default:
                 clearStateDialog();
@@ -164,24 +163,20 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         titleDialog
     ]);
 
-    const handleOpenDialogConfirmRemoveAsset = useCallback(
-        (id: number) => {
-            setVisibleDialog(true);
-            setTitleDialog('Confirm');
-            setContentDialog('Do you want to remove this asset ?');
-            setIdAsset(id);
-            clearStateDialog();
-        },
-        [clearStateDialog]
-    );
+    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm');
+        setContentDialog('Do you want to remove this asset ?');
+        setIdAsset(id);
+    }, []);
 
     const openImagePicker = async () => {
         try {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
 
             launchImageLibrary(options, (response) => {
@@ -204,8 +199,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -371,14 +366,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         clearStateDialog();
                         setVisibleDialog(true);
                         setTitleDialog('Duplicate Asset');
-                        setShowCancelDialog(true);
                         setContentDialog(
                             `${code} is duplicate in Document ${documentValue?.id}`
                         );
                         setShowCancelDialog(false);
                         return;
                     }
-
                     if (isOnline) {
                         const response = await GetAssetByCode(code);
                         if (response?.error) {

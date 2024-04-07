@@ -175,6 +175,75 @@ export const getTotalDocumentLine = async (
     }
 };
 
+export const updateDocumentLineData = (
+    db: SQLiteDatabase,
+    documentLine: DocumentAssetData
+) => {
+    const setClauses = [];
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (documentLine.use_state !== undefined) {
+        setClauses.push(`use_state = ?`);
+        queryParams.push(documentLine.use_state);
+    }
+
+    if (documentLine.use_state_code !== undefined) {
+        setClauses.push(`use_state_code = ?`);
+        queryParams.push(documentLine.use_state_code);
+    }
+
+    if (documentLine.image !== undefined) {
+        setClauses.push(`image = ?`);
+        queryParams.push(documentLine.image);
+    }
+
+    if (documentLine.new_img !== undefined) {
+        setClauses.push(`new_img = ?`);
+        queryParams.push(documentLine.new_img ? 1 : 0);
+    }
+
+    if (documentLine.asset_id !== undefined) {
+        whereConditions.push(`asset_id = ?`);
+        queryParams.push(documentLine.asset_id);
+    }
+
+    if (documentLine.document_id !== undefined) {
+        whereConditions.push(`document_id = ?`);
+        queryParams.push(documentLine.document_id);
+    }
+
+    const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+    const queryUpdate = `UPDATE documentLine SET ${setClauses.join(
+        ', '
+    )} ${whereClause}`;
+
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(
+                queryUpdate,
+                queryParams,
+                () => {
+                    console.log('Table document created successfully');
+                },
+                (_, error) => {
+                    console.log(
+                        'Error occurred while creating the table:',
+                        error
+                    );
+                    throw new Error(
+                        `Failed to create document table: ${error.message}`
+                    );
+                }
+            );
+        });
+        console.log('Document line updated successfully');
+    } catch (err) {
+        throw new Error(`Error updating document line: ${err.message}`);
+    }
+};
+
 export const removeDocumentLineByAssetId = (
     db: SQLiteDatabase,
     assetId: number

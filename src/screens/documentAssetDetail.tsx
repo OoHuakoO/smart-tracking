@@ -9,6 +9,7 @@ import {
     USE_STATE_ASSET_NORMAL_EN
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
+import { updateDocumentLineData } from '@src/db/documentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { UpdateDocumentLine } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
@@ -80,8 +81,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
 
             launchImageLibrary(options, (response) => {
@@ -104,8 +105,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
             const options = {
                 mediaType: 'photo' as MediaType,
                 includeBase64: true,
-                maxHeight: 2000,
-                maxWidth: 2000
+                maxHeight: 400,
+                maxWidth: 400
             };
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -171,34 +172,56 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 const filterUseStatus = listUseState.filter(
                     (item) => searchUseState === item?.name
                 );
-                const response = await UpdateDocumentLine({
-                    location_id: documentValue?.location_id,
-                    asset_tracking_id: documentValue?.id,
-                    asset_ids: [
-                        {
-                            id: route?.params?.assetData?.asset_id,
-                            state: handleMapMovementStateValue(
-                                route?.params?.assetData?.state
-                            ),
-                            ...(filterUseStatus?.length > 0 && {
-                                use_state: filterUseStatus[0]?.id
-                            }),
-                            ...(getImage() !== 'false' && {
-                                image: getImage()
-                            }),
-                            ...(getImage() !== 'false' && { new_img: true })
-                        }
-                    ]
-                });
-                if (response?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
-                    return;
-                }
-                if (response?.result?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
-                    return;
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await UpdateDocumentLine({
+                        location_id: documentValue?.location_id,
+                        asset_tracking_id: documentValue?.id,
+                        asset_ids: [
+                            {
+                                id: route?.params?.assetData?.asset_id,
+                                state: handleMapMovementStateValue(
+                                    route?.params?.assetData?.state
+                                ),
+                                ...(filterUseStatus?.length > 0 && {
+                                    use_state: filterUseStatus[0]?.id
+                                }),
+                                ...(getImage() !== 'false' && {
+                                    image: getImage()
+                                }),
+                                ...(getImage() !== 'false' && { new_img: true })
+                            }
+                        ]
+                    });
+                    if (response?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog('Something went wrong save asset');
+                        return;
+                    }
+                    if (response?.result?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog('Something went wrong save asset');
+                        return;
+                    }
+                } else {
+                    const db = await getDBConnection();
+                    const documentLine = {
+                        state: handleMapMovementStateValue(
+                            route?.params?.assetData?.state
+                        ),
+                        use_state: searchUseState,
+                        ...(filterUseStatus?.length > 0 && {
+                            use_state_code: filterUseStatus[0]?.id
+                        }),
+                        ...(getImage() !== 'false' && {
+                            image: getImage()
+                        }),
+                        ...(getImage() !== 'false' && { new_img: true }),
+                        asset_id: route?.params?.assetData?.asset_id,
+                        document_id: documentValue?.id
+                    };
+
+                    await updateDocumentLineData(db, documentLine);
                 }
                 navigation.replace('DocumentAssetStatus');
                 return;

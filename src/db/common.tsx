@@ -31,7 +31,7 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
 export const clearData = (db: SQLiteDatabase) => {
     try {
         db.transaction((tx) => {
-            tx.executeSql('DROP TABLE IF EXISTS document;');
+            tx.executeSql('DROP TABLE IF EXISTS documentLine;');
         });
         console.log('Data deleted from all tables successfully');
     } catch (err) {

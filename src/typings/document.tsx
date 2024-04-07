@@ -1,12 +1,12 @@
 export interface DocumentAssetData {
     asset_id: number;
-    code: string;
-    name: string;
-    category: string;
-    serial_no: string;
+    code?: string;
+    name?: string;
+    category?: string;
+    serial_no?: string;
     location_id?: number;
     location_old?: string;
-    location: string;
+    location?: string;
     state: string;
     use_state: string;
     new_img: boolean;
