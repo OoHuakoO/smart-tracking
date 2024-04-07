@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import InputText from '@src/components/core/inputText';
-import PopUpDialog from '@src/components/views/popUpDialog';
+import PopUpDialog from '@src/components/views/popupCameraDialog';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
@@ -42,12 +42,12 @@ import {
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 
-type DocumentCreateAssetProps = NativeStackScreenProps<
+type DocumentCreateNewAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
-    'DocumentCreateAsset'
+    'DocumentCreateNewAsset'
 >;
 
-const DocumentCreateAsset: FC<DocumentCreateAssetProps> = (props) => {
+const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const { navigation, route } = props;
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [dialogVisible, setDialogVisible] = useState(false);
@@ -554,4 +554,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default DocumentCreateAsset;
+export default DocumentCreateNewAsset;

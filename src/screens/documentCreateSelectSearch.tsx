@@ -2,7 +2,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import AssetCardDetail from '@src/components/views/assetCardDetail';
-import SearchButton from '@src/components/views/searchButton';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { GetAssetSearch } from '@src/services/asset';
@@ -147,11 +146,6 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>
-                <View style={styles.searchButtonWrap}>
-                    <SearchButton
-                        handlePress={() => navigation.navigate('AssetSearch')}
-                    />
-                </View>
                 <Text variant="bodyLarge" style={styles.textTotalAsset}>
                     Total Asset : {countTotalAsset}
                 </Text>

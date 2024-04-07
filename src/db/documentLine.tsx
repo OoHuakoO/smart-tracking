@@ -1,0 +1,191 @@
+import { DocumentAssetData } from '@src/typings/document';
+import { SQLiteDatabase } from 'react-native-sqlite-storage';
+
+export const createTableDocumentLine = (db: SQLiteDatabase) => {
+    db.transaction(
+        (tx) => {
+            const query = `CREATE TABLE IF NOT EXISTS documentLine(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            asset_id INTEGER NOT NULL,
+            document_id INTEGER NOT NULL,
+            code TEXT NOT NULL,
+            name TEXT NOT NULL,
+            category TEXT,
+            serial_no TEXT,
+            location_id INTEGER,
+            location_old TEXT,
+            location TEXT,
+            state TEXT,
+            use_state TEXT,
+            use_state_code INTEGER,
+            image TEXT,
+            new_img BOOLEAN,
+            date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
+        );`;
+            tx.executeSql(
+                query,
+                [],
+                () => {
+                    console.log('Table document created successfully');
+                },
+                (_, error) => {
+                    console.log(
+                        'Error occurred while creating the table:',
+                        error
+                    );
+                    throw new Error(
+                        `Failed to create document table: ${error.message}`
+                    );
+                }
+            );
+        },
+        (error) => {
+            console.log('Transaction createTableDocumentLine error:', error);
+        },
+        () => {
+            console.log(
+                'Transaction createTableDocumentLine completed successfully'
+            );
+        }
+    );
+};
+
+export const insertDocumentLineData = (
+    db: SQLiteDatabase,
+    documentLine: DocumentAssetData[]
+) => {
+    const queryInsert =
+        `INSERT INTO documentLine (
+          asset_id,
+          document_id,
+          code,
+          name,
+          category,
+          serial_no,
+          location_id,
+          location_old,
+          location,
+          state,
+          use_state,
+          use_state_code,
+          image,
+          new_img
+        ) VALUES ` +
+        documentLine
+            .map(
+                (item) => `(
+                ${item.asset_id},
+                ${item.document_id},
+                '${item.code}',
+                '${item.name}',
+                '${item.category}',
+                '${item.serial_no}',
+                 ${item.location_id},
+                '${item.location_old}',
+                '${item.location}',
+                '${item.state}',
+                '${item.use_state}',
+                 ${item.use_state_code},
+                '${item.image}',
+                 ${item.new_img}
+                )`
+            )
+            .join(',');
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(queryInsert);
+        });
+        console.log('All document line inserted successfully');
+    } catch (err) {
+        throw new Error(`Error inserting document line: ${err.message}`);
+    }
+};
+
+export const getDocumentLine = async (
+    db: SQLiteDatabase,
+    filters?: {
+        document_id?: number;
+    },
+    page: number = 1,
+    limit: number = 10
+): Promise<DocumentAssetData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM documentLine`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.document_id !== undefined) {
+        whereConditions.push(`documentLine.document_id = ?`);
+        queryParams.push(filters.document_id);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const assets = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                assets.push(results[0]?.rows?.item(i));
+            }
+        }
+
+        return assets;
+    } catch (err) {
+        throw new Error(`Error retrieving document line: ${err.message}`);
+    }
+};
+
+export const getTotalDocumentLine = async (
+    db: SQLiteDatabase,
+    filters?: {
+        document_id?: number;
+    }
+): Promise<number> => {
+    let queryTotal = `SELECT COUNT(*) as total FROM documentLine`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.document_id !== undefined) {
+        whereConditions.push(`documentLine.document_id = ?`);
+        queryParams.push(filters.document_id);
+    }
+
+    if (whereConditions.length > 0) {
+        queryTotal += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    try {
+        const results = await db.executeSql(queryTotal, queryParams);
+        if (results.length > 0 && results[0].rows.length > 0) {
+            return results[0].rows.item(0).total;
+        } else {
+            return 0;
+        }
+    } catch (err) {
+        throw new Error(
+            `Error calculating total document line :  ${err.message}`
+        );
+    }
+};
+
+export const removeDocumentLineByAssetId = (
+    db: SQLiteDatabase,
+    assetId: number
+) => {
+    const deleteQuery = `DELETE FROM documentLine WHERE asset_id = ?`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery, [assetId]);
+        });
+        console.log(`remove document line assetId: ${assetId} successfully`);
+    } catch (err) {
+        throw new Error(`Error remove document line: ${err.message}`);
+    }
+};

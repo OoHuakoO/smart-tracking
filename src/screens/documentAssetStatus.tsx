@@ -20,6 +20,12 @@ import {
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     STATE_DOCUMENT_NAME
 } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import {
+    getDocumentLine,
+    getTotalDocumentLine,
+    removeDocumentLineByAssetId
+} from '@src/db/documentLine';
 import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
 import {
     documentAssetListState,
@@ -94,6 +100,22 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     response?.result?.data?.asset?.assets?.length
                 );
                 setListAssetDocument(response?.result?.data?.asset?.assets);
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    document_id: documentValue?.id
+                };
+                const listDocumentDB = await getDocumentLine(db, filter);
+                listDocumentDB?.map((item) => {
+                    item.state = handleMapMovementStateEN(item?.state);
+                    item.date_check = parseDateString(item?.date_check);
+                });
+                const totalDocumentLine = await getTotalDocumentLine(
+                    db,
+                    filter
+                );
+                setTotalAssetDocument(totalDocumentLine);
+                setListAssetDocument(listDocumentDB);
             }
             setLoading(false);
         } catch (err) {
@@ -119,17 +141,25 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const handleRemoveAsset = useCallback(async () => {
         try {
             clearStateDialog();
-            const response = await DeleteDocumentLine({
-                asset_tracking_id: documentValue?.id,
-                asset_ids: [{ id: idAsset }]
-            });
-            if (
-                response?.result?.message ===
-                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
-            ) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong asset data not found');
-                return;
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const response = await DeleteDocumentLine({
+                    asset_tracking_id: documentValue?.id,
+                    asset_ids: [{ id: idAsset }]
+                });
+                if (
+                    response?.result?.message ===
+                    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(
+                        'Something went wrong asset data not found'
+                    );
+                    return;
+                }
+            } else {
+                const db = await getDBConnection();
+                await removeDocumentLineByAssetId(db, idAsset);
             }
             setListAssetDocument((prev) => {
                 const listAssetFilter = prev.filter(

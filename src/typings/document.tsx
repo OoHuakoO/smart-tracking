@@ -4,14 +4,17 @@ export interface DocumentAssetData {
     name: string;
     category: string;
     serial_no: string;
+    location_id?: number;
     location_old?: string;
     location: string;
-    quantity: number;
     state: string;
     use_state: string;
     new_img: boolean;
     image: string;
     date_check?: string;
+    // for offline upload asset
+    use_state_code?: number;
+    document_id?: number;
 }
 
 export interface DocumentData {

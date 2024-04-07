@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import AssetTagStatus from '@src/components/views/assetTagStatus';
-import PopUpDialog from '@src/components/views/popUpDialog';
+import PopupDialog from '@src/components/views/popupCameraDialog';
 import {
     MOVEMENT_ASSET_EN,
     STATE_DOCUMENT_NAME,
@@ -418,7 +418,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     </TouchableOpacity>
                 )}
             </View>
-            <PopUpDialog
+            <PopupDialog
                 visible={dialogVisible}
                 onClose={toggleDialog}
                 openImagePicker={openImagePicker}

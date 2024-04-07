@@ -20,7 +20,8 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             image TEXT,
             use_state TEXT,
             new_img BOOLEAN,
-            owner TEXT
+            owner TEXT,
+            is_sync_odoo BOOLEAN DEFAULT TRUE
         );`;
 
             tx.executeSql(

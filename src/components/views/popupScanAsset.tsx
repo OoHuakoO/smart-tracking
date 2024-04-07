@@ -11,7 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActionButton from '../core/actionButton';
-import PopUpDialog from './popUpDialog';
+import PopUpDialog from './popupCameraDialog';
 
 interface PopupScanAssetProp {
     visiblePopupScanAsset: boolean;

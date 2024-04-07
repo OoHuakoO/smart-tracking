@@ -57,7 +57,7 @@ export type PrivateStackParamsList = {
     DocumentCreateSelectSearch: {
         assetSearch: SearchAsset;
     };
-    DocumentCreateAsset: {
+    DocumentCreateNewAsset: {
         code: string;
         onGoBack?: (assetData: AssetDataForPassParamsDocumentCreate) => void;
     };

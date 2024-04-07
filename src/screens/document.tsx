@@ -2,12 +2,16 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
+import SearchButton from '@src/components/core/searchButton';
 import DocumentCard from '@src/components/views/documentCard';
 import DocumentDialog from '@src/components/views/documentDialog';
-import SearchButton from '@src/components/views/searchButton';
 import { STATE_DOCUMENT_NAME, STATE_DOCUMENT_VALUE } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
-import { getTotalDocument, insertDocumentData } from '@src/db/document';
+import {
+    getDocument,
+    getTotalDocument,
+    insertDocumentData
+} from '@src/db/document';
 import { getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocationSearch } from '@src/services/location';
@@ -51,7 +55,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const [page, setPage] = useState<number>(1);
-    const [online, setLogin] = useState<boolean>(false);
+
     const [locationSearch, setLocationSearch] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
@@ -158,7 +162,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             const documentSearch = removeKeyEmpty(
                 route?.params?.documentSearch
             );
-            setLogin(isOnline);
+
             if (isOnline) {
                 const response = await GetDocumentSearch({
                     page: 1,
@@ -175,6 +179,16 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 const totalPagesDocument = response?.result?.data?.total;
                 setCountDocument(totalPagesDocument);
                 setListDocument(response?.result?.data?.documents);
+            } else {
+                const db = await getDBConnection();
+                const listDocumentDB = await getDocument(db);
+                listDocumentDB?.map((item) => {
+                    item.state = handleMapDocumentStateValue(item?.state);
+                    item.date_order = parseDateString(item?.date_order);
+                });
+                const totalDocument = await getTotalDocument(db);
+                setCountDocument(totalDocument);
+                setListDocument(listDocumentDB);
             }
             setLoading(false);
         } catch (err) {
@@ -213,6 +227,16 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         ...listDocument,
                         ...response?.result?.data?.documents
                     ]);
+                } else {
+                    const db = await getDBConnection();
+                    const listDocumentDB = await getDocument(db, page + 1);
+                    listDocumentDB?.map((item) => {
+                        item.state = handleMapDocumentStateValue(item?.state);
+                        item.date_order = parseDateString(item?.date_order);
+                    });
+                    const totalDocument = await getTotalDocument(db);
+                    setCountDocument(totalDocument);
+                    setListDocument(listDocumentDB);
                 }
             }
             setPage(page + 1);
@@ -241,7 +265,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         );
                         return;
                     }
-                    toggleDialog();
                     const documentObj = {
                         id: response?.result?.asset_tracking_id,
                         state: STATE_DOCUMENT_NAME.Draft,
@@ -261,6 +284,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     await insertDocumentData(db, documentObj as DocumentData);
                     setDocument(documentObj);
                 }
+                toggleDialog();
                 navigation.navigate('DocumentAssetStatus');
                 await handleFetchDocument();
                 await handleFetchLocation();
@@ -345,7 +369,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                 }}
                             >
                                 <DocumentCard
-                                    online={online}
                                     documentTitle={`Document ${item?.id}`}
                                     locationInfo={item?.location}
                                     dateInfo={item?.date_order}

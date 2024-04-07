@@ -8,7 +8,8 @@ export const createTableDocument = (db: SQLiteDatabase) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             state TEXT,
             location_id INTEGER,
-            location TEXT
+            location TEXT,
+            date_order DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
         );`;
             tx.executeSql(
                 query,
@@ -60,6 +61,50 @@ export const insertDocumentData = (
         console.log('All document inserted successfully');
     } catch (err) {
         throw new Error(`Error inserting document: ${err.message}`);
+    }
+};
+
+export const getDocument = async (
+    db: SQLiteDatabase,
+    page: number = 1,
+    limit: number = 10
+): Promise<DocumentData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM document`;
+    const queryParams = [];
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const assets = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                assets.push(results[0]?.rows?.item(i));
+            }
+        }
+
+        return assets;
+    } catch (err) {
+        throw new Error(`Error retrieving documents: ${err.message}`);
+    }
+};
+
+export const getTotalWithFilterDocument = async (
+    db: SQLiteDatabase
+): Promise<number> => {
+    let queryTotal = `SELECT COUNT(*) as total FROM document`;
+
+    try {
+        const results = await db.executeSql(queryTotal);
+        if (results.length > 0 && results[0].rows.length > 0) {
+            return results[0].rows.item(0).total;
+        } else {
+            return 0;
+        }
+    } catch (err) {
+        throw new Error(`Error calculating total assets :  ${err.message}`);
     }
 };
 

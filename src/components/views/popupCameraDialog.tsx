@@ -5,14 +5,14 @@ import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button, Modal, Text } from 'react-native-paper';
 
-interface PopUpDialogProp {
+interface PopupCameraDialogProp {
     visible: boolean;
     onClose: () => void;
     openImagePicker: () => void;
     handleCameraLaunch: () => void;
 }
 
-const PopUpDialog: FC<PopUpDialogProp> = (props) => {
+const PopupCameraDialog: FC<PopupCameraDialogProp> = (props) => {
     const { visible, onClose, openImagePicker, handleCameraLaunch } = props;
     const handleImageSelection = () => {
         onClose();
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default PopUpDialog;
+export default PopupCameraDialog;

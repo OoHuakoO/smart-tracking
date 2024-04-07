@@ -1,9 +1,7 @@
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { STATE_DOCUMENT_NAME } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 interface DocumentScreenProp {
@@ -11,11 +9,9 @@ interface DocumentScreenProp {
     locationInfo: string;
     dateInfo: string;
     documentStatus: string;
-    online: boolean;
 }
 const DocumentCard: FC<DocumentScreenProp> = (props) => {
-    const { documentTitle, locationInfo, dateInfo, documentStatus, online } =
-        props;
+    const { documentTitle, locationInfo, dateInfo, documentStatus } = props;
     let backgroundColor = theme.colors.black;
     let borderColor = theme.colors.black;
     switch (documentStatus) {
@@ -39,7 +35,7 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
 
     return (
         <View style={[styles.cardContainer, { borderColor }]}>
-            <View style={styles.deleteIconContainer}>
+            {/* <View style={styles.deleteIconContainer}>
                 {documentStatus === STATE_DOCUMENT_NAME.Draft && !online && (
                     <TouchableOpacity
                         onPress={() => console.log('Delete')}
@@ -48,7 +44,7 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                         <FontAwesomeIcon icon={faTrash} color="#F0787A" />
                     </TouchableOpacity>
                 )}
-            </View>
+            </View> */}
             <View style={styles.textContainer}>
                 <Text style={styles.documentTitle}>{documentTitle}</Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>

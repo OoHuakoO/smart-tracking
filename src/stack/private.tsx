@@ -7,7 +7,7 @@ import DocumentAssetDetail from '@src/screens/documentAssetDetail';
 import DocumentAssetSearch from '@src/screens/documentAssetSearch';
 import DocumentAssetStatus from '@src/screens/documentAssetStatus';
 import DocumentCreate from '@src/screens/documentCreate';
-import DocumentCreateAsset from '@src/screens/documentCreateAsset';
+import DocumentCreateNewAsset from '@src/screens/documentCreateNewAsset';
 import DocumentCreateSearch from '@src/screens/documentCreateSelectSearch';
 import DocumentScanAsset from '@src/screens/documentScanAsset';
 import DocumentSearch from '@src/screens/documentSearch';
@@ -150,11 +150,11 @@ const PrivateStack = () => {
             />
 
             <Stack.Screen
-                name="DocumentCreateAsset"
+                name="DocumentCreateNewAsset"
                 options={{
                     headerShown: false
                 }}
-                component={DocumentCreateAsset}
+                component={DocumentCreateNewAsset}
             />
             <Stack.Screen
                 name="DocumentScanAsset"
