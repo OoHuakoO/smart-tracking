@@ -50,7 +50,7 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
         const settings = await AsyncStorage.getItem('Settings');
         const jsonSettings: SettingParams = JSON.parse(settings);
         form?.setValue('server', jsonSettings?.server);
-        form?.setValue('port', jsonSettings?.port);
+        // form?.setValue('port', jsonSettings?.port);
         form?.setValue('login', jsonSettings?.login);
         form?.setValue('password', jsonSettings?.password);
         form?.setValue('db', jsonSettings?.db);
@@ -74,12 +74,12 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
                         render={({ field }) => (
                             <InputText
                                 {...field}
-                                placeholder="Server"
+                                placeholder="Url"
                                 onChangeText={(value) => field?.onChange(value)}
                             />
                         )}
                     />
-                    <Controller
+                    {/* <Controller
                         name="port"
                         defaultValue=""
                         control={form?.control}
@@ -90,7 +90,7 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
                                 onChangeText={(value) => field?.onChange(value)}
                             />
                         )}
-                    />
+                    /> */}
                     <Controller
                         name="login"
                         defaultValue=""

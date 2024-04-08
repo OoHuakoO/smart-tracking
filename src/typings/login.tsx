@@ -5,7 +5,6 @@ export interface LoginParams {
 
 export interface SettingParams {
     server: string;
-    port: string;
     login: string;
     password: string;
     db: string;

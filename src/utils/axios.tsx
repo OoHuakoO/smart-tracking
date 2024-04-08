@@ -11,7 +11,7 @@ export const apiInstances = axios.create();
 const getBaseURL = async () => {
     const settings = await AsyncStorage.getItem('Settings');
     const jsonSettings: SettingParams = JSON.parse(settings);
-    return `http://${jsonSettings?.server}:${jsonSettings?.port}`;
+    return `https://${jsonSettings?.server}`;
 };
 
 apiInstances.interceptors.request.use(
