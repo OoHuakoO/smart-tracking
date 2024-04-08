@@ -14,6 +14,7 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             category TEXT,
             serial_no TEXT,
             brand_name TEXT,
+            purchase_price INTEGER,
             quantity INTEGER NOT NULL,
             location_id INTEGER,
             location TEXT,
@@ -108,6 +109,90 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
         console.log('All assets inserted successfully');
     } catch (err) {
         throw new Error(`Error inserting assets: ${err.message}`);
+    }
+};
+
+export const insertNewAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
+    const queryInsert =
+        `INSERT INTO asset (
+      asset_id,
+      default_code,
+      name,
+      description,
+      category_id,
+      category,
+      serial_no,
+      brand_name,
+      quantity,
+      location_id,
+      location,
+      image,
+      use_state,
+      new_img,
+      owner,
+      is_sync_odoo
+    ) VALUES ` +
+        assets
+            .map(
+                (item) => `(
+                    ${item.asset_id},
+                    '${item.default_code}',
+                    '${item.name}',
+                    '${item.description}',
+                    ${item.category_id},
+                    '${item.category}',
+                    '${item.serial_no}',
+                    '${item.brand_name}',
+                    ${item.quantity},
+                    ${item.location_id},
+                    '${item.location}',
+                    '${item.image}',
+                    '${item.use_state}',
+                    ${item.new_img},
+                    '${item.owner}',
+                    ${item.is_sync_odoo}
+                    )`
+            )
+            .join(',');
+
+    try {
+        db.transaction(
+            (tx) => {
+                tx.executeSql(queryInsert);
+            },
+            (error) => {
+                console.log('Transaction insertAssetData error:', error);
+            },
+            () => {
+                console.log(
+                    'Transaction insertAssetData completed successfully'
+                );
+            }
+        );
+        console.log('All assets inserted successfully');
+    } catch (err) {
+        throw new Error(`Error inserting assets: ${err.message}`);
+    }
+};
+
+export const getLastAsset = async (
+    db: SQLiteDatabase
+): Promise<AssetData[]> => {
+    let query = `SELECT * FROM asset ORDER BY id DESC LIMIT 1`;
+
+    try {
+        const results = await db.executeSql(query);
+        const assets = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                assets.push(results[0]?.rows?.item(i));
+            }
+        }
+
+        return assets;
+    } catch (err) {
+        throw new Error(`Error retrieving assets: ${err.message}`);
     }
 };
 

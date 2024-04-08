@@ -11,7 +11,7 @@ export interface AssetData {
     location_id: number;
     location: string;
     image: string;
-    state: string;
+    state?: string;
     use_state: string;
     owner: string;
     new_img: boolean;

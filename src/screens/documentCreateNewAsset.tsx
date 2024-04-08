@@ -7,6 +7,10 @@ import BackButton from '@src/components/core/backButton';
 import InputText from '@src/components/core/inputText';
 import PopUpDialog from '@src/components/views/popupCameraDialog';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
+import { getLastAsset, insertNewAssetData } from '@src/db/asset';
+import { getCategory } from '@src/db/category';
+import { getDBConnection } from '@src/db/config';
+import { getUseStatus } from '@src/db/useStatus';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { documentState, loginState, useRecoilValue } from '@src/store';
@@ -18,6 +22,7 @@ import {
     UseStatusData
 } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
+import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
@@ -157,34 +162,82 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const handleSaveAsset = useCallback(
         async (data: AssetData) => {
             try {
-                const assetData = {
-                    default_code: data?.default_code,
-                    name: data?.name,
-                    category_id: searchCategory?.category_id,
-                    quantity: 1,
-                    location_id: documentValue?.location_id,
-                    user_id: loginValue?.uid,
-                    purchase_price: 0,
-                    ...(selectedImage && {
-                        image: selectedImage,
-                        new_img: true
-                    })
-                };
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const assetData = {
+                        default_code: data?.default_code,
+                        name: data?.name,
+                        category_id: searchCategory?.category_id,
+                        quantity: 1,
+                        location_id: documentValue?.location_id,
+                        user_id: loginValue?.uid,
+                        purchase_price: 0,
+                        ...(selectedImage && {
+                            image: selectedImage,
+                            new_img: true
+                        })
+                    };
 
-                const response = await CreateAsset({
-                    asset_data: assetData
-                });
+                    const response = await CreateAsset({
+                        asset_data: assetData
+                    });
 
-                if (response?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
-                    return;
-                }
-                if (
-                    response?.result?.message === 'Asset created successfully'
-                ) {
+                    if (response?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog('Something went wrong save asset');
+                        return;
+                    }
+                    if (
+                        response?.result?.message ===
+                        'Asset created successfully'
+                    ) {
+                        route?.params?.onGoBack({
+                            asset_id: response?.result?.data?.id,
+                            default_code: data?.default_code,
+                            name: data?.name,
+                            use_state: searchUseState,
+                            state: MOVEMENT_ASSET_EN.New,
+                            ...(selectedImage
+                                ? {
+                                      image: selectedImage,
+                                      new_img: true
+                                  }
+                                : {
+                                      image: false,
+                                      new_img: false
+                                  })
+                        });
+                        navigation.goBack();
+                    }
+                } else {
+                    const db = await getDBConnection();
+                    const lastAsset = await getLastAsset(db);
+                    const assetID =
+                        lastAsset.length > 0 ? lastAsset[0].asset_id + 1 : 1;
+                    const assetData = [
+                        {
+                            asset_id: assetID,
+                            default_code: data?.default_code,
+                            name: data?.name,
+                            description: '',
+                            category_id: searchCategory?.category_id,
+                            category: searchCategory?.category_name,
+                            quantity: 1,
+                            serial_no: '',
+                            brand_name: '',
+                            use_state: searchUseState,
+                            location_id: documentValue?.location_id,
+                            location: documentValue?.location,
+                            purchase_price: 0,
+                            image: selectedImage ? selectedImage : 'false',
+                            new_img: selectedImage ? true : false,
+                            owner: '',
+                            is_sync_odoo: false
+                        }
+                    ];
+                    await insertNewAssetData(db, assetData);
                     route?.params?.onGoBack({
-                        asset_id: response?.result?.data?.id,
+                        asset_id: assetID,
                         default_code: data?.default_code,
                         name: data?.name,
                         use_state: searchUseState,
@@ -207,11 +260,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             }
         },
         [
+            documentValue?.location,
             documentValue?.location_id,
             loginValue?.uid,
             navigation,
             route?.params,
             searchCategory?.category_id,
+            searchCategory?.category_name,
             searchUseState,
             selectedImage
         ]
@@ -220,12 +275,26 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const handleInitFetch = useCallback(async () => {
         try {
             form?.setValue('default_code', route?.params?.code);
-            const [responseUseStatus, responseCategory] = await Promise.all([
-                GetUseStatus({ page: 1, limit: 1000 }),
-                GetCategory({ page: 1, limit: 1000 })
-            ]);
-            setListUseState(responseUseStatus?.result?.data.data);
-            setListCategory(responseCategory?.result?.data.asset);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const [responseUseStatus, responseCategory] = await Promise.all(
+                    [
+                        GetUseStatus({ page: 1, limit: 1000 }),
+                        GetCategory({ page: 1, limit: 1000 })
+                    ]
+                );
+                setListUseState(responseUseStatus?.result?.data.data);
+                setListCategory(responseCategory?.result?.data.asset);
+            } else {
+                const db = await getDBConnection();
+                const [listUseStatusDB, listCategoryDB] = await Promise.all([
+                    getUseStatus(db, 1, 1000),
+                    getCategory(db, 1, 1000)
+                ]);
+
+                setListUseState(listUseStatusDB);
+                setListCategory(listCategoryDB);
+            }
         } catch (err) {
             setVisibleDialog(true);
             setContentDialog('Something went wrong init fetch');
