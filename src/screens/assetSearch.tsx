@@ -428,9 +428,9 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                             navigation.navigate('Assets', {
                                 assetSearch: {
                                     default_code: searchCode,
-                                    location: searchLocation,
+                                    'location_id.name': searchLocation,
                                     use_state: searchUseState,
-                                    category_name: searchCategory
+                                    'category_id.name': searchCategory
                                 }
                             })
                         }

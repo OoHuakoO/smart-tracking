@@ -43,6 +43,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const handleFetchAsset = useCallback(async () => {
         try {
             setLoading(true);
+            setPage(1);
             const isOnline = await getOnlineMode();
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
             if (isOnline) {
