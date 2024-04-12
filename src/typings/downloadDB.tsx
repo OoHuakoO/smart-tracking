@@ -34,17 +34,15 @@ export interface GetAssetsResponse {
 }
 
 export interface LocationData {
-    asset_location_id: number;
-    name: string;
-    // for report
-    total_asset?: number;
-    report_asset?: ReportAssetData[];
+    location_id: number;
+    location_code: string;
+    location_name: string;
 }
 
 export interface GetLocationData {
     total_page: number;
     current_page: number;
-    data: LocationData[];
+    asset: LocationData[];
     total: number;
 }
 

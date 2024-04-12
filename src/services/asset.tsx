@@ -15,6 +15,7 @@ export function GetAssetByCode(
 export function GetAssetSearch(
     params: Params
 ): Promise<Response<GetAssetsResponse>> {
+    console.log(params);
     return post<GetAssetsResponse>(`/api/asset/search`, params);
 }
 

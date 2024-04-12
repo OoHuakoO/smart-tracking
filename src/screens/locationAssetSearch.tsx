@@ -36,8 +36,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
     const [listCategory, setListCategory] = useState<CategoryData[]>([]);
-    const [searchCategory, setSearchCategory] =
-        useState<CategoryData>(undefined);
+    const [searchCategory, setSearchCategory] = useState<string>('');
     const [isFocusCode, setIsFocusCode] = useState<boolean>(false);
     const [isFocusName, setIsFocusName] = useState<boolean>(false);
     const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
@@ -308,7 +307,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     onFocus={() => setIsFocusCategory(true)}
                     onBlur={() => setIsFocusCategory(false)}
                     onChange={(item) => {
-                        setSearchCategory(item);
+                        setSearchCategory(item?.category_name);
                     }}
                     renderItem={renderItemCategory}
                 />
@@ -328,9 +327,8 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                             navigation.navigate('LocationListAsset', {
                                 assetSearch: {
                                     default_code: searchCode,
-                                    name: searchName,
                                     use_state: searchUseState,
-                                    category_id: searchCategory?.category_id
+                                    category_name: searchCategory
                                 },
                                 LocationData: route?.params?.LocationData
                             })

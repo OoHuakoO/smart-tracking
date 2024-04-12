@@ -55,7 +55,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                 });
                 const totalPagesLocation = response?.result?.data?.total;
                 setCountLocation(totalPagesLocation);
-                setListLocation(response?.result?.data?.data);
+                setListLocation(response?.result?.data?.asset);
             } else {
                 const db = await getDBConnection();
                 const countLocation = await getTotalLocations(db);
@@ -84,7 +84,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
 
                     setListLocation([
                         ...listLocation,
-                        ...response?.result?.data?.data
+                        ...response?.result?.data?.asset
                     ]);
                 } else {
                     const db = await getDBConnection();
@@ -158,13 +158,13 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                                 style={styles.searchButton}
                             >
                                 <LocationCardDetail
-                                    location={item?.name}
-                                    locationId={item?.asset_location_id?.toString()}
+                                    location={item?.location_name}
+                                    locationId={item?.location_id?.toString()}
                                 />
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.asset_location_id.toString()}
+                    keyExtractor={(item) => item.location_id.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                     onEndReached={handleOnEndReached}

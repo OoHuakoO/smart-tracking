@@ -1,6 +1,7 @@
 export interface LocationSearchData {
     location_id: number;
     location_name: string;
+    location_code: string;
 }
 
 export interface GetLocationSearchData {

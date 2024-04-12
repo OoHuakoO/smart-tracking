@@ -6,6 +6,7 @@ import AssetCardDetail from '@src/components/views/assetCardDetail';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { GetAssetSearch } from '@src/services/asset';
+import { GetAssets } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -45,14 +46,24 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
             const isOnline = await getOnlineMode();
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
             if (isOnline) {
-                const responseAsset = await GetAssetSearch({
-                    page: 1,
-                    limit: 10,
-                    search_term: {
-                        ...assetSearch
-                    }
-                });
-                const totalPagesAsset = responseAsset?.result?.data?.total;
+                let responseAsset;
+                let totalPagesAsset;
+                if (assetSearch) {
+                    responseAsset = await GetAssetSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: {
+                            and: { ...assetSearch }
+                        }
+                    });
+                    totalPagesAsset = responseAsset?.result?.data?.total;
+                } else {
+                    responseAsset = await GetAssets({
+                        page: 1,
+                        limit: 10
+                    });
+                    totalPagesAsset = responseAsset?.result?.data?.total;
+                }
                 setCountAsset(totalPagesAsset);
                 setListAsset(responseAsset?.result?.data?.asset);
             } else {
@@ -79,14 +90,21 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 const isOnline = await getOnlineMode();
                 const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
                 if (isOnline) {
-                    const response = await GetAssetSearch({
-                        page: page + 1,
-                        limit: 10,
-                        search_term: {
-                            ...assetSearch
-                        }
-                    });
-
+                    let response;
+                    if (assetSearch) {
+                        response = await GetAssetSearch({
+                            page: page + 1,
+                            limit: 10,
+                            search_term: {
+                                and: { ...assetSearch }
+                            }
+                        });
+                    } else {
+                        response = await GetAssets({
+                            page: page + 1,
+                            limit: 10
+                        });
+                    }
                     setListAsset([
                         ...listAsset,
                         ...response?.result?.data?.asset
