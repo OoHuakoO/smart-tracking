@@ -46,6 +46,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
     const handleFetchAssetLocation = useCallback(async () => {
         try {
             setLoading(true);
+            setPage(1);
             const isOnline = await getOnlineMode();
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
             if (isOnline) {
@@ -53,8 +54,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                     page: 1,
                     limit: 10,
                     search_term: {
-                        location: route?.params?.LocationData?.name,
-                        ...(assetSearch && { ...assetSearch })
+                        and: {
+                            'location_id.name':
+                                route?.params?.LocationData?.location_name,
+                            ...(assetSearch && { ...assetSearch })
+                        }
                     }
                 });
                 const totalPagesAsset = response?.result?.data?.total;
@@ -62,7 +66,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                 setListAsset(response?.result?.data?.asset);
             } else {
                 const filter = {
-                    location_id: route?.params?.LocationData?.asset_location_id,
+                    location_id: route?.params?.LocationData?.location_id,
                     ...(assetSearch && { ...assetSearch })
                 };
                 const db = await getDBConnection();
@@ -79,8 +83,8 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
             setContentDialog('Something went wrong fetch asset');
         }
     }, [
-        route?.params?.LocationData?.asset_location_id,
-        route?.params?.LocationData?.name,
+        route?.params?.LocationData?.location_id,
+        route?.params?.LocationData?.location_name,
         route?.params?.assetSearch
     ]);
 
@@ -95,8 +99,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            location: route?.params?.LocationData?.name,
-                            ...(assetSearch && { ...assetSearch })
+                            and: {
+                                'location_id.name':
+                                    route?.params?.LocationData?.location_name,
+                                ...(assetSearch && { ...assetSearch })
+                            }
                         }
                     });
 
@@ -106,8 +113,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                     ]);
                 } else {
                     const filter = {
-                        location_id:
-                            route?.params?.LocationData?.asset_location_id,
+                        location_id: route?.params?.LocationData?.location_id,
                         ...(assetSearch && { ...assetSearch })
                     };
                     const db = await getDBConnection();
@@ -149,7 +155,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        {route?.params?.LocationData?.name}
+                        {route?.params?.LocationData?.location_name}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้

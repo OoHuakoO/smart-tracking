@@ -123,7 +123,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                 }
             } catch (err) {
                 setVisibleDialog(true);
-                setContentDialog('Something went wrong search asset by code');
+                setContentDialog('Something went wrong search asset ');
             }
         },
         [handleInitAsset]
