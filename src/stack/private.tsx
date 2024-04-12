@@ -18,6 +18,7 @@ import LocationListAsset from '@src/screens/locationListAsset';
 import LocationListReportAsset from '@src/screens/locationListReportAsset';
 import Report from '@src/screens/report';
 import ReportAssetData from '@src/screens/reportAssetData';
+import ReportSearch from '@src/screens/reportSearch';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { memo } from 'react';
 
@@ -123,6 +124,14 @@ const PrivateStack = () => {
                     headerShown: false
                 }}
                 component={ReportAssetData}
+            />
+
+            <Stack.Screen
+                name="ReportSearch"
+                options={{
+                    headerShown: false
+                }}
+                component={ReportSearch}
             />
 
             <Stack.Screen

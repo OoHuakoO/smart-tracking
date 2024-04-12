@@ -38,9 +38,14 @@ export type PrivateStackParamsList = {
     ReportAssetData: {
         title: string;
     };
-    LocationListReportAsset: {
+    ReportSearch: {
         LocationData: LocationReportData;
         title: string;
+    };
+    LocationListReportAsset: {
+        LocationData: LocationReportData;
+        title?: string;
+        assetSearch?: SearchAsset;
     };
     DocumentAssetDetail: {
         assetData: DocumentAssetData;

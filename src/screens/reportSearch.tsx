@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import { REPORT_TYPE } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
@@ -21,12 +22,12 @@ import { Dropdown } from 'react-native-element-dropdown';
 
 import { Text } from 'react-native-paper';
 
-type LocationAssetSearchProps = NativeStackScreenProps<
+type ReportSearchProps = NativeStackScreenProps<
     PrivateStackParamsList,
-    'LocationAssetSearch'
+    'ReportSearch'
 >;
 
-const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
+const ReportSearch: FC<ReportSearchProps> = (props) => {
     const { navigation, route } = props;
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
     const [searchCode, setSearchCode] = useState<string>('');
@@ -283,13 +284,23 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     <TouchableOpacity
                         style={styles.buttonApply}
                         onPress={() =>
-                            navigation.navigate('LocationListAsset', {
+                            navigation.navigate('LocationListReportAsset', {
                                 assetSearch: {
-                                    default_code: searchCode,
+                                    name:
+                                        route?.params?.title !==
+                                        REPORT_TYPE.NotFound
+                                            ? searchCode
+                                            : '',
+                                    default_code:
+                                        route?.params?.title ===
+                                        REPORT_TYPE.NotFound
+                                            ? searchCode
+                                            : '',
                                     use_state: searchUseState,
                                     'category_id.name': searchCategory
                                 },
-                                LocationData: route?.params?.LocationData
+                                LocationData: route?.params?.LocationData,
+                                title: route?.params?.title
                             })
                         }
                     >
@@ -387,4 +398,4 @@ const styles = StyleSheet.create({
         fontFamily: 'DMSans-Regular'
     }
 });
-export default LocationAssetSearch;
+export default ReportSearch;

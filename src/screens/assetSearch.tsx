@@ -56,111 +56,62 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         setVisibleDialog(false);
     }, []);
 
-    const handleInitAsset = useCallback(async () => {
+    const handleOnChangeSearchAsset = useCallback(async (text: string) => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const responseAsset = await GetAssets({
-                    page: 1,
-                    limit: 10
-                });
-                setListAsset(responseAsset?.result?.data?.asset);
-            } else {
-                const db = await getDBConnection();
-                const listAssetDB = await getAsset(db);
-                setListAsset(listAssetDB);
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetAssetSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: {
+                            or: { default_code: text, name: text }
+                        }
+                    });
+
+                    setListAsset(response?.result?.data?.asset);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        default_code: text
+                    };
+                    const listAssetDB = await getAsset(db, filter);
+                    setListAsset(listAssetDB);
+                }
             }
         } catch (err) {
             setVisibleDialog(true);
+            setContentDialog('Something went wrong search asset ');
         }
     }, []);
 
-    const handleInitLocation = useCallback(async () => {
+    const handleOnChangeSearchLocation = useCallback(async (text: string) => {
         try {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const responseLocation = await GetLocation({
-                    page: 1,
-                    limit: 10
-                });
-
-                setListLocation(responseLocation?.result?.data?.asset);
-            } else {
-                const db = await getDBConnection();
-                const listLocationDB = await getLocations(db);
-                setListLocation(listLocationDB);
+            if (text !== '') {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetLocationSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: {
+                            or: { name: text, default_code: text }
+                        }
+                    });
+                    setListLocation(response?.result?.data?.locations);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        name: text
+                    };
+                    const listLocationDB = await getLocations(db, filter);
+                    setListLocation(listLocationDB);
+                }
             }
         } catch (err) {
             setVisibleDialog(true);
+            setContentDialog('Something went wrong search location');
         }
     }, []);
-
-    const handleOnChangeSearchAsset = useCallback(
-        async (text: string) => {
-            try {
-                if (text !== '') {
-                    const isOnline = await getOnlineMode();
-                    if (isOnline) {
-                        const response = await GetAssetSearch({
-                            page: 1,
-                            limit: 10,
-                            search_term: {
-                                or: { default_code: text, name: text }
-                            }
-                        });
-
-                        setListAsset(response?.result?.data?.asset);
-                    } else {
-                        const db = await getDBConnection();
-                        const filter = {
-                            default_code: text
-                        };
-                        const listAssetDB = await getAsset(db, filter);
-                        setListAsset(listAssetDB);
-                    }
-                } else {
-                    handleInitAsset();
-                }
-            } catch (err) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong search asset ');
-            }
-        },
-        [handleInitAsset]
-    );
-
-    const handleOnChangeSearchLocation = useCallback(
-        async (text: string) => {
-            try {
-                if (text !== '') {
-                    const isOnline = await getOnlineMode();
-                    if (isOnline) {
-                        const response = await GetLocationSearch({
-                            page: 1,
-                            limit: 10,
-                            search_term: {
-                                or: { name: text, default_code: text }
-                            }
-                        });
-                        setListLocation(response?.result?.data?.locations);
-                    } else {
-                        const db = await getDBConnection();
-                        const filter = {
-                            name: text
-                        };
-                        const listLocationDB = await getLocations(db, filter);
-                        setListLocation(listLocationDB);
-                    }
-                } else {
-                    handleInitLocation();
-                }
-            } catch (err) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong search location');
-            }
-        },
-        [handleInitLocation]
-    );
 
     const renderItemAsset = (item: AssetData) => {
         return (

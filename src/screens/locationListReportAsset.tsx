@@ -2,6 +2,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
+import SearchButton from '@src/components/core/searchButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
 import { REPORT_TYPE, STATE_ASSET } from '@src/constant';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
@@ -10,7 +11,11 @@ import { theme } from '@src/theme';
 
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ReportAssetData, SearchQueryReport } from '@src/typings/report';
-import { getOnlineMode, handleMapReportStateValue } from '@src/utils/common';
+import {
+    getOnlineMode,
+    handleMapReportStateValue,
+    removeKeyEmpty
+} from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -36,6 +41,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+    const [totalListReportAsset, setTotalListReportAsset] = useState<number>(0);
     const [page, setPage] = useState<number>(1);
 
     const handleCloseDialog = useCallback(() => {
@@ -168,7 +174,8 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             page: number
         ): Promise<ReportAssetData[]> => {
             let listReportAsset: ReportAssetData[] = [];
-            let searchQuery: SearchQueryReport = {};
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+            let searchQuery: SearchQueryReport = { ...assetSearch };
             if (locationID !== 0) {
                 searchQuery['location_id.id'] = locationID;
             }
@@ -180,6 +187,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     and: searchQuery
                 }
             });
+            setTotalListReportAsset(response?.result?.data?.count_ids);
             response?.result?.data?.asset?.map((document) => {
                 listReportAsset.push({
                     code: document?.default_code,
@@ -191,7 +199,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             });
             return listReportAsset;
         },
-        []
+        [route?.params?.assetSearch]
     );
 
     const createReportAssetListFound = useCallback(
@@ -201,7 +209,8 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             page: number
         ): Promise<ReportAssetData[]> => {
             let listReportAsset: ReportAssetData[] = [];
-            let searchQuery: SearchQueryReport = {};
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+            let searchQuery: SearchQueryReport = { ...assetSearch };
             if (locationID !== 0) {
                 searchQuery['location_id.id'] = locationID;
             }
@@ -213,7 +222,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     and: searchQuery
                 }
             });
-
+            setTotalListReportAsset(response?.result?.data?.total);
             response?.result?.data?.document_item_line?.map((document) => {
                 document?.assets.map((asset) => {
                     listReportAsset.push({
@@ -229,7 +238,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
 
             return listReportAsset;
         },
-        []
+        [route?.params?.assetSearch]
     );
 
     const handleInitFetch = useCallback(async () => {
@@ -308,7 +317,8 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
 
     useEffect(() => {
         handleInitFetch();
-    }, [handleInitFetch]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [route?.params?.assetSearch]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -338,13 +348,18 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             </LinearGradient>
 
             <View style={styles.listSection}>
-                {/* <View style={styles.searchButtonWrap}>
+                <View style={styles.searchButtonWrap}>
                     <SearchButton
-                        handlePress={() => navigation.navigate('AssetSearch')}
+                        handlePress={() =>
+                            navigation.navigate('ReportSearch', {
+                                LocationData: route?.params?.LocationData,
+                                title: route?.params?.title
+                            })
+                        }
                     />
-                </View> */}
+                </View>
                 <Text variant="bodyLarge" style={styles.textTotalAsset}>
-                    Total Asset: {route?.params?.LocationData?.total_asset}
+                    Total Asset: {totalListReportAsset}
                 </Text>
 
                 <FlatList

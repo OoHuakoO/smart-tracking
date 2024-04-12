@@ -2,12 +2,15 @@ export interface LocationReportData {
     location_id: number;
     location_code: string;
     location_name: string;
-    total_asset: number;
+    total_asset?: number;
 }
 
 export interface SearchQueryReport {
     'location_id.id'?: number;
+    'category_id.name'?: string;
     state?: string | string[];
+    name?: string;
+    use_state?: string;
 }
 
 export interface ReportAssetData {

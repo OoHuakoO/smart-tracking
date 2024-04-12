@@ -56,14 +56,14 @@ export const handleMapReportStateValue = (
             return MOVEMENT_ASSET.Transfer;
         case REPORT_TYPE.Found:
             return [
-                MOVEMENT_ASSET_EN.Normal,
-                MOVEMENT_ASSET_EN.New,
+                MOVEMENT_ASSET.Normal,
+                MOVEMENT_ASSET.New,
                 MOVEMENT_ASSET.Transfer
             ];
         default:
             return [
-                MOVEMENT_ASSET_EN.Normal,
-                MOVEMENT_ASSET_EN.New,
+                MOVEMENT_ASSET.Normal,
+                MOVEMENT_ASSET.New,
                 MOVEMENT_ASSET.Transfer
             ];
     }
