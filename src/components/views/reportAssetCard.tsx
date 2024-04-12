@@ -6,7 +6,6 @@ import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface ReportAssetCardProps {
-    imageSource?: any;
     assetCode: string;
     assetName: string;
     assetStatus: string;
@@ -17,7 +16,6 @@ interface ReportAssetCardProps {
 
 const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     const {
-        imageSource,
         assetCode,
         assetName,
         assetStatus,
@@ -30,13 +28,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
             <View style={styles.imagesContainer}>
                 <Image
                     style={styles.image}
-                    source={
-                        imageSource?.toString() !== 'false'
-                            ? {
-                                  uri: `data:image/png;base64,${imageSource}`
-                              }
-                            : require('../../../assets/images/default_image.jpg')
-                    }
+                    source={require('../../../assets/images/default_image.jpg')}
                     resizeMode="cover"
                 />
             </View>

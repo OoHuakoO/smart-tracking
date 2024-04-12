@@ -1,23 +1,16 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
-import {
-    ALL_LOCATION,
-    MOVEMENT_ASSET,
-    REPORT_TYPE,
-    USE_STATE_ASSET_TH
-} from '@src/constant';
-import { getAsset } from '@src/db/asset';
-import { getDBConnection } from '@src/db/config';
-import { getReport } from '@src/db/report';
-import { GetAssetSearch } from '@src/services/asset';
-import { GetDocumentSearch } from '@src/services/document';
+import { REPORT_TYPE, STATE_ASSET } from '@src/constant';
+import { GetAssetNotFoundSearch } from '@src/services/asset';
+import { GetDocumentLineSearch } from '@src/services/document';
 import { theme } from '@src/theme';
-import { DocumentData } from '@src/typings/document';
-import { AssetData, ReportAssetData } from '@src/typings/downloadDB';
+
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import { getOnlineMode } from '@src/utils/common';
+import { ReportAssetData, SearchQueryReport } from '@src/typings/report';
+import { getOnlineMode, handleMapReportStateValue } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { FlatList, SafeAreaView, StyleSheet, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -40,8 +33,6 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     const [listReportAsset, setListReportAsset] = useState<ReportAssetData[]>(
         []
     );
-    const [listReportForNotFoundAsset, setListReportForNotFoundAsset] =
-        useState<ReportAssetData[]>([]);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
@@ -51,164 +42,192 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
         setVisibleDialog(false);
     }, []);
 
-    const handleFilterReportOnline = useCallback(
-        (asset: ReportAssetData, title: string): boolean => {
-            switch (title) {
-                case REPORT_TYPE.New:
-                    return asset.state === MOVEMENT_ASSET.New;
-                case REPORT_TYPE.Transfer:
-                    return asset.state === MOVEMENT_ASSET.Transfer;
-                case REPORT_TYPE.Found:
-                    return true;
-                case REPORT_TYPE.NotFound:
-                    return true;
-                default:
-                    return false;
-            }
-        },
-        []
-    );
+    // const handleFilterReportOnline = useCallback(
+    //     (asset: ReportAssetData, title: string): boolean => {
+    //         switch (title) {
+    //             case REPORT_TYPE.New:
+    //                 return asset.state === MOVEMENT_ASSET.New;
+    //             case REPORT_TYPE.Transfer:
+    //                 return asset.state === MOVEMENT_ASSET.Transfer;
+    //             case REPORT_TYPE.Found:
+    //                 return true;
+    //             case REPORT_TYPE.NotFound:
+    //                 return true;
+    //             default:
+    //                 return false;
+    //         }
+    //     },
+    //     []
+    // );
 
-    const handleCheckTitleToSetAssetState = useCallback(
-        (title: string): undefined | string => {
-            let state;
-            switch (title) {
-                case REPORT_TYPE.New:
-                    state = MOVEMENT_ASSET.New;
-                    break;
-                case REPORT_TYPE.Transfer:
-                    state = MOVEMENT_ASSET.Transfer;
-                    break;
-            }
-            return state;
-        },
-        []
-    );
+    // const handleCheckTitleToSetAssetState = useCallback(
+    //     (title: string): undefined | string => {
+    //         let state;
+    //         switch (title) {
+    //             case REPORT_TYPE.New:
+    //                 state = MOVEMENT_ASSET.New;
+    //                 break;
+    //             case REPORT_TYPE.Transfer:
+    //                 state = MOVEMENT_ASSET.Transfer;
+    //                 break;
+    //         }
+    //         return state;
+    //     },
+    //     []
+    // );
 
-    const fetchReportFromAPI = useCallback(
-        async (locationName: string, pageReport: number) => {
-            return await GetDocumentSearch({
-                page: pageReport,
+    // const fetchReportFromAPI = useCallback(
+    //     async (locationName: string, pageReport: number) => {
+    //         return await GetDocumentSearch({
+    //             page: pageReport,
+    //             limit: 10,
+    //             search_term: {
+    //                 location: locationName === ALL_LOCATION ? '' : locationName
+    //             }
+    //         });
+    //     },
+    //     []
+    // );
+
+    // const fetchAssetsFromAPI = async (
+    //     locationName: string,
+    //     pageAsset: number
+    // ) => {
+    //     return await GetAssetSearch({
+    //         page: pageAsset,
+    //         limit: 10,
+    //         search_term: {
+    //             location: locationName === ALL_LOCATION ? '' : locationName
+    //         }
+    //     });
+    // };
+
+    // const fetchReportAssetFromDB = useCallback(
+    //     async (
+    //         locationName: string,
+    //         title: string,
+    //         isPagination: boolean,
+    //         pageReport: number
+    //     ) => {
+    //         const db = await getDBConnection();
+    //         let filter = {
+    //             location:
+    //                 locationName === ALL_LOCATION ? undefined : locationName,
+    //             state: handleCheckTitleToSetAssetState(title)
+    //         };
+    //         return await getReport(db, filter, isPagination, pageReport);
+    //     },
+    //     [handleCheckTitleToSetAssetState]
+    // );
+
+    // const fetchAssetsFromDB = async (
+    //     locationName: string,
+    //     pageAsset: number
+    // ) => {
+    //     const db = await getDBConnection();
+    //     let filter =
+    //         locationName !== ALL_LOCATION ? { location: locationName } : null;
+    //     return await getAsset(db, filter, pageAsset);
+    // };
+
+    // const filterAssetsNotInReport = (
+    //     assets: AssetData[],
+    //     listAssetReport: ReportAssetData[]
+    // ): AssetData[] => {
+    //     const filterAsset = assets.filter(
+    //         (asset) =>
+    //             !listAssetReport.some(
+    //                 (listAssetItem) => listAssetItem.code === asset.default_code
+    //             )
+    //     );
+
+    //     return filterAsset;
+    // };
+
+    // const convertAssetToReportAssetData = (
+    //     filteredAssets: AssetData[]
+    // ): ReportAssetData[] => {
+    //     return filteredAssets.map((item) => ({
+    //         image: item.image,
+    //         code: item.default_code,
+    //         name: item.name,
+    //         use_state: item.use_state,
+    //         location: item.location,
+    //         location_old: item.location,
+    //         category: item.category,
+    //         serial_no: item.serial_no,
+    //         quantity: item.quantity,
+    //         state: USE_STATE_ASSET_TH.Normal,
+    //         new_img: item.new_img
+    //     }));
+    // };
+
+    const createReportAssetListNotFound = useCallback(
+        async (
+            locationID: number,
+            page: number
+        ): Promise<ReportAssetData[]> => {
+            let listReportAsset: ReportAssetData[] = [];
+            let searchQuery: SearchQueryReport = {};
+            if (locationID !== 0) {
+                searchQuery['location_id.id'] = locationID;
+            }
+            searchQuery.state = STATE_ASSET;
+            const response = await GetAssetNotFoundSearch({
+                page: page,
                 limit: 10,
                 search_term: {
-                    location: locationName === ALL_LOCATION ? '' : locationName
+                    and: searchQuery
                 }
             });
+            response?.result?.data?.asset?.map((document) => {
+                listReportAsset.push({
+                    code: document?.default_code,
+                    name: document?.name,
+                    category: document?.category,
+                    location: document?.location,
+                    use_state: document?.use_state
+                });
+            });
+            return listReportAsset;
         },
         []
     );
 
-    const fetchAssetsFromAPI = async (
-        locationName: string,
-        pageAsset: number
-    ) => {
-        return await GetAssetSearch({
-            page: pageAsset,
-            limit: 10,
-            search_term: {
-                location: locationName === ALL_LOCATION ? '' : locationName
-            }
-        });
-    };
-
-    const fetchReportAssetFromDB = useCallback(
+    const createReportAssetListFound = useCallback(
         async (
-            locationName: string,
+            locationID: number,
             title: string,
-            isPagination: boolean,
-            pageReport: number
-        ) => {
-            const db = await getDBConnection();
-            let filter = {
-                location:
-                    locationName === ALL_LOCATION ? undefined : locationName,
-                state: handleCheckTitleToSetAssetState(title)
-            };
-            return await getReport(db, filter, isPagination, pageReport);
-        },
-        [handleCheckTitleToSetAssetState]
-    );
+            page: number
+        ): Promise<ReportAssetData[]> => {
+            let listReportAsset: ReportAssetData[] = [];
+            let searchQuery: SearchQueryReport = {};
+            if (locationID !== 0) {
+                searchQuery['location_id.id'] = locationID;
+            }
+            searchQuery.state = handleMapReportStateValue(title);
+            const response = await GetDocumentLineSearch({
+                page: page,
+                limit: 10,
+                search_term: {
+                    and: searchQuery
+                }
+            });
 
-    const fetchAssetsFromDB = async (
-        locationName: string,
-        pageAsset: number
-    ) => {
-        const db = await getDBConnection();
-        let filter =
-            locationName !== ALL_LOCATION ? { location: locationName } : null;
-        return await getAsset(db, filter, pageAsset);
-    };
-
-    const filterAssetsNotInReport = (
-        assets: AssetData[],
-        listAssetReport: ReportAssetData[]
-    ): AssetData[] => {
-        const filterAsset = assets.filter(
-            (asset) =>
-                !listAssetReport.some(
-                    (listAssetItem) => listAssetItem.code === asset.default_code
-                )
-        );
-
-        return filterAsset;
-    };
-
-    const convertAssetToReportAssetData = (
-        filteredAssets: AssetData[]
-    ): ReportAssetData[] => {
-        return filteredAssets.map((item) => ({
-            image: item.image,
-            code: item.default_code,
-            name: item.name,
-            use_state: item.use_state,
-            location: item.location,
-            location_old: item.location,
-            category: item.category,
-            serial_no: item.serial_no,
-            quantity: item.quantity,
-            state: USE_STATE_ASSET_TH.Normal,
-            new_img: item.new_img
-        }));
-    };
-
-    const createReportAssetList = useCallback(
-        (
-            documents: DocumentData[],
-            reportAssets: ReportAssetData[],
-            title: string,
-            online: boolean
-        ): ReportAssetData[] => {
-            let assets = [];
-            if (online) {
-                assets = documents
-                    .flatMap((document) => document.assets || [])
-                    .filter((asset) => {
-                        return handleFilterReportOnline(asset, title);
+            response?.result?.data?.document_item_line?.map((document) => {
+                document?.assets.map((asset) => {
+                    listReportAsset.push({
+                        code: asset?.code,
+                        name: asset?.name,
+                        category: asset?.category,
+                        location_old: asset?.location_old,
+                        location: asset?.location,
+                        use_state: asset?.use_state
                     });
-            } else {
-                assets = reportAssets;
-            }
-            return assets;
-        },
-        [handleFilterReportOnline]
-    );
+                });
+            });
 
-    const handleLoadReport = useCallback(
-        async (totalPages: number): Promise<DocumentData[]> => {
-            try {
-                const promises = Array.from({ length: totalPages }, (_, i) =>
-                    GetDocumentSearch({ page: i + 1, limit: 1000 })
-                );
-                const results = await Promise.all(promises);
-                const report = results.flatMap(
-                    (result) => result?.result?.data?.documents ?? []
-                );
-                return report;
-            } catch (err) {
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong load report');
-                return [];
-            }
+            return listReportAsset;
         },
         []
     );
@@ -217,141 +236,24 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
-            const locationName = route?.params?.LocationData?.name;
+            const locationID = route?.params?.LocationData?.location_id;
+            const title = route?.params?.title;
             let listAsset = [];
 
             if (isOnline) {
-                const documentSearchResponse = await fetchReportFromAPI(
-                    locationName,
-                    1
-                );
-                if (route?.params?.title !== REPORT_TYPE.NotFound) {
-                    listAsset = createReportAssetList(
-                        documentSearchResponse?.result?.data?.documents,
-                        [],
-                        route?.params?.title,
-                        isOnline
-                    );
-                }
                 if (route?.params?.title === REPORT_TYPE.NotFound) {
-                    let pageCount = 1;
-                    let isCountListAssetMoreThanSix = false;
-                    if (route?.params?.LocationData?.total_asset > 0) {
-                        const listLoadDocument = await handleLoadReport(
-                            documentSearchResponse?.result?.data?.total_page
-                        );
-
-                        const listAssetReport = createReportAssetList(
-                            listLoadDocument,
-                            [],
-                            route?.params?.title,
-                            isOnline
-                        );
-
-                        setListReportForNotFoundAsset(listAssetReport);
-
-                        while (!isCountListAssetMoreThanSix) {
-                            const assetResponse = await fetchAssetsFromAPI(
-                                locationName,
-                                pageCount
-                            );
-
-                            const filteredAssets = filterAssetsNotInReport(
-                                assetResponse?.result?.data?.asset,
-                                listAssetReport
-                            );
-
-                            if (listAsset.length <= 6) {
-                                pageCount++;
-                                listAsset = [
-                                    ...listAsset,
-                                    ...convertAssetToReportAssetData(
-                                        filteredAssets
-                                    )
-                                ];
-                            }
-                            if (listAsset.length > 6) {
-                                listAsset = [
-                                    ...listAsset,
-                                    ...convertAssetToReportAssetData(
-                                        filteredAssets
-                                    )
-                                ];
-                                isCountListAssetMoreThanSix = true;
-                                setPage(pageCount);
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (route?.params?.title !== REPORT_TYPE.NotFound) {
-                    const listReportDB = await fetchReportAssetFromDB(
-                        locationName,
-                        route?.params?.title,
-                        true,
+                    listAsset = await createReportAssetListNotFound(
+                        locationID,
                         1
                     );
-
-                    listAsset = createReportAssetList(
-                        [],
-                        listReportDB,
-                        route?.params?.title,
-                        isOnline
+                } else {
+                    listAsset = await createReportAssetListFound(
+                        locationID,
+                        title,
+                        1
                     );
                 }
-                if (route?.params?.title === REPORT_TYPE.NotFound) {
-                    let pageCount = 1;
-                    let isCountListAssetMoreThanSix = false;
-                    if (route?.params?.LocationData?.total_asset > 0) {
-                        const listReportDB = await fetchReportAssetFromDB(
-                            locationName,
-                            route?.params?.title,
-                            false,
-                            1
-                        );
-
-                        const listAssetReport = createReportAssetList(
-                            [],
-                            listReportDB,
-                            route?.params?.title,
-                            isOnline
-                        );
-
-                        setListReportForNotFoundAsset(listAssetReport);
-
-                        while (!isCountListAssetMoreThanSix) {
-                            const listAssetDB = await fetchAssetsFromDB(
-                                locationName,
-                                pageCount
-                            );
-
-                            const filteredAssets = filterAssetsNotInReport(
-                                listAssetDB,
-                                listAssetReport
-                            );
-
-                            if (listAsset.length <= 6) {
-                                pageCount++;
-                                listAsset = [
-                                    ...listAsset,
-                                    ...convertAssetToReportAssetData(
-                                        filteredAssets
-                                    )
-                                ];
-                            }
-                            if (listAsset.length > 6) {
-                                listAsset = [
-                                    ...listAsset,
-                                    ...convertAssetToReportAssetData(
-                                        filteredAssets
-                                    )
-                                ];
-                                isCountListAssetMoreThanSix = true;
-                                setPage(pageCount);
-                            }
-                        }
-                    }
-                }
+            } else {
             }
 
             setListReportAsset(listAsset);
@@ -363,13 +265,10 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             setContentDialog('Something went wrong fetch asset');
         }
     }, [
-        route?.params?.LocationData?.name,
-        route?.params?.LocationData?.total_asset,
-        route?.params?.title,
-        fetchReportFromAPI,
-        createReportAssetList,
-        handleLoadReport,
-        fetchReportAssetFromDB
+        createReportAssetListFound,
+        createReportAssetListNotFound,
+        route?.params?.LocationData?.location_id,
+        route?.params?.title
     ]);
 
     const handleOnEndReached = async () => {
@@ -378,68 +277,22 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
                 let listAsset = [];
-                const locationName = route?.params?.LocationData?.name;
+                const locationID = route?.params?.LocationData?.location_id;
                 const title = route?.params?.title;
                 if (isOnline) {
-                    if (title !== REPORT_TYPE.NotFound) {
-                        const documentSearchResponse = await fetchReportFromAPI(
-                            locationName,
+                    if (route?.params?.title === REPORT_TYPE.NotFound) {
+                        listAsset = await createReportAssetListNotFound(
+                            locationID,
                             page + 1
                         );
-
-                        listAsset = createReportAssetList(
-                            documentSearchResponse?.result?.data?.documents,
-                            [],
+                    } else {
+                        listAsset = await createReportAssetListFound(
+                            locationID,
                             title,
-                            isOnline
-                        );
-                    }
-                    if (title === REPORT_TYPE.NotFound) {
-                        const assetResponse = await fetchAssetsFromAPI(
-                            locationName,
                             page + 1
                         );
-
-                        const filteredAssets = filterAssetsNotInReport(
-                            assetResponse?.result?.data?.asset,
-                            listReportForNotFoundAsset
-                        );
-
-                        listAsset = [
-                            ...listAsset,
-                            ...convertAssetToReportAssetData(filteredAssets)
-                        ];
                     }
                 } else {
-                    if (title !== REPORT_TYPE.NotFound) {
-                        const listReportDB = await fetchReportAssetFromDB(
-                            locationName,
-                            title,
-                            true,
-                            page + 1
-                        );
-
-                        listAsset = createReportAssetList(
-                            [],
-                            listReportDB,
-                            title,
-                            isOnline
-                        );
-                    }
-                    if (title === REPORT_TYPE.NotFound) {
-                        const listAssetDB = await fetchAssetsFromDB(
-                            locationName,
-                            page + 1
-                        );
-                        const filteredAssets = filterAssetsNotInReport(
-                            listAssetDB,
-                            listReportForNotFoundAsset
-                        );
-                        listAsset = [
-                            ...listAsset,
-                            ...convertAssetToReportAssetData(filteredAssets)
-                        ];
-                    }
                 }
                 setListReportAsset([...listReportAsset, ...listAsset]);
             }
@@ -476,7 +329,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 </View>
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        {route?.params?.LocationData?.name}
+                        {route?.params?.LocationData?.location_name}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
@@ -500,7 +353,6 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         <View style={styles.wrapDetailList}>
                             <ReportAssetCard
                                 title={route?.params?.title}
-                                imageSource={item?.image}
                                 assetCode={item?.code}
                                 assetName={item?.name}
                                 assetStatus={item?.use_state}

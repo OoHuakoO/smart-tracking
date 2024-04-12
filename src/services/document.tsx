@@ -3,6 +3,7 @@ import {
     CreateDocumentResponse,
     DeleteDocumentLineResponse,
     GetDocumentByIdResponse,
+    GetDocumentLineSearchResponse,
     GetDocumentSearchResponse,
     PostPutDocumentLineResponse
 } from '@src/typings/document';
@@ -12,6 +13,15 @@ export function GetDocumentSearch(
     params: Params
 ): Promise<Response<GetDocumentSearchResponse>> {
     return post<GetDocumentSearchResponse>(`/api/document/search`, params);
+}
+
+export function GetDocumentLineSearch(
+    params: Params
+): Promise<Response<GetDocumentLineSearchResponse>> {
+    return post<GetDocumentLineSearchResponse>(
+        `/api/document/line/search`,
+        params
+    );
 }
 
 export function GetDocumentById(

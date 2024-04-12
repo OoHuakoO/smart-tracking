@@ -65,13 +65,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                         name: text
                     };
                     const listLocationDB = await getLocations(db, filter);
-                    const listLocationSearch = listLocationDB.map((item) => {
-                        return {
-                            location_id: item?.asset_location_id,
-                            location_name: item?.name
-                        };
-                    });
-                    setListLocation(listLocationSearch);
+                    setListLocation(listLocationDB);
                 }
             }
         } catch (err) {

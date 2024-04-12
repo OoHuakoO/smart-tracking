@@ -1,6 +1,7 @@
 import { AssetDataForPassParamsDocumentCreate, SearchAsset } from './asset';
 import { DocumentAssetData, SearchDocument } from './document';
 import { AssetData, LocationData } from './downloadDB';
+import { LocationReportData } from './report';
 
 export type RootStackParamsList = {
     PrivateStack: undefined;
@@ -38,7 +39,7 @@ export type PrivateStackParamsList = {
         title: string;
     };
     LocationListReportAsset: {
-        LocationData: LocationData;
+        LocationData: LocationReportData;
         title: string;
     };
     DocumentAssetDetail: {

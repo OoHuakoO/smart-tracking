@@ -18,6 +18,12 @@ export function GetAssetSearch(
     return post<GetAssetsResponse>(`/api/asset/search`, params);
 }
 
+export function GetAssetNotFoundSearch(
+    params: Params
+): Promise<Response<GetAssetsResponse>> {
+    return post<GetAssetsResponse>(`/api/asset/not/found`, params);
+}
+
 export function CreateAsset(
     params: Params
 ): Promise<Response<CreateAssetResponse>> {

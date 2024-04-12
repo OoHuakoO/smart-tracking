@@ -42,6 +42,24 @@ export interface GetDocumentSearchResponse {
     data: GetDocumentSearchData;
 }
 
+export interface DocumentLineData {
+    assets: DocumentAssetData[];
+}
+
+export interface GetDocumentLineSearchData {
+    total_page: number;
+    current_page: number;
+    document_item_line: DocumentLineData[];
+    total: number;
+    uid: number;
+}
+
+export interface GetDocumentLineSearchResponse {
+    success: boolean;
+    message: string;
+    data: GetDocumentLineSearchData;
+}
+
 export interface GetDocumentByIdData {
     asset: DocumentData;
     uid: number;

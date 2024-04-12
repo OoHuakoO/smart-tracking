@@ -24,6 +24,7 @@ export interface GetAssetsData {
     current_page: number;
     asset: AssetData[];
     total: number;
+    count_ids?: number;
     uid: number;
 }
 
