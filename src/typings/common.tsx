@@ -6,6 +6,7 @@ export interface Params {
     asset_tracking_id?: number;
     asset_ids?: any[];
     asset_data?: any;
+    date_order?: string;
 }
 
 export interface Toast {

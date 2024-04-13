@@ -1,5 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MOVEMENT_ASSET, MOVEMENT_ASSET_EN, REPORT_TYPE } from '@src/constant';
+import {
+    MOVEMENT_ASSET,
+    MOVEMENT_ASSET_EN,
+    REPORT_TYPE,
+    STATE_DOCUMENT_NAME,
+    STATE_DOCUMENT_VALUE
+} from '@src/constant';
 
 export const getOnlineMode = async (): Promise<boolean> => {
     const online = await AsyncStorage.getItem('Online');
@@ -66,5 +72,20 @@ export const handleMapReportStateValue = (
                 MOVEMENT_ASSET.New,
                 MOVEMENT_ASSET.Transfer
             ];
+    }
+};
+
+export const handleMapDocumentStateValue = (state: string): string => {
+    switch (state) {
+        case STATE_DOCUMENT_VALUE.Draft:
+            return STATE_DOCUMENT_NAME.Draft;
+        case STATE_DOCUMENT_VALUE.Check:
+            return STATE_DOCUMENT_NAME.Check;
+        case STATE_DOCUMENT_VALUE.Done:
+            return STATE_DOCUMENT_NAME.Done;
+        case STATE_DOCUMENT_VALUE.Cancel:
+            return STATE_DOCUMENT_NAME.Cancel;
+        default:
+            return STATE_DOCUMENT_NAME.Draft;
     }
 };

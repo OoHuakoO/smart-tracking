@@ -46,6 +46,7 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                                 onPress={() => handleSelectLocation(item)}
                             >
                                 <Text variant="bodyLarge">
+                                    [{item?.location_code}]{' '}
                                     {item?.location_name}
                                 </Text>
                             </TouchableOpacity>

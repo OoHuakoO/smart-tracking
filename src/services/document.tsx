@@ -42,10 +42,7 @@ export function DeleteDocumentLine(
 export function CreateDocument(
     params: Params
 ): Promise<Response<CreateDocumentResponse>> {
-    return post<CreateDocumentResponse>(
-        `/api/document/tracking/create/`,
-        params
-    );
+    return post<CreateDocumentResponse>(`/api/asset/tracking/create`, params);
 }
 
 export function AddDocumentLine(

@@ -1,19 +1,17 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import InputText from '@src/components/core/inputText';
 import { getDBConnection } from '@src/db/config';
 import { getLocations } from '@src/db/location';
+import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
 import { State } from '@src/typings/document';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
-import { parseDateString, parseMonthDateString } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import DatePicker from 'react-native-date-picker';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
@@ -32,10 +30,6 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     const [isFocusState, setIsFocusState] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-    const [dateStart, setDateStart] = useState<Date>(null);
-    const [dateEnd, setDateEnd] = useState<Date>(null);
-    const [openDateStart, setOpenStart] = useState<boolean>(false);
-    const [openDateEnd, setOpenEnd] = useState<boolean>(false);
 
     const stateList: State[] = [
         { label: 'Draft', value: 'draft' },
@@ -56,7 +50,9 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     const response = await GetLocationSearch({
                         page: 1,
                         limit: 10,
-                        search_term: text
+                        search_term: {
+                            or: { name: text, default_code: text }
+                        }
                     });
                     setListLocation(response?.result?.data?.locations);
                 } else {
@@ -78,7 +74,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
         return (
             <View style={styles.dropdownItem}>
                 <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    {item?.location_name}
+                    [{item?.location_code}] {item?.location_name}
                 </Text>
             </View>
         );
@@ -98,22 +94,24 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
         try {
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const responseLocation = await GetLocationSearch({
+                const responseLocation = await GetLocation({
                     page: 1,
                     limit: 10
                 });
-                setListLocation(responseLocation?.result?.data?.locations);
+                setListLocation(responseLocation?.result?.data?.asset);
             }
         } catch (err) {
             setVisibleDialog(true);
         }
     }, []);
 
+    const handleSearchQuery = (): boolean => {
+        return true;
+    };
+
     const handleClearInput = useCallback(() => {
         setSearchLocation('');
         setSearchState('');
-        setDateStart(null);
-        setDateEnd(null);
     }, []);
 
     useEffect(() => {
@@ -168,6 +166,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     setSearchLocation(item?.location_name);
                 }}
                 onChangeText={(text) => handleOnChangeSearchLocation(text)}
+                searchQuery={handleSearchQuery}
                 renderItem={renderItemLocation}
             />
 
@@ -190,7 +189,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 }}
                 renderItem={renderItemUseState}
             />
-
+            {/*
             <Text variant="bodyLarge">Start From</Text>
 
             <TouchableOpacity
@@ -255,7 +254,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                         setOpenEnd(false);
                     }}
                 />
-            )}
+            )} */}
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
@@ -271,14 +270,8 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     onPress={() =>
                         navigation.navigate('Document', {
                             documentSearch: {
-                                location: searchLocation,
-                                state: searchState,
-                                start_date: dateStart
-                                    ? parseMonthDateString(dateStart.toString())
-                                    : null,
-                                end_date: dateEnd
-                                    ? parseMonthDateString(dateEnd.toString())
-                                    : null
+                                'location_id.name': searchLocation,
+                                state: searchState
                             }
                         })
                     }

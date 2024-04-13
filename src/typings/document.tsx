@@ -76,16 +76,17 @@ export interface DeleteDocumentLineResponse {
     message: string;
 }
 
-export interface SampleDateCreateDocument {
-    location_id: number;
+export interface CreateDocumentDataResponse {
+    id: number;
+    state: string;
     date_order: string;
-    user_id: number;
+    location_id: number;
+    location: string;
 }
 export interface CreateDocumentResponse {
     success: boolean;
     message: string;
-    asset_tracking_id: number;
-    sample_data: SampleDateCreateDocument;
+    data: CreateDocumentDataResponse;
 }
 
 export interface PostPutDocumentLineResponse {
@@ -100,8 +101,6 @@ export interface State {
 }
 
 export interface SearchDocument {
-    location: string;
+    'location_id.name': string;
     state: string;
-    start_date: string;
-    end_date: string;
 }
