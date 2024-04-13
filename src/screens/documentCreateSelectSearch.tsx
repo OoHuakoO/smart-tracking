@@ -50,7 +50,7 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
                     page: 1,
                     limit: 10,
                     search_term: {
-                        ...assetSearch
+                        and: { ...assetSearch }
                     }
                 });
                 const totalPagesAsset = responseAsset?.result?.data?.total;
@@ -84,7 +84,7 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            ...assetSearch
+                            and: { ...assetSearch }
                         }
                     });
 

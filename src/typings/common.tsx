@@ -7,6 +7,7 @@ export interface Params {
     asset_ids?: any[];
     asset_data?: any;
     date_order?: string;
+    date_check?: string;
 }
 
 export interface Toast {

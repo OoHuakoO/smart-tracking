@@ -27,12 +27,7 @@ import {
     removeDocumentLineByAssetId
 } from '@src/db/documentLine';
 import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
-import {
-    documentAssetListState,
-    documentState,
-    useRecoilValue,
-    useSetRecoilState
-} from '@src/store';
+import { documentState, useRecoilValue } from '@src/store';
 import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode, handleMapMovementStateEN } from '@src/utils/common';
@@ -63,9 +58,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
     const documentValue = useRecoilValue<DocumentState>(documentState);
-    const setDocumentAssetList = useSetRecoilState<DocumentAssetData[]>(
-        documentAssetListState
-    );
 
     const colorStateTag = useMemo((): string => {
         switch (documentValue?.state) {
@@ -289,7 +281,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     style={styles.button}
                     onPress={() => {
                         navigation.navigate('DocumentCreate');
-                        setDocumentAssetList(listAssetDocument);
                     }}
                 >
                     <ActionButton icon="plus" color={theme.colors.white} />

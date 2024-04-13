@@ -205,7 +205,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                                 : {
                                       image: false,
                                       new_img: false
-                                  })
+                                  }),
+                            location: documentValue?.location
                         });
                         navigation.goBack();
                     }
@@ -250,7 +251,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             : {
                                   image: false,
                                   new_img: false
-                              })
+                              }),
+                        location: documentValue?.location
                     });
                     navigation.goBack();
                 }

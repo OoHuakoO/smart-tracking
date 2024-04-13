@@ -19,6 +19,7 @@ import { DocumentState } from '@src/typings/common';
 import { UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
+import { parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     Image,
@@ -189,7 +190,12 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                                 ...(getImage() !== 'false' && {
                                     image: getImage()
                                 }),
-                                ...(getImage() !== 'false' && { new_img: true })
+                                ...(getImage() !== 'false' && {
+                                    new_img: true
+                                }),
+                                date_check: parseDateStringTime(
+                                    new Date(Date.now()).toISOString()
+                                )
                             }
                         ]
                     });

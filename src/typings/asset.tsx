@@ -6,6 +6,7 @@ export interface AssetDataForPassParamsDocumentCreate {
     name: string;
     state: string;
     use_state: string;
+    location: string;
     image?: string | boolean;
     new_img?: boolean;
 }

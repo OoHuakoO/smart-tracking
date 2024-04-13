@@ -6,8 +6,9 @@ export const createTableLocation = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS location(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            asset_location_id INTEGER NOT NULL UNIQUE,
-            name TEXT NOT NULL
+            location_id INTEGER NOT NULL UNIQUE,
+            location_name TEXT NOT NULL,
+            location_code TEXT NOT NULL
         );`;
             tx.executeSql(
                 query,
@@ -43,15 +44,17 @@ export const insertLocationData = (
 ) => {
     const queryInsert =
         `INSERT INTO location (
-            asset_location_id,
-            name
+            location_id,
+            location_name,
+            location_code
         ) VALUES ` +
         locations
             .map(
                 (item) =>
                     `(
-                  ${item.asset_location_id},
-                 '${item.name}'
+                  ${item.location_id},
+                 '${item.location_name}',
+                 '${item.location_code}'
                      )`
             )
             .join(',');

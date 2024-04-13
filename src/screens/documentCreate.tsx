@@ -12,16 +12,16 @@ import { getDBConnection } from '@src/db/config';
 import { insertDocumentLineData } from '@src/db/documentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetByCode } from '@src/services/asset';
-import { AddDocumentLine } from '@src/services/document';
+import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
-import { documentAssetListState, documentState } from '@src/store';
+import { documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState } from '@src/typings/common';
-import { DocumentAssetData } from '@src/typings/document';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
+import { parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     FlatList,
@@ -65,9 +65,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
     const [idAsset, setIdAsset] = useState<number>(0);
     const documentValue = useRecoilValue<DocumentState>(documentState);
-    const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
-        documentAssetListState
-    );
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -254,18 +251,22 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleSaveAsset = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
+
             if (isOnline) {
                 const assetList = listAssetCreate.map((assetCreate) => {
                     listUseState.filter(
                         (item) => item?.name === assetCreate?.use_state
                     );
                     return {
-                        asset_id: assetCreate?.asset_id,
+                        id: assetCreate?.asset_id,
                         state: handleMapMovementStateValue(assetCreate?.state),
                         use_state:
                             listUseState.length > 0 ? listUseState[0].id : 2,
                         image: assetCreate?.image,
-                        new_img: assetCreate?.new_img
+                        new_img: assetCreate?.new_img,
+                        date_check: parseDateStringTime(
+                            new Date(Date.now()).toISOString()
+                        )
                     };
                 });
                 const response = await AddDocumentLine({
@@ -352,27 +353,37 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         async (code: string) => {
             try {
                 setAssetCode('');
+                setSelectedImage(null);
                 const isOnline = await getOnlineMode();
                 if (code !== '' && code !== undefined) {
-                    const isDuplicateAsset =
-                        documentAssetListValue?.some(
-                            (item) => item?.code === code
-                        ) ||
-                        listAssetCreate.some(
-                            (item) => item?.default_code === code
-                        );
-
-                    if (isDuplicateAsset) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setTitleDialog('Duplicate Asset');
-                        setContentDialog(
-                            `${code} is duplicate in Document ${documentValue?.id}`
-                        );
-                        setShowCancelDialog(false);
-                        return;
-                    }
                     if (isOnline) {
+                        const responseDocumentLine =
+                            await GetDocumentLineSearch({
+                                page: 1,
+                                limit: 10,
+                                search_term: {
+                                    and: { name: code }
+                                }
+                            });
+
+                        const isDuplicateAsset =
+                            responseDocumentLine?.result?.data
+                                ?.document_item_line?.length > 0 ||
+                            listAssetCreate.some(
+                                (item) => item?.default_code === code
+                            );
+
+                        if (isDuplicateAsset) {
+                            clearStateDialog();
+                            setVisibleDialog(true);
+                            setTitleDialog('Duplicate Asset');
+                            setContentDialog(
+                                `${code} is duplicate in fixed asset tracking`
+                            );
+                            setShowCancelDialog(false);
+                            return;
+                        }
+
                         const response = await GetAssetByCode(code);
                         if (response?.error) {
                             clearStateDialog();
@@ -420,13 +431,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setContentDialog('Something went wrong search asset');
             }
         },
-        [
-            clearStateDialog,
-            documentAssetListValue,
-            documentValue?.id,
-            handleMapValueToSetAssetData,
-            listAssetCreate
-        ]
+        [clearStateDialog, handleMapValueToSetAssetData, listAssetCreate]
     );
 
     const getImage = useCallback((): string => {
