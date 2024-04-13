@@ -83,6 +83,7 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -91,6 +92,16 @@ android {
             keyPassword 'android'
         }
     }
+
+    signingConfigs {
+        myRelease {
+            storeFile file("my-release-key.keystore")
+            storePassword "smarttracking"
+            keyAlias "smarttrackingalias"
+            keyPassword "smarttracking"
+        }
+    }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -98,7 +109,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.myRelease
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
