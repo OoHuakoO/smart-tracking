@@ -6,7 +6,7 @@ import PopupDialog from '@src/components/views/popupCameraDialog';
 import {
     MOVEMENT_ASSET_EN,
     STATE_DOCUMENT_NAME,
-    USE_STATE_ASSET_NORMAL_EN
+    USE_STATE_ASSET_TH
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { updateDocumentLineData } from '@src/db/documentLine';
@@ -240,7 +240,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     use_state: searchUseState,
                     state: route?.params?.assetData?.state,
                     image: getImage() !== 'false' ? getImage() : false,
-                    new_img: getImage() !== 'false'
+                    new_img: getImage() !== 'false',
+                    location: documentValue?.location
                 });
                 navigation.goBack();
             }
@@ -250,6 +251,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         }
     }, [
         documentValue?.id,
+        documentValue?.location,
         documentValue?.location_id,
         getImage,
         listUseState,
@@ -354,7 +356,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                                 route?.params?.assetData?.use_state?.toString() !==
                                 'false'
                                     ? route?.params?.assetData?.use_state
-                                    : USE_STATE_ASSET_NORMAL_EN
+                                    : USE_STATE_ASSET_TH.Normal
                             }
                         />
                     </View>

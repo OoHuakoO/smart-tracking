@@ -1,8 +1,4 @@
-import {
-    MOVEMENT_ASSET_NORMAL_TH,
-    USE_STATE_ASSET_NORMAL_EN,
-    USE_STATE_ASSET_TH
-} from '@src/constant';
+import { USE_STATE_ASSET_NORMAL_EN, USE_STATE_ASSET_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -35,10 +31,7 @@ const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {
     return (
         <View style={[styles.container, { backgroundColor }]}>
             <Text variant="titleMedium" style={styles.statusText}>
-                สถานะ :{' '}
-                {status === USE_STATE_ASSET_NORMAL_EN
-                    ? MOVEMENT_ASSET_NORMAL_TH
-                    : status}
+                สถานะ : {status}
             </Text>
         </View>
     );

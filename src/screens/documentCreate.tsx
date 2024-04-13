@@ -6,7 +6,7 @@ import Button from '@src/components/core/button';
 import SearchButton from '@src/components/core/searchButton';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import PopupScanAsset from '@src/components/views/popupScanAsset';
-import { MOVEMENT_ASSET_EN, USE_STATE_ASSET_NORMAL_EN } from '@src/constant';
+import { MOVEMENT_ASSET_EN, USE_STATE_ASSET_TH } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { insertDocumentLineData } from '@src/db/documentLine';
@@ -334,7 +334,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         (asset: AssetData) => {
             const use_state =
                 asset.use_state?.toString() === 'false'
-                    ? USE_STATE_ASSET_NORMAL_EN
+                    ? USE_STATE_ASSET_TH.Normal
                     : asset.use_state;
             const state =
                 asset.location !== documentValue?.location
