@@ -18,7 +18,9 @@ import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
-    STATE_DOCUMENT_NAME
+    RESPONSE_PUT_DOCUMENT_SUCCESS,
+    STATE_DOCUMENT_NAME,
+    STATE_DOCUMENT_VALUE
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import {
@@ -26,8 +28,17 @@ import {
     getTotalDocumentLine,
     removeDocumentLineByAssetId
 } from '@src/db/documentLine';
-import { DeleteDocumentLine, GetDocumentById } from '@src/services/document';
-import { documentState, useRecoilValue } from '@src/store';
+import {
+    DeleteDocumentLine,
+    GetDocumentById,
+    UpdateDocument
+} from '@src/services/document';
+import {
+    documentAssetListState,
+    documentState,
+    useRecoilValue,
+    useSetRecoilState
+} from '@src/store';
 import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode, handleMapMovementStateEN } from '@src/utils/common';
@@ -58,6 +69,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
     const documentValue = useRecoilValue<DocumentState>(documentState);
+    const setDocumentAssetList = useSetRecoilState<DocumentAssetData[]>(
+        documentAssetListState
+    );
+    const setDocument = useSetRecoilState<DocumentState>(documentState);
 
     const colorStateTag = useMemo((): string => {
         switch (documentValue?.state) {
@@ -74,6 +89,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         }
     }, [documentValue?.state]);
 
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+    }, []);
+
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
@@ -84,6 +105,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             const isOnline = await getOnlineMode();
             if (isOnline) {
                 const response = await GetDocumentById(documentValue?.id);
+                if (response?.error) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong fetch document');
+                }
                 response?.result?.data?.asset?.assets?.map((item) => {
                     item.state = handleMapMovementStateEN(item?.state);
                     item.date_check = parseDateString(item?.date_check);
@@ -111,17 +137,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             }
             setLoading(false);
         } catch (err) {
+            clearStateDialog();
             setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [documentValue?.id]);
-
-    const clearStateDialog = useCallback(() => {
-        setVisibleDialog(false);
-        setTitleDialog('');
-        setContentDialog('');
-    }, []);
+    }, [clearStateDialog, documentValue?.id]);
 
     const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
         setVisibleDialog(true);
@@ -129,6 +150,90 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         setContentDialog('Do you want to remove this asset ?');
         setIdAsset(id);
     }, []);
+
+    const handleOpenDialogConfirmCancelDocument = useCallback(() => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm cancel');
+        setContentDialog('Do you want to cancel this document ?');
+    }, []);
+
+    const handleOpenDialogResetToCheckDocument = useCallback(() => {
+        setVisibleDialog(true);
+        setTitleDialog('Confirm Reset to check');
+        setContentDialog('Do you want to reset to check this document ?');
+    }, []);
+
+    const handleCancelDocument = useCallback(async () => {
+        try {
+            const response = await UpdateDocument({
+                document_data: {
+                    id: documentValue?.id,
+                    state: STATE_DOCUMENT_VALUE.Cancel
+                }
+            });
+            if (response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS) {
+                clearStateDialog();
+                const documentObj = {
+                    id: documentValue?.id,
+                    state: STATE_DOCUMENT_NAME.Cancel,
+                    location: documentValue?.location,
+                    location_id: documentValue?.location_id
+                };
+                setDocument(documentObj);
+            } else {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong cancel document');
+            }
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong cancel document');
+        }
+    }, [
+        clearStateDialog,
+        documentValue?.id,
+        documentValue?.location,
+        documentValue?.location_id,
+        setDocument
+    ]);
+
+    const handleResetToCheck = useCallback(async () => {
+        try {
+            const response = await UpdateDocument({
+                document_data: {
+                    id: documentValue?.id,
+                    state: STATE_DOCUMENT_VALUE.Check
+                }
+            });
+            if (response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS) {
+                clearStateDialog();
+                const documentObj = {
+                    id: documentValue?.id,
+                    state: STATE_DOCUMENT_NAME.Check,
+                    location: documentValue?.location,
+                    location_id: documentValue?.location_id
+                };
+                setDocument(documentObj);
+            } else {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog(
+                    'Something went wrong reset to check document'
+                );
+            }
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong reset to check document');
+        }
+    }, [
+        clearStateDialog,
+        documentValue?.id,
+        documentValue?.location,
+        documentValue?.location_id,
+        setDocument
+    ]);
 
     const handleRemoveAsset = useCallback(async () => {
         try {
@@ -143,6 +248,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     response?.result?.message ===
                     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
                 ) {
+                    clearStateDialog();
                     setVisibleDialog(true);
                     setContentDialog(
                         'Something went wrong asset data not found'
@@ -173,11 +279,23 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             case 'Confirm':
                 await handleRemoveAsset();
                 break;
+            case 'Confirm Reset to check':
+                await handleResetToCheck();
+                break;
+            case 'Confirm cancel':
+                await handleCancelDocument();
+                break;
             default:
                 handleCloseDialog();
                 break;
         }
-    }, [handleCloseDialog, handleRemoveAsset, titleDialog]);
+    }, [
+        handleCancelDocument,
+        handleCloseDialog,
+        handleRemoveAsset,
+        handleResetToCheck,
+        titleDialog
+    ]);
 
     useEffect(() => {
         handleFetchDocumentById();
@@ -202,16 +320,28 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             >
                 <View style={styles.backToPrevious}>
                     <BackButton
-                        handlePress={() => navigation.navigate('Document')}
+                        handlePress={() => navigation.replace('Document')}
                     />
                 </View>
-                {documentValue?.state === STATE_DOCUMENT_NAME.Cancel && (
+                {documentValue?.state === STATE_DOCUMENT_NAME.Check && (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.resetCancel}
+                        onPress={handleOpenDialogConfirmCancelDocument}
+                    >
+                        <Text variant="bodySmall" style={styles.textCancel}>
+                            Cancel
+                        </Text>
+                    </TouchableOpacity>
+                )}
+                {documentValue?.state === STATE_DOCUMENT_NAME.Cancel && (
+                    <TouchableOpacity
+                        activeOpacity={0.5}
+                        style={styles.resetCheck}
+                        onPress={handleOpenDialogResetToCheckDocument}
                     >
                         <Text variant="bodySmall" style={styles.textReset}>
-                            Reset to Inprogress
+                            Reset to Check
                         </Text>
                     </TouchableOpacity>
                 )}
@@ -281,6 +411,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     style={styles.button}
                     onPress={() => {
                         navigation.navigate('DocumentCreate');
+                        setDocumentAssetList(listAssetDocument);
                     }}
                 >
                     <ActionButton icon="plus" color={theme.colors.white} />
@@ -314,6 +445,17 @@ const styles = StyleSheet.create({
         top: 30,
         borderWidth: 2,
         borderColor: theme.colors.documentCancel,
+        backgroundColor: theme.colors.white,
+        borderRadius: 25,
+        paddingVertical: 5,
+        paddingHorizontal: 15
+    },
+    resetCheck: {
+        position: 'absolute',
+        right: 15,
+        top: 30,
+        borderWidth: 2,
+        borderColor: theme.colors.documentCheck,
         backgroundColor: theme.colors.white,
         borderRadius: 25,
         paddingVertical: 5,
@@ -393,6 +535,10 @@ const styles = StyleSheet.create({
     },
 
     textReset: {
+        fontWeight: 'bold',
+        color: theme.colors.documentCheck
+    },
+    textCancel: {
         fontWeight: 'bold',
         color: theme.colors.documentCancel
     },

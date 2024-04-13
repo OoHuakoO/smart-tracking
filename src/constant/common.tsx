@@ -55,5 +55,6 @@ export const REPORT_TYPE = {
 
 export const RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND =
     'Asset data not found';
-
+export const RESPONSE_PUT_DOCUMENT_SUCCESS =
+    'Asset tracking record updated successfully';
 export const STATE_ASSET = ['draft', 'running'];

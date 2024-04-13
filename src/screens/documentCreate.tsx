@@ -73,8 +73,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         useState<boolean>(false);
     const [visibleDialogCamera, setVisibleDialogCamera] =
         useState<boolean>(false);
-
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
+
+    // const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
+    //     documentAssetListState
+    // );
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);

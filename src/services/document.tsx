@@ -5,7 +5,8 @@ import {
     GetDocumentByIdResponse,
     GetDocumentLineSearchResponse,
     GetDocumentSearchResponse,
-    PostPutDocumentLineResponse
+    PostPutDocumentLineResponse,
+    PutDocumentResponse
 } from '@src/typings/document';
 import { Response, post, postDelete, put } from '@src/utils/axios';
 
@@ -52,6 +53,12 @@ export function AddDocumentLine(
         `/api/add/document/line`,
         params
     );
+}
+
+export function UpdateDocument(
+    params: Params
+): Promise<Response<PutDocumentResponse>> {
+    return put<PutDocumentResponse>(`/api/asset/tracking/update`, params);
 }
 
 export function UpdateDocumentLine(

@@ -95,6 +95,12 @@ export interface PostPutDocumentLineResponse {
     error: string;
 }
 
+export interface PutDocumentResponse {
+    success: boolean;
+    message: string;
+    error: string;
+}
+
 export interface State {
     label: string;
     value: string;
