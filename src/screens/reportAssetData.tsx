@@ -3,6 +3,10 @@ import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetDataCard from '@src/components/views/reportAssetDataCard';
 import { ALL_LOCATION, REPORT_TYPE, STATE_ASSET } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import { getLocations } from '@src/db/location';
+import { getTotalReportAssetNotFound } from '@src/db/reportAssetNotFound';
+import { getTotalReportDocumentLine } from '@src/db/reportDocumentLine';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetDocumentLineSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
@@ -41,39 +45,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
         setVisibleDialog(false);
     }, []);
 
-    // const handleFilterReport = useCallback((title: string): boolean => {
-    //     switch (title) {
-    //         case REPORT_TYPE.New:
-    //             return asset.state === MOVEMENT_ASSET.New;
-    //         case REPORT_TYPE.Transfer:
-    //             return asset.state === MOVEMENT_ASSET.Transfer;
-    //         case REPORT_TYPE.Found:
-    //             return true;
-    //         case REPORT_TYPE.NotFound:
-    //             return true;
-    //         default:
-    //             return false;
-    //     }
-    // }, []);
-
-    // const handleCountAssetInLocation = useCallback(
-    //     (
-    //         locationName: string,
-    //         reportAssets: ReportAssetData[],
-    //         title: string
-    //     ): number => {
-    //         const filterAssets = (asset) => {
-    //             const isLocationMatch =
-    //                 locationName === ALL_LOCATION ||
-    //                 asset?.location === locationName;
-    //             return isLocationMatch && handleFilterReport(asset, title);
-    //         };
-    //         return reportAssets?.filter(filterAssets).length;
-    //     },
-    //     [handleFilterReport]
-    // );
-
-    const createLocationDataList = useCallback(
+    const createLocationDataListOnline = useCallback(
         async (
             locations: LocationData[],
             title: string
@@ -118,10 +90,49 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
         []
     );
 
+    const createLocationDataListOffline = useCallback(
+        async (
+            locations: LocationData[],
+            title: string
+        ): Promise<LocationReportData[]> => {
+            const results = await Promise.all(
+                locations.map(async (item) => {
+                    let totalAsset;
+                    let filter: SearchQueryReport = {};
+                    const db = await getDBConnection();
+
+                    if (item.location_id !== 0) {
+                        filter.location = item?.location_name;
+                    }
+
+                    if (title === REPORT_TYPE.NotFound) {
+                        totalAsset = await getTotalReportAssetNotFound(
+                            db,
+                            filter
+                        );
+                    } else {
+                        filter.state = handleMapReportStateValue(title);
+
+                        totalAsset = await getTotalReportDocumentLine(
+                            db,
+                            filter
+                        );
+                    }
+
+                    return {
+                        ...item,
+                        total_asset: totalAsset
+                    };
+                })
+            );
+            return results;
+        },
+        []
+    );
+
     const handleInitFetch = useCallback(async () => {
         try {
             setLoading(true);
-
             const isOnline = await getOnlineMode();
             let listLocationData;
 
@@ -137,8 +148,21 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                     location_name: ALL_LOCATION
                 });
 
-                listLocationData = await createLocationDataList(
+                listLocationData = await createLocationDataListOnline(
                     locationResponse?.result?.data?.asset || [],
+                    route?.params?.title
+                );
+            } else {
+                const db = await getDBConnection();
+                const listLocationDB = await getLocations(db);
+
+                listLocationDB?.unshift({
+                    location_id: 0,
+                    location_code: ALL_LOCATION,
+                    location_name: ALL_LOCATION
+                });
+                listLocationData = await createLocationDataListOffline(
+                    listLocationDB || [],
                     route?.params?.title
                 );
             }
@@ -150,7 +174,11 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');
         }
-    }, [createLocationDataList, route?.params?.title]);
+    }, [
+        createLocationDataListOffline,
+        createLocationDataListOnline,
+        route?.params?.title
+    ]);
 
     useEffect(() => {
         handleInitFetch();

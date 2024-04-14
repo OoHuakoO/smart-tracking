@@ -94,40 +94,30 @@ export const insertReportAssetNotFound = (
     }
 };
 
-export const getReport = async (
+export const getReportAssetNotFound = async (
     db: SQLiteDatabase,
     filters?: {
         location?: string;
-        state?: string;
     },
-    isPagination: boolean = true,
     page: number = 1,
     limit: number = 10
 ): Promise<ReportAssetData[]> => {
-    let query = `SELECT * FROM report`;
-
+    let query = `SELECT * FROM reportAssetNotFound`;
     const queryParams = [];
     const whereConditions = [];
 
     if (filters?.location !== undefined) {
-        whereConditions.push(`report.location LIKE ?`);
+        whereConditions.push(`reportAssetNotFound.location LIKE ?`);
         queryParams.push(`%${filters.location}%`);
-    }
-
-    if (filters?.state !== undefined) {
-        whereConditions.push(`report.state LIKE ?`);
-        queryParams.push(`%${filters.state}%`);
     }
 
     if (whereConditions.length > 0) {
         query += ` WHERE ` + whereConditions.join(' AND ');
     }
 
-    if (isPagination) {
-        const offset = (page - 1) * limit;
-        query += ` LIMIT ? OFFSET ?`;
-        queryParams.push(limit, offset);
-    }
+    const offset = (page - 1) * limit;
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
 
     try {
         const results = await db.executeSql(query, queryParams);
@@ -139,20 +129,39 @@ export const getReport = async (
         }
         return report;
     } catch (err) {
-        throw new Error(`Error retrieving report: ${err.message}`);
+        throw new Error(`Error retrieving reportAssetNotFound: ${err.message}`);
     }
 };
 
-export const getTotalReport = async (db: SQLiteDatabase): Promise<number> => {
-    const queryTotal = `SELECT COUNT(*) as total FROM report`;
+export const getTotalReportAssetNotFound = async (
+    db: SQLiteDatabase,
+    filters?: {
+        location?: string;
+    }
+): Promise<number> => {
+    let queryTotal = `SELECT COUNT(*) as total FROM reportAssetNotFound`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`reportAssetNotFound.location = ?`);
+        queryParams.push(filters.location);
+    }
+
+    if (whereConditions.length > 0) {
+        queryTotal += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
     try {
-        const results = await db.executeSql(queryTotal);
+        const results = await db.executeSql(queryTotal, queryParams);
         if (results.length > 0) {
             return results[0].rows?.item(0)?.total;
         } else {
             return 0;
         }
     } catch (err) {
-        throw new Error(`Error calculating total report: ${err.message}`);
+        throw new Error(
+            `Error calculating total reportAssetNotFound: ${err.message}`
+        );
     }
 };

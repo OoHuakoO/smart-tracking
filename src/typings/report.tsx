@@ -6,6 +6,7 @@ export interface LocationReportData {
 }
 
 export interface SearchQueryReport {
+    location?: string;
     'location_id.id'?: number;
     'category_id.name'?: string;
     state?: string | string[];
