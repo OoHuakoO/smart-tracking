@@ -15,6 +15,8 @@ import { getDBConnection } from './db/config';
 import { createTableDocument } from './db/document';
 import { createTableDocumentLine } from './db/documentLine';
 import { createTableLocation } from './db/location';
+import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
+import { createTableReportDocumentLine } from './db/reportDocumentLine';
 import { createTableUseStatus } from './db/useStatus';
 import { LoginState } from './typings/common';
 
@@ -43,6 +45,8 @@ export default function App() {
             await createTableCategory(db);
             await createTableDocument(db);
             await createTableDocumentLine(db);
+            await createTableReportAssetNotFound(db);
+            await createTableReportDocumentLine(db);
         } catch (error) {
             console.error(error);
         }

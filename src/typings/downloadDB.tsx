@@ -21,6 +21,7 @@ export interface AssetData {
 
 export interface GetAssetsData {
     total_page: number;
+    total_pages?: number;
     current_page: number;
     asset: AssetData[];
     total: number;

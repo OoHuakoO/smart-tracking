@@ -7,6 +7,8 @@ export const clearDataFromMasterTable = (db: SQLiteDatabase) => {
             tx.executeSql('DELETE FROM location;');
             tx.executeSql('DELETE FROM useStatus;');
             tx.executeSql('DELETE FROM category;');
+            tx.executeSql('DELETE FROM reportAssetNotFound;');
+            tx.executeSql('DELETE FROM reportDocumentLine;');
         });
         console.log('Data deleted from all tables successfully');
     } catch (err) {
@@ -21,6 +23,8 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS location;');
             tx.executeSql('DROP TABLE IF EXISTS useStatus;');
             tx.executeSql('DROP TABLE IF EXISTS category;');
+            tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
+            tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
         });
         console.log('Drop master table successfully');
     } catch (err) {

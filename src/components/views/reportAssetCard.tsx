@@ -1,4 +1,4 @@
-import { MOVEMENT_ASSET_NORMAL_TH, REPORT_TYPE } from '@src/constant';
+import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
@@ -11,7 +11,6 @@ interface ReportAssetCardProps {
     assetStatus: string;
     assetLocation: string;
     assetOldLocation?: string;
-    title?: string;
 }
 
 const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
@@ -20,8 +19,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
         assetName,
         assetStatus,
         assetLocation,
-        assetOldLocation,
-        title
+        assetOldLocation
     } = props;
     return (
         <View style={styles.cardContainer}>
@@ -38,7 +36,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 </View>
                 <View style={styles.rowText}>
                     <Text variant="bodyLarge" style={styles.assetName}>
-                        {assetName}
+                        {assetName || '-'}
                     </Text>
                 </View>
                 <Text variant="bodyMedium">
@@ -46,20 +44,22 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                     <Text style={styles.additionalText}>
                         {assetStatus.toString() === 'false'
                             ? MOVEMENT_ASSET_NORMAL_TH
-                            : assetStatus}
+                            : assetStatus || '-'}
                     </Text>
                 </Text>
-                {title === REPORT_TYPE.Transfer && (
-                    <Text variant="bodyMedium">
-                        Old Location: {}
-                        <Text style={styles.additionalText}>
-                            {assetOldLocation}
-                        </Text>
+
+                <Text variant="bodyMedium">
+                    Old Location: {}
+                    <Text style={styles.additionalText}>
+                        {assetOldLocation || '-'}
                     </Text>
-                )}
+                </Text>
+
                 <Text variant="bodyMedium">
                     Location: {}
-                    <Text style={styles.additionalText}>{assetLocation}</Text>
+                    <Text style={styles.additionalText}>
+                        {assetLocation || '-'}
+                    </Text>
                 </Text>
             </View>
         </View>

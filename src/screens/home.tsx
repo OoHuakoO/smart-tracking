@@ -16,7 +16,7 @@ import ImageSlider from '@src/components/core/imagesSlider';
 import StatusTag from '@src/components/core/statusTag';
 import ToastComponent from '@src/components/core/toast';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
-import { WARNING } from '@src/constant';
+import { STATE_ASSET, WARNING } from '@src/constant';
 import {
     createTableAsset,
     getTotalAssets,
@@ -27,7 +27,17 @@ import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import { createTableReport } from '@src/db/report';
+import {
+    createTableReportAssetNotFound,
+    insertReportAssetNotFound
+} from '@src/db/reportAssetNotFound';
+import {
+    createTableReportDocumentLine,
+    insertReportDocumentLine
+} from '@src/db/reportDocumentLine';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
+import { GetAssetNotFoundSearch } from '@src/services/asset';
+import { GetDocumentLineSearch } from '@src/services/document';
 import {
     GetAssets,
     GetCategory,
@@ -38,7 +48,9 @@ import { loginState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
+import { DocumentAssetData } from '@src/typings/document';
 import {
+    AssetData,
     CategoryData,
     LocationData,
     UseStatusData
@@ -174,7 +186,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 const results = await Promise.all(promises);
                 const assets = results.flatMap(
-                    (result) => result?.result?.data?.data ?? []
+                    (result) => result?.result?.data?.asset ?? []
                 );
                 return assets;
             } catch (err) {
@@ -232,6 +244,65 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadAssetNotFound = useCallback(
+        async (totalPages: number): Promise<AssetData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetAssetNotFoundSearch({
+                        page: i + 1,
+                        limit: 1000,
+                        search_term: {
+                            and: { state: STATE_ASSET }
+                        }
+                    })
+                );
+                const results = await Promise.all(promises);
+                const categorys = results.flatMap(
+                    (result) => result?.result?.data?.asset ?? []
+                );
+                return categorys;
+            } catch (err) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load asset not found');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
+    const handleLoadDocumentLine = useCallback(
+        async (totalPages: number): Promise<DocumentAssetData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetDocumentLineSearch({
+                        page: i + 1,
+                        limit: 1000,
+                        search_term: {
+                            and: { state: ['0', '1', '2'] }
+                        }
+                    })
+                );
+                const results = await Promise.all(promises);
+                const assets = results.flatMap(
+                    (result) =>
+                        result?.result?.data?.document_item_line?.flatMap(
+                            (item) => item.assets
+                        ) ?? []
+                );
+                return assets;
+            } catch (err) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load documentLine');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
     const handleDownload = useCallback(async () => {
         try {
             setDisableCloseDialog(true);
@@ -240,12 +311,28 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseAssets,
                 initialResponseLocation,
                 initialResponseUseStatus,
-                initialResponseCategory
+                initialResponseCategory,
+                initialResponseAssetNotFound,
+                initialDocumentLine
             ] = await Promise.all([
                 GetAssets({ page: 1, limit: 200 }),
                 GetLocation({ page: 1, limit: 1000 }),
                 GetUseStatus({ page: 1, limit: 1000 }),
-                GetCategory({ page: 1, limit: 1000 })
+                GetCategory({ page: 1, limit: 1000 }),
+                GetAssetNotFoundSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: STATE_ASSET }
+                    }
+                }),
+                GetDocumentLineSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: ['0', '1', '2'] }
+                    }
+                })
             ]);
 
             const errorAssets = handleResponseError(
@@ -260,12 +347,20 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const errorCategorys = handleResponseError(
                 initialResponseCategory?.error
             );
+            const errorAssetNotFound = handleResponseError(
+                initialResponseAssetNotFound?.error
+            );
+            const errorDocumentLine = handleResponseError(
+                initialDocumentLine?.error
+            );
 
             if (
                 errorAssets ||
                 errorLocation ||
                 errorUseStatus ||
-                errorCategorys
+                errorCategorys ||
+                errorAssetNotFound ||
+                errorDocumentLine
             ) {
                 return;
             }
@@ -278,13 +373,24 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseUseStatus?.result?.data?.total_page;
             const totalPagesCategory =
                 initialResponseCategory?.result?.data?.total_page;
+            const totalPagesAssetNotFound =
+                initialResponseAssetNotFound?.result?.data?.total_pages;
+            const totalPagesDocumentLine =
+                initialDocumentLine?.result?.data?.total_page;
 
-            const [listLocation, listUseStatus, listCategory] =
-                await Promise.all([
-                    handleLoadLocation(totalPagesLocation),
-                    handleLoadUseStatus(totalPagesUseStatus),
-                    handleLoadCategory(totalPagesCategory)
-                ]);
+            const [
+                listLocation,
+                listUseStatus,
+                listCategory,
+                listAssetNotFound,
+                listDocumentLine
+            ] = await Promise.all([
+                handleLoadLocation(totalPagesLocation),
+                handleLoadUseStatus(totalPagesUseStatus),
+                handleLoadCategory(totalPagesCategory),
+                handleLoadAssetNotFound(totalPagesAssetNotFound),
+                handleLoadDocumentLine(totalPagesDocumentLine)
+            ]);
 
             const db = await getDBConnection();
             await dropAllMasterTable(db);
@@ -301,16 +407,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             if (
                 listLocation?.length > 0 &&
                 listUseStatus?.length > 0 &&
-                listCategory?.length > 0
+                listCategory?.length > 0 &&
+                listAssetNotFound?.length > 0 &&
+                listDocumentLine?.length > 0
             ) {
                 await createTableLocation(db);
                 await createTableUseStatus(db);
                 await createTableCategory(db);
+                await createTableReportAssetNotFound(db);
+                await createTableReportDocumentLine(db);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
                 await insertCategoryData(db, listCategory);
+                await insertReportAssetNotFound(db, listAssetNotFound);
+                await insertReportDocumentLine(db, listDocumentLine);
             }
-
             setTimeout(() => {
                 setToast({ open: true, text: 'Download Successfully' });
             }, 0);
@@ -325,7 +436,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [
         clearStateDialog,
+        handleLoadAssetNotFound,
         handleLoadCategory,
+        handleLoadDocumentLine,
         handleLoadLocation,
         handleLoadUseStatus,
         handleResponseError,

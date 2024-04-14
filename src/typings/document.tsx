@@ -9,8 +9,8 @@ export interface DocumentAssetData {
     location?: string;
     state: string;
     use_state: string;
-    new_img: boolean;
-    image: string;
+    new_img?: boolean;
+    image?: string;
     date_check?: string;
     // for offline upload asset
     use_state_code?: number;

@@ -13,6 +13,7 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ReportAssetData, SearchQueryReport } from '@src/typings/report';
 import {
     getOnlineMode,
+    handleMapMovementStateEN,
     handleMapReportStateValue,
     removeKeyEmpty
 } from '@src/utils/common';
@@ -231,7 +232,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         category: asset?.category,
                         location_old: asset?.location_old,
                         location: asset?.location,
-                        use_state: asset?.use_state
+                        use_state: handleMapMovementStateEN(asset?.use_state)
                     });
                 });
             });
@@ -367,7 +368,6 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <ReportAssetCard
-                                title={route?.params?.title}
                                 assetCode={item?.code}
                                 assetName={item?.name}
                                 assetStatus={item?.use_state}
