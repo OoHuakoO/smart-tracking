@@ -202,9 +202,9 @@ export const getAsset = async (
         location_id?: number;
         default_code?: string;
         name?: string;
-        category_id?: number;
+        'category_id.name'?: string;
         use_state?: string;
-        location?: string;
+        'location_id.name'?: string;
     },
     page: number = 1,
     limit: number = 10
@@ -220,9 +220,9 @@ export const getAsset = async (
         queryParams.push(filters.location_id);
     }
 
-    if (filters?.location !== undefined) {
+    if (filters && filters['location_id.name'] !== undefined) {
         whereConditions.push(`asset.location LIKE ?`);
-        queryParams.push(`%${filters.location}%`);
+        queryParams.push(`%${filters['location_id.name']}%`);
     }
 
     if (filters?.default_code !== undefined) {
@@ -235,9 +235,9 @@ export const getAsset = async (
         queryParams.push(`%${filters.name}%`);
     }
 
-    if (filters?.category_id !== undefined) {
-        whereConditions.push(`asset.category_id = ?`);
-        queryParams.push(filters.category_id);
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`asset.category LIKE ?`);
+        queryParams.push(`%${filters['category_id.name']}%`);
     }
 
     if (filters?.use_state !== undefined) {
@@ -268,15 +268,64 @@ export const getAsset = async (
     }
 };
 
+export const getAssetSuggestion = async (
+    db: SQLiteDatabase,
+    filters?: {
+        default_code?: string;
+        name?: string;
+    },
+    page: number = 1,
+    limit: number = 10
+): Promise<AssetData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM asset`;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`asset.default_code LIKE ?`);
+        queryParams.push(`%${filters.default_code}%`);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`asset.name LIKE ?`);
+        queryParams.push(`%${filters.name}%`);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' OR ');
+    }
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+    console.log(query);
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const assets = [];
+
+        if (results?.length > 0) {
+            for (let i = 0; i < results[0]?.rows?.length; i++) {
+                assets.push(results[0]?.rows?.item(i));
+            }
+        }
+
+        return assets;
+    } catch (err) {
+        throw new Error(`Error retrieving assets: ${err.message}`);
+    }
+};
+
 export const getTotalAssets = async (
     db: SQLiteDatabase,
+
     filters?: {
         location_id?: number;
         default_code?: string;
         name?: string;
-        category_id?: number;
+        'category_id.name'?: number;
         use_state?: string;
-        location?: string;
+        'location_id.name'?: string;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM asset`;
@@ -288,9 +337,9 @@ export const getTotalAssets = async (
         queryParams.push(filters.location_id);
     }
 
-    if (filters?.location !== undefined) {
+    if (filters && filters['location_id.name'] !== undefined) {
         whereConditions.push(`asset.location LIKE ?`);
-        queryParams.push(`%${filters.location}%`);
+        queryParams.push(`%${filters['location_id.name']}%`);
     }
 
     if (filters?.default_code !== undefined) {
@@ -303,9 +352,9 @@ export const getTotalAssets = async (
         queryParams.push(`%${filters.name}%`);
     }
 
-    if (filters?.category_id !== undefined) {
-        whereConditions.push(`asset.category_id = ?`);
-        queryParams.push(filters.category_id);
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`asset.category LIKE ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (filters?.use_state !== undefined) {

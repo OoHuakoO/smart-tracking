@@ -111,6 +111,54 @@ export const getLocations = async (
     }
 };
 
+export const getLocationSuggestion = async (
+    db: SQLiteDatabase,
+    filters?: {
+        name?: string;
+        code?: string;
+    },
+    page: number = 1,
+    limit: number = 10
+): Promise<LocationData[]> => {
+    const offset = (page - 1) * limit;
+    let query = `SELECT * FROM location`;
+
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`location.location_name LIKE ?`);
+        queryParams.push(`%${filters.name}%`);
+    }
+
+    if (filters?.code !== undefined) {
+        whereConditions.push(`location.location_code LIKE ?`);
+        queryParams.push(`%${filters.code}%`);
+    }
+
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' OR ');
+    }
+
+    query += ` LIMIT ? OFFSET ?`;
+    queryParams.push(limit, offset);
+
+    try {
+        const results = await db.executeSql(query, queryParams);
+        const locations = [];
+
+        if (results.length > 0) {
+            for (let i = 0; i < results[0].rows.length; i++) {
+                locations.push(results[0].rows.item(i));
+            }
+        }
+
+        return locations;
+    } catch (err) {
+        throw new Error(`Error retrieving locations: ${err.message}`);
+    }
+};
+
 export const getTotalLocations = async (
     db: SQLiteDatabase
 ): Promise<number> => {
