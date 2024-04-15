@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import { REPORT_TYPE } from '@src/constant';
-import { getAsset } from '@src/db/asset';
+import { getAsset, getAssetSuggestion } from '@src/db/asset';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
@@ -62,9 +62,10 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                 } else {
                     const db = await getDBConnection();
                     const filter = {
-                        default_code: text
+                        default_code: text,
+                        name: text
                     };
-                    const listAssetDB = await getAsset(db, filter);
+                    const listAssetDB = await getAssetSuggestion(db, filter);
                     setListAsset(listAssetDB);
                 }
             }

@@ -98,6 +98,10 @@ export const getReportAssetNotFound = async (
     db: SQLiteDatabase,
     filters?: {
         location?: string;
+        use_state?: string;
+        default_code?: string;
+        name?: string;
+        'category_id.name'?: string;
     },
     page: number = 1,
     limit: number = 10
@@ -107,8 +111,28 @@ export const getReportAssetNotFound = async (
     const whereConditions = [];
 
     if (filters?.location !== undefined) {
-        whereConditions.push(`reportAssetNotFound.location LIKE ?`);
-        queryParams.push(`%${filters.location}%`);
+        whereConditions.push(`reportAssetNotFound.location = ?`);
+        queryParams.push(filters.location);
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`reportAssetNotFound.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`reportAssetNotFound.code = ?`);
+        queryParams.push(filters.default_code);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`reportAssetNotFound.code = ?`);
+        queryParams.push(filters.name);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`reportAssetNotFound.category = ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (whereConditions.length > 0) {
@@ -137,6 +161,10 @@ export const getTotalReportAssetNotFound = async (
     db: SQLiteDatabase,
     filters?: {
         location?: string;
+        use_state?: string;
+        default_code?: string;
+        name?: string;
+        'category_id.name'?: string;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM reportAssetNotFound`;
@@ -146,6 +174,26 @@ export const getTotalReportAssetNotFound = async (
     if (filters?.location !== undefined) {
         whereConditions.push(`reportAssetNotFound.location = ?`);
         queryParams.push(filters.location);
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`reportAssetNotFound.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`reportAssetNotFound.code = ?`);
+        queryParams.push(filters.default_code);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`reportAssetNotFound.code = ?`);
+        queryParams.push(filters.name);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`reportAssetNotFound.category = ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (whereConditions.length > 0) {

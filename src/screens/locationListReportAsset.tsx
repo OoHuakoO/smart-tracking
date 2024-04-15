@@ -4,7 +4,16 @@ import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import SearchButton from '@src/components/core/searchButton';
 import ReportAssetCard from '@src/components/views/reportAssetCard';
-import { REPORT_TYPE, STATE_ASSET } from '@src/constant';
+import { ALL_LOCATION, REPORT_TYPE, STATE_ASSET } from '@src/constant';
+import { getDBConnection } from '@src/db/config';
+import {
+    getReportAssetNotFound,
+    getTotalReportAssetNotFound
+} from '@src/db/reportAssetNotFound';
+import {
+    getReportDocumentLine,
+    getTotalReportDocumentLine
+} from '@src/db/reportDocumentLine';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetDocumentLineSearch } from '@src/services/document';
 import { theme } from '@src/theme';
@@ -13,7 +22,6 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ReportAssetData, SearchQueryReport } from '@src/typings/report';
 import {
     getOnlineMode,
-    handleMapMovementStateEN,
     handleMapReportStateValue,
     removeKeyEmpty
 } from '@src/utils/common';
@@ -49,127 +57,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
         setVisibleDialog(false);
     }, []);
 
-    // const handleFilterReportOnline = useCallback(
-    //     (asset: ReportAssetData, title: string): boolean => {
-    //         switch (title) {
-    //             case REPORT_TYPE.New:
-    //                 return asset.state === MOVEMENT_ASSET.New;
-    //             case REPORT_TYPE.Transfer:
-    //                 return asset.state === MOVEMENT_ASSET.Transfer;
-    //             case REPORT_TYPE.Found:
-    //                 return true;
-    //             case REPORT_TYPE.NotFound:
-    //                 return true;
-    //             default:
-    //                 return false;
-    //         }
-    //     },
-    //     []
-    // );
-
-    // const handleCheckTitleToSetAssetState = useCallback(
-    //     (title: string): undefined | string => {
-    //         let state;
-    //         switch (title) {
-    //             case REPORT_TYPE.New:
-    //                 state = MOVEMENT_ASSET.New;
-    //                 break;
-    //             case REPORT_TYPE.Transfer:
-    //                 state = MOVEMENT_ASSET.Transfer;
-    //                 break;
-    //         }
-    //         return state;
-    //     },
-    //     []
-    // );
-
-    // const fetchReportFromAPI = useCallback(
-    //     async (locationName: string, pageReport: number) => {
-    //         return await GetDocumentSearch({
-    //             page: pageReport,
-    //             limit: 10,
-    //             search_term: {
-    //                 location: locationName === ALL_LOCATION ? '' : locationName
-    //             }
-    //         });
-    //     },
-    //     []
-    // );
-
-    // const fetchAssetsFromAPI = async (
-    //     locationName: string,
-    //     pageAsset: number
-    // ) => {
-    //     return await GetAssetSearch({
-    //         page: pageAsset,
-    //         limit: 10,
-    //         search_term: {
-    //             location: locationName === ALL_LOCATION ? '' : locationName
-    //         }
-    //     });
-    // };
-
-    // const fetchReportAssetFromDB = useCallback(
-    //     async (
-    //         locationName: string,
-    //         title: string,
-    //         isPagination: boolean,
-    //         pageReport: number
-    //     ) => {
-    //         const db = await getDBConnection();
-    //         let filter = {
-    //             location:
-    //                 locationName === ALL_LOCATION ? undefined : locationName,
-    //             state: handleCheckTitleToSetAssetState(title)
-    //         };
-    //         return await getReport(db, filter, isPagination, pageReport);
-    //     },
-    //     [handleCheckTitleToSetAssetState]
-    // );
-
-    // const fetchAssetsFromDB = async (
-    //     locationName: string,
-    //     pageAsset: number
-    // ) => {
-    //     const db = await getDBConnection();
-    //     let filter =
-    //         locationName !== ALL_LOCATION ? { location: locationName } : null;
-    //     return await getAsset(db, filter, pageAsset);
-    // };
-
-    // const filterAssetsNotInReport = (
-    //     assets: AssetData[],
-    //     listAssetReport: ReportAssetData[]
-    // ): AssetData[] => {
-    //     const filterAsset = assets.filter(
-    //         (asset) =>
-    //             !listAssetReport.some(
-    //                 (listAssetItem) => listAssetItem.code === asset.default_code
-    //             )
-    //     );
-
-    //     return filterAsset;
-    // };
-
-    // const convertAssetToReportAssetData = (
-    //     filteredAssets: AssetData[]
-    // ): ReportAssetData[] => {
-    //     return filteredAssets.map((item) => ({
-    //         image: item.image,
-    //         code: item.default_code,
-    //         name: item.name,
-    //         use_state: item.use_state,
-    //         location: item.location,
-    //         location_old: item.location,
-    //         category: item.category,
-    //         serial_no: item.serial_no,
-    //         quantity: item.quantity,
-    //         state: USE_STATE_ASSET_TH.Normal,
-    //         new_img: item.new_img
-    //     }));
-    // };
-
-    const createReportAssetListNotFound = useCallback(
+    const createReportAssetListNotFoundOnline = useCallback(
         async (
             locationID: number,
             page: number
@@ -181,6 +69,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 searchQuery['location_id.id'] = locationID;
             }
             searchQuery.state = STATE_ASSET;
+
             const response = await GetAssetNotFoundSearch({
                 page: page,
                 limit: 10,
@@ -188,6 +77,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     and: searchQuery
                 }
             });
+
             setTotalListReportAsset(response?.result?.data?.count_ids);
             response?.result?.data?.asset?.map((document) => {
                 listReportAsset.push({
@@ -203,7 +93,45 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
         [route?.params?.assetSearch]
     );
 
-    const createReportAssetListFound = useCallback(
+    const createReportAssetListNotFoundOffline = useCallback(
+        async (
+            locationName: string,
+            page: number
+        ): Promise<ReportAssetData[]> => {
+            const db = await getDBConnection();
+            let listReportAsset: ReportAssetData[] = [];
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+            let searchQuery: SearchQueryReport = { ...assetSearch };
+
+            if (locationName !== ALL_LOCATION) {
+                searchQuery.location = locationName;
+            }
+
+            const listReportAssetNotFound = await getReportAssetNotFound(
+                db,
+                searchQuery,
+                page
+            );
+            const totalAsset = await getTotalReportAssetNotFound(
+                db,
+                searchQuery
+            );
+            setTotalListReportAsset(totalAsset);
+            listReportAssetNotFound?.map((report) => {
+                listReportAsset.push({
+                    code: report?.code,
+                    name: report?.name,
+                    category: report?.category,
+                    location: report?.location,
+                    use_state: report?.use_state
+                });
+            });
+            return listReportAsset;
+        },
+        [route?.params?.assetSearch]
+    );
+
+    const createReportAssetListFoundOnline = useCallback(
         async (
             locationID: number,
             title: string,
@@ -223,6 +151,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     and: searchQuery
                 }
             });
+
             setTotalListReportAsset(response?.result?.data?.total);
             response?.result?.data?.document_item_line?.map((document) => {
                 document?.assets.map((asset) => {
@@ -232,8 +161,50 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         category: asset?.category,
                         location_old: asset?.location_old,
                         location: asset?.location,
-                        use_state: handleMapMovementStateEN(asset?.use_state)
+                        use_state: asset?.use_state
                     });
+                });
+            });
+
+            return listReportAsset;
+        },
+        [route?.params?.assetSearch]
+    );
+
+    const createReportAssetListFoundOffline = useCallback(
+        async (
+            locationName: string,
+            title: string,
+            page: number
+        ): Promise<ReportAssetData[]> => {
+            const db = await getDBConnection();
+            let listReportAsset: ReportAssetData[] = [];
+            const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+            let searchQuery: SearchQueryReport = { ...assetSearch };
+            if (locationName !== ALL_LOCATION) {
+                searchQuery.location = locationName;
+            }
+            searchQuery.state = handleMapReportStateValue(title);
+
+            const listReportDocumentLine = await getReportDocumentLine(
+                db,
+                searchQuery,
+                page
+            );
+            const totalDocumentLine = await getTotalReportDocumentLine(
+                db,
+                searchQuery
+            );
+
+            setTotalListReportAsset(totalDocumentLine);
+            listReportDocumentLine?.map((document) => {
+                listReportAsset.push({
+                    code: document?.code,
+                    name: document?.name,
+                    category: document?.category,
+                    location_old: document?.location_old,
+                    location: document?.location,
+                    use_state: document?.use_state
                 });
             });
 
@@ -247,23 +218,36 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             setLoading(true);
             const isOnline = await getOnlineMode();
             const locationID = route?.params?.LocationData?.location_id;
+            const locationName = route?.params?.LocationData?.location_name;
             const title = route?.params?.title;
             let listAsset = [];
 
             if (isOnline) {
                 if (route?.params?.title === REPORT_TYPE.NotFound) {
-                    listAsset = await createReportAssetListNotFound(
+                    listAsset = await createReportAssetListNotFoundOnline(
                         locationID,
                         1
                     );
                 } else {
-                    listAsset = await createReportAssetListFound(
+                    listAsset = await createReportAssetListFoundOnline(
                         locationID,
                         title,
                         1
                     );
                 }
             } else {
+                if (route?.params?.title === REPORT_TYPE.NotFound) {
+                    listAsset = await createReportAssetListNotFoundOffline(
+                        locationName,
+                        1
+                    );
+                } else {
+                    listAsset = await createReportAssetListFoundOffline(
+                        locationName,
+                        title,
+                        1
+                    );
+                }
             }
 
             setListReportAsset(listAsset);
@@ -275,9 +259,12 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             setContentDialog('Something went wrong fetch asset');
         }
     }, [
-        createReportAssetListFound,
-        createReportAssetListNotFound,
+        createReportAssetListFoundOffline,
+        createReportAssetListFoundOnline,
+        createReportAssetListNotFoundOffline,
+        createReportAssetListNotFoundOnline,
         route?.params?.LocationData?.location_id,
+        route?.params?.LocationData?.location_name,
         route?.params?.title
     ]);
 
@@ -288,21 +275,34 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 const isOnline = await getOnlineMode();
                 let listAsset = [];
                 const locationID = route?.params?.LocationData?.location_id;
+                const locationName = route?.params?.LocationData?.location_name;
                 const title = route?.params?.title;
                 if (isOnline) {
                     if (route?.params?.title === REPORT_TYPE.NotFound) {
-                        listAsset = await createReportAssetListNotFound(
+                        listAsset = await createReportAssetListNotFoundOnline(
                             locationID,
                             page + 1
                         );
                     } else {
-                        listAsset = await createReportAssetListFound(
+                        listAsset = await createReportAssetListFoundOnline(
                             locationID,
                             title,
                             page + 1
                         );
                     }
                 } else {
+                    if (route?.params?.title === REPORT_TYPE.NotFound) {
+                        listAsset = await createReportAssetListNotFoundOffline(
+                            locationName,
+                            page + 1
+                        );
+                    } else {
+                        listAsset = await createReportAssetListFoundOffline(
+                            locationName,
+                            title,
+                            page + 1
+                        );
+                    }
                 }
                 setListReportAsset([...listReportAsset, ...listAsset]);
             }
@@ -368,11 +368,13 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <ReportAssetCard
+                                title={route?.params?.title}
                                 assetCode={item?.code}
                                 assetName={item?.name}
                                 assetStatus={item?.use_state}
                                 assetLocation={item?.location}
                                 assetOldLocation={item?.location_old}
+                                assetCategory={item?.category}
                             />
                         </View>
                     )}

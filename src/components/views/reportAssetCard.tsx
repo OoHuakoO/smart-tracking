@@ -1,4 +1,4 @@
-import { MOVEMENT_ASSET_NORMAL_TH } from '@src/constant';
+import { MOVEMENT_ASSET_NORMAL_TH, REPORT_TYPE } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
@@ -6,20 +6,24 @@ import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface ReportAssetCardProps {
+    title: string;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetLocation: string;
     assetOldLocation?: string;
+    assetCategory?: string;
 }
 
 const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     const {
+        title,
         assetCode,
         assetName,
         assetStatus,
         assetLocation,
-        assetOldLocation
+        assetOldLocation,
+        assetCategory
     } = props;
     return (
         <View style={styles.cardContainer}>
@@ -40,25 +44,31 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                     </Text>
                 </View>
                 <Text variant="bodyMedium">
-                    State: {}
+                    Status: {}
                     <Text style={styles.additionalText}>
                         {assetStatus.toString() === 'false'
                             ? MOVEMENT_ASSET_NORMAL_TH
                             : assetStatus || '-'}
                     </Text>
                 </Text>
-
-                <Text variant="bodyMedium">
-                    Old Location: {}
-                    <Text style={styles.additionalText}>
-                        {assetOldLocation || '-'}
+                {title !== REPORT_TYPE.NotFound && (
+                    <Text variant="bodyMedium">
+                        Old Location: {}
+                        <Text style={styles.additionalText}>
+                            {assetOldLocation || '-'}
+                        </Text>
                     </Text>
-                </Text>
-
+                )}
                 <Text variant="bodyMedium">
                     Location: {}
                     <Text style={styles.additionalText}>
                         {assetLocation || '-'}
+                    </Text>
+                </Text>
+                <Text variant="bodyMedium">
+                    Category: {}
+                    <Text style={styles.additionalText}>
+                        {assetCategory || '-'}
                     </Text>
                 </Text>
             </View>

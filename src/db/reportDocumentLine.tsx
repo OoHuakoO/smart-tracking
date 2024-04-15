@@ -107,6 +107,10 @@ export const getReportDocumentLine = async (
     filters?: {
         location?: string;
         state?: string | string[];
+        use_state?: string;
+        default_code?: string;
+        name?: string;
+        'category_id.name'?: string;
     },
     page: number = 1,
     limit: number = 10
@@ -131,6 +135,26 @@ export const getReportDocumentLine = async (
             whereConditions.push(`reportDocumentLine.state = ?`);
             queryParams.push(filters.state);
         }
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`reportDocumentLine.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`reportDocumentLine.code = ?`);
+        queryParams.push(filters.default_code);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`reportDocumentLine.code = ?`);
+        queryParams.push(filters.name);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`reportDocumentLine.category = ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (whereConditions.length > 0) {
@@ -160,6 +184,10 @@ export const getTotalReportDocumentLine = async (
     filters?: {
         location?: string;
         state?: string | string[];
+        use_state?: string;
+        default_code?: string;
+        name?: string;
+        'category_id.name'?: string;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM reportDocumentLine`;
@@ -182,6 +210,26 @@ export const getTotalReportDocumentLine = async (
             whereConditions.push(`reportDocumentLine.state = ?`);
             queryParams.push(filters.state);
         }
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`reportDocumentLine.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`reportDocumentLine.code = ?`);
+        queryParams.push(filters.default_code);
+    }
+
+    if (filters?.name !== undefined) {
+        whereConditions.push(`reportDocumentLine.code = ?`);
+        queryParams.push(filters.name);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`reportDocumentLine.category = ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (whereConditions.length > 0) {

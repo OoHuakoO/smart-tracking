@@ -112,7 +112,6 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                         );
                     } else {
                         filter.state = handleMapReportStateValue(title);
-
                         totalAsset = await getTotalReportDocumentLine(
                             db,
                             filter
