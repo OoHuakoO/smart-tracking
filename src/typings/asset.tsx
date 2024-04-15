@@ -9,6 +9,7 @@ export interface AssetDataForPassParamsDocumentCreate {
     location: string;
     image?: string | boolean;
     new_img?: boolean;
+    category?: string;
 }
 
 export interface GetAssetData {

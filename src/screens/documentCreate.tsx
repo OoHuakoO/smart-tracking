@@ -309,7 +309,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         code: assetCreate?.default_code,
                         name: assetCreate?.name,
                         category: assetCreate?.category,
-                        serial_no: assetCreate?.serial_no,
                         location_id: documentValue?.location_id,
                         location_old: assetCreate?.location,
                         location: documentValue?.location,
@@ -435,10 +434,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         const isDuplicateAsset =
                             listDocumentLineDB?.length > 0 ||
                             listReportDocumentLineDB?.length > 0 ||
-                            documentAssetListValue?.length > 0 ||
+                            documentAssetListValue?.some(
+                                (item) => item?.code === code
+                            ) ||
                             listAssetCreate.some(
                                 (item) => item?.default_code === code
                             );
+
+                        console.log(documentAssetListValue);
 
                         if (isDuplicateAsset) {
                             clearStateDialog();
@@ -473,7 +476,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         },
         [
             clearStateDialog,
-            documentAssetListValue?.length,
+            documentAssetListValue,
             handleMapValueToSetAssetData,
             listAssetCreate
         ]

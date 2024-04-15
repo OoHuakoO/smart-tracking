@@ -143,7 +143,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
         return (
             <View style={styles.dropdownItem}>
                 <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    {item?.category_name}
+                    [{item?.category_code}] {item?.category_name}
                 </Text>
             </View>
         );
@@ -206,7 +206,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                                       image: false,
                                       new_img: false
                                   }),
-                            location: documentValue?.location
+                            location: documentValue?.location,
+                            category: searchCategory?.category_name
                         });
                         navigation.goBack();
                     }
@@ -252,7 +253,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                                   image: false,
                                   new_img: false
                               }),
-                        location: documentValue?.location
+                        location: documentValue?.location,
+                        category: searchCategory?.category_name
                     });
                     navigation.goBack();
                 }
