@@ -88,6 +88,10 @@ export const getDocument = async (
         queryParams.push(filters.state);
     }
 
+    if (whereConditions.length > 0) {
+        query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
 

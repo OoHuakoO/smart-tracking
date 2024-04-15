@@ -1,4 +1,5 @@
 export interface AssetData {
+    id?: number;
     asset_id?: number;
     default_code?: string;
     name?: string;

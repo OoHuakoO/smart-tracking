@@ -206,9 +206,19 @@ export const updateDocumentLineData = (
         queryParams.push(documentLine.new_img ? 1 : 0);
     }
 
+    if (documentLine.asset_id_update !== undefined) {
+        setClauses.push(`asset_id = ?`);
+        queryParams.push(documentLine.asset_id_update);
+    }
+
     if (documentLine.asset_id !== undefined) {
         whereConditions.push(`asset_id = ?`);
         queryParams.push(documentLine.asset_id);
+    }
+
+    if (documentLine.code !== undefined) {
+        whereConditions.push(`code = ?`);
+        queryParams.push(documentLine.code);
     }
 
     if (documentLine.document_id !== undefined) {

@@ -17,10 +17,11 @@ import Menu from '../core/menu';
 interface ShortcutMenuProps
     extends NativeStackScreenProps<PrivateStackParamsList, 'Home'> {
     handleDownload: () => void;
+    handleUpload: () => void;
 }
 
 const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
-    const { navigation, handleDownload } = props;
+    const { navigation, handleDownload, handleUpload } = props;
 
     return (
         <View>
@@ -53,7 +54,7 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
                 <Menu
                     icon={faUpload}
                     menuName={'Upload'}
-                    menuPage={handleDownload}
+                    menuPage={handleUpload}
                 />
                 <Menu
                     icon={faDownload}

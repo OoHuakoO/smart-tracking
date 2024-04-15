@@ -205,6 +205,7 @@ export const getAsset = async (
         'category_id.name'?: string;
         use_state?: string;
         'location_id.name'?: string;
+        is_sync_odoo?: boolean;
     },
     page: number = 1,
     limit: number = 10
@@ -243,6 +244,12 @@ export const getAsset = async (
     if (filters?.use_state !== undefined) {
         whereConditions.push(`asset.use_state = ?`);
         queryParams.push(filters.use_state);
+    }
+
+    if (filters?.is_sync_odoo !== undefined) {
+        const isSyncOdooValue = filters.is_sync_odoo ? 1 : 0;
+        whereConditions.push(`asset.is_sync_odoo = ?`);
+        queryParams.push(isSyncOdooValue);
     }
 
     if (whereConditions.length > 0) {
@@ -374,5 +381,51 @@ export const getTotalAssets = async (
         }
     } catch (err) {
         throw new Error(`Error calculating total assets :  ${err.message}`);
+    }
+};
+
+export const updateAsset = (db: SQLiteDatabase, asset: AssetData) => {
+    const setClauses = [];
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (asset.asset_id !== undefined) {
+        setClauses.push(`asset_id = ?`);
+        queryParams.push(asset.asset_id);
+    }
+
+    if (asset.id !== undefined) {
+        whereConditions.push(`id = ?`);
+        queryParams.push(asset.id);
+    }
+
+    const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+    const queryUpdate = `UPDATE asset SET ${setClauses.join(
+        ', '
+    )} ${whereClause}`;
+
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(
+                queryUpdate,
+                queryParams,
+                () => {
+                    console.log('Table asset update successfully');
+                },
+                (_, error) => {
+                    console.log(
+                        'Error occurred while update the asset:',
+                        error
+                    );
+                    throw new Error(
+                        `Failed to update asset table: ${error.message}`
+                    );
+                }
+            );
+        });
+        console.log('Asset updated successfully');
+    } catch (err) {
+        throw new Error(`Error updating asset : ${err.message}`);
     }
 };

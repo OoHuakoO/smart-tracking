@@ -6,7 +6,11 @@ import Button from '@src/components/core/button';
 import SearchButton from '@src/components/core/searchButton';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import PopupScanAsset from '@src/components/views/popupScanAsset';
-import { MOVEMENT_ASSET_EN, USE_STATE_ASSET_TH } from '@src/constant';
+import {
+    MOVEMENT_ASSET_EN,
+    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    USE_STATE_ASSET_TH
+} from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { getDocumentLine, insertDocumentLineData } from '@src/db/documentLine';
@@ -283,16 +287,25 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     asset_tracking_id: documentValue?.id,
                     asset_ids: assetList
                 });
+                if (
+                    response?.result?.message ===
+                    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                ) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong add document line');
+                    return;
+                }
                 if (response?.error) {
                     clearStateDialog();
                     setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
+                    setContentDialog('Something went wrong add document line');
                     return;
                 }
                 if (response?.result?.error) {
                     clearStateDialog();
                     setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
+                    setContentDialog('Something went wrong add document line');
                     return;
                 }
             } else {

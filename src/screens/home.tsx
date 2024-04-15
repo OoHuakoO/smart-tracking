@@ -16,15 +16,24 @@ import ImageSlider from '@src/components/core/imagesSlider';
 import StatusTag from '@src/components/core/statusTag';
 import ToastComponent from '@src/components/core/toast';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
-import { STATE_ASSET, WARNING } from '@src/constant';
+import {
+    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    STATE_ASSET,
+    STATE_DOCUMENT_NAME,
+    WARNING
+} from '@src/constant';
 import {
     createTableAsset,
+    getAsset,
     getTotalAssets,
-    insertAssetData
+    insertAssetData,
+    updateAsset
 } from '@src/db/asset';
 import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
+import { getDocument, updateDocument } from '@src/db/document';
+import { getDocumentLine, updateDocumentLineData } from '@src/db/documentLine';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import { createTableReport } from '@src/db/report';
 import {
@@ -36,15 +45,19 @@ import {
     insertReportDocumentLine
 } from '@src/db/reportDocumentLine';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
-import { GetAssetNotFoundSearch } from '@src/services/asset';
-import { GetDocumentLineSearch } from '@src/services/document';
+import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
+import {
+    AddDocumentLine,
+    CreateDocument,
+    GetDocumentLineSearch
+} from '@src/services/document';
 import {
     GetAssets,
     GetCategory,
     GetLocation,
     GetUseStatus
 } from '@src/services/downloadDB';
-import { loginState, useSetRecoilState } from '@src/store';
+import { loginState, useRecoilValue, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
@@ -59,6 +72,7 @@ import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { getOnlineMode } from '@src/utils/common';
+import { parseDateStringTime } from '@src/utils/time-manager';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import { Portal, Text } from 'react-native-paper';
@@ -77,6 +91,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [typeDialog, setTypeDialog] = useState<string>('warning');
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+    const loginValue = useRecoilValue<LoginState>(loginState);
     const setToast = useSetRecoilState<Toast>(toastState);
 
     const clearStateDialog = useCallback(() => {
@@ -138,15 +153,17 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const db = await getDBConnection();
             const countAsset = await getTotalAssets(db);
             if (countAsset > 0) {
+                clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog('Download Lasted Data');
                 setContentDialog(
-                    'Your old data will be deleted\nDo you want to download the latest data?'
+                    'Your old data will be deleted\nDo you want to download the latest data ?'
                 );
                 setTypeDialog('download');
                 setShowCancelDialog(false);
                 return;
             }
+            clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog('Data Not Found');
             setContentDialog('Please download the current data');
@@ -159,6 +176,26 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog(WARNING);
             setContentDialog(
                 `Online mode is close, please open online mode to download`
+            );
+            setTypeDialog('warning');
+        }
+    }, [clearStateDialog]);
+
+    const handleOpenDialogUpload = useCallback(async () => {
+        const isOnline = await getOnlineMode();
+        if (isOnline) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog('Upload');
+            setContentDialog('Do you want to upload document ?');
+            setTypeDialog('upload');
+            setShowCancelDialog(false);
+        } else {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(
+                `Online mode is close, please open online mode to upload`
             );
             setTypeDialog('warning');
         }
@@ -445,24 +482,157 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setToast
     ]);
 
+    const handleUpload = useCallback(async () => {
+        try {
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
+            const db = await getDBConnection();
+            const filterAsset = {
+                is_sync_odoo: false
+            };
+            const listAsset = await getAsset(db, filterAsset, 1, 100);
+
+            listAsset?.forEach(async (item) => {
+                const assetData = {
+                    default_code: item?.default_code,
+                    name: item?.name,
+                    category_id: item?.category_id,
+                    quantity: 1,
+                    location_id: item?.location_id,
+                    user_id: loginValue?.uid,
+                    purchase_price: 0,
+                    image: item?.image,
+                    new_img: item?.new_img
+                };
+                const response = await CreateAsset({
+                    asset_data: assetData
+                });
+                if (response?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong save asset');
+                    return;
+                }
+                if (
+                    response?.result?.message === 'Asset created successfully'
+                ) {
+                    const filterUpdateAsset = {
+                        asset_id: response?.result?.data?.id,
+                        id: item?.id
+                    };
+                    await updateAsset(db, filterUpdateAsset);
+
+                    const filterDocumentLine = {
+                        asset_id_update: response?.result?.data?.id,
+                        code: item?.default_code
+                    };
+
+                    await updateDocumentLineData(db, filterDocumentLine);
+                }
+            });
+
+            const filterDocument = {
+                state: STATE_DOCUMENT_NAME?.Draft
+            };
+            const listDocument = await getDocument(db, filterDocument, 1, 100);
+
+            listDocument?.forEach(async (item) => {
+                const responseCreateDocument = await CreateDocument({
+                    location_id: item?.location_id,
+                    date_order: parseDateStringTime(item?.date_order)
+                });
+                if (responseCreateDocument?.error) {
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong create document');
+                    return;
+                }
+                const filterDocumentLine = {
+                    document_id: item?.id
+                };
+                const listDocumentLine = await getDocumentLine(
+                    db,
+                    filterDocumentLine
+                );
+                const mappingValueDocumentLine = listDocumentLine?.map(
+                    (documentLine) => {
+                        return {
+                            id: documentLine?.asset_id,
+                            state: documentLine?.state,
+                            use_state: documentLine?.use_state_code,
+                            new_img: documentLine?.new_img ? true : false,
+                            image: documentLine?.image,
+                            date_check: parseDateStringTime(
+                                documentLine?.date_check
+                            )
+                        };
+                    }
+                );
+
+                const responseAddDocumentLine = await AddDocumentLine({
+                    location_id: item?.location_id,
+                    asset_tracking_id: responseCreateDocument?.result?.data?.id,
+                    asset_ids: mappingValueDocumentLine
+                });
+
+                if (
+                    responseAddDocumentLine?.result?.message ===
+                    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                ) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong add document line');
+                    return;
+                }
+                if (responseAddDocumentLine?.error) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong add document line');
+                    return;
+                }
+                if (responseAddDocumentLine?.result?.error) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong add document line');
+                    return;
+                }
+                const documentObj = {
+                    id: item?.id,
+                    state: STATE_DOCUMENT_NAME.Done
+                };
+
+                await updateDocument(db, documentObj);
+            });
+
+            setTimeout(() => {
+                setToast({ open: true, text: 'Upload Successfully' });
+            }, 0);
+
+            clearStateDialog();
+        } catch (err) {
+            console.log(err);
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(`Something went wrong upload`);
+            setTypeDialog('warning');
+        }
+    }, [clearStateDialog, loginValue?.uid, setToast]);
+
     const handleConfirmDialog = useCallback(async () => {
         switch (typeDialog) {
             case 'download':
                 await handleDownload();
                 break;
             case 'upload':
-                // handleUpload
+                await handleUpload();
                 break;
             case 'warning':
-                setShowCancelDialog(false);
-                setVisibleDialog(false);
+                clearStateDialog();
                 break;
             default:
-                setShowCancelDialog(false);
-                setVisibleDialog(false);
+                clearStateDialog();
                 break;
         }
-    }, [handleDownload, typeDialog]);
+    }, [clearStateDialog, handleDownload, handleUpload, typeDialog]);
 
     useEffect(() => {
         handleInitFetch();
@@ -529,6 +699,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 navigation={navigation}
                 route={route}
                 handleDownload={handleOpenDialogDownload}
+                handleUpload={handleOpenDialogUpload}
             />
             <ToastComponent />
         </SafeAreaView>
