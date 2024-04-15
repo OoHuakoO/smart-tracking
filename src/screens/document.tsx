@@ -12,7 +12,7 @@ import {
     getTotalDocument,
     insertDocumentData
 } from '@src/db/document';
-import { getLocations } from '@src/db/location';
+import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
@@ -73,44 +73,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         setDialogVisible(!dialogVisible);
     }, [dialogVisible]);
 
-    const handleSearchLocation = useCallback(async (text: string) => {
-        try {
-            setLocationSearch(text);
-            const isOnline = await getOnlineMode();
-            if (text !== '') {
-                if (isOnline) {
-                    const response = await GetLocationSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: {
-                            or: { name: text, default_code: text }
-                        }
-                    });
-                    if (response?.error) {
-                        setLoading(false);
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            'Something went wrong search location'
-                        );
-                        return;
-                    }
-                    setListLocation(response?.result?.data?.locations);
-                } else {
-                    const db = await getDBConnection();
-                    const filter = {
-                        name: text
-                    };
-                    const listLocationDB = await getLocations(db, filter);
-                    setListLocation(listLocationDB);
-                }
-            }
-        } catch (err) {
-            setLoading(false);
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong search location');
-        }
-    }, []);
-
     const handleFetchLocation = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
@@ -138,6 +100,53 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         }
     }, []);
 
+    const handleSearchLocation = useCallback(
+        async (text: string) => {
+            try {
+                setLocationSearch(text);
+                const isOnline = await getOnlineMode();
+                if (text !== '') {
+                    if (isOnline) {
+                        const response = await GetLocationSearch({
+                            page: 1,
+                            limit: 10,
+                            search_term: {
+                                or: { name: text, default_code: text }
+                            }
+                        });
+                        if (response?.error) {
+                            setLoading(false);
+                            setVisibleDialog(true);
+                            setContentDialog(
+                                'Something went wrong search location'
+                            );
+                            return;
+                        }
+                        setListLocation(response?.result?.data?.locations);
+                    } else {
+                        const db = await getDBConnection();
+                        const filter = {
+                            default_code: text,
+                            name: text
+                        };
+                        const listLocationDB = await getLocationSuggestion(
+                            db,
+                            filter
+                        );
+                        setListLocation(listLocationDB);
+                    }
+                } else {
+                    await handleFetchLocation();
+                }
+            } catch (err) {
+                setLoading(false);
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong search location');
+            }
+        },
+        [handleFetchLocation]
+    );
+
     const handleFetchDocument = useCallback(async () => {
         try {
             setLoading(true);
@@ -162,12 +171,15 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 setListDocument(response?.result?.data?.documents);
             } else {
                 const db = await getDBConnection();
-                const listDocumentDB = await getDocument(db);
+                const listDocumentDB = await getDocument(db, documentSearch);
                 listDocumentDB?.map((item) => {
                     item.state = handleMapDocumentStateValue(item?.state);
                     item.date_order = parseDateString(item?.date_order);
                 });
-                const totalDocument = await getTotalDocument(db);
+                const totalDocument = await getTotalDocument(
+                    db,
+                    documentSearch
+                );
                 setCountDocument(totalDocument);
                 setListDocument(listDocumentDB);
             }
@@ -205,12 +217,19 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     ]);
                 } else {
                     const db = await getDBConnection();
-                    const listDocumentDB = await getDocument(db, page + 1);
+                    const listDocumentDB = await getDocument(
+                        db,
+                        documentSearch,
+                        page + 1
+                    );
                     listDocumentDB?.map((item) => {
                         item.state = handleMapDocumentStateValue(item?.state);
                         item.date_order = parseDateString(item?.date_order);
                     });
-                    const totalDocument = await getTotalDocument(db);
+                    const totalDocument = await getTotalDocument(
+                        db,
+                        documentSearch
+                    );
                     setCountDocument(totalDocument);
                     setListDocument(listDocumentDB);
                 }

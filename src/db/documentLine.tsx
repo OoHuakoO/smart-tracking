@@ -105,6 +105,7 @@ export const getDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
         document_id?: number;
+        default_code?: string;
     },
     page: number = 1,
     limit: number = 10
@@ -117,6 +118,11 @@ export const getDocumentLine = async (
     if (filters?.document_id !== undefined) {
         whereConditions.push(`documentLine.document_id = ?`);
         queryParams.push(filters.document_id);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`documentLine.code = ?`);
+        queryParams.push(filters.default_code);
     }
 
     if (whereConditions.length > 0) {

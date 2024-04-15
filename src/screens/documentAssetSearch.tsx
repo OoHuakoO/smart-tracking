@@ -1,10 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import { getAsset } from '@src/db/asset';
+import { getAsset, getAssetSuggestion } from '@src/db/asset';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
-import { getLocations } from '@src/db/location';
+import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetSearch } from '@src/services/asset';
 import {
@@ -74,9 +74,10 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                 } else {
                     const db = await getDBConnection();
                     const filter = {
-                        default_code: text
+                        default_code: text,
+                        name: text
                     };
-                    const listAssetDB = await getAsset(db, filter);
+                    const listAssetDB = await getAssetSuggestion(db, filter);
                     setListAsset(listAssetDB);
                 }
             }
@@ -102,9 +103,13 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                 } else {
                     const db = await getDBConnection();
                     const filter = {
-                        name: text
+                        name: text,
+                        code: text
                     };
-                    const listLocationDB = await getLocations(db, filter);
+                    const listLocationDB = await getLocationSuggestion(
+                        db,
+                        filter
+                    );
                     setListLocation(listLocationDB);
                 }
             }

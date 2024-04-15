@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import { getDBConnection } from '@src/db/config';
-import { getLocations } from '@src/db/location';
+import { getLocationSuggestion } from '@src/db/location';
 import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
@@ -58,9 +58,13 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 } else {
                     const db = await getDBConnection();
                     const filter = {
-                        name: text
+                        name: text,
+                        code: text
                     };
-                    const listLocationDB = await getLocations(db, filter);
+                    const listLocationDB = await getLocationSuggestion(
+                        db,
+                        filter
+                    );
                     setListLocation(listLocationDB);
                 }
             }

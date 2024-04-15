@@ -16,7 +16,7 @@ interface DocumentAssetStatusProps {
     assetMovement: string;
     assetDate: string;
     documentStatus: string;
-    handleRemoveAsset: (id: number) => void;
+    handleRemoveAsset: (id: number, code: string) => void;
 }
 
 const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
@@ -37,7 +37,7 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
             <View style={styles.deleteIconContainer}>
                 {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                     <TouchableOpacity
-                        onPress={() => handleRemoveAsset(assetId)}
+                        onPress={() => handleRemoveAsset(assetId, assetCode)}
                         activeOpacity={0.5}
                     >
                         <FontAwesomeIcon icon={faTrash} color="#F0787A" />

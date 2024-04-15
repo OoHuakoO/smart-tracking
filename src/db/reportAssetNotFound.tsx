@@ -213,3 +213,20 @@ export const getTotalReportAssetNotFound = async (
         );
     }
 };
+
+export const removeReportAssetNotFoundByCode = (
+    db: SQLiteDatabase,
+    code: string
+) => {
+    const deleteQuery = `DELETE FROM reportAssetNotFound WHERE code = ?`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery, [code]);
+        });
+        console.log(
+            `remove report asset not found  code: ${code} successfully`
+        );
+    } catch (err) {
+        throw new Error(`Error remove report asset not found: ${err.message}`);
+    }
+};

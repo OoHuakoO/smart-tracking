@@ -299,7 +299,7 @@ export const getAssetSuggestion = async (
 
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
-    console.log(query);
+
     try {
         const results = await db.executeSql(query, queryParams);
         const assets = [];

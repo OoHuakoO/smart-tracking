@@ -9,15 +9,21 @@ import PopupScanAsset from '@src/components/views/popupScanAsset';
 import { MOVEMENT_ASSET_EN, USE_STATE_ASSET_TH } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { insertDocumentLineData } from '@src/db/documentLine';
+import { getDocumentLine, insertDocumentLineData } from '@src/db/documentLine';
+import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
+import {
+    getReportDocumentLine,
+    insertReportDocumentLine
+} from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetByCode } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
-import { documentState } from '@src/store';
+import { documentAssetListState, documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState } from '@src/typings/common';
+import { DocumentAssetData } from '@src/typings/document';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
@@ -75,9 +81,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         useState<boolean>(false);
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
 
-    // const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
-    //     documentAssetListState
-    // );
+    const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
+        documentAssetListState
+    );
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -291,8 +297,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 }
             } else {
                 const documentLine = [];
+
                 const db = await getDBConnection();
-                listAssetCreate.forEach((assetCreate) => {
+                listAssetCreate.forEach(async (assetCreate) => {
                     listUseState.filter(
                         (item) => item?.name === assetCreate?.use_state
                     );
@@ -310,12 +317,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         use_state: assetCreate?.use_state,
                         use_state_code:
                             listUseState.length > 0 ? listUseState[0].id : 2,
-
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img
                     });
+                    await removeReportAssetNotFoundByCode(
+                        db,
+                        assetCreate?.default_code
+                    );
                 });
                 await insertDocumentLineData(db, documentLine);
+                await insertReportDocumentLine(db, documentLine);
             }
             navigation.replace('DocumentAssetStatus');
         } catch (err) {
@@ -414,6 +425,32 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         const filter = {
                             default_code: code
                         };
+                        const listDocumentLineDB = await getDocumentLine(
+                            db,
+                            filter
+                        );
+                        const listReportDocumentLineDB =
+                            await getReportDocumentLine(db, filter);
+
+                        const isDuplicateAsset =
+                            listDocumentLineDB?.length > 0 ||
+                            listReportDocumentLineDB?.length > 0 ||
+                            documentAssetListValue?.length > 0 ||
+                            listAssetCreate.some(
+                                (item) => item?.default_code === code
+                            );
+
+                        if (isDuplicateAsset) {
+                            clearStateDialog();
+                            setVisibleDialog(true);
+                            setTitleDialog('Duplicate Asset');
+                            setContentDialog(
+                                `${code} is duplicate in fixed asset tracking`
+                            );
+                            setShowCancelDialog(false);
+                            return;
+                        }
+
                         const asset = await getAsset(db, filter);
 
                         if (asset.length === 0) {
@@ -434,7 +471,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setContentDialog('Something went wrong search asset');
             }
         },
-        [clearStateDialog, handleMapValueToSetAssetData, listAssetCreate]
+        [
+            clearStateDialog,
+            documentAssetListValue?.length,
+            handleMapValueToSetAssetData,
+            listAssetCreate
+        ]
     );
 
     const getImage = useCallback((): string => {
@@ -675,6 +717,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         </SafeAreaView>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1

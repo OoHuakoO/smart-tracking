@@ -19,13 +19,13 @@ export interface DocumentAssetData {
 
 export interface DocumentData {
     id: number;
-    location_id: number;
-    location: string;
+    location_id?: number;
+    location?: string;
     state: string;
-    date_order: string;
-    owner: string;
-    owner_id: number;
-    assets: DocumentAssetData[];
+    date_order?: string;
+    owner?: string;
+    owner_id?: number;
+    assets?: DocumentAssetData[];
 }
 
 export interface GetDocumentSearchData {

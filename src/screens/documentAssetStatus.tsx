@@ -23,11 +23,13 @@ import {
     STATE_DOCUMENT_VALUE
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
+import { updateDocument } from '@src/db/document';
 import {
     getDocumentLine,
     getTotalDocumentLine,
     removeDocumentLineByAssetId
 } from '@src/db/documentLine';
+import { removeReportDocumentLineByCode } from '@src/db/reportDocumentLine';
 import {
     DeleteDocumentLine,
     GetDocumentById,
@@ -68,6 +70,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         DocumentAssetData[]
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
+    const [codeAsset, setCodeAsset] = useState<string>('');
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const setDocumentAssetList = useSetRecoilState<DocumentAssetData[]>(
         documentAssetListState
@@ -144,46 +147,59 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         }
     }, [clearStateDialog, documentValue?.id]);
 
-    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
-        setVisibleDialog(true);
-        setTitleDialog('Confirm');
-        setContentDialog('Do you want to remove this asset ?');
-        setIdAsset(id);
-    }, []);
+    const handleOpenDialogConfirmRemoveAsset = useCallback(
+        (id: number, code: string) => {
+            setVisibleDialog(true);
+            setTitleDialog('Confirm');
+            setContentDialog('Do you want to remove this asset ?');
+            setIdAsset(id);
+            setCodeAsset(code);
+        },
+        []
+    );
 
     const handleOpenDialogConfirmCancelDocument = useCallback(() => {
         setVisibleDialog(true);
-        setTitleDialog('Confirm cancel');
+        setTitleDialog('Confirm Cancel');
         setContentDialog('Do you want to cancel this document ?');
     }, []);
 
-    const handleOpenDialogResetToCheckDocument = useCallback(() => {
+    const handleOpenDialogResetToDraftDocument = useCallback(() => {
         setVisibleDialog(true);
-        setTitleDialog('Confirm Reset to check');
-        setContentDialog('Do you want to reset to check this document ?');
+        setTitleDialog('Confirm Reset to Draft');
+        setContentDialog('Do you want to reset to draft this document ?');
     }, []);
 
     const handleCancelDocument = useCallback(async () => {
         try {
-            const response = await UpdateDocument({
-                document_data: {
-                    id: documentValue?.id,
-                    state: STATE_DOCUMENT_VALUE.Cancel
+            const isOnline = await getOnlineMode();
+            const documentObj = {
+                id: documentValue?.id,
+                state: STATE_DOCUMENT_NAME.Cancel,
+                location: documentValue?.location,
+                location_id: documentValue?.location_id
+            };
+            if (isOnline) {
+                const response = await UpdateDocument({
+                    document_data: {
+                        id: documentValue?.id,
+                        state: STATE_DOCUMENT_VALUE.Cancel
+                    }
+                });
+                if (
+                    response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS
+                ) {
+                    clearStateDialog();
+                    setDocument(documentObj);
+                } else {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog('Something went wrong cancel document');
                 }
-            });
-            if (response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS) {
-                clearStateDialog();
-                const documentObj = {
-                    id: documentValue?.id,
-                    state: STATE_DOCUMENT_NAME.Cancel,
-                    location: documentValue?.location,
-                    location_id: documentValue?.location_id
-                };
-                setDocument(documentObj);
             } else {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setContentDialog('Something went wrong cancel document');
+                const db = await getDBConnection();
+                await updateDocument(db, documentObj);
+                setDocument(documentObj);
             }
         } catch (err) {
             clearStateDialog();
@@ -198,34 +214,43 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         setDocument
     ]);
 
-    const handleResetToCheck = useCallback(async () => {
+    const handleResetToDraft = useCallback(async () => {
         try {
-            const response = await UpdateDocument({
-                document_data: {
-                    id: documentValue?.id,
-                    state: STATE_DOCUMENT_VALUE.Check
+            const isOnline = await getOnlineMode();
+            const documentObj = {
+                id: documentValue?.id,
+                state: STATE_DOCUMENT_NAME.Draft,
+                location: documentValue?.location,
+                location_id: documentValue?.location_id
+            };
+            if (isOnline) {
+                const response = await UpdateDocument({
+                    document_data: {
+                        id: documentValue?.id,
+                        state: STATE_DOCUMENT_VALUE.Draft
+                    }
+                });
+                if (
+                    response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS
+                ) {
+                    clearStateDialog();
+                    setDocument(documentObj);
+                } else {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog(
+                        'Something went wrong reset to draft document'
+                    );
                 }
-            });
-            if (response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS) {
-                clearStateDialog();
-                const documentObj = {
-                    id: documentValue?.id,
-                    state: STATE_DOCUMENT_NAME.Check,
-                    location: documentValue?.location,
-                    location_id: documentValue?.location_id
-                };
-                setDocument(documentObj);
             } else {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setContentDialog(
-                    'Something went wrong reset to check document'
-                );
+                const db = await getDBConnection();
+                await updateDocument(db, documentObj);
+                setDocument(documentObj);
             }
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
-            setContentDialog('Something went wrong reset to check document');
+            setContentDialog('Something went wrong reset to draft document');
         }
     }, [
         clearStateDialog,
@@ -258,6 +283,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             } else {
                 const db = await getDBConnection();
                 await removeDocumentLineByAssetId(db, idAsset);
+                await removeReportDocumentLineByCode(db, codeAsset);
             }
             setListAssetDocument((prev) => {
                 const listAssetFilter = prev.filter(
@@ -272,17 +298,23 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong remove asset');
         }
-    }, [clearStateDialog, documentValue?.id, handleFetchDocumentById, idAsset]);
+    }, [
+        clearStateDialog,
+        codeAsset,
+        documentValue?.id,
+        handleFetchDocumentById,
+        idAsset
+    ]);
 
     const handleConfirmDialog = useCallback(async () => {
         switch (titleDialog) {
             case 'Confirm':
                 await handleRemoveAsset();
                 break;
-            case 'Confirm Reset to check':
-                await handleResetToCheck();
+            case 'Confirm Reset to Draft':
+                await handleResetToDraft();
                 break;
-            case 'Confirm cancel':
+            case 'Confirm Cancel':
                 await handleCancelDocument();
                 break;
             default:
@@ -293,7 +325,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         handleCancelDocument,
         handleCloseDialog,
         handleRemoveAsset,
-        handleResetToCheck,
+        handleResetToDraft,
         titleDialog
     ]);
 
@@ -323,7 +355,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         handlePress={() => navigation.replace('Document')}
                     />
                 </View>
-                {documentValue?.state === STATE_DOCUMENT_NAME.Check && (
+                {documentValue?.state === STATE_DOCUMENT_NAME.Draft && (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.resetCancel}
@@ -334,17 +366,20 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         </Text>
                     </TouchableOpacity>
                 )}
-                {documentValue?.state === STATE_DOCUMENT_NAME.Cancel && (
+
+                {(documentValue?.state === STATE_DOCUMENT_NAME.Cancel ||
+                    documentValue?.state === STATE_DOCUMENT_NAME.Check) && (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         style={styles.resetCheck}
-                        onPress={handleOpenDialogResetToCheckDocument}
+                        onPress={handleOpenDialogResetToDraftDocument}
                     >
                         <Text variant="bodySmall" style={styles.textReset}>
-                            Reset to Check
+                            Reset to Draft
                         </Text>
                     </TouchableOpacity>
                 )}
+
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
                         Document : {documentValue?.id || '-'}

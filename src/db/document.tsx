@@ -66,12 +66,28 @@ export const insertDocumentData = (
 
 export const getDocument = async (
     db: SQLiteDatabase,
+    filters?: {
+        state?: string;
+        'location_id.name'?: string;
+    },
     page: number = 1,
     limit: number = 10
 ): Promise<DocumentData[]> => {
     const offset = (page - 1) * limit;
     let query = `SELECT * FROM document`;
     const queryParams = [];
+    const whereConditions = [];
+
+    if (filters && filters['location_id.name'] !== undefined) {
+        whereConditions.push(`document.location LIKE ?`);
+        queryParams.push(`%${filters['location_id.name']}%`);
+    }
+
+    if (filters?.state !== undefined) {
+        whereConditions.push(`document.state = ?`);
+        queryParams.push(filters.state);
+    }
+
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
 
@@ -91,10 +107,26 @@ export const getDocument = async (
     }
 };
 
-export const getTotalWithFilterDocument = async (
-    db: SQLiteDatabase
+export const getTotalDocument = async (
+    db: SQLiteDatabase,
+    filters?: {
+        state?: string;
+        'location_id.name'?: string;
+    }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM document`;
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (filters && filters['location_id.name'] !== undefined) {
+        whereConditions.push(`document.location LIKE ?`);
+        queryParams.push(`%${filters['location_id.name']}%`);
+    }
+
+    if (filters?.state !== undefined) {
+        whereConditions.push(`document.use_state = ?`);
+        queryParams.push(filters.state);
+    }
 
     try {
         const results = await db.executeSql(queryTotal);
@@ -108,17 +140,45 @@ export const getTotalWithFilterDocument = async (
     }
 };
 
-export const getTotalDocument = async (db: SQLiteDatabase): Promise<number> => {
-    let queryTotal = `SELECT COUNT(*) as total FROM document`;
+export const updateDocument = (db: SQLiteDatabase, document: DocumentData) => {
+    const setClauses = [];
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (document.state !== undefined) {
+        setClauses.push(`state = ?`);
+        queryParams.push(document.state);
+    }
+
+    if (document.id !== undefined) {
+        whereConditions.push(`id = ?`);
+        queryParams.push(document.id);
+    }
+
+    const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+    const queryUpdate = `UPDATE document SET ${setClauses.join(
+        ', '
+    )} ${whereClause}`;
 
     try {
-        const results = await db.executeSql(queryTotal);
-        if (results.length > 0 && results[0].rows.length > 0) {
-            return results[0].rows.item(0).total;
-        } else {
-            return 0;
-        }
+        db.transaction((tx) => {
+            tx.executeSql(
+                queryUpdate,
+                queryParams,
+                () => {
+                    console.log('Table document update  successfully');
+                },
+                (_, error) => {
+                    console.log('Error occurred while update data:', error);
+                    throw new Error(
+                        `Failed to update document : ${error.message}`
+                    );
+                }
+            );
+        });
+        console.log('Document updated successfully');
     } catch (err) {
-        throw new Error(`Error calculating total assets :  ${err.message}`);
+        throw new Error(`Error updating document : ${err.message}`);
     }
 };

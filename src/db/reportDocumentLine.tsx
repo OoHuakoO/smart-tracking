@@ -247,3 +247,67 @@ export const getTotalReportDocumentLine = async (
         throw new Error(`Error calculating total report: ${err.message}`);
     }
 };
+
+export const updateReportDocumentLine = (
+    db: SQLiteDatabase,
+    documentAssetData: DocumentAssetData
+) => {
+    const setClauses = [];
+    const queryParams = [];
+    const whereConditions = [];
+
+    if (documentAssetData.use_state !== undefined) {
+        setClauses.push(`use_state = ?`);
+        queryParams.push(documentAssetData.use_state);
+    }
+
+    if (documentAssetData.code !== undefined) {
+        whereConditions.push(`code = ?`);
+        queryParams.push(documentAssetData.code);
+    }
+
+    const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+    const queryUpdate = `UPDATE reportDocumentLine SET ${setClauses.join(
+        ', '
+    )} ${whereClause}`;
+
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(
+                queryUpdate,
+                queryParams,
+                () => {
+                    console.log('Table document created successfully');
+                },
+                (_, error) => {
+                    console.log(
+                        'Error occurred while creating the table:',
+                        error
+                    );
+                    throw new Error(
+                        `Failed to create reportDocumentLine table: ${error.message}`
+                    );
+                }
+            );
+        });
+        console.log('Report document line updated successfully');
+    } catch (err) {
+        throw new Error(`Error updating report document line : ${err.message}`);
+    }
+};
+
+export const removeReportDocumentLineByCode = (
+    db: SQLiteDatabase,
+    code: string
+) => {
+    const deleteQuery = `DELETE FROM reportDocumentLine WHERE code = ?`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery, [code]);
+        });
+        console.log(`remove document line code: ${code} successfully`);
+    } catch (err) {
+        throw new Error(`Error remove document line: ${err.message}`);
+    }
+};
