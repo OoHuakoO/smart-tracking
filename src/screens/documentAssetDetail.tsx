@@ -213,6 +213,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 } else {
                     const db = await getDBConnection();
                     const documentLine = {
+                        code: route?.params?.assetData?.code,
                         state: handleMapMovementStateValue(
                             route?.params?.assetData?.state
                         ),

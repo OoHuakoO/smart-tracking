@@ -1,21 +1,21 @@
 export interface AssetData {
-    asset_id: number;
-    default_code: string;
-    name: string;
-    description: string;
-    category_id: number;
-    category: string;
-    serial_no: string;
-    brand_name: string;
-    quantity: number;
-    location_id: number;
-    location: string;
-    image: string;
+    asset_id?: number;
+    default_code?: string;
+    name?: string;
+    description?: string;
+    category_id?: number;
+    category?: string;
+    serial_no?: string;
+    brand_name?: string;
+    quantity?: number;
+    location_id?: number;
+    location?: string;
+    image?: string;
     state?: string;
-    use_state: string;
-    owner: string;
-    new_img: boolean;
-    purchase_price: number;
+    use_state?: string;
+    owner?: string;
+    new_img?: boolean;
+    purchase_price?: number;
     is_sync_odoo?: boolean;
 }
 

@@ -22,6 +22,7 @@ import {
     STATE_DOCUMENT_NAME,
     STATE_DOCUMENT_VALUE
 } from '@src/constant';
+import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { updateDocument } from '@src/db/document';
 import {
@@ -29,6 +30,7 @@ import {
     getTotalDocumentLine,
     removeDocumentLineByAssetId
 } from '@src/db/documentLine';
+import { insertReportAssetNotFound } from '@src/db/reportAssetNotFound';
 import { removeReportDocumentLineByCode } from '@src/db/reportDocumentLine';
 import {
     DeleteDocumentLine,
@@ -199,6 +201,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             } else {
                 const db = await getDBConnection();
                 await updateDocument(db, documentObj);
+                clearStateDialog();
                 setDocument(documentObj);
             }
         } catch (err) {
@@ -245,6 +248,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             } else {
                 const db = await getDBConnection();
                 await updateDocument(db, documentObj);
+                clearStateDialog();
                 setDocument(documentObj);
             }
         } catch (err) {
@@ -281,9 +285,24 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     return;
                 }
             } else {
+                const filter = {
+                    default_code: codeAsset
+                };
                 const db = await getDBConnection();
                 await removeDocumentLineByAssetId(db, idAsset);
                 await removeReportDocumentLineByCode(db, codeAsset);
+                const asset = await getAsset(db, filter);
+                if (asset?.length > 0) {
+                    await insertReportAssetNotFound(db, [
+                        {
+                            default_code: asset[0]?.default_code,
+                            name: asset[0]?.name,
+                            category: asset[0]?.category,
+                            location: asset[0]?.location,
+                            use_state: asset[0]?.use_state
+                        }
+                    ]);
+                }
             }
             setListAssetDocument((prev) => {
                 const listAssetFilter = prev.filter(

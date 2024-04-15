@@ -14,6 +14,7 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
     const { documentTitle, locationInfo, dateInfo, documentStatus } = props;
     let backgroundColor = theme.colors.black;
     let borderColor = theme.colors.black;
+
     switch (documentStatus) {
         case STATE_DOCUMENT_NAME.Draft:
             backgroundColor = '#2E67A6';

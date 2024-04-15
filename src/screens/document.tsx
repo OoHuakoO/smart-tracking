@@ -173,13 +173,13 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 const db = await getDBConnection();
                 const listDocumentDB = await getDocument(db, documentSearch);
                 listDocumentDB?.map((item) => {
-                    item.state = handleMapDocumentStateValue(item?.state);
                     item.date_order = parseDateString(item?.date_order);
                 });
                 const totalDocument = await getTotalDocument(
                     db,
                     documentSearch
                 );
+
                 setCountDocument(totalDocument);
                 setListDocument(listDocumentDB);
             }

@@ -318,7 +318,6 @@ export const getAssetSuggestion = async (
 
 export const getTotalAssets = async (
     db: SQLiteDatabase,
-
     filters?: {
         location_id?: number;
         default_code?: string;

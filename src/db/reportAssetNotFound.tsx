@@ -10,7 +10,6 @@ export const createTableReportAssetNotFound = (db: SQLiteDatabase) => {
             name TEXT NOT NULL,
             category TEXT,
             location TEXT,
-            state TEXT,
             use_state TEXT
         );`;
 
@@ -55,7 +54,6 @@ export const insertReportAssetNotFound = (
         name,
         category,
         location,
-        state,
         use_state
   ) VALUES ` +
         documentAssetData
@@ -65,7 +63,6 @@ export const insertReportAssetNotFound = (
                   '${item.name}',
                   '${item.category}',
                   '${item.location}',
-                  '${item.state}',
                   '${item.use_state}'
                   )`
             )
