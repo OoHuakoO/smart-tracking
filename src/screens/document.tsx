@@ -223,15 +223,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         page + 1
                     );
                     listDocumentDB?.map((item) => {
-                        item.state = handleMapDocumentStateValue(item?.state);
                         item.date_order = parseDateString(item?.date_order);
                     });
-                    const totalDocument = await getTotalDocument(
-                        db,
-                        documentSearch
-                    );
-                    setCountDocument(totalDocument);
-                    setListDocument(listDocumentDB);
+                    setListDocument([...listDocument, ...listDocumentDB]);
                 }
             }
             setPage(page + 1);

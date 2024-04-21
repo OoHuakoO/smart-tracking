@@ -1,4 +1,5 @@
 export interface DocumentAssetData {
+    id?: number;
     asset_id?: number;
     code?: string;
     name?: string;
@@ -8,7 +9,7 @@ export interface DocumentAssetData {
     location_old?: string;
     location?: string;
     state?: string;
-    use_state?: string;
+    use_state?: string | number;
     new_img?: boolean;
     image?: string;
     date_check?: string;

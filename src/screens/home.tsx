@@ -502,23 +502,31 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const filterAsset = {
                 is_sync_odoo: false
             };
-            const listAsset = await getAsset(db, filterAsset, 1, 100);
+            const listAsset = await getAsset(db, filterAsset, 1, 1000);
 
             listAsset?.forEach(async (item) => {
-                const assetData = {
+                let assetData: AssetData = {
                     default_code: item?.default_code,
                     name: item?.name,
                     category_id: item?.category_id,
                     quantity: 1,
                     location_id: item?.location_id,
                     user_id: loginValue?.uid,
-                    purchase_price: 0,
-                    image: item?.image,
-                    new_img: item?.new_img
+                    purchase_price: 0
                 };
+
+                if (item?.image !== 'false') {
+                    assetData.image = item?.image;
+                }
+
+                if (item?.new_img) {
+                    assetData.new_img = item?.new_img;
+                }
+
                 const response = await CreateAsset({
                     asset_data: assetData
                 });
+
                 if (response?.error) {
                     setVisibleDialog(true);
                     setContentDialog('Something went wrong save asset');
@@ -529,6 +537,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 ) {
                     const filterUpdateAsset = {
                         asset_id: response?.result?.data?.id,
+                        is_sync_odoo: true,
                         id: item?.id
                     };
                     await updateAsset(db, filterUpdateAsset);
@@ -545,7 +554,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const filterDocument = {
                 state: STATE_DOCUMENT_NAME?.Draft
             };
-            const listDocument = await getDocument(db, filterDocument, 1, 100);
+            const listDocument = await getDocument(db, filterDocument, 1, 1000);
 
             listDocument?.forEach(async (item) => {
                 const responseCreateDocument = await CreateDocument({
@@ -566,16 +575,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 const mappingValueDocumentLine = listDocumentLine?.map(
                     (documentLine) => {
-                        return {
+                        const documentData: DocumentAssetData = {
                             id: documentLine?.asset_id,
                             state: documentLine?.state,
                             use_state: documentLine?.use_state_code,
                             new_img: documentLine?.new_img ? true : false,
-                            image: documentLine?.image,
                             date_check: parseDateStringTime(
                                 documentLine?.date_check
                             )
                         };
+
+                        if (documentLine?.image !== 'false') {
+                            documentData.image = documentLine?.image;
+                        }
+
+                        return documentData;
                     }
                 );
 

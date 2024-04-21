@@ -394,6 +394,12 @@ export const updateAsset = (db: SQLiteDatabase, asset: AssetData) => {
         queryParams.push(asset.asset_id);
     }
 
+    if (asset.is_sync_odoo !== undefined) {
+        const isSyncOdooValue = asset.is_sync_odoo ? 1 : 0;
+        setClauses.push(`is_sync_odoo = ?`);
+        queryParams.push(isSyncOdooValue);
+    }
+
     if (asset.id !== undefined) {
         whereConditions.push(`id = ?`);
         queryParams.push(asset.id);

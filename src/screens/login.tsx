@@ -87,7 +87,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     return (
         <SafeAreaView style={styles.container}>
             <Text variant="headlineLarge" style={styles.textSmartTrack}>
-                Smart Tracking
+                Smart Track
             </Text>
             <Portal>
                 <AlertDialog

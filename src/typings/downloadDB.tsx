@@ -18,6 +18,7 @@ export interface AssetData {
     new_img?: boolean;
     purchase_price?: number;
     is_sync_odoo?: boolean;
+    user_id?: string;
 }
 
 export interface GetAssetsData {
