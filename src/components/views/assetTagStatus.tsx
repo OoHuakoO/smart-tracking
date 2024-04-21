@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
 interface AssetTagStatusProps {
-    status: string;
+    status: string | number;
 }
 
 const AssetTagStatus: FC<AssetTagStatusProps> = ({ status }) => {

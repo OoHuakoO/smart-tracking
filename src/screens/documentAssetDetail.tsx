@@ -56,7 +56,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>(
-        route?.params?.assetData?.use_state
+        route?.params?.assetData?.use_state as string
     );
     const documentValue = useRecoilValue<DocumentState>(documentState);
 
