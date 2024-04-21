@@ -32,10 +32,17 @@ import {
 import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
-import { getDocument, updateDocument } from '@src/db/document';
-import { getDocumentLine, updateDocumentLineData } from '@src/db/documentLine';
+import {
+    createTableDocument,
+    getDocument,
+    updateDocument
+} from '@src/db/document';
+import {
+    createTableDocumentLine,
+    getDocumentLine,
+    updateDocumentLineData
+} from '@src/db/documentLine';
 import { createTableLocation, insertLocationData } from '@src/db/location';
-import { createTableReport } from '@src/db/report';
 import {
     createTableReportAssetNotFound,
     insertReportAssetNotFound
@@ -119,7 +126,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             await createTableLocation(db);
             await createTableUseStatus(db);
             await createTableCategory(db);
-            await createTableReport(db);
+            await createTableDocument(db);
+            await createTableDocumentLine(db);
+            await createTableReportAssetNotFound(db);
+            await createTableReportDocumentLine(db);
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
@@ -444,9 +454,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             if (
                 listLocation?.length > 0 &&
                 listUseStatus?.length > 0 &&
-                listCategory?.length > 0 &&
-                listAssetNotFound?.length > 0 &&
-                listDocumentLine?.length > 0
+                listCategory?.length > 0
             ) {
                 await createTableLocation(db);
                 await createTableUseStatus(db);
@@ -456,8 +464,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
                 await insertCategoryData(db, listCategory);
-                await insertReportAssetNotFound(db, listAssetNotFound);
-                await insertReportDocumentLine(db, listDocumentLine);
+                if (listAssetNotFound?.length > 0) {
+                    await insertReportAssetNotFound(db, listAssetNotFound);
+                }
+                if (listDocumentLine?.length > 0) {
+                    await insertReportDocumentLine(db, listDocumentLine);
+                }
             }
             setTimeout(() => {
                 setToast({ open: true, text: 'Download Successfully' });

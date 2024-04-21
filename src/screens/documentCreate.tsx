@@ -287,6 +287,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     asset_tracking_id: documentValue?.id,
                     asset_ids: assetList
                 });
+
                 if (
                     response?.result?.message ===
                     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
@@ -328,7 +329,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         state: handleMapMovementStateValue(assetCreate?.state),
                         use_state: assetCreate?.use_state,
                         use_state_code:
-                            listUseState.length > 0 ? listUseState[0].id : 2,
+                            listUseState.length > 0
+                                ? listUseState[0].use_status_id
+                                : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img
                     });
@@ -453,8 +456,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             listAssetCreate.some(
                                 (item) => item?.default_code === code
                             );
-
-                        console.log(documentAssetListValue);
 
                         if (isDuplicateAsset) {
                             clearStateDialog();

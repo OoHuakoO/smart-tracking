@@ -57,6 +57,7 @@ export interface GetLocationResponse {
 
 export interface UseStatusData {
     id: number;
+    use_status_id?: number;
     name: string;
 }
 
