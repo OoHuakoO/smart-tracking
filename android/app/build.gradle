@@ -95,9 +95,9 @@ android {
 
     signingConfigs {
         myRelease {
-            storeFile file("my-release-key.keystore")
+            storeFile file("my-release-key.jks")
             storePassword "smarttracking"
-            keyAlias "smarttrackingalias"
+            keyAlias "key0"
             keyPassword "smarttracking"
         }
     }
