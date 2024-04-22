@@ -141,8 +141,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setLogin({ session_id: '', uid: '' });
             await AsyncStorage.setItem('Login', '');
             await AsyncStorage.setItem('Online', JSON.stringify(true));
-            const db = await getDBConnection();
-            await dropAllMasterTable(db);
             setTimeout(() => {
                 setToast({ open: true, text: 'Logout Successfully' });
             }, 0);

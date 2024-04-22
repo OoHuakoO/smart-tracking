@@ -19,7 +19,7 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             use_state_code INTEGER,
             image TEXT,
             new_img BOOLEAN,
-            date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
+            date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
             tx.executeSql(
                 query,

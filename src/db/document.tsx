@@ -9,7 +9,7 @@ export const createTableDocument = (db: SQLiteDatabase) => {
             state TEXT,
             location_id INTEGER,
             location TEXT,
-            date_order DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'))
+            date_order DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
             tx.executeSql(
                 query,
