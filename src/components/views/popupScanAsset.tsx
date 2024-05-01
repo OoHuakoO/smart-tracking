@@ -250,7 +250,7 @@ const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
 
 const styles = StyleSheet.create({
     topSectionList: {
-        height: hp('30%'),
+        height: hp('45%'),
         width: wp('90%'),
         backgroundColor: theme.colors.background,
         alignItems: 'center',

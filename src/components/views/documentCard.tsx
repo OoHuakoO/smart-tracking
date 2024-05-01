@@ -47,7 +47,9 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                 )}
             </View> */}
             <View style={styles.textContainer}>
-                <Text style={styles.documentTitle}>{documentTitle}</Text>
+                <Text variant="titleMedium" style={styles.documentTitle}>
+                    {documentTitle}
+                </Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>
                     <Text variant="bodyMedium" style={styles.primitiveText}>
                         Location : {''}
@@ -97,7 +99,6 @@ const styles = StyleSheet.create({
         marginLeft: 20
     },
     documentTitle: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: '#404040',
         marginBottom: 5

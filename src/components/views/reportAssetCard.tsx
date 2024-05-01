@@ -36,7 +36,9 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
             </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
-                    <Text style={styles.assetCode}>{assetCode}</Text>
+                    <Text variant="titleMedium" style={styles.assetCode}>
+                        {assetCode}
+                    </Text>
                 </View>
                 <View style={styles.rowText}>
                     <Text variant="bodyLarge" style={styles.assetName}>
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
         width: '60%'
     },
     assetCode: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: theme.colors.textPrimary,
         width: 0,

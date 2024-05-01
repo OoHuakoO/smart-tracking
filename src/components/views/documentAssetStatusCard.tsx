@@ -59,7 +59,9 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
             </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
-                    <Text style={styles.assetCode}>{assetCode}</Text>
+                    <Text variant="titleMedium" style={styles.assetCode}>
+                        {assetCode}
+                    </Text>
                 </View>
                 <View style={styles.rowText}>
                     <Text variant="bodyLarge">{assetName}</Text>
@@ -114,7 +116,6 @@ const styles = StyleSheet.create({
         width: '60%'
     },
     assetCode: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: theme.colors.textPrimary
     },
