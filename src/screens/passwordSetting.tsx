@@ -186,7 +186,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.backgroundPassword,
         justifyContent: 'center',
         alignItems: 'center',
-
         borderWidth: 1
     },
     pinContent: {
