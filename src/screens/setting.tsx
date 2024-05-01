@@ -51,9 +51,6 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
         const settings = await AsyncStorage.getItem('Settings');
         const jsonSettings: SettingParams = JSON.parse(settings);
         form?.setValue('server', jsonSettings?.server);
-        // form?.setValue('port', jsonSettings?.port);
-        form?.setValue('login', jsonSettings?.login);
-        form?.setValue('password', jsonSettings?.password);
         form?.setValue('db', jsonSettings?.db);
     }, [form]);
 
@@ -94,42 +91,7 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
                             />
                         )}
                     />
-                    {/* <Controller
-                        name="port"
-                        defaultValue=""
-                        control={form?.control}
-                        render={({ field }) => (
-                            <InputText
-                                {...field}
-                                placeholder="Port"
-                                onChangeText={(value) => field?.onChange(value)}
-                            />
-                        )}
-                    /> */}
-                    <Controller
-                        name="login"
-                        defaultValue=""
-                        control={form?.control}
-                        render={({ field }) => (
-                            <InputText
-                                {...field}
-                                placeholder="User"
-                                onChangeText={(value) => field?.onChange(value)}
-                            />
-                        )}
-                    />
-                    <Controller
-                        name="password"
-                        defaultValue=""
-                        control={form?.control}
-                        render={({ field }) => (
-                            <InputText
-                                {...field}
-                                placeholder="Password"
-                                onChangeText={(value) => field?.onChange(value)}
-                            />
-                        )}
-                    />
+
                     <Controller
                         name="db"
                         defaultValue=""
