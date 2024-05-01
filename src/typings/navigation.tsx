@@ -11,6 +11,7 @@ export type RootStackParamsList = {
 export type PublicStackParamsList = {
     Setting: undefined;
     Login: undefined;
+    PasswordSetting: undefined;
 };
 
 export type PrivateStackParamsList = {

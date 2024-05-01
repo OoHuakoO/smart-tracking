@@ -27,5 +27,7 @@ export const colorConfig = {
     documentCancel: '#F0787A',
     greySoft: '#F1F1F1',
     cardContainer: '#EDEDED',
-    additionalText: '#777777'
+    additionalText: '#777777',
+    actionButton: '#4499CE',
+    backgroundPassword: '#3dabcb'
 };

@@ -18,6 +18,12 @@ export const fontConfig = {
         letterSpacing: 0,
         lineHeight: 64
     },
+    displayPassword: {
+        fontFamily: 'DMSans-Light',
+        fontSize: 57,
+        letterSpacing: 0,
+        lineHeight: 64
+    },
 
     // Headline
     headlineSmall: {

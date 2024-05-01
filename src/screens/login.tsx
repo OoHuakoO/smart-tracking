@@ -81,7 +81,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     };
 
     const handlePressSetting = () => {
-        navigation.replace('Setting');
+        navigation.replace('PasswordSetting');
     };
 
     return (

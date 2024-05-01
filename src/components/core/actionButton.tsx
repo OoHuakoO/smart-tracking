@@ -1,3 +1,4 @@
+import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet } from 'react-native';
 import { FAB } from 'react-native-paper';
@@ -17,7 +18,10 @@ const ActionButton: FC<ActionButtonProps> = (props) => {
             color={color}
             style={[
                 styles.fab,
-                { backgroundColor: backgroundColor || '#4499CE' }
+                {
+                    backgroundColor:
+                        backgroundColor || theme.colors.actionButton
+                }
             ]}
             icon={icon}
             size={size}
