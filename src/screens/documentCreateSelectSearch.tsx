@@ -125,7 +125,7 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
 
     useEffect(() => {
         const onBackPress = () => {
-            navigation.navigate('Home');
+            navigation.navigate('DocumentCreate');
             return true;
         };
         const subscription = BackHandler.addEventListener(
@@ -153,7 +153,9 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
             >
                 <View style={styles.backToPrevious}>
                     <BackButton
-                        handlePress={() => navigation.navigate('Home')}
+                        handlePress={() =>
+                            navigation.navigate('DocumentCreate')
+                        }
                     />
                 </View>
                 <View style={styles.containerText}>

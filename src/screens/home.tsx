@@ -169,7 +169,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     'Your old data will be deleted\nDo you want to download the latest data ?'
                 );
                 setTypeDialog('download');
-                setShowCancelDialog(false);
+                setShowCancelDialog(true);
                 return;
             }
             clearStateDialog();
@@ -177,7 +177,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog('Data Not Found');
             setContentDialog('Please download the current data');
             setTypeDialog('download');
-            setShowCancelDialog(false);
+            setShowCancelDialog(true);
             return;
         } else {
             clearStateDialog();
@@ -198,7 +198,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog('Upload');
             setContentDialog('Do you want to upload document ?');
             setTypeDialog('upload');
-            setShowCancelDialog(false);
+            setShowCancelDialog(true);
         } else {
             clearStateDialog();
             setVisibleDialog(true);

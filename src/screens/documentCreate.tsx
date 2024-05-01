@@ -174,12 +174,17 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         titleDialog
     ]);
 
-    const handleOpenDialogConfirmRemoveAsset = useCallback((id: number) => {
-        setVisibleDialog(true);
-        setTitleDialog('Confirm');
-        setContentDialog('Do you want to remove this asset ?');
-        setIdAsset(id);
-    }, []);
+    const handleOpenDialogConfirmRemoveAsset = useCallback(
+        (id: number) => {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog('Confirm');
+            setContentDialog('Do you want to remove this asset ?');
+            setShowCancelDialog(true);
+            setIdAsset(id);
+        },
+        [clearStateDialog]
+    );
 
     const openImagePicker = async () => {
         try {

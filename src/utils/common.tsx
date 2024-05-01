@@ -15,13 +15,17 @@ export const getOnlineMode = async (): Promise<boolean> => {
 
 export const removeKeyEmpty = (obj: object) => {
     if (obj === undefined || obj === null) {
-        return undefined;
+        return null;
     }
     Object.keys(obj).forEach((key) => {
         if (obj[key] === null || obj[key] === undefined || obj[key] === '') {
             delete obj[key];
         }
     });
+
+    if (Object.keys(obj).length === 0) {
+        return null;
+    }
 
     return obj;
 };

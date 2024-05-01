@@ -68,6 +68,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [totalAssetDocument, setTotalAssetDocument] = useState<number>(0);
     const [listAssetDocument, setListAssetDocument] = useState<
         DocumentAssetData[]
@@ -99,6 +100,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         setVisibleDialog(false);
         setTitleDialog('');
         setContentDialog('');
+        setShowCancelDialog(false);
     }, []);
 
     const handleCloseDialog = useCallback(() => {
@@ -155,6 +157,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setTitleDialog('Confirm');
             setContentDialog('Do you want to remove this asset ?');
+            setShowCancelDialog(true);
             setIdAsset(id);
             setCodeAsset(code);
         },
@@ -162,16 +165,20 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     );
 
     const handleOpenDialogConfirmCancelDocument = useCallback(() => {
+        clearStateDialog();
         setVisibleDialog(true);
         setTitleDialog('Confirm Cancel');
+        setShowCancelDialog(true);
         setContentDialog('Do you want to cancel this document ?');
-    }, []);
+    }, [clearStateDialog]);
 
     const handleOpenDialogResetToDraftDocument = useCallback(() => {
+        clearStateDialog();
         setVisibleDialog(true);
         setTitleDialog('Confirm Reset to Draft');
+        setShowCancelDialog(true);
         setContentDialog('Do you want to reset to draft this document ?');
-    }, []);
+    }, [clearStateDialog]);
 
     const handleCancelDocument = useCallback(async () => {
         try {
@@ -374,6 +381,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 textTitle={titleDialog}
                 textContent={contentDialog}
                 visible={visibleDialog}
+                showCloseDialog={showCancelDialog}
                 handleClose={handleCloseDialog}
                 handleConfirm={handleConfirmDialog}
             />
