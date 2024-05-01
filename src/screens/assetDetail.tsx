@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: hp('30%'),
+        height: hp('45%'),
         width: wp('100%'),
         position: 'absolute',
         display: 'flex',
@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 15
     },
     imagesContainer: {
-        width: '60%',
-        height: '100%',
+        width: hp('30%'),
+        height: wp('50%'),
         backgroundColor: theme.colors.emptyPicture,
         borderRadius: 10,
         position: 'absolute',

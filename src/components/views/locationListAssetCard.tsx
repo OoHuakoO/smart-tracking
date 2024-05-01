@@ -32,7 +32,9 @@ const LocationListAssetCard: FC<LocationListAssetProps> = (props) => {
             </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
-                    <Text style={styles.assetCode}>{assetCode}</Text>
+                    <Text variant="titleMedium" style={styles.assetCode}>
+                        {assetCode}
+                    </Text>
                 </View>
                 <View style={styles.rowText}>
                     <Text style={styles.additionalText}>{assetName}</Text>
@@ -79,7 +81,6 @@ const styles = StyleSheet.create({
         width: '60%'
     },
     assetCode: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: '#404040'
     },

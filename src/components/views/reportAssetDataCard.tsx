@@ -2,7 +2,8 @@ import { faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from 'react-native-paper';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface ReportAssetDataCardProps {
@@ -19,7 +20,9 @@ const ReportAssetDataCard: FC<ReportAssetDataCardProps> = (props) => {
                     color="#DC3E3F"
                     size={20}
                 />
-                <Text style={styles.locationText}>{location}</Text>
+                <Text variant="titleMedium" style={styles.locationText}>
+                    {location}
+                </Text>
             </View>
             <Text style={styles.locationId}> Total Asset : {totalAsset}</Text>
         </View>
@@ -75,7 +78,6 @@ const styles = StyleSheet.create({
     locationText: {
         color: theme.colors.black,
         fontWeight: 'bold',
-        fontSize: 18,
         marginLeft: 5
     }
 });
