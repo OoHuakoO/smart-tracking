@@ -1,5 +1,10 @@
-import React, { FC, useCallback, useState } from 'react';
-import { SafeAreaView, TouchableOpacity, View } from 'react-native';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import {
+    BackHandler,
+    SafeAreaView,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import ActionButton from '@src/components/core/actionButton';
 import Button from '@src/components/core/button';
@@ -83,6 +88,20 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handlePressSetting = () => {
         navigation.replace('PasswordSetting');
     };
+
+    useEffect(() => {
+        const onBackPress = () => {
+            BackHandler.exitApp();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

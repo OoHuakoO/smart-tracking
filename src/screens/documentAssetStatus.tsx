@@ -7,6 +7,7 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Text } from 'react-native-paper';
 
 import {
+    BackHandler,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -352,6 +353,20 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         handleFetchDocumentById();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route?.params?.isReFresh]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.replace('Document');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

@@ -34,6 +34,7 @@ import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     LogBox,
     PermissionsAndroid,
@@ -560,6 +561,20 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     useEffect(() => {
         handleFetchListUseState();
     }, [handleFetchListUseState]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [handleSearchAsset, navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

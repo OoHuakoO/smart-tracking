@@ -12,7 +12,7 @@ interface DocumentAssetStatusProps {
     assetId: number;
     assetCode: string;
     assetName: string;
-    assetStatus: string;
+    assetStatus: string | number;
     assetMovement: string;
     assetDate: string;
     documentStatus: string;

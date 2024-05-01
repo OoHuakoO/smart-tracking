@@ -30,6 +30,7 @@ import {
 import { parseDateString, parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -301,6 +302,20 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     useEffect(() => {
         handleFetchLocation();
     }, [handleFetchLocation]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Home');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

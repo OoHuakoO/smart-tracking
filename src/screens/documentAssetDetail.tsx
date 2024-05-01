@@ -23,6 +23,7 @@ import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     Image,
     PermissionsAndroid,
     StyleSheet,
@@ -285,6 +286,20 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     useEffect(() => {
         handleInitFetch();
     }, [handleInitFetch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView>

@@ -11,7 +11,7 @@ import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
@@ -121,6 +121,20 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     useEffect(() => {
         handleInitFetch();
     }, [handleInitFetch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <View style={styles.container}>

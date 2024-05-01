@@ -11,6 +11,7 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -109,6 +110,20 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
     useEffect(() => {
         handleFetchLocation();
     }, [handleFetchLocation]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

@@ -13,6 +13,7 @@ import { SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import {
+    BackHandler,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -59,6 +60,20 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
     useEffect(() => {
         handleInitSetting();
     }, [handleInitSetting]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Login');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

@@ -25,7 +25,13 @@ import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    BackHandler,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
 import { Text } from 'react-native-paper';
@@ -239,6 +245,20 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     useEffect(() => {
         handleInitDropdown();
     }, [handleInitDropdown]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <ScrollView style={styles.container}>

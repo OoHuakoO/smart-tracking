@@ -4,8 +4,14 @@ import AssetTagStatus from '@src/components/views/assetTagStatus';
 import { USE_STATE_ASSET_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { FC, useEffect } from 'react';
+import {
+    BackHandler,
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { Text } from 'react-native-paper';
 import {
     heightPercentageToDP as hp,
@@ -20,6 +26,21 @@ type AssetsDetailScreenProps = NativeStackScreenProps<
 
 const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
     const { navigation, route } = props;
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
+
     return (
         <SafeAreaView>
             <View style={styles.topSectionList}>

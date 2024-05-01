@@ -26,6 +26,7 @@ import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
+    BackHandler,
     Image,
     PermissionsAndroid,
     SafeAreaView,
@@ -308,6 +309,20 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     useEffect(() => {
         handleInitFetch();
     }, [handleInitFetch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

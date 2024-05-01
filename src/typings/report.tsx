@@ -20,5 +20,5 @@ export interface ReportAssetData {
     category: string;
     location_old?: string;
     location: string;
-    use_state: string;
+    use_state: string | number;
 }

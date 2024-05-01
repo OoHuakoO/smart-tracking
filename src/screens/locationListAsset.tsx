@@ -12,6 +12,7 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -135,6 +136,20 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
         handleFetchAssetLocation();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route?.params?.assetSearch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.goBack();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

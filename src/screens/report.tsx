@@ -5,8 +5,14 @@ import { REPORT_TYPE } from '@src/constant';
 
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
-import React, { FC } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import React, { FC, useEffect } from 'react';
+import {
+    BackHandler,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    View
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -20,6 +26,21 @@ type ReportScreenProps = NativeStackScreenProps<
 
 const ReportScreen: FC<ReportScreenProps> = (props) => {
     const { navigation } = props;
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Home');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
+
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient

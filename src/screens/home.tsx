@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     SafeAreaView,
     StatusBar,
     Switch,
@@ -661,6 +662,20 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     useEffect(() => {
         handleInitFetch();
     }, [handleInitFetch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            BackHandler.exitApp();
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

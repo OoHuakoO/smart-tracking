@@ -10,7 +10,13 @@ import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    BackHandler,
+    FlatList,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -116,6 +122,20 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
         handleFetchAsset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route?.params?.assetSearch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Home');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

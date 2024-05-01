@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
 import { theme } from '@src/theme';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import {
+    BackHandler,
     Dimensions,
     FlatList,
     StyleSheet,
@@ -63,6 +64,20 @@ const PasswordSettingScreen: FC<PasswordSettingScreenProps> = (props) => {
         },
         [code, navigation]
     );
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Login');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

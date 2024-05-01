@@ -17,6 +17,7 @@ import { LocationReportData, SearchQueryReport } from '@src/typings/report';
 import { getOnlineMode, handleMapReportStateValue } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
+    BackHandler,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -182,6 +183,20 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     useEffect(() => {
         handleInitFetch();
     }, [handleInitFetch]);
+
+    useEffect(() => {
+        const onBackPress = () => {
+            navigation.navigate('Report');
+            return true;
+        };
+        const subscription = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+        );
+        return () => {
+            subscription.remove();
+        };
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>
