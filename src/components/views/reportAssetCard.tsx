@@ -122,11 +122,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: theme.colors.additionalText
     },
-    deleteIconContainer: {
-        position: 'absolute',
-        right: 20,
-        top: 15
-    },
+
     rowText: {
         flexDirection: 'row'
     }

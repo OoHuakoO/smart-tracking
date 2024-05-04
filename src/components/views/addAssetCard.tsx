@@ -34,14 +34,13 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
 
     return (
         <View style={styles.cardContainer}>
-            <View style={styles.deleteIconContainer}>
-                <TouchableOpacity
-                    onPress={() => handleRemoveAsset(assetId)}
-                    activeOpacity={0.5}
-                >
-                    <FontAwesomeIcon icon={faTrash} color="#F0787A" />
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+                onPress={() => handleRemoveAsset(assetId)}
+                activeOpacity={0.5}
+                style={styles.deleteIconContainer}
+            >
+                <FontAwesomeIcon icon={faTrash} color="#F0787A" />
+            </TouchableOpacity>
             <View style={styles.imagesContainer}>
                 <Image
                     style={styles.image}
@@ -131,7 +130,8 @@ const styles = StyleSheet.create({
     deleteIconContainer: {
         position: 'absolute',
         right: 20,
-        top: 15
+        top: 15,
+        padding: 10
     },
     rowText: {
         flexDirection: 'row'
