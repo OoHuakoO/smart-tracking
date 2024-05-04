@@ -270,17 +270,18 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleSaveAsset = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
-
             if (isOnline) {
                 const assetList = listAssetCreate.map((assetCreate) => {
-                    listUseState.filter(
+                    const listUseStateFilter = listUseState.filter(
                         (item) => item?.name === assetCreate?.use_state
                     );
                     return {
                         id: assetCreate?.asset_id,
                         state: handleMapMovementStateValue(assetCreate?.state),
                         use_state:
-                            listUseState.length > 0 ? listUseState[0].id : 2,
+                            listUseStateFilter.length > 0
+                                ? listUseStateFilter[0].id
+                                : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img,
                         date_check: parseDateStringTime(
@@ -317,10 +318,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 }
             } else {
                 const documentLine = [];
-
                 const db = await getDBConnection();
                 listAssetCreate.forEach(async (assetCreate) => {
-                    listUseState.filter(
+                    const listUseStateFilter = listUseState.filter(
                         (item) => item?.name === assetCreate?.use_state
                     );
                     documentLine.push({
@@ -335,8 +335,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         state: handleMapMovementStateValue(assetCreate?.state),
                         use_state: assetCreate?.use_state,
                         use_state_code:
-                            listUseState.length > 0
-                                ? listUseState[0].use_status_id
+                            listUseStateFilter.length > 0
+                                ? listUseStateFilter[0].use_status_id
                                 : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img
