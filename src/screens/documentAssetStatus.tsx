@@ -129,7 +129,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             } else {
                 const db = await getDBConnection();
                 const filter = {
-                    document_id: documentValue?.id
+                    tracking_id: documentValue?.id
                 };
                 const listDocumentDB = await getDocumentLine(db, filter);
                 listDocumentDB?.map((item) => {

@@ -227,7 +227,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         }),
                         ...(getImage() !== 'false' && { new_img: true }),
                         asset_id: route?.params?.assetData?.asset_id,
-                        document_id: documentValue?.id
+                        tracking_id: documentValue?.id
                     };
 
                     await updateDocumentLineData(db, documentLine);

@@ -7,6 +7,7 @@ export const createTableReportDocumentLine = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS reportDocumentLine (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tracking_id INTEGER NOT NULL,
             code TEXT NOT NULL,
             name TEXT NOT NULL,
             category TEXT,
@@ -55,6 +56,7 @@ export const insertReportDocumentLine = (
 ) => {
     const queryInsert =
         `INSERT INTO reportDocumentLine (
+          tracking_id,
           code,
           name,
           category,
@@ -66,6 +68,7 @@ export const insertReportDocumentLine = (
         documentAssetData
             .map(
                 (item) => `(
+                     ${item.tracking_id},
                     '${item.code}',
                     '${item.name}',
                     '${item.category}',

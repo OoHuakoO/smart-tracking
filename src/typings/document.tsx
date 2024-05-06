@@ -17,7 +17,6 @@ export interface DocumentAssetData {
     // for offline upload asset
     asset_id_update?: number;
     use_state_code?: number;
-    document_id?: number;
 }
 
 export interface DocumentData {

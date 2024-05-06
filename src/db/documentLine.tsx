@@ -7,7 +7,7 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             const query = `CREATE TABLE IF NOT EXISTS documentLine(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             asset_id INTEGER NOT NULL,
-            document_id INTEGER NOT NULL,
+            tracking_id INTEGER NOT NULL,
             code TEXT NOT NULL,
             name TEXT NOT NULL,
             category TEXT,
@@ -56,7 +56,7 @@ export const insertDocumentLineData = (
     const queryInsert =
         `INSERT INTO documentLine (
           asset_id,
-          document_id,
+          tracking_id,
           code,
           name,
           category,
@@ -73,7 +73,7 @@ export const insertDocumentLineData = (
             .map(
                 (item) => `(
                 ${item.asset_id},
-                ${item.document_id},
+                ${item.tracking_id},
                 '${item.code}',
                 '${item.name}',
                 '${item.category}',
@@ -101,7 +101,7 @@ export const insertDocumentLineData = (
 export const getDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
-        document_id?: number;
+        tracking_id?: number;
         default_code?: string;
     },
     page: number = 1,
@@ -112,9 +112,9 @@ export const getDocumentLine = async (
     const queryParams = [];
     const whereConditions = [];
 
-    if (filters?.document_id !== undefined) {
-        whereConditions.push(`documentLine.document_id = ?`);
-        queryParams.push(filters.document_id);
+    if (filters?.tracking_id !== undefined) {
+        whereConditions.push(`documentLine.tracking_id = ?`);
+        queryParams.push(filters.tracking_id);
     }
 
     if (filters?.default_code !== undefined) {
@@ -148,16 +148,16 @@ export const getDocumentLine = async (
 export const getTotalDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
-        document_id?: number;
+        tracking_id?: number;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM documentLine`;
     const queryParams = [];
     const whereConditions = [];
 
-    if (filters?.document_id !== undefined) {
-        whereConditions.push(`documentLine.document_id = ?`);
-        queryParams.push(filters.document_id);
+    if (filters?.tracking_id !== undefined) {
+        whereConditions.push(`documentLine.tracking_id = ?`);
+        queryParams.push(filters.tracking_id);
     }
 
     if (whereConditions.length > 0) {
@@ -221,9 +221,9 @@ export const updateDocumentLineData = (
         queryParams.push(documentLine.code);
     }
 
-    if (documentLine.document_id !== undefined) {
-        whereConditions.push(`document_id = ?`);
-        queryParams.push(documentLine.document_id);
+    if (documentLine.tracking_id !== undefined) {
+        whereConditions.push(`tracking_id = ?`);
+        queryParams.push(documentLine.tracking_id);
     }
 
     const whereClause = `WHERE ${whereConditions.join(' AND ')}`;

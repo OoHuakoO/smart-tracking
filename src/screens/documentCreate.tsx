@@ -195,7 +195,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     );
                     documentLine.push({
                         asset_id: assetCreate?.asset_id,
-                        document_id: documentValue?.id,
+                        tracking_id: documentValue?.id,
                         code: assetCreate?.default_code,
                         name: assetCreate?.name,
                         category: assetCreate?.category,

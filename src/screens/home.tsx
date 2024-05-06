@@ -566,7 +566,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     return;
                 }
                 const filterDocumentLine = {
-                    document_id: item?.id
+                    tracking_id: item?.id
                 };
                 const listDocumentLine = await getDocumentLine(
                     db,

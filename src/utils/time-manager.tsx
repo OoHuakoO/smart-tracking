@@ -11,7 +11,3 @@ export function parseMonthDateString(timestamp: string) {
 export function parseDateStringTime(timestamp: string) {
     return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
 }
-
-export function parseDateUTCStringTime(timestamp: string) {
-    return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
-}
