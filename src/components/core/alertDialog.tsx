@@ -12,6 +12,7 @@ interface AlertDialogProps {
     showProgressBar?: boolean;
     handleClose: () => void;
     handleConfirm: () => void;
+    handleDismiss?: () => void;
 }
 
 const AlertDialog: FC<AlertDialogProps> = (props) => {
@@ -23,13 +24,15 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
         disableClose,
         showCloseDialog,
         showProgressBar,
-        handleConfirm
+        handleConfirm,
+        handleDismiss
     } = props;
+
     return (
         <Portal>
             <Dialog
                 visible={visible}
-                onDismiss={handleClose}
+                onDismiss={handleDismiss ? handleDismiss : handleClose}
                 style={styles.dialogContainer}
                 {...(disableClose && { dismissable: false })}
             >

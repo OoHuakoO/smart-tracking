@@ -113,10 +113,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         }
     }, [clearStateDialog, idAsset]);
 
-    const handleCloseDialog = useCallback(() => {
-        clearStateDialog();
-    }, [clearStateDialog]);
-
     const toggleDialogCamera = () => {
         setVisibleDialogCamera(!visibleDialogCamera);
     };
@@ -140,132 +136,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleSetSearchUseState = useCallback((name: string) => {
         setSearchUseState(name);
     }, []);
-
-    const handleConfirmDialog = useCallback(async () => {
-        switch (titleDialog) {
-            case 'Asset not found in Master':
-                clearStateDialog();
-                navigation.navigate('DocumentCreateNewAsset', {
-                    code: assetCodeNew,
-                    onGoBack: (
-                        assetData: AssetDataForPassParamsDocumentCreate
-                    ) => {
-                        setListAssetCreate((prev) => {
-                            return [assetData as AssetData, ...prev];
-                        });
-                    }
-                });
-                break;
-            case 'Duplicate Asset':
-                clearStateDialog();
-                break;
-            case 'Confirm':
-                handleRemoveAsset();
-                break;
-            default:
-                clearStateDialog();
-                break;
-        }
-    }, [
-        assetCodeNew,
-        clearStateDialog,
-        handleRemoveAsset,
-        navigation,
-        titleDialog
-    ]);
-
-    const handleOpenDialogConfirmRemoveAsset = useCallback(
-        (id: number) => {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog('Confirm');
-            setContentDialog('Do you want to remove this asset ?');
-            setShowCancelDialog(true);
-            setIdAsset(id);
-        },
-        [clearStateDialog]
-    );
-
-    const openImagePicker = async () => {
-        try {
-            const options = {
-                mediaType: 'photo' as MediaType,
-                includeBase64: true,
-                maxHeight: 400,
-                maxWidth: 400
-            };
-
-            launchImageLibrary(options, (response) => {
-                if (response.didCancel) {
-                    console.log('User cancelled image picker');
-                } else if (response.errorCode) {
-                    console.log('Image picker error: ', response.errorMessage);
-                } else {
-                    setSelectedImage(response?.assets?.[0]?.base64);
-                }
-            });
-        } catch (err) {
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong image library launch');
-        }
-    };
-
-    const handleCameraLaunch = async () => {
-        try {
-            const options = {
-                mediaType: 'photo' as MediaType,
-                includeBase64: true,
-                maxHeight: 400,
-                maxWidth: 400
-            };
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA,
-                {
-                    title: 'App Camera Permission',
-                    message: 'App needs access to your camera ',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK'
-                }
-            );
-
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Camera permission given');
-                launchCamera(options, (response) => {
-                    if (response.didCancel) {
-                        console.log('User cancelled camera');
-                    } else if (response.errorCode) {
-                        console.log('Camera Error: ', response.errorMessage);
-                    } else {
-                        setSelectedImage(response?.assets?.[0]?.base64);
-                    }
-                });
-            } else {
-                console.log('Camera permission denied');
-            }
-        } catch (err) {
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong camera launch');
-        }
-    };
-
-    const handleGoBackDocumentAssetDetail = useCallback(
-        (assetData: AssetDataForPassParamsDocumentCreate) => {
-            setListAssetCreate((prev) => {
-                return prev.map((item) => {
-                    if (item?.asset_id === assetData?.asset_id) {
-                        return {
-                            ...item,
-                            image: assetData?.image as string,
-                            use_state: assetData?.use_state
-                        };
-                    }
-                    return item;
-                });
-            });
-        },
-        []
-    );
 
     const handleSaveAsset = useCallback(async () => {
         try {
@@ -364,6 +234,161 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         listUseState,
         navigation
     ]);
+
+    const handleDismissDialog = useCallback(() => {
+        clearStateDialog();
+    }, [clearStateDialog]);
+
+    const handleCloseDialog = useCallback(() => {
+        switch (titleDialog) {
+            case 'Warning':
+                navigation.goBack();
+                break;
+            default:
+                clearStateDialog();
+                break;
+        }
+    }, [clearStateDialog, navigation, titleDialog]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (titleDialog) {
+            case 'Asset not found in Master':
+                clearStateDialog();
+                navigation.navigate('DocumentCreateNewAsset', {
+                    code: assetCodeNew,
+                    onGoBack: (
+                        assetData: AssetDataForPassParamsDocumentCreate
+                    ) => {
+                        setListAssetCreate((prev) => {
+                            return [assetData as AssetData, ...prev];
+                        });
+                    }
+                });
+                break;
+            case 'Duplicate Asset':
+                clearStateDialog();
+                break;
+            case 'Confirm':
+                handleRemoveAsset();
+                break;
+            case 'Warning':
+                handleSaveAsset();
+                break;
+            default:
+                clearStateDialog();
+                break;
+        }
+    }, [
+        assetCodeNew,
+        clearStateDialog,
+        handleRemoveAsset,
+        handleSaveAsset,
+        navigation,
+        titleDialog
+    ]);
+
+    const handleOpenDialogConfirmRemoveAsset = useCallback(
+        (id: number) => {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog('Confirm');
+            setContentDialog('Do you want to remove this asset ?');
+            setShowCancelDialog(true);
+            setIdAsset(id);
+        },
+        [clearStateDialog]
+    );
+
+    const handleOpenDialogWarningBackScreen = useCallback(() => {
+        clearStateDialog();
+        setVisibleDialog(true);
+        setTitleDialog('Warning');
+        setContentDialog(
+            'Do you want to save asset before back previous screen ?'
+        );
+        setShowCancelDialog(true);
+    }, [clearStateDialog]);
+
+    const openImagePicker = async () => {
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 400,
+                maxWidth: 400
+            };
+
+            launchImageLibrary(options, (response) => {
+                if (response.didCancel) {
+                    console.log('User cancelled image picker');
+                } else if (response.errorCode) {
+                    console.log('Image picker error: ', response.errorMessage);
+                } else {
+                    setSelectedImage(response?.assets?.[0]?.base64);
+                }
+            });
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong image library launch');
+        }
+    };
+
+    const handleCameraLaunch = async () => {
+        try {
+            const options = {
+                mediaType: 'photo' as MediaType,
+                includeBase64: true,
+                maxHeight: 400,
+                maxWidth: 400
+            };
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+                {
+                    title: 'App Camera Permission',
+                    message: 'App needs access to your camera ',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK'
+                }
+            );
+
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('Camera permission given');
+                launchCamera(options, (response) => {
+                    if (response.didCancel) {
+                        console.log('User cancelled camera');
+                    } else if (response.errorCode) {
+                        console.log('Camera Error: ', response.errorMessage);
+                    } else {
+                        setSelectedImage(response?.assets?.[0]?.base64);
+                    }
+                });
+            } else {
+                console.log('Camera permission denied');
+            }
+        } catch (err) {
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong camera launch');
+        }
+    };
+
+    const handleGoBackDocumentAssetDetail = useCallback(
+        (assetData: AssetDataForPassParamsDocumentCreate) => {
+            setListAssetCreate((prev) => {
+                return prev.map((item) => {
+                    if (item?.asset_id === assetData?.asset_id) {
+                        return {
+                            ...item,
+                            image: assetData?.image as string,
+                            use_state: assetData?.use_state
+                        };
+                    }
+                    return item;
+                });
+            });
+        },
+        []
+    );
 
     const handleMapValueToSetAssetData = useCallback(
         (asset: AssetData) => {
@@ -569,7 +594,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     useEffect(() => {
         const onBackPress = () => {
-            navigation.goBack();
+            if (listAssetCreate.length > 0) {
+                handleOpenDialogWarningBackScreen();
+            } else {
+                navigation.goBack();
+            }
             return true;
         };
         const subscription = BackHandler.addEventListener(
@@ -579,7 +608,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         return () => {
             subscription.remove();
         };
-    }, [handleSearchAsset, navigation]);
+    }, [
+        handleOpenDialogWarningBackScreen,
+        handleSearchAsset,
+        listAssetCreate.length,
+        navigation
+    ]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -589,6 +623,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 visible={visibleDialog}
                 handleClose={handleCloseDialog}
                 handleConfirm={handleConfirmDialog}
+                handleDismiss={handleDismissDialog}
                 showCloseDialog={showCancelDialog}
             />
             <LinearGradient
@@ -600,7 +635,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 <View style={styles.backToPrevious}>
                     <BackButton
                         handlePress={() => {
-                            navigation.goBack();
+                            if (listAssetCreate.length > 0) {
+                                handleOpenDialogWarningBackScreen();
+                            } else {
+                                navigation.goBack();
+                            }
                         }}
                     />
                 </View>
