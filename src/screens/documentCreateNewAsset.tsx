@@ -96,6 +96,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 }
             });
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong image library launch');
         }
@@ -135,6 +136,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 console.log('Camera permission denied');
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong camera launch');
         }
@@ -260,6 +262,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     navigation.goBack();
                 }
             } catch (err) {
+                console.log(err);
                 setVisibleDialog(true);
                 setContentDialog('Something went wrong save asset');
             }
@@ -301,6 +304,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 setListCategory(listCategoryDB);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong init fetch');
         }

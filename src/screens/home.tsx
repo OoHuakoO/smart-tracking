@@ -132,6 +132,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             await createTableReportAssetNotFound(db);
             await createTableReportDocumentLine(db);
         } catch (err) {
+            console.log(err);
             clearStateDialog();
             setVisibleDialog(true);
         }
@@ -258,6 +259,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
+                console.log(err);
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
@@ -280,6 +282,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return categorys;
             } catch (err) {
+                console.log(err);
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
@@ -308,6 +311,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return categorys;
             } catch (err) {
+                console.log(err);
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);
@@ -339,6 +343,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
+                console.log(err);
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog(WARNING);

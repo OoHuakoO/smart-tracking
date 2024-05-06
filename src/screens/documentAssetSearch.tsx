@@ -88,6 +88,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search asset ');
         }
@@ -120,6 +121,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search location');
         }
@@ -232,6 +234,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                 setListCategory(listCategoryDB);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
         }
     }, []);

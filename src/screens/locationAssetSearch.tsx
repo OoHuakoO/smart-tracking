@@ -75,6 +75,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search asset');
         }
@@ -165,6 +166,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                 setListCategory(listCategoryDB);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
         }
     }, []);

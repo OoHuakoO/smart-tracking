@@ -170,6 +170,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
             setListLocation(listLocationData);
             setLoading(false);
         } catch (err) {
+            console.log(err);
             setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');

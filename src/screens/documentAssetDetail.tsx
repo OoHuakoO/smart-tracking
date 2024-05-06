@@ -98,6 +98,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 }
             });
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong image library launch');
         }
@@ -137,6 +138,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 console.log('Camera permission denied');
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong camera launch');
         }
@@ -250,6 +252,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 navigation.goBack();
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong save asset');
         }
@@ -279,6 +282,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 setListUseState(listUseStatusDB);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
         }
     }, []);

@@ -69,6 +69,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search location');
         }
@@ -105,6 +106,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 setListLocation(responseLocation?.result?.data?.asset);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
         }
     }, []);

@@ -66,6 +66,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
             }
             setLoading(false);
         } catch (err) {
+            console.log(err);
             setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');
@@ -100,6 +101,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
             setPage(page + 1);
             setLoading(false);
         } catch (err) {
+            console.log(err);
             setStopFetchMore(true);
             setLoading(false);
             setVisibleDialog(true);

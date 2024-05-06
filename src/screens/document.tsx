@@ -95,6 +95,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 setListLocation(listLocationDB);
             }
         } catch (err) {
+            console.log(err);
             setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch location');
@@ -140,6 +141,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     await handleFetchLocation();
                 }
             } catch (err) {
+                console.log(err);
                 setLoading(false);
                 setVisibleDialog(true);
                 setContentDialog('Something went wrong search location');
@@ -186,6 +188,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             }
             setLoading(false);
         } catch (err) {
+            console.log(err);
             setLoading(false);
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
@@ -232,6 +235,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setPage(page + 1);
             setLoading(false);
         } catch (err) {
+            console.log(err);
             setStopFetchMore(true);
             setLoading(false);
             setVisibleDialog(true);
@@ -281,6 +285,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 await handleFetchDocument();
                 await handleFetchLocation();
             } catch (err) {
+                console.log(err);
                 setVisibleDialog(true);
                 setContentDialog('Something went wrong create document');
             }

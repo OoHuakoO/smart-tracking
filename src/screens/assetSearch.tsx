@@ -87,6 +87,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search asset ');
         }
@@ -119,6 +120,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search location');
         }
@@ -238,6 +240,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                 setListCategory(listCategoryDB);
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
         }
     }, []);

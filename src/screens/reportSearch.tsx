@@ -76,6 +76,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                 }
             }
         } catch (err) {
+            console.log(err);
             setVisibleDialog(true);
             setContentDialog('Something went wrong search asset');
         }

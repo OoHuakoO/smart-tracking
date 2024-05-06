@@ -328,6 +328,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 }
             });
         } catch (err) {
+            clearStateDialog();
             setVisibleDialog(true);
             setContentDialog('Something went wrong image library launch');
         }
@@ -367,6 +368,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 console.log('Camera permission denied');
             }
         } catch (err) {
+            clearStateDialog();
             setVisibleDialog(true);
             setContentDialog('Something went wrong camera launch');
         }
@@ -570,12 +572,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             setVisiblePopupScanAsset(false);
             setScanAssetData(null);
         } catch (err) {
+            clearStateDialog();
             setVisiblePopupScanAsset(false);
             setScanAssetData(null);
             setVisibleDialog(true);
             setContentDialog('Something went wrong save edit asset');
         }
-    }, [getImage, scanAssetData, searchUseState]);
+    }, [clearStateDialog, getImage, scanAssetData, searchUseState]);
 
     const handleFetchListUseState = useCallback(async () => {
         try {
@@ -592,9 +595,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setListUseState(listUseStatusDB);
             }
         } catch (err) {
+            clearStateDialog();
             setVisibleDialog(true);
         }
-    }, []);
+    }, [clearStateDialog]);
 
     useEffect(() => {
         handleSearchAsset(route?.params?.codeFromAssetSearch);

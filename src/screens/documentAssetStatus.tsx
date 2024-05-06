@@ -154,6 +154,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
     const handleOpenDialogConfirmRemoveAsset = useCallback(
         (id: number, code: string) => {
+            clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog('Confirm');
             setContentDialog('Do you want to remove this asset ?');
@@ -161,7 +162,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setIdAsset(id);
             setCodeAsset(code);
         },
-        []
+        [clearStateDialog]
     );
 
     const handleOpenDialogConfirmCancelDocument = useCallback(() => {
