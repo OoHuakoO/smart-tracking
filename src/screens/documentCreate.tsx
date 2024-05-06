@@ -426,20 +426,32 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 }
                             });
 
-                        const isDuplicateAsset =
+                        const isDuplicateAssetInDocumentLine =
                             responseDocumentLine?.result?.data
-                                ?.document_item_line?.length > 0 ||
+                                ?.document_item_line?.length > 0;
+                        const isDuplicateAssetInListAssetCreate =
                             listAssetCreate.some(
                                 (item) => item?.default_code === code
                             );
 
-                        if (isDuplicateAsset) {
+                        if (
+                            isDuplicateAssetInDocumentLine ||
+                            isDuplicateAssetInListAssetCreate
+                        ) {
                             clearStateDialog();
                             setVisibleDialog(true);
                             setTitleDialog('Duplicate Asset');
-                            setContentDialog(
-                                `${code} is duplicate in fixed asset tracking`
-                            );
+                            if (isDuplicateAssetInDocumentLine) {
+                                setContentDialog(
+                                    `${code} is duplicate in document ${responseDocumentLine?.result?.data?.document_item_line[0]?.assets[0]?.tracking_id}`
+                                );
+                            }
+                            if (isDuplicateAssetInListAssetCreate) {
+                                setContentDialog(
+                                    `${code} is duplicate in document ${documentValue?.id}`
+                                );
+                            }
+
                             setShowCancelDialog(false);
                             return;
                         }
@@ -522,6 +534,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         [
             clearStateDialog,
             documentAssetListValue,
+            documentValue?.id,
             handleMapValueToSetAssetData,
             listAssetCreate
         ]

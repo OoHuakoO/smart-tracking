@@ -1,5 +1,6 @@
 export interface DocumentAssetData {
     id?: number;
+    tracking_id?: number;
     asset_id?: number;
     code?: string;
     name?: string;
