@@ -23,11 +23,10 @@ import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetByCode } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
-import { documentAssetListState, documentState } from '@src/store';
+import { documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState } from '@src/typings/common';
-import { DocumentAssetData } from '@src/typings/document';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
@@ -85,10 +84,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [visibleDialogCamera, setVisibleDialogCamera] =
         useState<boolean>(false);
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
-
-    const documentAssetListValue = useRecoilValue<DocumentAssetData[]>(
-        documentAssetListState
-    );
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -492,23 +487,38 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         const listReportDocumentLineDB =
                             await getReportDocumentLine(db, filter);
 
-                        const isDuplicateAsset =
-                            listDocumentLineDB?.length > 0 ||
-                            listReportDocumentLineDB?.length > 0 ||
-                            documentAssetListValue?.some(
-                                (item) => item?.code === code
-                            ) ||
+                        const isDuplicateAssetInListDocumentLineDB =
+                            listDocumentLineDB?.length > 0;
+                        const isDuplicateAssetInListReportDocumentLineDB =
+                            listReportDocumentLineDB?.length > 0;
+                        const isDuplicateAssetInListAssetCreate =
                             listAssetCreate.some(
                                 (item) => item?.default_code === code
                             );
 
-                        if (isDuplicateAsset) {
+                        if (
+                            isDuplicateAssetInListDocumentLineDB ||
+                            isDuplicateAssetInListReportDocumentLineDB ||
+                            isDuplicateAssetInListAssetCreate
+                        ) {
                             clearStateDialog();
                             setVisibleDialog(true);
                             setTitleDialog('Duplicate Asset');
-                            setContentDialog(
-                                `${code} is duplicate in fixed asset tracking`
-                            );
+                            if (isDuplicateAssetInListDocumentLineDB) {
+                                setContentDialog(
+                                    `${code} is duplicate in document ${listDocumentLineDB[0]?.tracking_id}`
+                                );
+                            }
+                            if (isDuplicateAssetInListReportDocumentLineDB) {
+                                setContentDialog(
+                                    `${code} is duplicate in document ${listReportDocumentLineDB[0]?.tracking_id}`
+                                );
+                            }
+                            if (isDuplicateAssetInListAssetCreate) {
+                                setContentDialog(
+                                    `${code} is duplicate in document ${documentValue?.id}`
+                                );
+                            }
                             setShowCancelDialog(false);
                             return;
                         }
@@ -535,7 +545,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         },
         [
             clearStateDialog,
-            documentAssetListValue,
             documentValue?.id,
             handleMapValueToSetAssetData,
             listAssetCreate

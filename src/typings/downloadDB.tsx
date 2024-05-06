@@ -96,6 +96,7 @@ export interface GetCategoryResponse {
 }
 
 export interface ReportAssetData {
+    tracking_id: number;
     code: string;
     name: string;
     category: string;

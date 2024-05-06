@@ -222,7 +222,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         ),
                         use_state: searchUseState,
                         ...(filterUseStatus?.length > 0 && {
-                            use_state_code: filterUseStatus[0]?.id
+                            use_state_code: filterUseStatus[0]?.use_status_id
                         }),
                         ...(getImage() !== 'false' && {
                             image: getImage()
