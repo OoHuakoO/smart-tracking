@@ -41,6 +41,7 @@ export interface LocationData {
     location_id: number;
     location_code: string;
     location_name: string;
+    total_assets?: number;
 }
 
 export interface GetLocationData {

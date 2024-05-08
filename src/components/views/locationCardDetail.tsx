@@ -8,10 +8,10 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface LocationDetailProps {
     location: string;
-    locationId: string;
+    totalAsset: number;
 }
 const LocationCardDetail: FC<LocationDetailProps> = (props) => {
-    const { location, locationId } = props;
+    const { location, totalAsset } = props;
     return (
         <View style={styles.cardContainer}>
             <View style={styles.iconContainer}>
@@ -24,7 +24,7 @@ const LocationCardDetail: FC<LocationDetailProps> = (props) => {
                     {location}
                 </Text>
             </View>
-            <Text style={styles.locationId}> LocationID : {locationId}</Text>
+            <Text style={styles.totalAsset}> Total Asset : {totalAsset}</Text>
         </View>
     );
 };
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 4
     },
-    locationId: {
+    totalAsset: {
         color: '#9999',
         fontSize: 14,
         fontWeight: '500'

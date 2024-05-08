@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
 import LocationCardDetail from '@src/components/views/locationCardDetail';
+import { getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { getLocations, getTotalLocations } from '@src/db/location';
 import { GetLocation } from '@src/services/downloadDB';
@@ -58,11 +59,19 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                 setCountLocation(totalPagesLocation);
                 setListLocation(response?.result?.data?.asset);
             } else {
+                const newListLocation: LocationData[] = [];
                 const db = await getDBConnection();
                 const countLocation = await getTotalLocations(db);
                 const listLocationDB = await getLocations(db);
+                for (const item of listLocationDB) {
+                    const filters = {
+                        location_id: item?.location_id
+                    };
+                    const countAsset = await getTotalAssets(db, filters);
+                    newListLocation.push({ ...item, total_assets: countAsset });
+                }
                 setCountLocation(countLocation);
-                setListLocation(listLocationDB);
+                setListLocation(newListLocation);
             }
             setLoading(false);
         } catch (err) {
@@ -89,13 +98,24 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                         ...response?.result?.data?.asset
                     ]);
                 } else {
+                    const newListLocation: LocationData[] = [];
                     const db = await getDBConnection();
                     const listLocationDB = await getLocations(
                         db,
                         null,
                         page + 1
                     );
-                    setListLocation([...listLocation, ...listLocationDB]);
+                    for (const item of listLocationDB) {
+                        const filters = {
+                            location_id: item?.location_id
+                        };
+                        const countAsset = await getTotalAssets(db, filters);
+                        newListLocation.push({
+                            ...item,
+                            total_assets: countAsset
+                        });
+                    }
+                    setListLocation([...listLocation, ...newListLocation]);
                 }
             }
             setPage(page + 1);
@@ -176,7 +196,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                             >
                                 <LocationCardDetail
                                     location={item?.location_name}
-                                    locationId={item?.location_id?.toString()}
+                                    totalAsset={item?.total_assets}
                                 />
                             </TouchableOpacity>
                         </View>
