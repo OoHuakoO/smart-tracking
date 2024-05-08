@@ -39,7 +39,10 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                 activeOpacity={0.5}
                 style={styles.deleteIconContainer}
             >
-                <FontAwesomeIcon icon={faTrash} color="#F0787A" />
+                <FontAwesomeIcon
+                    icon={faTrash}
+                    color={theme.colors.documentCancel}
+                />
             </TouchableOpacity>
             <View style={styles.imagesContainer}>
                 <Image
@@ -116,7 +119,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         marginLeft: 20,
-        width: '60%'
+        width: '55%'
     },
     assetCode: {
         fontSize: 18,
@@ -129,9 +132,13 @@ const styles = StyleSheet.create({
     },
     deleteIconContainer: {
         position: 'absolute',
-        right: 20,
-        top: 15,
-        padding: 10
+        right: 10,
+        top: 10,
+        padding: 10,
+        backgroundColor: theme.colors.white,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: theme.colors.documentCancel
     },
     rowText: {
         flexDirection: 'row'

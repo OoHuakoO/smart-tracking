@@ -34,16 +34,19 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
 
     return (
         <View style={styles.cardContainer}>
-            <View style={styles.deleteIconContainer}>
-                {documentStatus === STATE_DOCUMENT_NAME.Draft && (
-                    <TouchableOpacity
-                        onPress={() => handleRemoveAsset(assetId, assetCode)}
-                        activeOpacity={0.5}
-                    >
-                        <FontAwesomeIcon icon={faTrash} color="#F0787A" />
-                    </TouchableOpacity>
-                )}
-            </View>
+            {documentStatus === STATE_DOCUMENT_NAME.Draft && (
+                <TouchableOpacity
+                    onPress={() => handleRemoveAsset(assetId, assetCode)}
+                    activeOpacity={0.5}
+                    style={styles.deleteIconContainer}
+                >
+                    <FontAwesomeIcon
+                        icon={faTrash}
+                        color={theme.colors.documentCancel}
+                    />
+                </TouchableOpacity>
+            )}
+
             <View style={styles.imagesContainer}>
                 <Image
                     style={styles.image}
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         marginLeft: 20,
-        width: '60%'
+        width: '55%'
     },
     assetCode: {
         fontWeight: 'bold',
@@ -125,9 +128,13 @@ const styles = StyleSheet.create({
     },
     deleteIconContainer: {
         position: 'absolute',
-        right: 20,
-        top: 15,
-        padding: 10
+        right: 10,
+        top: 10,
+        padding: 10,
+        backgroundColor: theme.colors.white,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: theme.colors.documentCancel
     },
     rowText: {
         flexDirection: 'row'
