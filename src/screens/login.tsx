@@ -33,6 +33,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
+    const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const setToast = useSetRecoilState<Toast>(toastState);
 
     const handleLogin = useCallback(
@@ -80,6 +81,10 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         },
         [setLogin, setToast]
     );
+
+    const handleVisiblePassword = useCallback(() => {
+        setIsPasswordVisible(!isPasswordVisible);
+    }, [isPasswordVisible]);
 
     const handleCloseDialog = () => {
         setVisibleDialog(false);
@@ -140,9 +145,11 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     render={({ field }) => (
                         <InputText
                             {...field}
+                            isPasswordVisible={isPasswordVisible}
+                            handleVisiblePassword={handleVisiblePassword}
                             placeholder="Password"
                             returnKeyType="done"
-                            secureTextEntry
+                            secureText
                             onChangeText={(value) => field?.onChange(value)}
                         />
                     )}
