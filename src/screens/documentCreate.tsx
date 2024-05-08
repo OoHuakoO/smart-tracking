@@ -419,7 +419,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 page: 1,
                                 limit: 10,
                                 search_term: {
-                                    and: { name: code }
+                                    and: {
+                                        name: code,
+                                        'tracking_id.state': [
+                                            'draft',
+                                            'open',
+                                            'done'
+                                        ]
+                                    }
                                 }
                             });
 
