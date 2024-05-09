@@ -194,9 +194,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                                 ...(getImage() !== 'false' && {
                                     image: getImage()
                                 }),
-                                ...(getImage() !== 'false' && {
-                                    new_img: true
-                                }),
+                                new_img: selectedImage ? true : false,
                                 date_check: parseDateStringTime(
                                     new Date(Date.now()).toISOString()
                                 )
@@ -227,7 +225,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         ...(getImage() !== 'false' && {
                             image: getImage()
                         }),
-                        ...(getImage() !== 'false' && { new_img: true }),
+                        new_img: selectedImage ? true : false,
                         asset_id: route?.params?.assetData?.asset_id,
                         tracking_id: documentValue?.id
                     };
@@ -246,7 +244,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     use_state: searchUseState,
                     state: route?.params?.assetData?.state,
                     image: getImage() !== 'false' ? getImage() : false,
-                    new_img: getImage() !== 'false',
+                    new_img: selectedImage ? true : false,
                     location: documentValue?.location
                 });
                 navigation.goBack();
@@ -264,7 +262,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         listUseState,
         navigation,
         route?.params,
-        searchUseState
+        searchUseState,
+        selectedImage
     ]);
 
     const handleInitFetch = useCallback(async () => {

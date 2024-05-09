@@ -377,6 +377,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         return {
                             ...item,
                             image: assetData?.image as string,
+                            new_img: assetData?.new_img,
                             use_state: assetData?.use_state
                         };
                     }
@@ -579,7 +580,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 ...scanAssetData,
                 use_state: searchUseState,
                 image: getImage() !== 'false' ? getImage() : false,
-                new_img: getImage() !== 'false'
+                new_img: selectedImage ? true : false
             };
 
             setListAssetCreate((prev) => {
@@ -594,7 +595,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong save edit asset');
         }
-    }, [clearStateDialog, getImage, scanAssetData, searchUseState]);
+    }, [
+        clearStateDialog,
+        getImage,
+        scanAssetData,
+        searchUseState,
+        selectedImage
+    ]);
 
     const handleFetchListUseState = useCallback(async () => {
         try {
