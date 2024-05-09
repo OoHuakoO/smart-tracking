@@ -20,7 +20,7 @@ import {
     insertReportDocumentLine
 } from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
-import { GetAssetByCode } from '@src/services/asset';
+import { GetAssetSearch } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
 import { documentState } from '@src/store';
@@ -461,7 +461,15 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             return;
                         }
 
-                        const response = await GetAssetByCode(code);
+                        const response = await GetAssetSearch({
+                            page: 1,
+                            limit: 10,
+                            search_term: {
+                                and: {
+                                    default_code: code
+                                }
+                            }
+                        });
                         if (response?.error) {
                             clearStateDialog();
                             setVisibleDialog(true);
@@ -471,7 +479,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             return;
                         }
 
-                        if (response?.result?.message === 'Asset not found') {
+                        if (response?.result?.data?.total === 0) {
                             clearStateDialog();
                             setAssetCodeNew(code);
                             setVisibleDialog(true);
@@ -480,9 +488,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             setContentDialog('Do you want to add new asset?');
                             return;
                         }
-                        handleMapValueToSetAssetData(
-                            response?.result?.data?.asset
-                        );
+
+                        if (response?.result?.data?.total > 0) {
+                            handleMapValueToSetAssetData(
+                                response?.result?.data?.asset[0]
+                            );
+                        }
                     } else {
                         const db = await getDBConnection();
                         const filter = {
@@ -718,7 +729,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         style={styles.input}
                         value={assetCode}
                         onChangeText={(text) => setAssetCode(text)}
-                        placeholder="Input Or Scan Asset"
+                        placeholder="Input Code Or Scan"
                         placeholderTextColor={theme.colors.textBody}
                         blurOnSubmit={false}
                         onSubmitEditing={() => {
