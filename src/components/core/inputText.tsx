@@ -40,7 +40,9 @@ const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
                     { borderColor: borderColor || 'gray' }
                 ]}
                 placeholder={placeholder}
-                secureTextEntry={!isPasswordVisible}
+                {...(isPasswordVisible !== undefined && {
+                    secureTextEntry: !isPasswordVisible
+                })}
                 placeholderTextColor={theme.colors.textBody}
                 {...props}
                 ref={ref}

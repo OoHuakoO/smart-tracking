@@ -280,6 +280,18 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
         ]
     );
 
+    const isDisableSaveButton = useCallback(() => {
+        if (
+            form.watch('default_code') === '' ||
+            form.watch('name') === '' ||
+            searchUseState === '' ||
+            !searchCategory
+        ) {
+            return true;
+        }
+        return false;
+    }, [form, searchCategory, searchUseState]);
+
     const handleInitFetch = useCallback(async () => {
         try {
             form?.setValue('default_code', route?.params?.code);
@@ -478,10 +490,15 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     <TouchableOpacity
                         style={[
                             styles.button,
-                            { backgroundColor: theme.colors.primary }
+                            {
+                                backgroundColor: isDisableSaveButton()
+                                    ? theme.colors.disableSwitch
+                                    : theme.colors.primary
+                            }
                         ]}
                         onPress={form?.handleSubmit(handleSaveAsset)}
                         activeOpacity={0.8}
+                        disabled={isDisableSaveButton()}
                     >
                         <Text
                             variant="bodyLarge"
