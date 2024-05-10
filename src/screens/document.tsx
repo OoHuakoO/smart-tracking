@@ -8,9 +8,9 @@ import DocumentDialog from '@src/components/views/documentDialog';
 import { STATE_DOCUMENT_NAME } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import {
-    getDocument,
+    getDocumentOffline,
     getTotalDocument,
-    insertDocumentData
+    insertDocumentOfflineData
 } from '@src/db/documentOffline';
 import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
@@ -174,7 +174,10 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 setListDocument(response?.result?.data?.documents);
             } else {
                 const db = await getDBConnection();
-                const listDocumentDB = await getDocument(db, documentSearch);
+                const listDocumentDB = await getDocumentOffline(
+                    db,
+                    documentSearch
+                );
                 listDocumentDB?.map((item) => {
                     item.date_order = parseDateString(item?.date_order);
                 });
@@ -221,7 +224,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     ]);
                 } else {
                     const db = await getDBConnection();
-                    const listDocumentDB = await getDocument(
+                    const listDocumentDB = await getDocumentOffline(
                         db,
                         documentSearch,
                         page + 1
@@ -277,7 +280,10 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         location: location?.location_name,
                         location_id: location?.location_id
                     };
-                    await insertDocumentData(db, documentObj as DocumentData);
+                    await insertDocumentOfflineData(
+                        db,
+                        documentObj as DocumentData
+                    );
                     setDocument(documentObj);
                 }
                 toggleDialog();

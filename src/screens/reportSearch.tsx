@@ -230,7 +230,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                     data={listAsset}
                     search
                     maxHeight={300}
-                    labelField="name"
+                    labelField="default_code"
                     valueField="default_code"
                     placeholder={'Select Asset'}
                     searchPlaceholder="Search"

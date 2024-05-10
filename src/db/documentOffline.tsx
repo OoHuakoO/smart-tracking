@@ -1,10 +1,10 @@
 import { DocumentData } from '@src/typings/document';
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 
-export const createTableDocument = (db: SQLiteDatabase) => {
+export const createTableDocumentOffline = (db: SQLiteDatabase) => {
     db.transaction(
         (tx) => {
-            const query = `CREATE TABLE IF NOT EXISTS document(
+            const query = `CREATE TABLE IF NOT EXISTS documentOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             state TEXT,
             location_id INTEGER,
@@ -15,7 +15,7 @@ export const createTableDocument = (db: SQLiteDatabase) => {
                 query,
                 [],
                 () => {
-                    console.log('Table document created successfully');
+                    console.log('Table documentOffline created successfully');
                 },
                 (_, error) => {
                     console.log(
@@ -23,28 +23,28 @@ export const createTableDocument = (db: SQLiteDatabase) => {
                         error
                     );
                     throw new Error(
-                        `Failed to create document table: ${error.message}`
+                        `Failed to create documentOffline table: ${error.message}`
                     );
                 }
             );
         },
         (error) => {
-            console.log('Transaction createTableDocument error:', error);
+            console.log('Transaction createTableDocumentOffline error:', error);
         },
         () => {
             console.log(
-                'Transaction createTableDocument completed successfully'
+                'Transaction createTableDocumentOffline completed successfully'
             );
         }
     );
 };
 
-export const insertDocumentData = (
+export const insertDocumentOfflineData = (
     db: SQLiteDatabase,
     documents: DocumentData
 ) => {
     const queryInsert =
-        `INSERT INTO document (
+        `INSERT INTO documentOffline (
           state,
           location_id,
           location
@@ -58,13 +58,13 @@ export const insertDocumentData = (
         db.transaction((tx) => {
             tx.executeSql(queryInsert);
         });
-        console.log('All document inserted successfully');
+        console.log('documentOffline inserted successfully');
     } catch (err) {
-        throw new Error(`Error inserting document: ${err.message}`);
+        throw new Error(`Error inserting documentOffline: ${err.message}`);
     }
 };
 
-export const getDocument = async (
+export const getDocumentOffline = async (
     db: SQLiteDatabase,
     filters?: {
         state?: string;
@@ -74,17 +74,17 @@ export const getDocument = async (
     limit: number = 10
 ): Promise<DocumentData[]> => {
     const offset = (page - 1) * limit;
-    let query = `SELECT * FROM document`;
+    let query = `SELECT * FROM documentOffline`;
     const queryParams = [];
     const whereConditions = [];
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`document.location LIKE ?`);
+        whereConditions.push(`documentOffline.location LIKE ?`);
         queryParams.push(`%${filters['location_id.name']}%`);
     }
 
     if (filters?.state !== undefined) {
-        whereConditions.push(`document.state = ?`);
+        whereConditions.push(`documentOffline.state = ?`);
         queryParams.push(filters.state);
     }
 
@@ -118,17 +118,17 @@ export const getTotalDocument = async (
         'location_id.name'?: string;
     }
 ): Promise<number> => {
-    let queryTotal = `SELECT COUNT(*) as total FROM document`;
+    let queryTotal = `SELECT COUNT(*) as total FROM documentOffline`;
     const queryParams = [];
     const whereConditions = [];
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`document.location LIKE ?`);
+        whereConditions.push(`documentOffline.location LIKE ?`);
         queryParams.push(`%${filters['location_id.name']}%`);
     }
 
     if (filters?.state !== undefined) {
-        whereConditions.push(`document.use_state = ?`);
+        whereConditions.push(`documentOffline.use_state = ?`);
         queryParams.push(filters.state);
     }
 
@@ -161,7 +161,7 @@ export const updateDocument = (db: SQLiteDatabase, document: DocumentData) => {
 
     const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
 
-    const queryUpdate = `UPDATE document SET ${setClauses.join(
+    const queryUpdate = `UPDATE documentOffline SET ${setClauses.join(
         ', '
     )} ${whereClause}`;
 
@@ -171,18 +171,18 @@ export const updateDocument = (db: SQLiteDatabase, document: DocumentData) => {
                 queryUpdate,
                 queryParams,
                 () => {
-                    console.log('Table document update  successfully');
+                    console.log('Table documentOffline update  successfully');
                 },
                 (_, error) => {
                     console.log('Error occurred while update data:', error);
                     throw new Error(
-                        `Failed to update document : ${error.message}`
+                        `Failed to update documentOffline : ${error.message}`
                     );
                 }
             );
         });
         console.log('Document updated successfully');
     } catch (err) {
-        throw new Error(`Error updating document : ${err.message}`);
+        throw new Error(`Error updating documentOffline : ${err.message}`);
     }
 };

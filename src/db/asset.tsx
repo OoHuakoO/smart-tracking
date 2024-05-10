@@ -222,22 +222,22 @@ export const getAsset = async (
     }
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`asset.location LIKE ?`);
+        whereConditions.push(`asset.location = ?`);
         queryParams.push(`%${filters['location_id.name']}%`);
     }
 
     if (filters?.default_code !== undefined) {
-        whereConditions.push(`asset.default_code LIKE ?`);
+        whereConditions.push(`asset.default_code = ?`);
         queryParams.push(`%${filters.default_code}%`);
     }
 
     if (filters?.name !== undefined) {
-        whereConditions.push(`asset.name LIKE ?`);
+        whereConditions.push(`asset.name = ?`);
         queryParams.push(`%${filters.name}%`);
     }
 
     if (filters && filters['category_id.name'] !== undefined) {
-        whereConditions.push(`asset.category LIKE ?`);
+        whereConditions.push(`asset.category = ?`);
         queryParams.push(`%${filters['category_id.name']}%`);
     }
 

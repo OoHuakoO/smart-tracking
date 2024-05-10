@@ -44,7 +44,7 @@ type AssetsSearchScreenProps = NativeStackScreenProps<
 const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     const { navigation } = props;
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
-    const [searchCode, setSearchCode] = useState<string>('');
+    const [searchName, setSearchName] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationData[]>([]);
     const [searchLocation, setSearchLocation] = useState<string>('');
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
@@ -189,7 +189,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
     };
 
     const handleClearInput = useCallback(() => {
-        setSearchCode('');
+        setSearchName('');
         setSearchLocation('');
         setSearchUseState('');
         setSearchCategory('');
@@ -300,14 +300,14 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                     search
                     maxHeight={300}
                     labelField="name"
-                    valueField="default_code"
+                    valueField="name"
                     placeholder={'Select Asset'}
                     searchPlaceholder="Search"
-                    value={searchCode}
+                    value={searchName}
                     onFocus={() => setIsFocusAsset(true)}
                     onBlur={() => setIsFocusAsset(false)}
                     onChange={(item) => {
-                        setSearchCode(item?.default_code);
+                        setSearchName(item?.name);
                     }}
                     onChangeText={(text) => handleOnChangeSearchAsset(text)}
                     searchQuery={handleSearchQuery}
@@ -406,7 +406,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         onPress={() =>
                             navigation.navigate('Assets', {
                                 assetSearch: {
-                                    default_code: searchCode,
+                                    name: searchName,
                                     'location_id.name': searchLocation,
                                     use_state: searchUseState,
                                     'category_id.name': searchCategory

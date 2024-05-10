@@ -4,7 +4,7 @@ import { SQLiteDatabase } from 'react-native-sqlite-storage';
 export const createTableDocumentLine = (db: SQLiteDatabase) => {
     db.transaction(
         (tx) => {
-            const query = `CREATE TABLE IF NOT EXISTS documentLine(
+            const query = `CREATE TABLE IF NOT EXISTS documentLineOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             asset_id INTEGER NOT NULL,
             tracking_id INTEGER NOT NULL,
@@ -39,11 +39,14 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             );
         },
         (error) => {
-            console.log('Transaction createTableDocumentLine error:', error);
+            console.log(
+                'Transaction createTableDocumentLineOffline error:',
+                error
+            );
         },
         () => {
             console.log(
-                'Transaction createTableDocumentLine completed successfully'
+                'Transaction createTableDocumentLineOffline completed successfully'
             );
         }
     );
@@ -54,7 +57,7 @@ export const insertDocumentLineData = (
     documentLine: DocumentAssetData[]
 ) => {
     const queryInsert =
-        `INSERT INTO documentLine (
+        `INSERT INTO documentLineOffline (
           asset_id,
           tracking_id,
           code,
@@ -94,7 +97,9 @@ export const insertDocumentLineData = (
         });
         console.log('All document line inserted successfully');
     } catch (err) {
-        throw new Error(`Error inserting document line: ${err.message}`);
+        throw new Error(
+            `Error inserting document line offline: ${err.message}`
+        );
     }
 };
 
@@ -108,17 +113,17 @@ export const getDocumentLine = async (
     limit: number = 10
 ): Promise<DocumentAssetData[]> => {
     const offset = (page - 1) * limit;
-    let query = `SELECT * FROM documentLine`;
+    let query = `SELECT * FROM documentLineOffline`;
     const queryParams = [];
     const whereConditions = [];
 
     if (filters?.tracking_id !== undefined) {
-        whereConditions.push(`documentLine.tracking_id = ?`);
+        whereConditions.push(`documentLineOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
     }
 
     if (filters?.default_code !== undefined) {
-        whereConditions.push(`documentLine.code = ?`);
+        whereConditions.push(`documentLineOffline.code = ?`);
         queryParams.push(filters.default_code);
     }
 
@@ -141,7 +146,9 @@ export const getDocumentLine = async (
 
         return assets;
     } catch (err) {
-        throw new Error(`Error retrieving document line: ${err.message}`);
+        throw new Error(
+            `Error retrieving document line offline: ${err.message}`
+        );
     }
 };
 
@@ -151,12 +158,12 @@ export const getTotalDocumentLine = async (
         tracking_id?: number;
     }
 ): Promise<number> => {
-    let queryTotal = `SELECT COUNT(*) as total FROM documentLine`;
+    let queryTotal = `SELECT COUNT(*) as total FROM documentLineOffline`;
     const queryParams = [];
     const whereConditions = [];
 
     if (filters?.tracking_id !== undefined) {
-        whereConditions.push(`documentLine.tracking_id = ?`);
+        whereConditions.push(`documentLineOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
     }
 
@@ -173,7 +180,7 @@ export const getTotalDocumentLine = async (
         }
     } catch (err) {
         throw new Error(
-            `Error calculating total document line :  ${err.message}`
+            `Error calculating total document line offline :  ${err.message}`
         );
     }
 };
@@ -228,7 +235,7 @@ export const updateDocumentLineData = (
 
     const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
 
-    const queryUpdate = `UPDATE documentLine SET ${setClauses.join(
+    const queryUpdate = `UPDATE documentLineOffline SET ${setClauses.join(
         ', '
     )} ${whereClause}`;
 
@@ -238,15 +245,15 @@ export const updateDocumentLineData = (
                 queryUpdate,
                 queryParams,
                 () => {
-                    console.log('Table document created successfully');
+                    console.log('Updated document line successfully');
                 },
                 (_, error) => {
                     console.log(
-                        'Error occurred while creating the table:',
+                        'Error occurred while updated the document line:',
                         error
                     );
                     throw new Error(
-                        `Failed to create document table: ${error.message}`
+                        `Failed to updated document line : ${error.message}`
                     );
                 }
             );
@@ -261,7 +268,7 @@ export const removeDocumentLineByAssetId = (
     db: SQLiteDatabase,
     assetId: number
 ) => {
-    const deleteQuery = `DELETE FROM documentLine WHERE asset_id = ?`;
+    const deleteQuery = `DELETE FROM documentLineOffline WHERE asset_id = ?`;
     try {
         db.transaction((tx) => {
             tx.executeSql(deleteQuery, [assetId]);

@@ -39,10 +39,14 @@ import {
     updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import {
-    createTableDocument,
-    getDocument,
+    createTableDocumentOffline,
+    getDocumentOffline,
     updateDocument
 } from '@src/db/documentOffline';
+import {
+    createTableDocumentOnline,
+    insertDocumentOnlineData
+} from '@src/db/documentOnline';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import {
     createTableReportAssetNotFound,
@@ -57,7 +61,8 @@ import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
 import {
     AddDocumentLine,
     CreateDocument,
-    GetDocumentLineSearch
+    GetDocumentLineSearch,
+    GetDocumentSearch
 } from '@src/services/document';
 import {
     GetAssets,
@@ -69,7 +74,7 @@ import { loginState, useRecoilValue, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
-import { DocumentAssetData } from '@src/typings/document';
+import { DocumentAssetData, DocumentData } from '@src/typings/document';
 import {
     AssetData,
     CategoryData,
@@ -79,7 +84,7 @@ import {
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
-import { getOnlineMode } from '@src/utils/common';
+import { getOnlineMode, handleMapDocumentStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
@@ -127,7 +132,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             await createTableLocation(db);
             await createTableUseStatus(db);
             await createTableCategory(db);
-            await createTableDocument(db);
+            await createTableDocumentOnline(db);
+            await createTableDocumentOffline(db);
             await createTableDocumentLine(db);
             await createTableReportAssetNotFound(db);
             await createTableReportDocumentLine(db);
@@ -322,6 +328,41 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadDocument = useCallback(
+        async (totalPages: number): Promise<DocumentData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetDocumentSearch({
+                        page: i + 1,
+                        limit: 1000,
+                        search_term: {
+                            and: { state: ['draft', 'open', 'done', 'cancel'] }
+                        }
+                    })
+                );
+                const results = await Promise.all(promises);
+                const documents =
+                    results.flatMap((result) =>
+                        result?.result?.data?.documents?.map((item) => {
+                            return {
+                                ...item,
+                                state: handleMapDocumentStateValue(item?.state)
+                            };
+                        })
+                    ) ?? [];
+                return documents;
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load documentLine');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
     const handleLoadDocumentLine = useCallback(
         async (totalPages: number): Promise<DocumentAssetData[]> => {
             try {
@@ -364,6 +405,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseUseStatus,
                 initialResponseCategory,
                 initialResponseAssetNotFound,
+                initialDocument,
                 initialDocumentLine
             ] = await Promise.all([
                 GetAssets({ page: 1, limit: 200 }),
@@ -375,6 +417,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     limit: 1000,
                     search_term: {
                         and: { state: STATE_ASSET }
+                    }
+                }),
+                GetDocumentSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: ['draft', 'open', 'done', 'cancel'] }
                     }
                 }),
                 GetDocumentLineSearch({
@@ -401,6 +450,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const errorAssetNotFound = handleResponseError(
                 initialResponseAssetNotFound?.error
             );
+            const errorDocument = handleResponseError(initialDocument?.error);
             const errorDocumentLine = handleResponseError(
                 initialDocumentLine?.error
             );
@@ -411,6 +461,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 errorUseStatus ||
                 errorCategorys ||
                 errorAssetNotFound ||
+                errorDocument ||
                 errorDocumentLine
             ) {
                 return;
@@ -426,6 +477,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseCategory?.result?.data?.total_page;
             const totalPagesAssetNotFound =
                 initialResponseAssetNotFound?.result?.data?.total_pages;
+            const totalPagesDocument =
+                initialDocumentLine?.result?.data?.total_page;
             const totalPagesDocumentLine =
                 initialDocumentLine?.result?.data?.total_page;
 
@@ -434,12 +487,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 listUseStatus,
                 listCategory,
                 listAssetNotFound,
+                listDocument,
                 listDocumentLine
             ] = await Promise.all([
                 handleLoadLocation(totalPagesLocation),
                 handleLoadUseStatus(totalPagesUseStatus),
                 handleLoadCategory(totalPagesCategory),
                 handleLoadAssetNotFound(totalPagesAssetNotFound),
+                handleLoadDocument(totalPagesDocument),
                 handleLoadDocumentLine(totalPagesDocumentLine)
             ]);
 
@@ -463,11 +518,15 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await createTableLocation(db);
                 await createTableUseStatus(db);
                 await createTableCategory(db);
+                await createTableDocumentOnline(db);
                 await createTableReportAssetNotFound(db);
                 await createTableReportDocumentLine(db);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
                 await insertCategoryData(db, listCategory);
+                if (listDocument?.length > 0) {
+                    await insertDocumentOnlineData(db, listDocument);
+                }
                 if (listAssetNotFound?.length > 0) {
                     await insertReportAssetNotFound(db, listAssetNotFound);
                 }
@@ -491,6 +550,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         clearStateDialog,
         handleLoadAssetNotFound,
         handleLoadCategory,
+        handleLoadDocument,
         handleLoadDocumentLine,
         handleLoadLocation,
         handleLoadUseStatus,
@@ -558,7 +618,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const filterDocument = {
                 state: STATE_DOCUMENT_NAME?.Draft
             };
-            const listDocument = await getDocument(db, filterDocument, 1, 1000);
+            const listDocument = await getDocumentOffline(
+                db,
+                filterDocument,
+                1,
+                1000
+            );
 
             listDocument?.forEach(async (item) => {
                 const responseCreateDocument = await CreateDocument({

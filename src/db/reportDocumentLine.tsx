@@ -55,8 +55,10 @@ export const insertReportDocumentLine = (
     db: SQLiteDatabase,
     documentAssetData: DocumentAssetData[]
 ) => {
-    const queryInsert =
-        `INSERT INTO reportDocumentLine (
+    let queryInsert = '';
+    if (documentAssetData.some((item) => item.mode !== undefined)) {
+        queryInsert =
+            `INSERT INTO reportDocumentLine (
           tracking_id,
           code,
           name,
@@ -67,9 +69,9 @@ export const insertReportDocumentLine = (
           use_state,
           mode
     ) VALUES ` +
-        documentAssetData
-            .map(
-                (item) => `(
+            documentAssetData
+                .map(
+                    (item) => `(
                      ${item.tracking_id},
                     '${item.code}',
                     '${item.name}',
@@ -78,10 +80,37 @@ export const insertReportDocumentLine = (
                     '${item.location}',
                     '${item.state}',
                     '${item.use_state}',
-                    '${item.mode}',
+                    '${item.mode}'
                     )`
-            )
-            .join(',');
+                )
+                .join(',');
+    } else {
+        queryInsert =
+            `INSERT INTO reportDocumentLine (
+          tracking_id,
+          code,
+          name,
+          category,
+          location_old,
+          location,
+          state,
+          use_state
+    ) VALUES ` +
+            documentAssetData
+                .map(
+                    (item) => `(
+                     ${item.tracking_id},
+                    '${item.code}',
+                    '${item.name}',
+                    '${item.category}',
+                    '${item.location_old}',
+                    '${item.location}',
+                    '${item.state}',
+                    '${item.use_state}'
+                    )`
+                )
+                .join(',');
+    }
 
     try {
         db.transaction(

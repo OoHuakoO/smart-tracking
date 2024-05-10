@@ -35,7 +35,7 @@ type LocationAssetSearchProps = NativeStackScreenProps<
 const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
     const { navigation, route } = props;
     const [listAsset, setListAsset] = useState<AssetData[]>([]);
-    const [searchCode, setSearchCode] = useState<string>('');
+    const [searchName, setSearchName] = useState<string>('');
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
     const [listCategory, setListCategory] = useState<CategoryData[]>([]);
@@ -171,7 +171,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         }
     }, []);
     const handleClearInput = useCallback(() => {
-        setSearchCode('');
+        setSearchName('');
         setSearchUseState('');
         setSearchCategory('');
     }, []);
@@ -231,14 +231,14 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     search
                     maxHeight={300}
                     labelField="name"
-                    valueField="default_code"
+                    valueField="name"
                     placeholder={'Select Asset'}
                     searchPlaceholder="Search"
-                    value={searchCode}
+                    value={searchName}
                     onFocus={() => setIsFocusAsset(true)}
                     onBlur={() => setIsFocusAsset(false)}
                     onChange={(item) => {
-                        setSearchCode(item?.default_code);
+                        setSearchName(item?.name);
                     }}
                     onChangeText={(text) => handleOnChangeSearchAsset(text)}
                     searchQuery={handleSearchQuery}
@@ -308,7 +308,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                         onPress={() =>
                             navigation.navigate('LocationListAsset', {
                                 assetSearch: {
-                                    default_code: searchCode,
+                                    name: searchName,
                                     use_state: searchUseState,
                                     'category_id.name': searchCategory
                                 },
