@@ -109,6 +109,7 @@ export interface ReportAssetData {
     use_state: string;
     new_img: boolean;
     image: string;
+    mode?: string;
 }
 
 export interface ReportData {

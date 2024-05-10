@@ -69,6 +69,7 @@ export const getDocumentOffline = async (
     filters?: {
         state?: string;
         'location_id.name'?: string;
+        tracking_id?: number;
     },
     page: number = 1,
     limit: number = 10
@@ -86,6 +87,11 @@ export const getDocumentOffline = async (
     if (filters?.state !== undefined) {
         whereConditions.push(`documentOffline.state = ?`);
         queryParams.push(filters.state);
+    }
+
+    if (filters?.tracking_id !== undefined) {
+        whereConditions.push(`documentOffline.id = ?`);
+        queryParams.push(filters.tracking_id);
     }
 
     if (whereConditions.length > 0) {

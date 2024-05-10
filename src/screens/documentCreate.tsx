@@ -9,14 +9,14 @@ import PopupScanAsset from '@src/components/views/popupScanAsset';
 import {
     MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    STATE_DOCUMENT_NAME,
     USE_STATE_ASSET_TH
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import {
-    getDocumentLine,
-    insertDocumentLineData
-} from '@src/db/documentLineOffline';
+import { insertDocumentLineData } from '@src/db/documentLineOffline';
+import { getDocumentOffline } from '@src/db/documentOffline';
+import { getDocumentOnline } from '@src/db/documentOnline';
 import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
 import {
     getReportDocumentLine,
@@ -30,7 +30,11 @@ import { documentState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState } from '@src/typings/common';
-import { AssetData, UseStatusData } from '@src/typings/downloadDB';
+import {
+    AssetData,
+    ReportAssetData,
+    UseStatusData
+} from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
@@ -207,7 +211,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 ? listUseStateFilter[0].use_status_id
                                 : 2,
                         image: assetCreate?.image,
-                        new_img: assetCreate?.new_img
+                        new_img: assetCreate?.new_img,
+                        mode: 'offline'
                     });
                     await removeReportAssetNotFoundByCode(
                         db,
@@ -410,154 +415,213 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         [clearStateDialog, documentValue?.location]
     );
 
+    const handleCheckDuplicateOnline = useCallback(
+        async (code: string) => {
+            const responseDocumentLine = await GetDocumentLineSearch({
+                page: 1,
+                limit: 10,
+                search_term: {
+                    and: {
+                        name: code,
+                        'tracking_id.state': ['draft', 'open', 'done']
+                    }
+                }
+            });
+            const isDuplicateAssetInDocumentLine =
+                responseDocumentLine?.result?.data?.document_item_line?.length >
+                0;
+            const isDuplicateAssetInListAssetCreate = listAssetCreate.some(
+                (item) => item?.default_code === code
+            );
+
+            if (
+                isDuplicateAssetInDocumentLine ||
+                isDuplicateAssetInListAssetCreate
+            ) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog('Duplicate Asset');
+                if (isDuplicateAssetInDocumentLine) {
+                    setContentDialog(
+                        `${code} is duplicate in document ${responseDocumentLine?.result?.data?.document_item_line[0]?.assets[0]?.tracking_id}`
+                    );
+                }
+                if (isDuplicateAssetInListAssetCreate) {
+                    setContentDialog(
+                        `${code} is duplicate in document ${documentValue?.id}`
+                    );
+                }
+
+                setShowCancelDialog(false);
+                return true;
+            }
+            return false;
+        },
+        [clearStateDialog, documentValue?.id, listAssetCreate]
+    );
+
+    const handleOnlineSearch = useCallback(
+        async (code: string) => {
+            if (await handleCheckDuplicateOnline(code)) return;
+            const response = await GetAssetSearch({
+                page: 1,
+                limit: 10,
+                search_term: {
+                    and: {
+                        default_code: code
+                    }
+                }
+            });
+            if (response?.error) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setContentDialog('Something went wrong search asset');
+                return;
+            }
+
+            if (response?.result?.data?.total === 0) {
+                clearStateDialog();
+                setAssetCodeNew(code);
+                setVisibleDialog(true);
+                setShowCancelDialog(true);
+                setTitleDialog('Asset not found in Master');
+                setContentDialog('Do you want to add new asset?');
+                return;
+            }
+
+            if (response?.result?.data?.total > 0) {
+                handleMapValueToSetAssetData(response?.result?.data?.asset[0]);
+            }
+        },
+        [
+            clearStateDialog,
+            handleCheckDuplicateOnline,
+            handleMapValueToSetAssetData
+        ]
+    );
+
+    const handleCheckDuplicateOffline = useCallback(
+        async (code: string, listReportDocumentLineDB: ReportAssetData[]) => {
+            const db = await getDBConnection();
+            const isDuplicateAssetInListAssetCreate = listAssetCreate.some(
+                (item) => item?.default_code === code
+            );
+
+            let isDuplicateAssetInListReportDocumentLineDB = false;
+
+            if (listReportDocumentLineDB.length > 0) {
+                const filterDocument = {
+                    tracking_id: listReportDocumentLineDB[0].tracking_id
+                };
+                if (listReportDocumentLineDB[0].mode === 'online') {
+                    const listDocumentDB = await getDocumentOnline(
+                        db,
+                        filterDocument
+                    );
+                    if (listDocumentDB.length > 0) {
+                        if (
+                            listDocumentDB[0].state ===
+                            STATE_DOCUMENT_NAME.Cancel
+                        ) {
+                            isDuplicateAssetInListReportDocumentLineDB = false;
+                        } else {
+                            isDuplicateAssetInListReportDocumentLineDB = true;
+                        }
+                    }
+                } else {
+                    const listDocumentDB = await getDocumentOffline(
+                        db,
+                        filterDocument
+                    );
+                    if (listDocumentDB.length > 0) {
+                        if (
+                            listDocumentDB[0].state ===
+                            STATE_DOCUMENT_NAME.Cancel
+                        ) {
+                            isDuplicateAssetInListReportDocumentLineDB = false;
+                        } else {
+                            isDuplicateAssetInListReportDocumentLineDB = true;
+                        }
+                    }
+                }
+            }
+
+            if (
+                isDuplicateAssetInListReportDocumentLineDB ||
+                isDuplicateAssetInListAssetCreate
+            ) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog('Duplicate Asset');
+
+                if (isDuplicateAssetInListReportDocumentLineDB) {
+                    setContentDialog(
+                        `${code} is duplicate in document ${listReportDocumentLineDB[0]?.tracking_id}`
+                    );
+                }
+                if (isDuplicateAssetInListAssetCreate) {
+                    setContentDialog(
+                        `${code} is duplicate in document ${documentValue?.id}`
+                    );
+                }
+                setShowCancelDialog(false);
+                return true;
+            }
+            return false;
+        },
+        [clearStateDialog, documentValue?.id, listAssetCreate]
+    );
+
+    const handleOfflineSearch = useCallback(
+        async (code: string) => {
+            const db = await getDBConnection();
+            const filter = {
+                default_code: code
+            };
+            const listReportDocumentLineDB = await getReportDocumentLine(
+                db,
+                filter
+            );
+
+            if (
+                await handleCheckDuplicateOffline(
+                    code,
+                    listReportDocumentLineDB
+                )
+            )
+                return;
+
+            const asset = await getAsset(db, filter);
+
+            if (asset.length === 0) {
+                clearStateDialog();
+                setAssetCodeNew(code);
+                setVisibleDialog(true);
+                setShowCancelDialog(true);
+                setTitleDialog('Asset not found in Master');
+                setContentDialog('Do you want to add new asset?');
+                return;
+            }
+            handleMapValueToSetAssetData(asset[0]);
+        },
+        [
+            clearStateDialog,
+            handleCheckDuplicateOffline,
+            handleMapValueToSetAssetData
+        ]
+    );
+
     const handleSearchAsset = useCallback(
         async (code: string) => {
             try {
+                if (code === '' || code === undefined) return;
                 setAssetCode('');
                 setSelectedImage(null);
                 const isOnline = await getOnlineMode();
-                if (code !== '' && code !== undefined) {
-                    if (isOnline) {
-                        const responseDocumentLine =
-                            await GetDocumentLineSearch({
-                                page: 1,
-                                limit: 10,
-                                search_term: {
-                                    and: {
-                                        name: code,
-                                        'tracking_id.state': [
-                                            'draft',
-                                            'open',
-                                            'done'
-                                        ]
-                                    }
-                                }
-                            });
-
-                        const isDuplicateAssetInDocumentLine =
-                            responseDocumentLine?.result?.data
-                                ?.document_item_line?.length > 0;
-                        const isDuplicateAssetInListAssetCreate =
-                            listAssetCreate.some(
-                                (item) => item?.default_code === code
-                            );
-
-                        if (
-                            isDuplicateAssetInDocumentLine ||
-                            isDuplicateAssetInListAssetCreate
-                        ) {
-                            clearStateDialog();
-                            setVisibleDialog(true);
-                            setTitleDialog('Duplicate Asset');
-                            if (isDuplicateAssetInDocumentLine) {
-                                setContentDialog(
-                                    `${code} is duplicate in document ${responseDocumentLine?.result?.data?.document_item_line[0]?.assets[0]?.tracking_id}`
-                                );
-                            }
-                            if (isDuplicateAssetInListAssetCreate) {
-                                setContentDialog(
-                                    `${code} is duplicate in document ${documentValue?.id}`
-                                );
-                            }
-
-                            setShowCancelDialog(false);
-                            return;
-                        }
-
-                        const response = await GetAssetSearch({
-                            page: 1,
-                            limit: 10,
-                            search_term: {
-                                and: {
-                                    default_code: code
-                                }
-                            }
-                        });
-                        if (response?.error) {
-                            clearStateDialog();
-                            setVisibleDialog(true);
-                            setContentDialog(
-                                'Something went wrong search asset'
-                            );
-                            return;
-                        }
-
-                        if (response?.result?.data?.total === 0) {
-                            clearStateDialog();
-                            setAssetCodeNew(code);
-                            setVisibleDialog(true);
-                            setShowCancelDialog(true);
-                            setTitleDialog('Asset not found in Master');
-                            setContentDialog('Do you want to add new asset?');
-                            return;
-                        }
-
-                        if (response?.result?.data?.total > 0) {
-                            handleMapValueToSetAssetData(
-                                response?.result?.data?.asset[0]
-                            );
-                        }
-                    } else {
-                        const db = await getDBConnection();
-                        const filter = {
-                            default_code: code
-                        };
-                        const listDocumentLineDB = await getDocumentLine(
-                            db,
-                            filter
-                        );
-                        const listReportDocumentLineDB =
-                            await getReportDocumentLine(db, filter);
-
-                        const isDuplicateAssetInListDocumentLineDB =
-                            listDocumentLineDB?.length > 0;
-                        const isDuplicateAssetInListReportDocumentLineDB =
-                            listReportDocumentLineDB?.length > 0;
-                        const isDuplicateAssetInListAssetCreate =
-                            listAssetCreate.some(
-                                (item) => item?.default_code === code
-                            );
-
-                        if (
-                            isDuplicateAssetInListDocumentLineDB ||
-                            isDuplicateAssetInListReportDocumentLineDB ||
-                            isDuplicateAssetInListAssetCreate
-                        ) {
-                            clearStateDialog();
-                            setVisibleDialog(true);
-                            setTitleDialog('Duplicate Asset');
-                            if (isDuplicateAssetInListDocumentLineDB) {
-                                setContentDialog(
-                                    `${code} is duplicate in document ${listDocumentLineDB[0]?.tracking_id}`
-                                );
-                            }
-                            if (isDuplicateAssetInListReportDocumentLineDB) {
-                                setContentDialog(
-                                    `${code} is duplicate in document ${listReportDocumentLineDB[0]?.tracking_id}`
-                                );
-                            }
-                            if (isDuplicateAssetInListAssetCreate) {
-                                setContentDialog(
-                                    `${code} is duplicate in document ${documentValue?.id}`
-                                );
-                            }
-                            setShowCancelDialog(false);
-                            return;
-                        }
-
-                        const asset = await getAsset(db, filter);
-
-                        if (asset.length === 0) {
-                            clearStateDialog();
-                            setAssetCodeNew(code);
-                            setVisibleDialog(true);
-                            setShowCancelDialog(true);
-                            setTitleDialog('Asset not found in Master');
-                            setContentDialog('Do you want to add new asset?');
-                            return;
-                        }
-                        handleMapValueToSetAssetData(asset[0]);
-                    }
+                if (isOnline) {
+                    handleOnlineSearch(code);
+                } else {
+                    handleOfflineSearch(code);
                 }
             } catch (err) {
                 clearStateDialog();
@@ -565,12 +629,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 setContentDialog('Something went wrong search asset');
             }
         },
-        [
-            clearStateDialog,
-            documentValue?.id,
-            handleMapValueToSetAssetData,
-            listAssetCreate
-        ]
+        [clearStateDialog, handleOfflineSearch, handleOnlineSearch]
     );
 
     const getImage = useCallback((): string => {
