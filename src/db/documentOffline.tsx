@@ -128,12 +128,16 @@ export const getTotalDocument = async (
     }
 
     if (filters?.state !== undefined) {
-        whereConditions.push(`documentOffline.use_state = ?`);
+        whereConditions.push(`documentOffline.state = ?`);
         queryParams.push(filters.state);
     }
 
+    if (whereConditions.length > 0) {
+        queryTotal += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
     try {
-        const results = await db.executeSql(queryTotal);
+        const results = await db.executeSql(queryTotal, queryParams);
         if (results.length > 0 && results[0].rows.length > 0) {
             return results[0].rows.item(0).total;
         } else {
@@ -171,7 +175,7 @@ export const updateDocument = (db: SQLiteDatabase, document: DocumentData) => {
                 queryUpdate,
                 queryParams,
                 () => {
-                    console.log('Table documentOffline update  successfully');
+                    console.log('Table documentOffline update successfully');
                 },
                 (_, error) => {
                     console.log('Error occurred while update data:', error);

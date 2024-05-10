@@ -228,12 +228,12 @@ export const getAsset = async (
 
     if (filters?.default_code !== undefined) {
         whereConditions.push(`asset.default_code = ?`);
-        queryParams.push(`%${filters.default_code}%`);
+        queryParams.push(filters.default_code);
     }
 
     if (filters?.name !== undefined) {
         whereConditions.push(`asset.name = ?`);
-        queryParams.push(`%${filters.name}%`);
+        queryParams.push(filters.name);
     }
 
     if (filters && filters['category_id.name'] !== undefined) {
@@ -349,13 +349,13 @@ export const getTotalAssets = async (
     }
 
     if (filters?.default_code !== undefined) {
-        whereConditions.push(`asset.default_code LIKE ?`);
-        queryParams.push(`%${filters.default_code}%`);
+        whereConditions.push(`asset.default_code = ?`);
+        queryParams.push(filters.default_code);
     }
 
     if (filters?.name !== undefined) {
-        whereConditions.push(`asset.name LIKE ?`);
-        queryParams.push(`%${filters.name}%`);
+        whereConditions.push(`asset.name = ?`);
+        queryParams.push(filters.name);
     }
 
     if (filters && filters['category_id.name'] !== undefined) {

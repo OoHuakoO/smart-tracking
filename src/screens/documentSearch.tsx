@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import { getDBConnection } from '@src/db/config';
-import { getLocationSuggestion } from '@src/db/location';
+import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
 import { theme } from '@src/theme';
@@ -104,6 +104,10 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     limit: 10
                 });
                 setListLocation(responseLocation?.result?.data?.asset);
+            } else {
+                const db = await getDBConnection();
+                const listLocationDB = await getLocations(db);
+                setListLocation(listLocationDB);
             }
         } catch (err) {
             console.log(err);
@@ -199,13 +203,13 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 data={stateList}
                 maxHeight={300}
                 labelField="label"
-                valueField="value"
+                valueField="label"
                 placeholder={'Select State'}
                 value={searchState}
                 onFocus={() => setIsFocusState(true)}
                 onBlur={() => setIsFocusState(false)}
                 onChange={(item) => {
-                    setSearchState(item?.value);
+                    setSearchState(item?.label);
                 }}
                 renderItem={renderItemUseState}
             />
