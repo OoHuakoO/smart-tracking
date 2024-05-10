@@ -71,6 +71,9 @@ export const getDocumentOffline = async (
         'location_id.name'?: string;
         tracking_id?: number;
     },
+    sort?: {
+        date_order?: boolean;
+    },
     page: number = 1,
     limit: number = 10
 ): Promise<DocumentData[]> => {
@@ -96,6 +99,10 @@ export const getDocumentOffline = async (
 
     if (whereConditions.length > 0) {
         query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+
+    if (sort?.date_order) {
+        query += ` ORDER BY date_order DESC`;
     }
 
     query += ` LIMIT ? OFFSET ?`;

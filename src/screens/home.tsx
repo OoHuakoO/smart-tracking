@@ -621,6 +621,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const listDocument = await getDocumentOffline(
                 db,
                 filterDocument,
+                null,
                 1,
                 1000
             );

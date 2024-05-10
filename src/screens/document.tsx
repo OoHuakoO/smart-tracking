@@ -19,11 +19,12 @@ import { GetLocationSearch } from '@src/services/location';
 import { documentState, loginState } from '@src/store';
 import { theme } from '@src/theme';
 import { DocumentState, LoginState } from '@src/typings/common';
-import { DocumentData } from '@src/typings/document';
+import { DocumentData, SearchDocument } from '@src/typings/document';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import {
     getOnlineMode,
+    handleMapDocumentStateName,
     handleMapDocumentStateValue,
     removeKeyEmpty
 } from '@src/utils/common';
@@ -154,15 +155,24 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
-            const documentSearch = removeKeyEmpty(
+            const documentSearch: SearchDocument = removeKeyEmpty(
                 route?.params?.documentSearch
-            );
+            ) as SearchDocument;
+
             if (isOnline) {
                 const response = await GetDocumentSearch({
                     page: 1,
                     limit: 10,
                     search_term: {
-                        and: { ...documentSearch, user_id: loginValue?.uid }
+                        and: {
+                            ...{
+                                ...documentSearch,
+                                state: handleMapDocumentStateName(
+                                    documentSearch?.state
+                                )
+                            },
+                            user_id: loginValue?.uid
+                        }
                     }
                 });
                 response?.result?.data?.documents?.map((item) => {
@@ -173,10 +183,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 setCountDocument(totalPagesDocument);
                 setListDocument(response?.result?.data?.documents);
             } else {
+                const sort = {
+                    date_order: true
+                };
                 const db = await getDBConnection();
                 const listDocumentDB = await getDocumentOffline(
                     db,
-                    documentSearch
+                    documentSearch,
+                    sort
                 );
                 listDocumentDB?.map((item) => {
                     item.date_order = parseDateString(item?.date_order);
@@ -203,15 +217,23 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setLoading(true);
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
-                const documentSearch = removeKeyEmpty(
+                const documentSearch: SearchDocument = removeKeyEmpty(
                     route?.params?.documentSearch
-                );
+                ) as SearchDocument;
                 if (isOnline) {
                     const response = await GetDocumentSearch({
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            and: { ...documentSearch, user_id: loginValue?.uid }
+                            and: {
+                                ...{
+                                    ...documentSearch,
+                                    state: handleMapDocumentStateName(
+                                        documentSearch?.state
+                                    )
+                                },
+                                user_id: loginValue?.uid
+                            }
                         }
                     });
                     response?.result?.data?.documents?.map((item) => {
@@ -223,10 +245,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         ...response?.result?.data?.documents
                     ]);
                 } else {
+                    const sort = {
+                        date_order: true
+                    };
                     const db = await getDBConnection();
                     const listDocumentDB = await getDocumentOffline(
                         db,
                         documentSearch,
+                        sort,
                         page + 1
                     );
                     listDocumentDB?.map((item) => {
