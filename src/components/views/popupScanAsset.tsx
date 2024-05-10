@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
         width: wp('80%'),
         alignSelf: 'center',
         display: 'flex',
-        marginTop: 20
+        marginTop: 10
     },
 
     assetDetailDes: {
@@ -407,7 +407,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 20,
         marginBottom: 20
     },
     buttonText: {

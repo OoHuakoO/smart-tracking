@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.backgroundPassword,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 50
+        paddingTop: 20
     },
     backToPrevious: {
         marginBottom: 20,
