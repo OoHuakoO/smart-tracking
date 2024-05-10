@@ -13,7 +13,10 @@ import {
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { getDocumentLine, insertDocumentLineData } from '@src/db/documentLine';
+import {
+    getDocumentLine,
+    insertDocumentLineData
+} from '@src/db/documentLineOffline';
 import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
 import {
     getReportDocumentLine,

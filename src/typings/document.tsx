@@ -13,6 +13,7 @@ export interface DocumentAssetData {
     use_state?: string | number;
     new_img?: boolean;
     image?: string;
+    mode?: string;
     date_check?: string;
     // for offline upload asset
     asset_id_update?: number;

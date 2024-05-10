@@ -25,12 +25,12 @@ import {
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { updateDocument } from '@src/db/document';
 import {
     getDocumentLine,
     getTotalDocumentLine,
     removeDocumentLineByAssetId
-} from '@src/db/documentLine';
+} from '@src/db/documentLineOffline';
+import { updateDocument } from '@src/db/documentOffline';
 import { insertReportAssetNotFound } from '@src/db/reportAssetNotFound';
 import { removeReportDocumentLineByCode } from '@src/db/reportDocumentLine';
 import {

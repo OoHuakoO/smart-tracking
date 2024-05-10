@@ -14,7 +14,8 @@ export const createTableReportDocumentLine = (db: SQLiteDatabase) => {
             location_old TEXT,
             location TEXT,
             state TEXT,
-            use_state TEXT
+            use_state TEXT,
+            mode TEXT DEFAULT online
         );`;
 
             tx.executeSql(
@@ -63,7 +64,8 @@ export const insertReportDocumentLine = (
           location_old,
           location,
           state,
-          use_state
+          use_state,
+          mode
     ) VALUES ` +
         documentAssetData
             .map(
@@ -75,7 +77,8 @@ export const insertReportDocumentLine = (
                     '${item.location_old}',
                     '${item.location}',
                     '${item.state}',
-                    '${item.use_state}'
+                    '${item.use_state}',
+                    '${item.mode}',
                     )`
             )
             .join(',');

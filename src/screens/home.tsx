@@ -34,15 +34,15 @@ import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import {
-    createTableDocument,
-    getDocument,
-    updateDocument
-} from '@src/db/document';
-import {
     createTableDocumentLine,
     getDocumentLine,
     updateDocumentLineData
-} from '@src/db/documentLine';
+} from '@src/db/documentLineOffline';
+import {
+    createTableDocument,
+    getDocument,
+    updateDocument
+} from '@src/db/documentOffline';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import {
     createTableReportAssetNotFound,

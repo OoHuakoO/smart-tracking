@@ -9,7 +9,7 @@ import {
     USE_STATE_ASSET_TH
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
-import { updateDocumentLineData } from '@src/db/documentLine';
+import { updateDocumentLineData } from '@src/db/documentLineOffline';
 import { updateReportDocumentLine } from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { UpdateDocumentLine } from '@src/services/document';

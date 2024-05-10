@@ -11,7 +11,7 @@ import {
     getDocument,
     getTotalDocument,
     insertDocumentData
-} from '@src/db/document';
+} from '@src/db/documentOffline';
 import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
