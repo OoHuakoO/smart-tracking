@@ -502,12 +502,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     const handleCheckDuplicateOffline = useCallback(
         async (code: string, listReportDocumentLineDB: ReportAssetData[]) => {
+            if (listReportDocumentLineDB.length === 0) return false;
             const db = await getDBConnection();
             const isDuplicateAssetInListAssetCreate = listAssetCreate.some(
                 (item) => item?.default_code === code
             );
 
-            let isDuplicateAssetInListReportDocumentLineDB = false;
+            let isDuplicateAssetInListReportDocumentLineDB = true;
 
             if (listReportDocumentLineDB.length > 0) {
                 const filterDocument = {
@@ -518,6 +519,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         db,
                         filterDocument
                     );
+
                     if (listDocumentDB.length > 0) {
                         if (
                             listDocumentDB[0].state ===

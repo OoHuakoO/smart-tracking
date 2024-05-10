@@ -91,7 +91,7 @@ export const getDocumentOnline = async (
     }
 
     if (filters?.tracking_id !== undefined) {
-        whereConditions.push(`documentOnline.id = ?`);
+        whereConditions.push(`documentOnline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
     }
 

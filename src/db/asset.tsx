@@ -222,7 +222,7 @@ export const getAsset = async (
     }
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`asset.location = ?`);
+        whereConditions.push(`asset.location LIKE ?`);
         queryParams.push(`%${filters['location_id.name']}%`);
     }
 
@@ -237,7 +237,7 @@ export const getAsset = async (
     }
 
     if (filters && filters['category_id.name'] !== undefined) {
-        whereConditions.push(`asset.category = ?`);
+        whereConditions.push(`asset.category LIKE ?`);
         queryParams.push(`%${filters['category_id.name']}%`);
     }
 
