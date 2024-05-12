@@ -513,6 +513,7 @@
 				DEVELOPMENT_TEAM = VP39Q7UQRB;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = SmartTracking/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Smart Track";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -540,6 +541,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VP39Q7UQRB;
 				INFOPLIST_FILE = SmartTracking/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Smart Track";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
