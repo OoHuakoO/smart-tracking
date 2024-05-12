@@ -20,10 +20,12 @@ const StatusTag = ({ status }) => {
 
 const styles = StyleSheet.create({
     tag: {
-        paddingHorizontal: 8,
+        paddingHorizontal: 4,
         paddingVertical: 4,
         borderRadius: 5,
-        marginLeft: 10
+        marginLeft: 10,
+        marginRight: 10,
+        justifyContent: 'center'
     },
     tagText: {
         color: '#0D0E0F',
