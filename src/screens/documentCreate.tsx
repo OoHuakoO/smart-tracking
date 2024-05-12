@@ -44,6 +44,7 @@ import {
     FlatList,
     LogBox,
     PermissionsAndroid,
+    Platform,
     SafeAreaView,
     StyleSheet,
     TextInput,
@@ -345,19 +346,36 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 maxHeight: 400,
                 maxWidth: 400
             };
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.CAMERA,
-                {
-                    title: 'App Camera Permission',
-                    message: 'App needs access to your camera ',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK'
-                }
-            );
+            if (Platform.OS === 'android') {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    {
+                        title: 'App Camera Permission',
+                        message: 'App needs access to your camera ',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK'
+                    }
+                );
 
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Camera permission given');
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log('Camera permission given');
+                    launchCamera(options, (response) => {
+                        if (response.didCancel) {
+                            console.log('User cancelled camera');
+                        } else if (response.errorCode) {
+                            console.log(
+                                'Camera Error: ',
+                                response.errorMessage
+                            );
+                        } else {
+                            setSelectedImage(response?.assets?.[0]?.base64);
+                        }
+                    });
+                } else {
+                    console.log('Camera permission denied');
+                }
+            } else {
                 launchCamera(options, (response) => {
                     if (response.didCancel) {
                         console.log('User cancelled camera');
@@ -367,8 +385,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         setSelectedImage(response?.assets?.[0]?.base64);
                     }
                 });
-            } else {
-                console.log('Camera permission denied');
             }
         } catch (err) {
             clearStateDialog();
