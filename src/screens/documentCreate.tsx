@@ -219,7 +219,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 await insertDocumentLineData(db, documentLine);
                 await insertReportDocumentLine(db, documentLine);
             }
-            navigation.replace('DocumentAssetStatus');
+            navigation.navigate('DocumentAssetStatus', {
+                isReFresh: true
+            });
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);

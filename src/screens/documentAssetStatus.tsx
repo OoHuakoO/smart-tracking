@@ -437,7 +437,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
             <View style={styles.listSection}>
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                    Total Document : {totalAssetDocument}
+                    Total Asset : {totalAssetDocument}
                 </Text>
                 <FlatList
                     data={listAssetDocument}
