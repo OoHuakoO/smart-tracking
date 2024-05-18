@@ -14,27 +14,22 @@ import {
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
-import { insertDocumentLineData } from '@src/db/documentLineOffline';
-import { getDocumentOffline } from '@src/db/documentOffline';
-import { getDocumentOnline } from '@src/db/documentOnline';
-import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
 import {
-    getReportDocumentLine,
-    insertReportDocumentLine
-} from '@src/db/reportDocumentLine';
+    getDocumentLine,
+    insertDocumentLineData
+} from '@src/db/documentLineOffline';
+import { getDocumentOffline } from '@src/db/documentOffline';
+import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
+import { insertReportDocumentLine } from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetSearch } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
-import { documentState } from '@src/store';
+import { documentState, loginState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
-import { DocumentState } from '@src/typings/common';
-import {
-    AssetData,
-    ReportAssetData,
-    UseStatusData
-} from '@src/typings/downloadDB';
+import { DocumentState, LoginState } from '@src/typings/common';
+import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
@@ -92,6 +87,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [visibleDialogCamera, setVisibleDialogCamera] =
         useState<boolean>(false);
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
+    const loginValue = useRecoilValue<LoginState>(loginState);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -439,7 +435,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 search_term: {
                     and: {
                         name: code,
-                        'tracking_id.state': ['draft', 'open', 'done']
+                        'tracking_id.state': ['draft', 'open'],
+                        user_id: loginValue?.uid
                     }
                 }
             });
@@ -473,7 +470,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             }
             return false;
         },
-        [clearStateDialog, documentValue?.id, listAssetCreate]
+        [clearStateDialog, documentValue?.id, listAssetCreate, loginValue?.uid]
     );
 
     const handleOnlineSearch = useCallback(
@@ -517,64 +514,56 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     );
 
     const handleCheckDuplicateOffline = useCallback(
-        async (code: string, listReportDocumentLineDB: ReportAssetData[]) => {
-            if (listReportDocumentLineDB.length === 0) return false;
+        async (code: string) => {
             const db = await getDBConnection();
             const isDuplicateAssetInListAssetCreate = listAssetCreate.some(
                 (item) => item?.default_code === code
             );
 
-            let isDuplicateAssetInListReportDocumentLineDB = true;
+            const filterDocumentLine = {
+                default_code: code
+            };
 
-            if (listReportDocumentLineDB.length > 0) {
+            const listDocumentLineDB = await getDocumentLine(
+                db,
+                filterDocumentLine
+            );
+
+            let isDuplicateAssetInListDocumentLineDB = true;
+
+            if (listDocumentLineDB.length > 0) {
                 const filterDocument = {
-                    tracking_id: listReportDocumentLineDB[0].tracking_id
+                    tracking_id: listDocumentLineDB[0].tracking_id
                 };
-                if (listReportDocumentLineDB[0].mode === 'online') {
-                    const listDocumentDB = await getDocumentOnline(
-                        db,
-                        filterDocument
-                    );
 
-                    if (listDocumentDB.length > 0) {
-                        if (
-                            listDocumentDB[0].state ===
-                            STATE_DOCUMENT_NAME.Cancel
-                        ) {
-                            isDuplicateAssetInListReportDocumentLineDB = false;
-                        } else {
-                            isDuplicateAssetInListReportDocumentLineDB = true;
-                        }
-                    }
-                } else {
-                    const listDocumentDB = await getDocumentOffline(
-                        db,
-                        filterDocument
-                    );
-                    if (listDocumentDB.length > 0) {
-                        if (
-                            listDocumentDB[0].state ===
-                            STATE_DOCUMENT_NAME.Cancel
-                        ) {
-                            isDuplicateAssetInListReportDocumentLineDB = false;
-                        } else {
-                            isDuplicateAssetInListReportDocumentLineDB = true;
-                        }
+                const listDocumentDB = await getDocumentOffline(
+                    db,
+                    filterDocument
+                );
+                if (listDocumentDB.length > 0) {
+                    if (
+                        listDocumentDB[0].state ===
+                            STATE_DOCUMENT_NAME.Cancel ||
+                        listDocumentDB[0].state === STATE_DOCUMENT_NAME.Done
+                    ) {
+                        isDuplicateAssetInListDocumentLineDB = false;
+                    } else {
+                        isDuplicateAssetInListDocumentLineDB = true;
                     }
                 }
             }
 
             if (
-                isDuplicateAssetInListReportDocumentLineDB ||
+                isDuplicateAssetInListDocumentLineDB ||
                 isDuplicateAssetInListAssetCreate
             ) {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog('Duplicate Asset');
 
-                if (isDuplicateAssetInListReportDocumentLineDB) {
+                if (isDuplicateAssetInListDocumentLineDB) {
                     setContentDialog(
-                        `${code} is duplicate in document ${listReportDocumentLineDB[0]?.tracking_id}`
+                        `${code} is duplicate in document ${listDocumentLineDB[0]?.tracking_id}`
                     );
                 }
                 if (isDuplicateAssetInListAssetCreate) {
@@ -593,21 +582,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleOfflineSearch = useCallback(
         async (code: string) => {
             const db = await getDBConnection();
+
+            if (await handleCheckDuplicateOffline(code)) return;
+
             const filter = {
                 default_code: code
             };
-            const listReportDocumentLineDB = await getReportDocumentLine(
-                db,
-                filter
-            );
-
-            if (
-                await handleCheckDuplicateOffline(
-                    code,
-                    listReportDocumentLineDB
-                )
-            )
-                return;
 
             const asset = await getAsset(db, filter);
 

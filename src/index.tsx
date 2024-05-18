@@ -14,7 +14,6 @@ import { createTableCategory } from './db/category';
 import { getDBConnection } from './db/config';
 import { createTableDocumentLine } from './db/documentLineOffline';
 import { createTableDocumentOffline } from './db/documentOffline';
-import { createTableDocumentOnline } from './db/documentOnline';
 import { createTableLocation } from './db/location';
 import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
 import { createTableReportDocumentLine } from './db/reportDocumentLine';
@@ -44,7 +43,6 @@ export default function App() {
             await createTableLocation(db);
             await createTableUseStatus(db);
             await createTableCategory(db);
-            await createTableDocumentOnline(db);
             await createTableDocumentOffline(db);
             await createTableDocumentLine(db);
             await createTableReportAssetNotFound(db);

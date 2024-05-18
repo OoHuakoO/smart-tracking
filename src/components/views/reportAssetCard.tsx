@@ -1,7 +1,7 @@
 import { MOVEMENT_ASSET_NORMAL_TH, REPORT_TYPE } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
@@ -27,13 +27,6 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
     } = props;
     return (
         <View style={styles.cardContainer}>
-            <View style={styles.imagesContainer}>
-                <Image
-                    style={styles.image}
-                    source={require('../../../assets/images/default_image.jpg')}
-                    resizeMode="cover"
-                />
-            </View>
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
                     <Text variant="titleMedium" style={styles.assetCode}>

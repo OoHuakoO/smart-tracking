@@ -14,8 +14,7 @@ export const createTableReportDocumentLine = (db: SQLiteDatabase) => {
             location_old TEXT,
             location TEXT,
             state TEXT,
-            use_state TEXT,
-            mode TEXT DEFAULT online
+            use_state TEXT
         );`;
 
             tx.executeSql(
@@ -55,38 +54,8 @@ export const insertReportDocumentLine = (
     db: SQLiteDatabase,
     documentAssetData: DocumentAssetData[]
 ) => {
-    let queryInsert = '';
-    if (documentAssetData.some((item) => item.mode !== undefined)) {
-        queryInsert =
-            `INSERT INTO reportDocumentLine (
-          tracking_id,
-          code,
-          name,
-          category,
-          location_old,
-          location,
-          state,
-          use_state,
-          mode
-    ) VALUES ` +
-            documentAssetData
-                .map(
-                    (item) => `(
-                     ${item.tracking_id},
-                    '${item.code}',
-                    '${item.name}',
-                    '${item.category}',
-                    '${item.location_old}',
-                    '${item.location}',
-                    '${item.state}',
-                    '${item.use_state}',
-                    '${item.mode}'
-                    )`
-                )
-                .join(',');
-    } else {
-        queryInsert =
-            `INSERT INTO reportDocumentLine (
+    const queryInsert =
+        `INSERT INTO reportDocumentLine (
           tracking_id,
           code,
           name,
@@ -96,9 +65,9 @@ export const insertReportDocumentLine = (
           state,
           use_state
     ) VALUES ` +
-            documentAssetData
-                .map(
-                    (item) => `(
+        documentAssetData
+            .map(
+                (item) => `(
                      ${item.tracking_id},
                     '${item.code}',
                     '${item.name}',
@@ -108,9 +77,8 @@ export const insertReportDocumentLine = (
                     '${item.state}',
                     '${item.use_state}'
                     )`
-                )
-                .join(',');
-    }
+            )
+            .join(',');
 
     try {
         db.transaction(
@@ -183,7 +151,7 @@ export const getReportDocumentLine = async (
     }
 
     if (filters?.name !== undefined) {
-        whereConditions.push(`reportDocumentLine.code = ?`);
+        whereConditions.push(`reportDocumentLine.name = ?`);
         queryParams.push(filters.name);
     }
 
@@ -258,7 +226,7 @@ export const getTotalReportDocumentLine = async (
     }
 
     if (filters?.name !== undefined) {
-        whereConditions.push(`reportDocumentLine.code = ?`);
+        whereConditions.push(`reportDocumentLine.name = ?`);
         queryParams.push(filters.name);
     }
 
