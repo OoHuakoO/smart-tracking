@@ -53,9 +53,8 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     locationId: {
-        color: '#9999',
-        fontSize: 14,
-        fontWeight: '500'
+        color: theme.colors.additionalText,
+        fontSize: 14
     },
     buttonContainer: {
         position: 'absolute',

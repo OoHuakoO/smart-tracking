@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         elevation: 4
     },
     totalAsset: {
-        color: '#9999',
+        color: theme.colors.additionalText,
         fontSize: 14,
         fontWeight: '500'
     },
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
+        color: theme.colors.additionalText
     },
     iconContainer: {
         flexDirection: 'row',

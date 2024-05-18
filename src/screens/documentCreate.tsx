@@ -794,6 +794,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         placeholder="Input Code Or Scan"
                         placeholderTextColor={theme.colors.textBody}
                         blurOnSubmit={false}
+                        autoFocus
                         onSubmitEditing={() => {
                             handleSearchAsset(assetCode);
                         }}

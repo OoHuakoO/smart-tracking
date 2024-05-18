@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
     },
     textAssetName: {
         fontFamily: 'Sarabun-Regular',
-        lineHeight: 40
+        lineHeight: 50
     },
     assetStatus: {
         display: 'flex',

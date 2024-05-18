@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
+        color: theme.colors.additionalText
     },
     iconContainer: {
         display: 'flex',

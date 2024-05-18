@@ -51,16 +51,10 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                     {documentTitle}
                 </Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>
-                    <Text variant="bodyMedium" style={styles.primitiveText}>
-                        Location : {''}
-                    </Text>
-                    {locationInfo}
+                    Location : {locationInfo}
                 </Text>
                 <Text variant="bodyMedium" style={styles.additionalText}>
-                    <Text variant="bodyMedium" style={styles.primitiveText}>
-                        Date : {''}
-                    </Text>
-                    {dateInfo}
+                    Date : {dateInfo}
                 </Text>
                 <View style={[styles.statusContainer, { backgroundColor }]}>
                     <Text
@@ -105,11 +99,7 @@ const styles = StyleSheet.create({
     },
     additionalText: {
         fontSize: 14,
-        color: '#777'
-    },
-    primitiveText: {
-        color: '#50555C',
-        fontWeight: '600'
+        color: theme.colors.additionalText
     },
     statusContainer: {
         marginTop: 5,
