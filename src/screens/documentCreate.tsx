@@ -820,7 +820,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                    Total Document : {listAssetCreate?.length}
+                    Total Asset : {listAssetCreate?.length}
                 </Text>
                 <FlatList
                     data={listAssetCreate}
