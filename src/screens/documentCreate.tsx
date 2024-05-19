@@ -528,7 +528,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 db,
                 filterDocumentLine
             );
-            console.log(listDocumentLineDB);
 
             let isDuplicateAssetInListDocumentLineDB = true;
 
@@ -615,7 +614,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleSearchAsset = useCallback(
         async (code: string) => {
             try {
-                if (code === '' || code === undefined) return;
+                if (code === '' || code === undefined || code === null) return;
                 setAssetCode('');
                 setSelectedImage(null);
                 const isOnline = await getOnlineMode();
@@ -624,13 +623,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 } else {
                     handleOfflineSearch(code);
                 }
+                navigation.setParams({ codeFromAssetSearch: null });
             } catch (err) {
                 clearStateDialog();
                 setVisibleDialog(true);
                 setContentDialog('Something went wrong search asset');
             }
         },
-        [clearStateDialog, handleOfflineSearch, handleOnlineSearch]
+        [clearStateDialog, handleOfflineSearch, handleOnlineSearch, navigation]
     );
 
     const getImage = useCallback((): string => {
