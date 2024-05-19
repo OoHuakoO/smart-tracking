@@ -55,9 +55,7 @@ export type PrivateStackParamsList = {
     };
     DocumentSearch: undefined;
     DocumentAssetSearch: undefined;
-    DocumentAssetStatus: {
-        isReFresh?: boolean;
-    };
+    DocumentAssetStatus: undefined;
     DocumentCreate: {
         codeFromAssetSearch?: string;
     };

@@ -15,6 +15,7 @@ import {
     View
 } from 'react-native';
 
+import { useIsFocused } from '@react-navigation/native';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
@@ -72,6 +73,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const [codeAsset, setCodeAsset] = useState<string>('');
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
+    const isFocused = useIsFocused();
 
     const colorStateTag = useMemo((): string => {
         switch (documentValue?.state) {
@@ -123,7 +125,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 const filter = {
                     tracking_id: documentValue?.id
                 };
-                const listDocumentDB = await getDocumentLine(db, filter);
+                const sort = {
+                    date_check: true
+                };
+                const listDocumentDB = await getDocumentLine(db, filter, sort);
                 listDocumentDB?.map((item) => {
                     item.state = handleMapMovementStateEN(item?.state);
                     item.date_check = parseDateString(item?.date_check);
@@ -352,7 +357,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     useEffect(() => {
         handleFetchDocumentById();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [route?.params?.isReFresh]);
+    }, [isFocused]);
 
     useEffect(() => {
         const onBackPress = () => {

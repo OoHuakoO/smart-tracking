@@ -107,7 +107,10 @@ export const getDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
         tracking_id?: number;
-        default_code?: string;
+        code?: string;
+    },
+    sort?: {
+        date_check?: boolean;
     },
     page: number = 1,
     limit: number = 10
@@ -122,13 +125,16 @@ export const getDocumentLine = async (
         queryParams.push(filters.tracking_id);
     }
 
-    if (filters?.default_code !== undefined) {
+    if (filters?.code !== undefined) {
         whereConditions.push(`documentLineOffline.code = ?`);
-        queryParams.push(filters.default_code);
+        queryParams.push(filters.code);
     }
 
     if (whereConditions.length > 0) {
         query += ` WHERE ` + whereConditions.join(' AND ');
+    }
+    if (sort?.date_check) {
+        query += ` ORDER BY date_check DESC`;
     }
 
     query += ` LIMIT ? OFFSET ?`;

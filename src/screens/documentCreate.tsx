@@ -219,9 +219,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 await insertDocumentLineData(db, documentLine);
                 await insertReportDocumentLine(db, documentLine);
             }
-            navigation.navigate('DocumentAssetStatus', {
-                isReFresh: true
-            });
+            navigation.navigate('DocumentAssetStatus');
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
@@ -523,13 +521,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             );
 
             const filterDocumentLine = {
-                default_code: code
+                code: code
             };
 
             const listDocumentLineDB = await getDocumentLine(
                 db,
                 filterDocumentLine
             );
+            console.log(listDocumentLineDB);
 
             let isDuplicateAssetInListDocumentLineDB = true;
 
@@ -553,6 +552,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         isDuplicateAssetInListDocumentLineDB = true;
                     }
                 }
+            } else {
+                isDuplicateAssetInListDocumentLineDB = false;
             }
 
             if (
