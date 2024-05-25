@@ -1,13 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
-
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PrivateStack from '@src/stack/private';
 import PublicStack from '@src/stack/public';
 import { loginState, useRecoilState } from '@src/store';
 import React, { useCallback, useEffect } from 'react';
-import { RootStackParamsList } from './typings/navigation';
-
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import { createTableAsset } from './db/asset';
 import { createTableCategory } from './db/category';
@@ -19,6 +16,7 @@ import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
 import { createTableReportDocumentLine } from './db/reportDocumentLine';
 import { createTableUseStatus } from './db/useStatus';
 import { LoginState } from './typings/common';
+import { RootStackParamsList } from './typings/navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
 

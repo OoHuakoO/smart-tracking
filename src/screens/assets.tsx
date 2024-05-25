@@ -8,6 +8,7 @@ import { getDBConnection } from '@src/db/config';
 import { GetAssetSearch } from '@src/services/asset';
 import { GetAssets } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
+import { SearchAsset } from '@src/typings/asset';
 import { AssetData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
@@ -51,17 +52,40 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
             setLoading(true);
             setPage(1);
             const isOnline = await getOnlineMode();
+            let searchTerm = {
+                and: {} as SearchAsset,
+                or: {} as SearchAsset
+            };
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+            let searchQuery: SearchAsset = assetSearch && { ...assetSearch };
+
+            if (searchQuery?.['location_id.name'] !== undefined) {
+                searchTerm.and['location_id.name'] =
+                    searchQuery['location_id.name'];
+            }
+
+            if (searchQuery?.['category_id.name'] !== undefined) {
+                searchTerm.and['category_id.name'] =
+                    searchQuery['category_id.name'];
+            }
+
+            if (searchQuery?.use_state !== undefined) {
+                searchTerm.and.use_state = searchQuery.use_state;
+            }
+
+            if (searchQuery?.name !== undefined) {
+                searchTerm.or.name = searchQuery?.name;
+                searchTerm.or.default_code = searchQuery?.name;
+            }
+
             if (isOnline) {
                 let responseAsset;
                 let totalPagesAsset;
-                if (assetSearch) {
+                if (searchQuery) {
                     responseAsset = await GetAssetSearch({
                         page: 1,
                         limit: 10,
-                        search_term: {
-                            and: { ...assetSearch }
-                        }
+                        search_term: searchTerm
                     });
                     totalPagesAsset = responseAsset?.result?.data?.total;
                 } else {
