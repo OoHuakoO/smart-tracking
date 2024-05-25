@@ -1,12 +1,11 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import { getAsset, getAssetSuggestion } from '@src/db/asset';
+import InputText from '@src/components/core/inputText';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
-import { GetAssetSearch } from '@src/services/asset';
-import { GetAssets, GetCategory, GetUseStatus } from '@src/services/downloadDB';
+import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
 import {
     AssetData,
@@ -16,6 +15,7 @@ import {
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
     BackHandler,
     ScrollView,
@@ -34,62 +34,18 @@ type LocationAssetSearchProps = NativeStackScreenProps<
 
 const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
     const { navigation, route } = props;
-    const [listAsset, setListAsset] = useState<AssetData[]>([]);
-    const [searchName, setSearchName] = useState<string>('');
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
     const [listCategory, setListCategory] = useState<CategoryData[]>([]);
     const [searchCategory, setSearchCategory] = useState<string>('');
-    const [isFocusAsset, setIsFocusAsset] = useState<boolean>(false);
     const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
     const [isFocusCategory, setIsFocusCategory] = useState<boolean>(false);
-    const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const form = useForm<AssetData>({});
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
-
-    const handleOnChangeSearchAsset = useCallback(async (text: string) => {
-        try {
-            if (text !== '') {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const response = await GetAssetSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: {
-                            or: { default_code: text, name: text }
-                        }
-                    });
-
-                    setListAsset(response?.result?.data?.asset);
-                } else {
-                    const db = await getDBConnection();
-                    const filter = {
-                        default_code: text,
-                        name: text
-                    };
-                    const listAssetDB = await getAssetSuggestion(db, filter);
-                    setListAsset(listAssetDB);
-                }
-            }
-        } catch (err) {
-            console.log(err);
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong search asset');
-        }
-    }, []);
-
-    const renderItemAsset = (item: AssetData) => {
-        return (
-            <View style={styles.dropdownItem}>
-                <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    [{item?.default_code}] {item?.name}
-                </Text>
-            </View>
-        );
-    };
 
     const renderItemUseState = (item: UseStatusData) => {
         return (
@@ -111,10 +67,6 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         );
     };
 
-    const handleSearchQuery = (): boolean => {
-        return true;
-    };
-
     const handleSearchCategoryQuery = (
         keyword: string,
         label: string
@@ -133,35 +85,35 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         );
     };
 
+    const handleSearchAsset = async (data: AssetData) => {
+        navigation.navigate('LocationListAsset', {
+            assetSearch: {
+                name: data?.name,
+                use_state: searchUseState,
+                'category_id.name': searchCategory
+            },
+            LocationData: route?.params?.LocationData
+        });
+    };
+
     const handleInitDropdown = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const [responseAsset, responseUseStatus, responseCategory] =
-                    await Promise.all([
-                        GetAssets({
-                            page: 1,
-                            limit: 10
-                        }),
-
+                const [responseUseStatus, responseCategory] = await Promise.all(
+                    [
                         GetUseStatus({ page: 1, limit: 1000 }),
                         GetCategory({ page: 1, limit: 1000 })
-                    ]);
-                setListAsset(responseAsset?.result?.data?.asset);
-
+                    ]
+                );
                 setListUseState(responseUseStatus?.result?.data.data);
                 setListCategory(responseCategory?.result?.data.asset);
             } else {
                 const db = await getDBConnection();
-                const [listUseStatusDB, listCategoryDB, listAssetDB] =
-                    await Promise.all([
-                        getUseStatus(db, 1, 1000),
-                        getCategory(db, 1, 1000),
-
-                        getAsset(db)
-                    ]);
-
-                setListAsset(listAssetDB);
+                const [listUseStatusDB, listCategoryDB] = await Promise.all([
+                    getUseStatus(db, 1, 1000),
+                    getCategory(db, 1, 1000)
+                ]);
                 setListUseState(listUseStatusDB);
                 setListCategory(listCategoryDB);
             }
@@ -171,10 +123,10 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         }
     }, []);
     const handleClearInput = useCallback(() => {
-        setSearchName('');
+        form.reset({ name: '' });
         setSearchUseState('');
         setSearchCategory('');
-    }, []);
+    }, [form]);
 
     useEffect(() => {
         handleInitDropdown();
@@ -197,7 +149,6 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
     return (
         <ScrollView style={styles.container}>
             <AlertDialog
-                textContent={contentDialog}
                 visible={visibleDialog}
                 handleClose={handleCloseDialog}
                 handleConfirm={handleCloseDialog}
@@ -219,30 +170,18 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                 </Text>
                 <Text variant="bodyLarge">Asset</Text>
 
-                <Dropdown
-                    style={[
-                        styles.dropdown,
-                        isFocusAsset && styles.dropdownSelect
-                    ]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    data={listAsset}
-                    search
-                    maxHeight={300}
-                    labelField="name"
-                    valueField="name"
-                    placeholder={'Select Asset'}
-                    searchPlaceholder="Search"
-                    value={searchName}
-                    onFocus={() => setIsFocusAsset(true)}
-                    onBlur={() => setIsFocusAsset(false)}
-                    onChange={(item) => {
-                        setSearchName(item?.name);
-                    }}
-                    onChangeText={(text) => handleOnChangeSearchAsset(text)}
-                    searchQuery={handleSearchQuery}
-                    renderItem={renderItemAsset}
+                <Controller
+                    name="name"
+                    defaultValue=""
+                    control={form?.control}
+                    render={({ field }) => (
+                        <InputText
+                            {...field}
+                            placeholder="Search Asset"
+                            borderColor="#828282"
+                            onChangeText={(value) => field?.onChange(value)}
+                        />
+                    )}
                 />
                 <Text variant="bodyLarge">Use State</Text>
 
@@ -305,16 +244,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.buttonApply}
-                        onPress={() =>
-                            navigation.navigate('LocationListAsset', {
-                                assetSearch: {
-                                    name: searchName,
-                                    use_state: searchUseState,
-                                    'category_id.name': searchCategory
-                                },
-                                LocationData: route?.params?.LocationData
-                            })
-                        }
+                        onPress={form?.handleSubmit(handleSearchAsset)}
                     >
                         <Text variant="bodyLarge" style={styles.buttonText}>
                             Apply
