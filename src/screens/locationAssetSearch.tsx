@@ -72,7 +72,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         label: string
     ): boolean => {
         const categories = listCategory.filter((item) =>
-            item.category_name.includes(label)
+            item?.category_name?.includes(label)
         );
 
         if (categories.length === 0) {
@@ -80,8 +80,8 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
         }
 
         return (
-            categories[0].category_code.includes(keyword) ||
-            categories[0].category_name.includes(keyword)
+            categories[0].category_code?.includes(keyword) ||
+            categories[0].category_name?.includes(keyword)
         );
     };
 
@@ -168,7 +168,9 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                 <Text variant="displaySmall" style={styles.textSearchAsset}>
                     Search Asset
                 </Text>
-                <Text variant="bodyLarge">Asset</Text>
+                <Text variant="bodyLarge" style={styles.assetSearch}>
+                    Asset
+                </Text>
 
                 <Controller
                     name="name"
@@ -183,7 +185,9 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                         />
                     )}
                 />
-                <Text variant="bodyLarge">Use State</Text>
+                <Text variant="bodyLarge" style={styles.useStateSearch}>
+                    Use State
+                </Text>
 
                 <Dropdown
                     style={[
@@ -266,6 +270,12 @@ const styles = StyleSheet.create({
     textSearchAsset: {
         fontWeight: 'bold',
         marginBottom: 15
+    },
+    assetSearch: {
+        marginBottom: 8
+    },
+    useStateSearch: {
+        marginTop: -12
     },
     closeButton: {
         marginVertical: 20,

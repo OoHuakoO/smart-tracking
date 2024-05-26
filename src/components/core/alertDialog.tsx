@@ -42,7 +42,7 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                     </Text>
                 </Dialog.Title>
                 <Dialog.Content>
-                    {textContent.includes('\n') ? (
+                    {textContent && textContent.includes('\n') ? (
                         textContent.split('\n').map((line, index) => (
                             <Text key={index} variant="titleMedium">
                                 {line}

@@ -130,17 +130,17 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
         keyword: string,
         label: string
     ): boolean => {
-        const categories = listCategory.filter((item) =>
-            item.category_name.includes(label)
+        const categories = listCategory?.filter((item) =>
+            item?.category_name?.includes(label)
         );
 
-        if (categories.length === 0) {
+        if (categories?.length === 0) {
             return false;
         }
 
         return (
-            categories[0].category_code.includes(keyword) ||
-            categories[0].category_name.includes(keyword)
+            categories[0]?.category_code?.includes(keyword) ||
+            categories[0]?.category_name?.includes(keyword)
         );
     };
 
