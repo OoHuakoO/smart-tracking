@@ -98,10 +98,17 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                 setCountAsset(totalPagesAsset);
                 setListAsset(responseAsset?.result?.data?.asset);
             } else {
+                const filter = {
+                    default_code_for_or: searchQuery?.name,
+                    name: searchQuery?.name,
+                    use_state: searchQuery?.use_state,
+                    'location_id.name': searchQuery?.['location_id.name'],
+                    'category_id.name': searchQuery?.['category_id.name']
+                };
                 const db = await getDBConnection();
                 const [countAsset, listAssetDB] = await Promise.all([
-                    getTotalAssets(db, assetSearch),
-                    getAsset(db, assetSearch)
+                    getTotalAssets(db, filter),
+                    getAsset(db, filter)
                 ]);
                 setCountAsset(countAsset);
                 setListAsset(listAssetDB);
@@ -121,15 +128,39 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
                 const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+                let searchTerm = {
+                    and: {} as SearchAsset,
+                    or: {} as SearchAsset
+                };
+                let searchQuery: SearchAsset = assetSearch && {
+                    ...assetSearch
+                };
+                if (searchQuery?.['location_id.name'] !== undefined) {
+                    searchTerm.and['location_id.name'] =
+                        searchQuery['location_id.name'];
+                }
+
+                if (searchQuery?.['category_id.name'] !== undefined) {
+                    searchTerm.and['category_id.name'] =
+                        searchQuery['category_id.name'];
+                }
+
+                if (searchQuery?.use_state !== undefined) {
+                    searchTerm.and.use_state = searchQuery.use_state;
+                }
+
+                if (searchQuery?.name !== undefined) {
+                    searchTerm.or.name = searchQuery?.name;
+                    searchTerm.or.default_code = searchQuery?.name;
+                }
+
                 if (isOnline) {
                     let response;
                     if (assetSearch) {
                         response = await GetAssetSearch({
                             page: page + 1,
                             limit: 10,
-                            search_term: {
-                                and: { ...assetSearch }
-                            }
+                            search_term: searchTerm
                         });
                     } else {
                         response = await GetAssets({
@@ -142,12 +173,15 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         ...response?.result?.data?.asset
                     ]);
                 } else {
+                    const filter = {
+                        default_code_for_or: searchQuery?.name,
+                        name: searchQuery?.name,
+                        use_state: searchQuery?.use_state,
+                        'location_id.name': searchQuery?.['location_id.name'],
+                        'category_id.name': searchQuery?.['category_id.name']
+                    };
                     const db = await getDBConnection();
-                    const listAssetDB = await getAsset(
-                        db,
-                        assetSearch,
-                        page + 1
-                    );
+                    const listAssetDB = await getAsset(db, filter, page + 1);
                     setListAsset([...listAsset, ...listAssetDB]);
                 }
             }

@@ -201,6 +201,7 @@ export const getAsset = async (
     filters?: {
         location_id?: number;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
         'category_id.name'?: string;
         use_state?: string;
@@ -222,8 +223,8 @@ export const getAsset = async (
     }
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`asset.location LIKE ?`);
-        queryParams.push(`%${filters['location_id.name']}%`);
+        whereConditions.push(`asset.location = ?`);
+        queryParams.push(filters['location_id.name']);
     }
 
     if (filters?.default_code !== undefined) {
@@ -231,14 +232,9 @@ export const getAsset = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`asset.name = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
-        whereConditions.push(`asset.category LIKE ?`);
-        queryParams.push(`%${filters['category_id.name']}%`);
+        whereConditions.push(`asset.category = ?`);
+        queryParams.push(filters['category_id.name']);
     }
 
     if (filters?.use_state !== undefined) {
@@ -252,12 +248,30 @@ export const getAsset = async (
         queryParams.push(isSyncOdooValue);
     }
 
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`asset.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`asset.default_code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
+    }
+
     if (whereConditions.length > 0) {
         query += ` WHERE ` + whereConditions.join(' AND ');
     }
 
     query += ` LIMIT ? OFFSET ?`;
     queryParams.push(limit, offset);
+
+    console.log(query);
 
     try {
         const results = await db.executeSql(query, queryParams);
@@ -328,8 +342,9 @@ export const getTotalAssets = async (
     filters?: {
         location_id?: number;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
-        'category_id.name'?: number;
+        'category_id.name'?: string;
         use_state?: string;
         'location_id.name'?: string;
     }
@@ -344,8 +359,8 @@ export const getTotalAssets = async (
     }
 
     if (filters && filters['location_id.name'] !== undefined) {
-        whereConditions.push(`asset.location LIKE ?`);
-        queryParams.push(`%${filters['location_id.name']}%`);
+        whereConditions.push(`asset.location = ?`);
+        queryParams.push(filters['location_id.name']);
     }
 
     if (filters?.default_code !== undefined) {
@@ -353,19 +368,30 @@ export const getTotalAssets = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`asset.name = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
-        whereConditions.push(`asset.category LIKE ?`);
+        whereConditions.push(`asset.category = ?`);
         queryParams.push(filters['category_id.name']);
     }
 
     if (filters?.use_state !== undefined) {
         whereConditions.push(`asset.use_state = ?`);
         queryParams.push(filters.use_state);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`asset.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`asset.default_code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {
