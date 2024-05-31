@@ -112,6 +112,7 @@ export const getReportDocumentLine = async (
         state?: string | string[];
         use_state?: string;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
         'category_id.name'?: string;
     },
@@ -150,14 +151,25 @@ export const getReportDocumentLine = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`reportDocumentLine.name = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
         whereConditions.push(`reportDocumentLine.category = ?`);
         queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`reportDocumentLine.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`reportDocumentLine.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {
@@ -189,6 +201,7 @@ export const getTotalReportDocumentLine = async (
         state?: string | string[];
         use_state?: string;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
         'category_id.name'?: string;
     }
@@ -225,14 +238,25 @@ export const getTotalReportDocumentLine = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`reportDocumentLine.name = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
         whereConditions.push(`reportDocumentLine.category = ?`);
         queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`reportDocumentLine.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`reportDocumentLine.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {

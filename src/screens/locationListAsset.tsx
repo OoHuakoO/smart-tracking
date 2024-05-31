@@ -87,8 +87,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                 setListAsset(response?.result?.data?.asset);
             } else {
                 const filter = {
+                    default_code_for_or: searchQuery?.name,
+                    name: searchQuery?.name,
+                    use_state: searchQuery?.use_state,
                     location_id: route?.params?.LocationData?.location_id,
-                    ...(assetSearch && { ...assetSearch })
+                    'category_id.name': searchQuery?.['category_id.name']
                 };
                 const db = await getDBConnection();
                 const countAsset = await getTotalAssets(db, filter);
@@ -116,16 +119,38 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
             if (!stopFetchMore) {
                 const isOnline = await getOnlineMode();
                 const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
+                let searchTerm = {
+                    and: {} as SearchAsset,
+                    or: {} as SearchAsset
+                };
+                let searchQuery: SearchAsset = assetSearch && {
+                    ...assetSearch
+                };
+                if (route?.params?.LocationData?.location_name !== undefined) {
+                    searchTerm.and['location_id.name'] =
+                        route?.params?.LocationData?.location_name;
+                }
+
+                if (searchQuery?.['category_id.name'] !== undefined) {
+                    searchTerm.and['category_id.name'] =
+                        searchQuery['category_id.name'];
+                }
+
+                if (searchQuery?.use_state !== undefined) {
+                    searchTerm.and.use_state = searchQuery.use_state;
+                }
+
+                if (searchQuery?.name !== undefined) {
+                    searchTerm.or.name = searchQuery?.name;
+                    searchTerm.or.default_code = searchQuery?.name;
+                }
+
                 if (isOnline) {
                     const response = await GetAssetSearch({
                         page: page + 1,
                         limit: 10,
                         search_term: {
-                            and: {
-                                'location_id.name':
-                                    route?.params?.LocationData?.location_name,
-                                ...(assetSearch && { ...assetSearch })
-                            }
+                            search_term: searchTerm
                         }
                     });
 
@@ -135,8 +160,11 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                     ]);
                 } else {
                     const filter = {
+                        default_code_for_or: searchQuery?.name,
+                        name: searchQuery?.name,
+                        use_state: searchQuery?.use_state,
                         location_id: route?.params?.LocationData?.location_id,
-                        ...(assetSearch && { ...assetSearch })
+                        'category_id.name': searchQuery?.['category_id.name']
                     };
                     const db = await getDBConnection();
                     const listAssetDB = await getAsset(db, filter, page + 1);

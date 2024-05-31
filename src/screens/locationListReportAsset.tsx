@@ -69,19 +69,40 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             page: number
         ): Promise<ReportAssetData[]> => {
             let listReportAsset: ReportAssetData[] = [];
+            let searchTerm = {
+                and: {} as SearchQueryReport,
+                or: {} as SearchQueryReport
+            };
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
-            let searchQuery: SearchQueryReport = { ...assetSearch };
+
+            let searchQuery: SearchQueryReport = assetSearch && {
+                ...assetSearch
+            };
+
+            searchTerm.and.state = STATE_ASSET;
+
             if (locationID !== 0) {
-                searchQuery['location_id.id'] = locationID;
+                searchTerm.and['location_id.id'] = locationID;
             }
-            searchQuery.state = STATE_ASSET;
+
+            if (searchQuery?.['category_id.name'] !== undefined) {
+                searchTerm.and['category_id.name'] =
+                    searchQuery['category_id.name'];
+            }
+
+            if (searchQuery?.use_state !== undefined) {
+                searchTerm.and.use_state = searchQuery.use_state;
+            }
+
+            if (searchQuery?.name !== undefined) {
+                searchTerm.or.name = searchQuery?.name;
+                searchTerm.or.default_code = searchQuery?.name;
+            }
 
             const response = await GetAssetNotFoundSearch({
                 page: page,
                 limit: 10,
-                search_term: {
-                    and: searchQuery
-                }
+                search_term: searchTerm
             });
 
             setTotalListReportAsset(response?.result?.data?.count_ids);
@@ -107,21 +128,29 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             const db = await getDBConnection();
             let listReportAsset: ReportAssetData[] = [];
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
-            let searchQuery: SearchQueryReport = { ...assetSearch };
+
+            let searchQuery: SearchQueryReport = assetSearch && {
+                ...assetSearch
+            };
 
             if (locationName !== ALL_LOCATION) {
                 searchQuery.location = locationName;
             }
 
+            const filter = {
+                default_code_for_or: searchQuery?.name,
+                name: searchQuery?.name,
+                use_state: searchQuery?.use_state,
+                location: searchQuery.location,
+                'category_id.name': searchQuery?.['category_id.name']
+            };
+
             const listReportAssetNotFound = await getReportAssetNotFound(
                 db,
-                searchQuery,
+                filter,
                 page
             );
-            const totalAsset = await getTotalReportAssetNotFound(
-                db,
-                searchQuery
-            );
+            const totalAsset = await getTotalReportAssetNotFound(db, filter);
             setTotalListReportAsset(totalAsset);
             listReportAssetNotFound?.map((report) => {
                 listReportAsset.push({
@@ -144,18 +173,40 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             page: number
         ): Promise<ReportAssetData[]> => {
             let listReportAsset: ReportAssetData[] = [];
+            let searchTerm = {
+                and: {} as SearchQueryReport,
+                or: {} as SearchQueryReport
+            };
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
-            let searchQuery: SearchQueryReport = { ...assetSearch };
+
+            let searchQuery: SearchQueryReport = assetSearch && {
+                ...assetSearch
+            };
+
+            searchTerm.and.state = handleMapReportStateValue(title);
+
             if (locationID !== 0) {
-                searchQuery['location_id.id'] = locationID;
+                searchTerm.and['location_id.id'] = locationID;
             }
-            searchQuery.state = handleMapReportStateValue(title);
+
+            if (searchQuery?.['category_id.name'] !== undefined) {
+                searchTerm.and['category_id.name'] =
+                    searchQuery['category_id.name'];
+            }
+
+            if (searchQuery?.use_state !== undefined) {
+                searchTerm.and.use_state = searchQuery.use_state;
+            }
+
+            if (searchQuery?.name !== undefined) {
+                searchTerm.or.name = searchQuery?.name;
+                searchTerm.or.default_code = searchQuery?.name;
+            }
+
             const response = await GetDocumentLineSearch({
                 page: page,
                 limit: 10,
-                search_term: {
-                    and: searchQuery
-                }
+                search_term: searchTerm
             });
 
             setTotalListReportAsset(response?.result?.data?.total);
@@ -186,20 +237,34 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             const db = await getDBConnection();
             let listReportAsset: ReportAssetData[] = [];
             const assetSearch = removeKeyEmpty(route?.params?.assetSearch);
-            let searchQuery: SearchQueryReport = { ...assetSearch };
+
+            let searchQuery: SearchQueryReport = assetSearch && {
+                ...assetSearch
+            };
+
             if (locationName !== ALL_LOCATION) {
                 searchQuery.location = locationName;
             }
+
+            const filter = {
+                default_code_for_or: searchQuery?.name,
+                name: searchQuery?.name,
+                use_state: searchQuery?.use_state,
+                location: searchQuery.location,
+                'category_id.name': searchQuery?.['category_id.name'],
+                state: handleMapReportStateValue(title)
+            };
+
             searchQuery.state = handleMapReportStateValue(title);
 
             const listReportDocumentLine = await getReportDocumentLine(
                 db,
-                searchQuery,
+                filter,
                 page
             );
             const totalDocumentLine = await getTotalReportDocumentLine(
                 db,
-                searchQuery
+                filter
             );
 
             setTotalListReportAsset(totalDocumentLine);

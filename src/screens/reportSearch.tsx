@@ -1,13 +1,12 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import InputText from '@src/components/core/inputText';
 import { REPORT_TYPE } from '@src/constant';
-import { getAsset, getAssetSuggestion } from '@src/db/asset';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
-import { GetAssetSearch } from '@src/services/asset';
-import { GetAssets, GetCategory, GetUseStatus } from '@src/services/downloadDB';
+import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
 import { theme } from '@src/theme';
 import {
     AssetData,
@@ -17,6 +16,7 @@ import {
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import {
     BackHandler,
     ScrollView,
@@ -35,62 +35,18 @@ type ReportSearchProps = NativeStackScreenProps<
 
 const ReportSearch: FC<ReportSearchProps> = (props) => {
     const { navigation, route } = props;
-    const [listAsset, setListAsset] = useState<AssetData[]>([]);
-    const [searchCode, setSearchCode] = useState<string>('');
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
     const [listCategory, setListCategory] = useState<CategoryData[]>([]);
     const [searchCategory, setSearchCategory] = useState<string>('');
-    const [isFocusAsset, setIsFocusAsset] = useState<boolean>(false);
     const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
     const [isFocusCategory, setIsFocusCategory] = useState<boolean>(false);
-    const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const form = useForm<AssetData>({});
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
-
-    const handleOnChangeSearchAsset = useCallback(async (text: string) => {
-        try {
-            if (text !== '') {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const response = await GetAssetSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: {
-                            or: { default_code: text, name: text }
-                        }
-                    });
-
-                    setListAsset(response?.result?.data?.asset);
-                } else {
-                    const db = await getDBConnection();
-                    const filter = {
-                        default_code: text,
-                        name: text
-                    };
-                    const listAssetDB = await getAssetSuggestion(db, filter);
-                    setListAsset(listAssetDB);
-                }
-            }
-        } catch (err) {
-            console.log(err);
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong search asset');
-        }
-    }, []);
-
-    const renderItemAsset = (item: AssetData) => {
-        return (
-            <View style={styles.dropdownItem}>
-                <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    [{item?.default_code}] {item?.name}
-                </Text>
-            </View>
-        );
-    };
 
     const renderItemUseState = (item: UseStatusData) => {
         return (
@@ -110,10 +66,6 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                 </Text>
             </View>
         );
-    };
-
-    const handleSearchQuery = (): boolean => {
-        return true;
     };
 
     const handleSearchCategoryQuery = (
@@ -138,31 +90,20 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
         try {
             const isOnline = await getOnlineMode();
             if (isOnline) {
-                const [responseAsset, responseUseStatus, responseCategory] =
-                    await Promise.all([
-                        GetAssets({
-                            page: 1,
-                            limit: 10
-                        }),
-
+                const [responseUseStatus, responseCategory] = await Promise.all(
+                    [
                         GetUseStatus({ page: 1, limit: 1000 }),
                         GetCategory({ page: 1, limit: 1000 })
-                    ]);
-                setListAsset(responseAsset?.result?.data?.asset);
-
+                    ]
+                );
                 setListUseState(responseUseStatus?.result?.data.data);
                 setListCategory(responseCategory?.result?.data.asset);
             } else {
                 const db = await getDBConnection();
-                const [listUseStatusDB, listCategoryDB, listAssetDB] =
-                    await Promise.all([
-                        getUseStatus(db, 1, 1000),
-                        getCategory(db, 1, 1000),
-
-                        getAsset(db)
-                    ]);
-
-                setListAsset(listAssetDB);
+                const [listUseStatusDB, listCategoryDB] = await Promise.all([
+                    getUseStatus(db, 1, 1000),
+                    getCategory(db, 1, 1000)
+                ]);
                 setListUseState(listUseStatusDB);
                 setListCategory(listCategoryDB);
             }
@@ -170,8 +111,23 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
             setVisibleDialog(true);
         }
     }, []);
+
+    const handleSearchAsset = async (data: AssetData) => {
+        navigation.navigate('LocationListReportAsset', {
+            assetSearch: {
+                name:
+                    route?.params?.title !== REPORT_TYPE.NotFound
+                        ? data.name
+                        : '',
+                use_state: searchUseState,
+                'category_id.name': searchCategory
+            },
+            LocationData: route?.params?.LocationData,
+            title: route?.params?.title
+        });
+    };
+
     const handleClearInput = useCallback(() => {
-        setSearchCode('');
         setSearchUseState('');
         setSearchCategory('');
     }, []);
@@ -197,7 +153,6 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
     return (
         <ScrollView style={styles.container}>
             <AlertDialog
-                textContent={contentDialog}
                 visible={visibleDialog}
                 handleClose={handleCloseDialog}
                 handleConfirm={handleCloseDialog}
@@ -217,34 +172,27 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                 <Text variant="displaySmall" style={styles.textSearchAsset}>
                     Search Asset
                 </Text>
-                <Text variant="bodyLarge">Asset</Text>
+                <Text variant="bodyLarge" style={styles.assetSearch}>
+                    Asset
+                </Text>
 
-                <Dropdown
-                    style={[
-                        styles.dropdown,
-                        isFocusAsset && styles.dropdownSelect
-                    ]}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    inputSearchStyle={styles.inputSearchStyle}
-                    data={listAsset}
-                    search
-                    maxHeight={300}
-                    labelField="default_code"
-                    valueField="default_code"
-                    placeholder={'Select Asset'}
-                    searchPlaceholder="Search"
-                    value={searchCode}
-                    onFocus={() => setIsFocusAsset(true)}
-                    onBlur={() => setIsFocusAsset(false)}
-                    onChange={(item) => {
-                        setSearchCode(item?.default_code);
-                    }}
-                    onChangeText={(text) => handleOnChangeSearchAsset(text)}
-                    searchQuery={handleSearchQuery}
-                    renderItem={renderItemAsset}
+                <Controller
+                    name="name"
+                    defaultValue=""
+                    control={form?.control}
+                    render={({ field }) => (
+                        <InputText
+                            {...field}
+                            placeholder="Search Asset"
+                            borderColor="#828282"
+                            onChangeText={(value) => field?.onChange(value)}
+                        />
+                    )}
                 />
-                <Text variant="bodyLarge">Use State</Text>
+
+                <Text variant="bodyLarge" style={styles.locationSearch}>
+                    Use State
+                </Text>
 
                 <Dropdown
                     style={[
@@ -305,26 +253,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.buttonApply}
-                        onPress={() =>
-                            navigation.navigate('LocationListReportAsset', {
-                                assetSearch: {
-                                    name:
-                                        route?.params?.title !==
-                                        REPORT_TYPE.NotFound
-                                            ? searchCode
-                                            : '',
-                                    default_code:
-                                        route?.params?.title ===
-                                        REPORT_TYPE.NotFound
-                                            ? searchCode
-                                            : '',
-                                    use_state: searchUseState,
-                                    'category_id.name': searchCategory
-                                },
-                                LocationData: route?.params?.LocationData,
-                                title: route?.params?.title
-                            })
-                        }
+                        onPress={form?.handleSubmit(handleSearchAsset)}
                     >
                         <Text variant="bodyLarge" style={styles.buttonText}>
                             Apply
@@ -346,6 +275,12 @@ const styles = StyleSheet.create({
     textSearchAsset: {
         fontWeight: 'bold',
         marginBottom: 15
+    },
+    assetSearch: {
+        marginBottom: 8
+    },
+    locationSearch: {
+        marginTop: -12
     },
     closeButton: {
         marginVertical: 20,

@@ -97,6 +97,7 @@ export const getReportAssetNotFound = async (
         location?: string;
         use_state?: string;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
         'category_id.name'?: string;
     },
@@ -122,14 +123,25 @@ export const getReportAssetNotFound = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`reportAssetNotFound.code = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
         whereConditions.push(`reportAssetNotFound.category = ?`);
         queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`reportAssetNotFound.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`reportAssetNotFound.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {
@@ -160,6 +172,7 @@ export const getTotalReportAssetNotFound = async (
         location?: string;
         use_state?: string;
         default_code?: string;
+        default_code_for_or?: string;
         name?: string;
         'category_id.name'?: string;
     }
@@ -183,14 +196,25 @@ export const getTotalReportAssetNotFound = async (
         queryParams.push(filters.default_code);
     }
 
-    if (filters?.name !== undefined) {
-        whereConditions.push(`reportAssetNotFound.code = ?`);
-        queryParams.push(filters.name);
-    }
-
     if (filters && filters['category_id.name'] !== undefined) {
         whereConditions.push(`reportAssetNotFound.category = ?`);
         queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`reportAssetNotFound.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`reportAssetNotFound.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {

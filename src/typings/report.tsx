@@ -11,6 +11,7 @@ export interface SearchQueryReport {
     'category_id.name'?: string;
     state?: string | string[];
     name?: string;
+    default_code?: string;
     use_state?: string;
 }
 
