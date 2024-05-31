@@ -318,6 +318,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     }
                     const documentObj = {
                         id: response?.result?.data?.id,
+                        name: 'Draft Tracking',
                         state: STATE_DOCUMENT_NAME.Draft,
                         location: location?.location_name,
                         location_id: location?.location_id
@@ -472,6 +473,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                 onPress={() => {
                                     const documentObj = {
                                         id: item?.id,
+                                        name: item?.name,
                                         state: item?.state,
                                         location: item?.location,
                                         location_id: item?.location_id
@@ -482,7 +484,11 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             >
                                 <DocumentCard
                                     online={online}
-                                    documentTitle={`Document ${item?.id}`}
+                                    documentTitle={
+                                        online
+                                            ? `${item?.name} - ${item?.id}`
+                                            : `Document ${item?.id}`
+                                    }
                                     locationInfo={item?.location}
                                     dateInfo={item?.date_order}
                                     documentStatus={item?.state}

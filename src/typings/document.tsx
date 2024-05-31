@@ -22,6 +22,7 @@ export interface DocumentAssetData {
 
 export interface DocumentData {
     id: number;
+    name?: string;
     location_id?: number;
     location?: string;
     state: string;

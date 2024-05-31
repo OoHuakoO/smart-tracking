@@ -23,6 +23,7 @@ export interface LoginState {
 
 export interface DocumentState {
     id: number;
+    name?: string;
     state: string;
     location: string;
     location_id: number;

@@ -71,8 +71,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     >([]);
     const [idAsset, setIdAsset] = useState<number>(0);
     const [codeAsset, setCodeAsset] = useState<string>('');
+    const [online, setOnline] = useState<boolean>(false);
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
+
     const isFocused = useIsFocused();
 
     const colorStateTag = useMemo((): string => {
@@ -105,6 +107,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         try {
             setLoading(true);
             const isOnline = await getOnlineMode();
+            setOnline(isOnline);
             if (isOnline) {
                 const response = await GetDocumentById(documentValue?.id);
                 if (response?.error) {
@@ -371,7 +374,9 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>
-                        Document : {documentValue?.id || '-'}
+                        {online
+                            ? `${documentValue?.name} - ${documentValue?.id}`
+                            : `Document : ${documentValue?.id}`}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}

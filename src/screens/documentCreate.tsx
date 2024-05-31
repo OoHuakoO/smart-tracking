@@ -86,6 +86,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [visibleDialogCamera, setVisibleDialogCamera] =
         useState<boolean>(false);
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
+    const [online, setOnline] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
 
     const clearStateDialog = useCallback(() => {
@@ -679,6 +680,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleFetchListUseState = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
+            setOnline(isOnline);
             if (isOnline) {
                 const responseUseStatus = await GetUseStatus({
                     page: 1,
@@ -761,7 +763,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No : {documentValue?.id || '-'}
+                        {online
+                            ? `${documentValue?.name} - ${documentValue?.id}`
+                            : `Document : ${documentValue?.id}`}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
@@ -820,7 +824,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>
-                    Total Asset : {listAssetCreate?.length}
+                    Count Asset : {listAssetCreate?.length}
                 </Text>
                 <FlatList
                     data={listAssetCreate}

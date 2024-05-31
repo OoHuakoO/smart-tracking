@@ -67,6 +67,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const [isFocusCategory, setIsFocusCategory] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [online, setOnline] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const form = useForm<AssetData>({});
@@ -312,6 +313,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
         try {
             form?.setValue('default_code', route?.params?.code);
             const isOnline = await getOnlineMode();
+            setOnline(isOnline);
             if (isOnline) {
                 const [responseUseStatus, responseCategory] = await Promise.all(
                     [
@@ -381,7 +383,9 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         Add Asset New
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
-                        Document No : {documentValue?.id || '-'}
+                        {online
+                            ? `${documentValue?.name} - ${documentValue?.id}`
+                            : `Document : ${documentValue?.id}`}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
