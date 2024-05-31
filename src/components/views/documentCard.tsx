@@ -1,7 +1,9 @@
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { STATE_DOCUMENT_NAME } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 interface DocumentScreenProp {
@@ -9,9 +11,20 @@ interface DocumentScreenProp {
     locationInfo: string;
     dateInfo: string;
     documentStatus: string;
+    online: boolean;
+    id: number;
+    handleRemoveDocument: (id: number) => void;
 }
 const DocumentCard: FC<DocumentScreenProp> = (props) => {
-    const { documentTitle, locationInfo, dateInfo, documentStatus } = props;
+    const {
+        documentTitle,
+        locationInfo,
+        dateInfo,
+        documentStatus,
+        online,
+        handleRemoveDocument,
+        id
+    } = props;
     let backgroundColor = theme.colors.black;
     let borderColor = theme.colors.black;
 
@@ -36,16 +49,21 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
 
     return (
         <View style={[styles.cardContainer, { borderColor }]}>
-            {/* <View style={styles.deleteIconContainer}>
-                {documentStatus === STATE_DOCUMENT_NAME.Draft && !online && (
+            {(documentStatus === STATE_DOCUMENT_NAME.Cancel ||
+                documentStatus === STATE_DOCUMENT_NAME.Done) &&
+                !online && (
                     <TouchableOpacity
-                        onPress={() => console.log('Delete')}
+                        onPress={() => handleRemoveDocument(id)}
                         activeOpacity={0.5}
+                        style={styles.deleteIconContainer}
                     >
-                        <FontAwesomeIcon icon={faTrash} color="#F0787A" />
+                        <FontAwesomeIcon
+                            icon={faTrash}
+                            color={theme.colors.documentCancel}
+                        />
                     </TouchableOpacity>
                 )}
-            </View> */}
+
             <View style={styles.textContainer}>
                 <Text variant="titleMedium" style={styles.documentTitle}>
                     {documentTitle}
@@ -111,9 +129,13 @@ const styles = StyleSheet.create({
     },
     deleteIconContainer: {
         position: 'absolute',
-        right: 20,
-        top: 15,
-        padding: 10
+        right: 10,
+        top: 10,
+        padding: 10,
+        backgroundColor: theme.colors.white,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: theme.colors.documentCancel
     },
     documentStatusText: {
         color: '#ffffff'

@@ -170,13 +170,13 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         setContentDialog('Do you want to cancel this document ?');
     }, [clearStateDialog]);
 
-    const handleOpenDialogResetToDraftDocument = useCallback(() => {
-        clearStateDialog();
-        setVisibleDialog(true);
-        setTitleDialog('Confirm Reset to Draft');
-        setShowCancelDialog(true);
-        setContentDialog('Do you want to reset to draft this document ?');
-    }, [clearStateDialog]);
+    // const handleOpenDialogResetToDraftDocument = useCallback(() => {
+    //     clearStateDialog();
+    //     setVisibleDialog(true);
+    //     setTitleDialog('Confirm Reset to Draft');
+    //     setShowCancelDialog(true);
+    //     setContentDialog('Do you want to reset to draft this document ?');
+    // }, [clearStateDialog]);
 
     const handleCancelDocument = useCallback(async () => {
         try {
@@ -214,53 +214,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             clearStateDialog();
             setVisibleDialog(true);
             setContentDialog('Something went wrong cancel document');
-        }
-    }, [
-        clearStateDialog,
-        documentValue?.id,
-        documentValue?.location,
-        documentValue?.location_id,
-        setDocument
-    ]);
-
-    const handleResetToDraft = useCallback(async () => {
-        try {
-            const isOnline = await getOnlineMode();
-            const documentObj = {
-                id: documentValue?.id,
-                state: STATE_DOCUMENT_NAME.Draft,
-                location: documentValue?.location,
-                location_id: documentValue?.location_id
-            };
-            if (isOnline) {
-                const response = await UpdateDocument({
-                    document_data: {
-                        id: documentValue?.id,
-                        state: STATE_DOCUMENT_VALUE.Draft
-                    }
-                });
-                if (
-                    response?.result?.message === RESPONSE_PUT_DOCUMENT_SUCCESS
-                ) {
-                    clearStateDialog();
-                    setDocument(documentObj);
-                } else {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog(
-                        'Something went wrong reset to draft document'
-                    );
-                }
-            } else {
-                const db = await getDBConnection();
-                await updateDocument(db, documentObj);
-                clearStateDialog();
-                setDocument(documentObj);
-            }
-        } catch (err) {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong reset to draft document');
         }
     }, [
         clearStateDialog,
@@ -336,21 +289,17 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             case 'Confirm':
                 await handleRemoveAsset();
                 break;
-            case 'Confirm Reset to Draft':
-                await handleResetToDraft();
-                break;
             case 'Confirm Cancel':
                 await handleCancelDocument();
                 break;
             default:
-                handleCloseDialog();
+                clearStateDialog();
                 break;
         }
     }, [
+        clearStateDialog,
         handleCancelDocument,
-        handleCloseDialog,
         handleRemoveAsset,
-        handleResetToDraft,
         titleDialog
     ]);
 
@@ -407,7 +356,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </TouchableOpacity>
                 )}
 
-                {(documentValue?.state === STATE_DOCUMENT_NAME.Cancel ||
+                {/* {(documentValue?.state === STATE_DOCUMENT_NAME.Cancel ||
                     documentValue?.state === STATE_DOCUMENT_NAME.Check) && (
                     <TouchableOpacity
                         activeOpacity={0.5}
@@ -418,7 +367,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             Reset to Draft
                         </Text>
                     </TouchableOpacity>
-                )}
+                )} */}
 
                 <View style={styles.containerText}>
                     <Text variant="headlineLarge" style={styles.textHeader}>

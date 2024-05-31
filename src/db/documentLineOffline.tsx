@@ -284,3 +284,20 @@ export const removeDocumentLineByAssetId = (
         throw new Error(`Error remove document line: ${err.message}`);
     }
 };
+
+export const removeDocumentLineOfflineByTrackingID = (
+    db: SQLiteDatabase,
+    tracking_id: number
+) => {
+    const deleteQuery = `DELETE FROM documentLineOffline WHERE tracking_id = ?`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery, [tracking_id]);
+        });
+        console.log(
+            `remove document line tracking_id: ${tracking_id} successfully`
+        );
+    } catch (err) {
+        throw new Error(`Error remove document line : ${err.message}`);
+    }
+};
