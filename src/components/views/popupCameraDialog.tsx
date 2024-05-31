@@ -37,7 +37,7 @@ const PopupCameraDialog: FC<PopupCameraDialogProp> = (props) => {
                         onPress={handleImageSelection}
                     >
                         <Text style={styles.text} variant="bodyLarge">
-                            Choose from Device
+                            Open Gallery
                         </Text>
                     </Button>
                     <Button

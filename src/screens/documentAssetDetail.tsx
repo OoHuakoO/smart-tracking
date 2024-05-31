@@ -351,7 +351,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                                 <ActionButton
                                     icon={'camera'}
                                     size="small"
-                                    backgroundColor={theme.colors.white}
+                                    backgroundColor={theme.colors.actionButton}
+                                    color={theme.colors.white}
                                 />
                             </TouchableOpacity>
                         </View>
