@@ -83,6 +83,7 @@ import { getOnlineMode } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
+import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
@@ -691,6 +692,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <KeepAwake />
             <Portal>
                 <AlertDialog
                     textTitle={titleDialog}
