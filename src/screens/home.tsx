@@ -102,7 +102,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const setToast = useSetRecoilState<Toast>(toastState);
-
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
         setTitleDialog('');

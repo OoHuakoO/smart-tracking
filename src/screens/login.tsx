@@ -23,11 +23,13 @@ import { LoginParams, SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import { Portal, Text } from 'react-native-paper';
 
 type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
+    let version = DeviceInfo.getVersion();
     const { navigation } = props;
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const form = useForm<LoginParams>({});
@@ -113,6 +115,9 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             <Text variant="headlineLarge" style={styles.textSmartTrack}>
                 Smart Track
             </Text>
+            <Text variant="titleMedium" style={styles.textVersion}>
+                Version {version}
+            </Text>
             <Portal>
                 <AlertDialog
                     textContent={contentDialog}
@@ -191,8 +196,13 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         textAlign: 'center',
         fontWeight: '700',
-        marginBottom: 40,
         marginTop: 40
+    },
+    textVersion: {
+        marginTop: 10,
+        marginBottom: 10,
+        textAlign: 'center',
+        color: theme.colors.versionText
     },
     sectionLogin: {
         padding: 16

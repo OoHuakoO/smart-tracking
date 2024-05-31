@@ -28,6 +28,7 @@ export const colorConfig = {
     greySoft: '#F1F1F1',
     cardContainer: '#EDEDED',
     additionalText: '#444444',
+    versionText: '#777777',
     actionButton: '#4499CE',
     backgroundPassword: '#3dabcb'
 };
