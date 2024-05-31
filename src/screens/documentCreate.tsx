@@ -2,7 +2,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import BackButton from '@src/components/core/backButton';
-import Button from '@src/components/core/button';
 import SearchButton from '@src/components/core/searchButton';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import PopupScanAsset from '@src/components/views/popupScanAsset';
@@ -783,9 +782,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         activeOpacity={0.5}
                     >
                         <ActionButton
-                            icon="barcode-scan"
+                            icon="camera"
                             size="small"
-                            backgroundColor={theme.colors.white}
+                            backgroundColor={theme.colors.actionButton}
+                            color={theme.colors.white}
                         />
                     </TouchableOpacity>
                     <TextInput
@@ -803,14 +803,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     <TouchableOpacity
                         onPress={() => handleSearchAsset(assetCode)}
                     >
-                        <Button style={styles.dialogActionConfirm}>
-                            <Text
-                                style={styles.textActionConfirm}
-                                variant="bodyLarge"
-                            >
-                                Search
-                            </Text>
-                        </Button>
+                        <ActionButton
+                            icon="plus"
+                            size="small"
+                            backgroundColor={theme.colors.actionButton}
+                            color={theme.colors.white}
+                        />
                     </TouchableOpacity>
                 </View>
 
@@ -937,11 +935,11 @@ const styles = StyleSheet.create({
 
     searchContainer: {
         marginTop: 30,
-        marginLeft: 20,
-        marginRight: 20,
         flexDirection: 'row',
         width: '100%',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 10
     },
     statusText: {
         color: theme.colors.pureWhite
@@ -1016,9 +1014,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         fontFamily: 'DMSans-Bold',
         color: theme.colors.textBody,
-        width: '50%',
-        marginRight: 10,
-        marginLeft: 10
+        width: '60%',
+        marginRight: 15,
+        marginLeft: 15
     },
     searchButton: {
         zIndex: 2
