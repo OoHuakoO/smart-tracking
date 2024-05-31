@@ -133,15 +133,12 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 ...assetSearch
             };
 
-            if (locationName !== ALL_LOCATION) {
-                searchQuery.location = locationName;
-            }
-
             const filter = {
                 default_code_for_or: searchQuery?.name,
                 name: searchQuery?.name,
                 use_state: searchQuery?.use_state,
-                location: searchQuery.location,
+                location:
+                    locationName !== ALL_LOCATION ? locationName : undefined,
                 'category_id.name': searchQuery?.['category_id.name']
             };
 
@@ -182,7 +179,6 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             let searchQuery: SearchQueryReport = assetSearch && {
                 ...assetSearch
             };
-
             searchTerm.and.state = handleMapReportStateValue(title);
 
             if (locationID !== 0) {
@@ -199,8 +195,8 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
             }
 
             if (searchQuery?.name !== undefined) {
+                searchTerm.or.asset_name = searchQuery?.name;
                 searchTerm.or.name = searchQuery?.name;
-                searchTerm.or.default_code = searchQuery?.name;
             }
 
             const response = await GetDocumentLineSearch({
@@ -242,20 +238,15 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 ...assetSearch
             };
 
-            if (locationName !== ALL_LOCATION) {
-                searchQuery.location = locationName;
-            }
-
             const filter = {
                 default_code_for_or: searchQuery?.name,
                 name: searchQuery?.name,
                 use_state: searchQuery?.use_state,
-                location: searchQuery.location,
+                location:
+                    locationName !== ALL_LOCATION ? locationName : undefined,
                 'category_id.name': searchQuery?.['category_id.name'],
                 state: handleMapReportStateValue(title)
             };
-
-            searchQuery.state = handleMapReportStateValue(title);
 
             const listReportDocumentLine = await getReportDocumentLine(
                 db,

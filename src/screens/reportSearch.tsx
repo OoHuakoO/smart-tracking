@@ -2,7 +2,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import InputText from '@src/components/core/inputText';
-import { REPORT_TYPE } from '@src/constant';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
@@ -115,10 +114,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
     const handleSearchAsset = async (data: AssetData) => {
         navigation.navigate('LocationListReportAsset', {
             assetSearch: {
-                name:
-                    route?.params?.title !== REPORT_TYPE.NotFound
-                        ? data.name
-                        : '',
+                name: data.name,
                 use_state: searchUseState,
                 'category_id.name': searchCategory
             },

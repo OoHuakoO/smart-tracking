@@ -13,6 +13,7 @@ export interface SearchQueryReport {
     name?: string;
     default_code?: string;
     use_state?: string;
+    asset_name?: string;
 }
 
 export interface ReportAssetData {
