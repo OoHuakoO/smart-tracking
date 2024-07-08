@@ -3,7 +3,6 @@ import {
     BackHandler,
     SafeAreaView,
     StatusBar,
-    Switch,
     TouchableOpacity,
     View
 } from 'react-native';
@@ -65,6 +64,7 @@ import {
     GetLocation,
     GetUseStatus
 } from '@src/services/downloadDB';
+import { LogoutDevice } from '@src/services/login';
 import { loginState, useRecoilValue, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
@@ -81,8 +81,9 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { getOnlineMode } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
 
@@ -90,6 +91,8 @@ type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
+    let deviceId = DeviceInfo.getDeviceId();
+    let deviceName = DeviceInfo.getDeviceName();
     const form = useForm<SettingParams>({});
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -140,6 +143,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleLogout = useCallback(async () => {
         try {
+            const settings = await AsyncStorage.getItem('Settings');
+            const jsonSettings: SettingParams = JSON.parse(settings);
+            const response = await LogoutDevice({
+                login: jsonSettings?.login,
+                password: jsonSettings?.password,
+                mac_address: await deviceId,
+                device_name: await deviceName
+            });
+
+            if (response?.error) {
+                setVisibleDialog(true);
+                setContentDialog('Logout Failed');
+                return;
+            }
+
             setLogin({ session_id: '', uid: '' });
             await AsyncStorage.setItem('Login', '');
             await AsyncStorage.setItem('Online', JSON.stringify(true));
@@ -151,7 +169,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             clearStateDialog();
             setVisibleDialog(true);
         }
-    }, [clearStateDialog, setLogin, setToast]);
+    }, [clearStateDialog, deviceId, deviceName, setLogin, setToast]);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -710,7 +728,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         <StatusTag
                             status={form.watch('online') ? 'Online' : 'Offline'}
                         />
-                        <Controller
+                        {/* <Controller
                             name="online"
                             defaultValue={true}
                             control={form?.control}
@@ -731,7 +749,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                                     }}
                                 />
                             )}
-                        />
+                        /> */}
                     </View>
                 </View>
 

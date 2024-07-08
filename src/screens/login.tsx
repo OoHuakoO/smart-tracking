@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
-import { Login } from '@src/services/login';
+import { ActiveDevice, CreateDevice, Login } from '@src/services/login';
 import { loginState, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
@@ -30,6 +30,9 @@ type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
     let version = DeviceInfo.getVersion();
+    let deviceId = DeviceInfo.getDeviceId();
+    let deviceName = DeviceInfo.getDeviceName();
+
     const { navigation } = props;
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const form = useForm<LoginParams>({});
@@ -37,6 +40,40 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const [contentDialog, setContentDialog] = useState<string>('');
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const setToast = useSetRecoilState<Toast>(toastState);
+
+    const handleCreateDevice = useCallback(
+        async (login: string, password: string) => {
+            const response = await CreateDevice({
+                login: login,
+                password: password,
+                mac_address: await deviceId,
+                device_name: await deviceName
+            });
+            if (response?.error) {
+                setVisibleDialog(true);
+                setContentDialog('Login Failed');
+                return;
+            }
+        },
+        [deviceId, deviceName]
+    );
+
+    const handleActiveUser = useCallback(
+        async (login: string, password: string) => {
+            const response = await ActiveDevice({
+                login: login,
+                password: password,
+                mac_address: await deviceId,
+                device_name: await deviceName
+            });
+            if (response?.error) {
+                setVisibleDialog(true);
+                setContentDialog('Login Failed');
+                return;
+            }
+        },
+        [deviceId, deviceName]
+    );
 
     const handleLogin = useCallback(
         async (data: LoginParams) => {
@@ -72,6 +109,9 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     })
                 );
 
+                handleCreateDevice(data?.login, data?.password);
+                handleActiveUser(data?.login, data?.password);
+
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);
@@ -81,7 +121,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 setContentDialog(`Something went wrong login`);
             }
         },
-        [setLogin, setToast]
+        [handleActiveUser, handleCreateDevice, setLogin, setToast]
     );
 
     const handleVisiblePassword = useCallback(() => {
