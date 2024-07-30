@@ -16,6 +16,8 @@ export interface LoginResponse {
     session_id: string;
 }
 
+// Online Mode
+
 export interface CreateDeviceParams {
     login: string;
     password: string;
@@ -45,11 +47,19 @@ export interface ActiveDeviceResponse {
     device_offline_mode: boolean;
 }
 
-export interface CheckDeviceParams {
-    login: string;
-    password: string;
+export interface CheckActiveDeviceParams {
+    login?: string;
+    password?: string;
     mac_address: string;
+    device_name?: string;
+}
+
+export interface CheckActiveDeviceResponse {
     device_name: string;
+    mac_address: string;
+    user_name: string;
+    user_active: boolean;
+    device_offline_mode: boolean;
 }
 
 export interface LogoutDeviceParams {
@@ -60,6 +70,23 @@ export interface LogoutDeviceParams {
 }
 
 export interface LogoutDeviceResponse {
+    device_name: string;
+    mac_address: string;
+    user_name: string;
+    user_active: boolean;
+    device_offline_mode: boolean;
+}
+
+// Offline Mode
+
+export interface CheckMacAddressParams {
+    login: string;
+    password: string;
+    mac_address: string;
+    device_name: string;
+}
+
+export interface CheckMacAddressResponse {
     device_name: string;
     mac_address: string;
     user_name: string;

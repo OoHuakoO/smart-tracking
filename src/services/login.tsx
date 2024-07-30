@@ -1,7 +1,10 @@
 import {
     ActiveDeviceParams,
     ActiveDeviceResponse,
-    CheckDeviceParams,
+    CheckActiveDeviceParams,
+    CheckActiveDeviceResponse,
+    CheckMacAddressParams,
+    CheckMacAddressResponse,
     CreateDeviceParams,
     CreateDeviceResponse,
     LoginParams,
@@ -15,6 +18,8 @@ export function Login(params: LoginParams): Promise<Response<LoginResponse>> {
     return post<LoginResponse>('/web/session/authenticate', params);
 }
 
+// Online Mode
+
 export function CreateDevice(
     params: CreateDeviceParams
 ): Promise<Response<CreateDeviceResponse>> {
@@ -27,14 +32,22 @@ export function ActiveDevice(
     return post<ActiveDeviceResponse>('/api/device/active', params);
 }
 
-export function CheckUser(
-    params: CheckDeviceParams
-): Promise<Response<ActiveDeviceResponse>> {
-    return post<ActiveDeviceResponse>('/api/user/check', params);
+export function CheckActiveDevice(
+    params: CheckActiveDeviceParams
+): Promise<Response<CheckActiveDeviceResponse>> {
+    return post<CheckActiveDeviceResponse>('/api/device/user/check', params);
 }
 
 export function LogoutDevice(
     params: LogoutDeviceParams
 ): Promise<Response<LogoutDeviceResponse>> {
     return post<LogoutDeviceResponse>('/api/device/logout', params);
+}
+
+// Offline Mode
+
+export function CheckMacAddress(
+    params: CheckMacAddressParams
+): Promise<Response<CheckMacAddressResponse>> {
+    return post<CheckMacAddressResponse>('/api/get/device/mac/address', params);
 }

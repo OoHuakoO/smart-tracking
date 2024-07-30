@@ -64,7 +64,7 @@ import {
     GetLocation,
     GetUseStatus
 } from '@src/services/downloadDB';
-import { LogoutDevice } from '@src/services/login';
+import { CheckActiveDevice, LogoutDevice } from '@src/services/login';
 import { loginState, useRecoilValue, useSetRecoilState } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
@@ -688,6 +688,43 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 break;
         }
     }, [clearStateDialog, handleDownload, handleUpload, typeDialog]);
+
+    const handleCheckUserLogin = useCallback(async () => {
+        try {
+            const intervalId = setInterval(async () => {
+                const response = await CheckActiveDevice({
+                    mac_address: await deviceId
+                });
+
+                if (response.error) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setTitleDialog(WARNING);
+                    setTypeDialog('warning');
+                    return;
+                }
+
+                if (response?.result?.mac_address === (await deviceId)) {
+                    console.log('login exist');
+                }
+            }, 5000);
+
+            return () => clearInterval(intervalId);
+        } catch (err) {
+            console.log(err);
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setTypeDialog('warning');
+        }
+    }, [clearStateDialog, deviceId]);
+
+    useEffect(() => {
+        const modeCompany = 'Online';
+        if (modeCompany === 'Online') {
+            handleCheckUserLogin();
+        }
+    }, [handleCheckUserLogin]);
 
     useEffect(() => {
         handleInitFetch();

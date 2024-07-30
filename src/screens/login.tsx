@@ -78,39 +78,46 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleLogin = useCallback(
         async (data: LoginParams) => {
             try {
-                const response = await Login({
-                    login: data?.login,
-                    password: data?.password
-                });
-                if (
-                    response?.error ||
-                    data?.login === '' ||
-                    data?.password === ''
-                ) {
-                    setVisibleDialog(true);
-                    setContentDialog('Email Or Password Incorrect');
-                    return;
-                }
-                const loginObj = {
-                    session_id: response?.result?.session_id,
-                    uid: response?.result?.uid
-                };
-                setLogin(loginObj);
-                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
+                const modeCompany = 'Online';
 
-                const settings = await AsyncStorage.getItem('Settings');
-                const jsonSettings: SettingParams = JSON.parse(settings);
-                await AsyncStorage.setItem(
-                    'Settings',
-                    JSON.stringify({
-                        ...jsonSettings,
+                if (modeCompany === 'Online') {
+                    handleCreateDevice(data?.login, data?.password);
+                    handleActiveUser(data?.login, data?.password);
+
+                    const response = await Login({
                         login: data?.login,
                         password: data?.password
-                    })
-                );
+                    });
+                    if (
+                        response?.error ||
+                        data?.login === '' ||
+                        data?.password === ''
+                    ) {
+                        setVisibleDialog(true);
+                        setContentDialog('Email Or Password Incorrect');
+                        return;
+                    }
+                    const loginObj = {
+                        session_id: response?.result?.session_id,
+                        uid: response?.result?.uid
+                    };
+                    setLogin(loginObj);
+                    await AsyncStorage.setItem(
+                        'Login',
+                        JSON.stringify(loginObj)
+                    );
 
-                handleCreateDevice(data?.login, data?.password);
-                handleActiveUser(data?.login, data?.password);
+                    const settings = await AsyncStorage.getItem('Settings');
+                    const jsonSettings: SettingParams = JSON.parse(settings);
+                    await AsyncStorage.setItem(
+                        'Settings',
+                        JSON.stringify({
+                            ...jsonSettings,
+                            login: data?.login,
+                            password: data?.password
+                        })
+                    );
+                }
 
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
