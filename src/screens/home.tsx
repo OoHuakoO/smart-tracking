@@ -704,7 +704,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     return;
                 }
 
-                if (response?.result?.mac_address === (await deviceId)) {
+                console.log(response?.result?.mac_address);
+
+                if (response?.result?.mac_address !== (await deviceId)) {
                     console.log('login exist');
                 }
             }, 5000);
