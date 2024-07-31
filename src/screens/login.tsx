@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Keyboard,
     SafeAreaView,
     TouchableOpacity,
     View
@@ -56,8 +57,8 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const [visiblePopupDeviceLogin, setVisiblePopupDeviceLogin] =
         useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
-    const [modeCompany, setModeCompany] = useState<string>('');
-    const [modeDeviceLogin, setModeDeviceLogin] = useState<string>('');
+    const [modeCompany, setModeCompany] = useState<string>('Online');
+    const [modeDeviceLogin, setModeDeviceLogin] = useState<string>('Yes');
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const setToast = useSetRecoilState<Toast>(toastState);
 
@@ -111,6 +112,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     response?.result?.data?.mac_address !== (await deviceId) &&
                     response?.result?.data?.user_active
                 ) {
+                    Keyboard.dismiss();
                     setVisiblePopupDeviceLogin(true);
                     return true;
                 }
@@ -199,6 +201,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 if (privilege === 'Online') {
                     handleOnlineLogin(data);
                 } else {
+                    Keyboard.dismiss();
                     setVisiblePopupSelectModeCompany(true);
                 }
             } catch (err) {
