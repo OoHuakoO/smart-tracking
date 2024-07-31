@@ -18,7 +18,7 @@ export interface Toast {
 
 export interface LoginState {
     session_id: string;
-    uid: string;
+    uid?: string;
 }
 
 export interface DocumentState {

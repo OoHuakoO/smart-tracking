@@ -8,3 +8,8 @@ export const loginState: RecoilState<LoginState> = atom({
         uid: ''
     }
 });
+
+export const PrivilegeCompanyState: RecoilState<string> = atom({
+    key: 'PrivilegeCompany',
+    default: ''
+});

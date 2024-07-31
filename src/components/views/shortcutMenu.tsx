@@ -11,17 +11,17 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Menu from '../core/menu';
 
 interface ShortcutMenuProps
     extends NativeStackScreenProps<PrivateStackParamsList, 'Home'> {
     handleDownload: () => void;
     handleUpload: () => void;
+    online?: boolean;
 }
 
 const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
-    const { navigation, handleDownload, handleUpload } = props;
+    const { navigation, handleDownload, handleUpload, online } = props;
 
     return (
         <View>
@@ -30,37 +30,43 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
                     Menu
                 </Text>
             </View>
-            <View style={styles.menu}>
-                <Menu
-                    icon={faFile}
-                    menuName={'Document'}
-                    menuPage={() => navigation.navigate('Document')}
-                />
-                <Menu
-                    icon={faLocationDot}
-                    menuName={'Location'}
-                    menuPage={() => navigation.navigate('Location')}
-                />
-                <Menu
-                    icon={faBoxesStacked}
-                    menuName={'Asset'}
-                    menuPage={() => navigation.navigate('Assets')}
-                />
-                <Menu
-                    icon={faFlag}
-                    menuName={'Report'}
-                    menuPage={() => navigation.navigate('Report')}
-                />
-                <Menu
-                    icon={faUpload}
-                    menuName={'Upload'}
-                    menuPage={handleUpload}
-                />
-                <Menu
-                    icon={faDownload}
-                    menuName={'Download'}
-                    menuPage={handleDownload}
-                />
+            <View style={styles.menuContainer}>
+                <View style={styles.menuBox}>
+                    <Menu
+                        icon={faFile}
+                        menuName={'Document'}
+                        menuPage={() => navigation.navigate('Document')}
+                    />
+                    <Menu
+                        icon={faLocationDot}
+                        menuName={'Location'}
+                        menuPage={() => navigation.navigate('Location')}
+                    />
+                    <Menu
+                        icon={faBoxesStacked}
+                        menuName={'Asset'}
+                        menuPage={() => navigation.navigate('Assets')}
+                    />
+                    <Menu
+                        icon={faFlag}
+                        menuName={'Report'}
+                        menuPage={() => navigation.navigate('Report')}
+                    />
+                    {!online && (
+                        <>
+                            <Menu
+                                icon={faUpload}
+                                menuName={'Upload'}
+                                menuPage={handleUpload}
+                            />
+                            <Menu
+                                icon={faDownload}
+                                menuName={'Download'}
+                                menuPage={handleDownload}
+                            />
+                        </>
+                    )}
+                </View>
             </View>
         </View>
     );
@@ -71,14 +77,20 @@ const styles = StyleSheet.create({
         marginTop: 15,
         fontWeight: 'bold'
     },
-    menu: {
+    menuContainer: {
         display: 'flex',
         justifyContent: 'center',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 10,
+        alignItems: 'center',
+        marginTop: 30,
+        width: '100%'
+    },
+    menuBox: {
         gap: 20,
-        width: wp('90%')
+        display: 'flex',
+        flexDirection: 'row',
+        width: '90%',
+        flexWrap: 'wrap',
+        marginLeft: 40
     }
 });
 

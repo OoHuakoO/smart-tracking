@@ -51,7 +51,7 @@ export interface ActiveDeviceResponse {
 export interface CheckActiveDeviceParams {
     login?: string;
     password?: string;
-    mac_address: string;
+    mac_address?: string;
     device_name?: string;
 }
 

@@ -71,7 +71,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                {login?.session_id !== '' ? (
+                {login?.uid ? (
                     <Stack.Screen
                         options={{
                             headerShown: false

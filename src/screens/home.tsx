@@ -105,6 +105,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const setToast = useSetRecoilState<Toast>(toastState);
+
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
         setTitleDialog('');
@@ -118,11 +119,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleInitFetch = useCallback(async () => {
         try {
             const online = await AsyncStorage.getItem('Online');
-            if (!online) {
-                await AsyncStorage.setItem('Online', JSON.stringify(true));
-                form?.setValue('online', true);
-                return;
-            }
             const onlineValue = JSON.parse(online);
             form?.setValue('online', onlineValue);
             const db = await getDBConnection();
@@ -141,35 +137,38 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [clearStateDialog, form]);
 
-    const handleLogout = useCallback(async () => {
-        try {
-            const settings = await AsyncStorage.getItem('Settings');
-            const jsonSettings: SettingParams = JSON.parse(settings);
-            const response = await LogoutDevice({
-                login: jsonSettings?.login,
-                password: jsonSettings?.password,
-                mac_address: await deviceId,
-                device_name: await deviceName
-            });
+    const handleLogout = useCallback(
+        async (loginAnotherDevoice?: boolean) => {
+            try {
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
+                if (!loginAnotherDevoice) {
+                    const response = await LogoutDevice({
+                        login: jsonSettings?.login,
+                        password: jsonSettings?.password,
+                        mac_address: await deviceId,
+                        device_name: await deviceName
+                    });
+                    if (response?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog('Logout Failed');
+                        return;
+                    }
+                }
 
-            if (response?.error) {
+                setLogin({ session_id: '', uid: '' });
+                await AsyncStorage.setItem('Login', '');
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Logout Successfully' });
+                }, 0);
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
                 setVisibleDialog(true);
-                setContentDialog('Logout Failed');
-                return;
             }
-
-            setLogin({ session_id: '', uid: '' });
-            await AsyncStorage.setItem('Login', '');
-            await AsyncStorage.setItem('Online', JSON.stringify(true));
-            setTimeout(() => {
-                setToast({ open: true, text: 'Logout Successfully' });
-            }, 0);
-        } catch (err) {
-            console.log(err);
-            clearStateDialog();
-            setVisibleDialog(true);
-        }
-    }, [clearStateDialog, deviceId, deviceName, setLogin, setToast]);
+        },
+        [clearStateDialog, deviceId, deviceName, setLogin, setToast]
+    );
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -680,6 +679,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             case 'upload':
                 await handleUpload();
                 break;
+            case 'logout device':
+                handleLogout(true);
+                break;
             case 'warning':
                 clearStateDialog();
                 break;
@@ -687,30 +689,44 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 clearStateDialog();
                 break;
         }
-    }, [clearStateDialog, handleDownload, handleUpload, typeDialog]);
+    }, [
+        clearStateDialog,
+        handleDownload,
+        handleLogout,
+        handleUpload,
+        typeDialog
+    ]);
 
     const handleCheckUserLogin = useCallback(async () => {
         try {
             const intervalId = setInterval(async () => {
-                const response = await CheckActiveDevice({
-                    mac_address: await deviceId
-                });
-
-                if (response.error) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setTitleDialog(WARNING);
-                    setTypeDialog('warning');
-                    return;
+                const online = await AsyncStorage.getItem('Online');
+                const isOnline = JSON.parse(online);
+                if (isOnline) {
+                    const response = await CheckActiveDevice();
+                    if (response.error) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setTitleDialog(WARNING);
+                        setTypeDialog('warning');
+                        return;
+                    }
+                    if (
+                        response?.result?.data?.mac_address &&
+                        response?.result?.data?.mac_address !==
+                            (await deviceId) &&
+                        response?.result?.data?.user_active
+                    ) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setTitleDialog('User Login Another Device');
+                        setContentDialog(
+                            `You have been logged out because there was a login from another device. If this wasn't you, please check the security of your account immediately.`
+                        );
+                        setTypeDialog('logout device');
+                    }
                 }
-
-                console.log(response?.result?.mac_address);
-
-                if (response?.result?.mac_address !== (await deviceId)) {
-                    console.log('login exist');
-                }
-            }, 5000);
-
+            }, 10000);
             return () => clearInterval(intervalId);
         } catch (err) {
             console.log(err);
@@ -722,10 +738,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, [clearStateDialog, deviceId]);
 
     useEffect(() => {
-        const modeCompany = 'Online';
-        if (modeCompany === 'Online') {
-            handleCheckUserLogin();
-        }
+        handleCheckUserLogin();
     }, [handleCheckUserLogin]);
 
     useEffect(() => {
@@ -792,7 +805,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     </View>
                 </View>
 
-                <TouchableOpacity activeOpacity={0.5} onPress={handleLogout}>
+                <TouchableOpacity
+                    activeOpacity={0.5}
+                    onPress={() => handleLogout(false)}
+                >
                     <View>
                         <FontAwesomeIcon icon={faRightFromBracket} />
                     </View>
@@ -809,6 +825,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 route={route}
                 handleDownload={handleOpenDialogDownload}
                 handleUpload={handleOpenDialogUpload}
+                online={form.getValues('online')}
             />
             <ToastComponent />
         </SafeAreaView>

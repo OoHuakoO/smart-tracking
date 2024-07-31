@@ -14,8 +14,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
-import { ActiveDevice, CreateDevice, Login } from '@src/services/login';
-import { loginState, useSetRecoilState } from '@src/store';
+import PopupDeviceLogin from '@src/components/views/popupDeviceLogin';
+import PopupSelectModeCompany from '@src/components/views/popupSelectModeCompany';
+import {
+    ActiveDevice,
+    CheckActiveDevice,
+    CreateDevice,
+    Login
+} from '@src/services/login';
+import {
+    loginState,
+    PrivilegeCompanyState,
+    useSetRecoilState
+} from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
@@ -24,7 +35,7 @@ import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { Portal, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
 
@@ -35,24 +46,35 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     const { navigation } = props;
     const setLogin = useSetRecoilState<LoginState>(loginState);
+    const setPrivilegeCompany = useSetRecoilState<string>(
+        PrivilegeCompanyState
+    );
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [visiblePopupSelectModeCompany, setVisiblePopupSelectModeCompany] =
+        useState<boolean>(false);
+    const [visiblePopupDeviceLogin, setVisiblePopupDeviceLogin] =
+        useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
+    const [modeCompany, setModeCompany] = useState<string>('');
+    const [modeDeviceLogin, setModeDeviceLogin] = useState<string>('');
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const setToast = useSetRecoilState<Toast>(toastState);
 
     const handleCreateDevice = useCallback(
         async (login: string, password: string) => {
-            const response = await CreateDevice({
-                login: login,
-                password: password,
-                mac_address: await deviceId,
-                device_name: await deviceName
-            });
-            if (response?.error) {
-                setVisibleDialog(true);
-                setContentDialog('Login Failed');
-                return;
+            try {
+                const response = await CreateDevice({
+                    login: login,
+                    password: password,
+                    mac_address: await deviceId,
+                    device_name: await deviceName
+                });
+                if (response?.error) {
+                    throw response?.error;
+                }
+            } catch (err) {
+                throw err;
             }
         },
         [deviceId, deviceName]
@@ -60,76 +82,166 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     const handleActiveUser = useCallback(
         async (login: string, password: string) => {
-            const response = await ActiveDevice({
-                login: login,
-                password: password,
-                mac_address: await deviceId,
-                device_name: await deviceName
-            });
-            if (response?.error) {
-                setVisibleDialog(true);
-                setContentDialog('Login Failed');
-                return;
+            try {
+                const response = await ActiveDevice({
+                    login: login,
+                    password: password,
+                    mac_address: await deviceId,
+                    device_name: await deviceName
+                });
+                if (response?.error) {
+                    throw response?.error;
+                }
+            } catch (err) {
+                throw err;
             }
         },
         [deviceId, deviceName]
     );
 
-    const handleLogin = useCallback(
-        async (data: LoginParams) => {
+    const handleCheckActiveDevice = useCallback(
+        async (login: string, password: string): Promise<boolean> => {
             try {
-                const modeCompany = 'Online';
+                const response = await CheckActiveDevice({ login, password });
+                if (response?.error) {
+                    throw response.error;
+                }
+                if (
+                    response?.result?.data?.mac_address &&
+                    response?.result?.data?.mac_address !== (await deviceId) &&
+                    response?.result?.data?.user_active
+                ) {
+                    setVisiblePopupDeviceLogin(true);
+                    return true;
+                }
+                return false;
+            } catch (err) {
+                throw err;
+            }
+        },
+        [deviceId]
+    );
 
-                if (modeCompany === 'Online') {
-                    handleCreateDevice(data?.login, data?.password);
-                    handleActiveUser(data?.login, data?.password);
+    const handleCheckPrivilegeCompany = useCallback(async () => {
+        /// fetch api PrivilegeCompany
+        const privilege = 'Online/Offline';
+        await AsyncStorage.setItem('PrivilegeCompany', privilege);
+        setPrivilegeCompany(privilege);
+        return privilege;
+    }, [setPrivilegeCompany]);
 
-                    const response = await Login({
-                        login: data?.login,
-                        password: data?.password
-                    });
-                    if (
-                        response?.error ||
-                        data?.login === '' ||
-                        data?.password === ''
-                    ) {
-                        setVisibleDialog(true);
-                        setContentDialog('Email Or Password Incorrect');
+    // const handleOfflineLogin = useCallback(async (data: LoginParams) => {}, []);
+
+    const handleOnlineLogin = useCallback(
+        async (data: LoginParams, forceLogin?: boolean) => {
+            try {
+                if (!forceLogin) {
+                    const foundActiveDevice = await handleCheckActiveDevice(
+                        data?.login,
+                        data?.password
+                    );
+                    if (foundActiveDevice) {
                         return;
                     }
-                    const loginObj = {
-                        session_id: response?.result?.session_id,
-                        uid: response?.result?.uid
-                    };
-                    setLogin(loginObj);
-                    await AsyncStorage.setItem(
-                        'Login',
-                        JSON.stringify(loginObj)
-                    );
-
-                    const settings = await AsyncStorage.getItem('Settings');
-                    const jsonSettings: SettingParams = JSON.parse(settings);
-                    await AsyncStorage.setItem(
-                        'Settings',
-                        JSON.stringify({
-                            ...jsonSettings,
-                            login: data?.login,
-                            password: data?.password
-                        })
-                    );
                 }
-
+                handleCreateDevice(data?.login, data?.password);
+                handleActiveUser(data?.login, data?.password);
+                const response = await Login({
+                    login: data?.login,
+                    password: data?.password
+                });
+                if (
+                    response?.error ||
+                    data?.login === '' ||
+                    data?.password === ''
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog('Email Or Password Incorrect');
+                    return;
+                }
+                const loginObj = {
+                    session_id: '',
+                    uid: response?.result?.uid
+                };
+                setLogin(loginObj);
+                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
+                await AsyncStorage.setItem('Online', JSON.stringify(true));
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
+                await AsyncStorage.setItem(
+                    'Settings',
+                    JSON.stringify({
+                        ...jsonSettings,
+                        login: data?.login,
+                        password: data?.password
+                    })
+                );
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);
+            } catch (err) {
+                throw err;
+            }
+        },
+        [
+            handleActiveUser,
+            handleCheckActiveDevice,
+            handleCreateDevice,
+            setLogin,
+            setToast
+        ]
+    );
+
+    const handleLogin = useCallback(
+        async (data: LoginParams) => {
+            try {
+                const privilege = await handleCheckPrivilegeCompany();
+                if (privilege === 'Online') {
+                    handleOnlineLogin(data);
+                } else {
+                    setVisiblePopupSelectModeCompany(true);
+                }
             } catch (err) {
                 console.log(err);
                 setVisibleDialog(true);
                 setContentDialog(`Something went wrong login`);
             }
         },
-        [handleActiveUser, handleCreateDevice, setLogin, setToast]
+        [handleCheckPrivilegeCompany, handleOnlineLogin]
     );
+
+    const handleConfirmSelectModeCompany = useCallback(() => {
+        if (modeCompany === 'Online') {
+            handleOnlineLogin({
+                login: form.getValues('login'),
+                password: form.getValues('password')
+            });
+        } else {
+            setVisiblePopupSelectModeCompany(false);
+        }
+    }, [form, handleOnlineLogin, modeCompany]);
+
+    const handleConfirmDeviceLogin = useCallback(() => {
+        if (modeDeviceLogin === 'Yes') {
+            handleOnlineLogin(
+                {
+                    login: form.getValues('login'),
+                    password: form.getValues('password')
+                },
+                true
+            );
+        } else {
+            setVisiblePopupDeviceLogin(false);
+        }
+    }, [form, handleOnlineLogin, modeDeviceLogin]);
+
+    const handleChangeModeCompany = useCallback((value: string) => {
+        setModeCompany(value);
+    }, []);
+
+    const handleChangeModeDeviceLogin = useCallback((value: string) => {
+        setModeDeviceLogin(value);
+    }, []);
 
     const handleVisiblePassword = useCallback(() => {
         setIsPasswordVisible(!isPasswordVisible);
@@ -137,6 +249,14 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     const handleCloseDialog = () => {
         setVisibleDialog(false);
+    };
+
+    const handleClosePopupSelectModeCompany = () => {
+        setVisiblePopupSelectModeCompany(false);
+    };
+
+    const handleClosePopupDeviceLogin = () => {
+        setVisiblePopupDeviceLogin(false);
     };
 
     const handlePressSetting = () => {
@@ -159,20 +279,32 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <AlertDialog
+                textContent={contentDialog}
+                visible={visibleDialog}
+                handleClose={handleCloseDialog}
+                handleConfirm={handleCloseDialog}
+            />
+            <PopupSelectModeCompany
+                visible={visiblePopupSelectModeCompany}
+                modeCompany={modeCompany}
+                handleClose={handleClosePopupSelectModeCompany}
+                handleConfirm={handleConfirmSelectModeCompany}
+                handleChangeModeCompany={handleChangeModeCompany}
+            />
+            <PopupDeviceLogin
+                visible={visiblePopupDeviceLogin}
+                modeDeviceLogin={modeDeviceLogin}
+                handleClose={handleClosePopupDeviceLogin}
+                handleConfirm={handleConfirmDeviceLogin}
+                handleChangeModeDeviceLogin={handleChangeModeDeviceLogin}
+            />
             <Text variant="headlineLarge" style={styles.textSmartTrack}>
                 Smart Track
             </Text>
             <Text variant="titleMedium" style={styles.textVersion}>
                 Version {version}
             </Text>
-            <Portal>
-                <AlertDialog
-                    textContent={contentDialog}
-                    visible={visibleDialog}
-                    handleClose={handleCloseDialog}
-                    handleConfirm={handleCloseDialog}
-                />
-            </Portal>
             <View style={styles.sectionLogin}>
                 <Controller
                     name="login"

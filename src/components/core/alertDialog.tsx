@@ -96,9 +96,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     dialogTitle: {
-        fontWeight: 'bold'
+        fontFamily: 'DMSans-Medium'
     },
-
     dialogActionCancel: {
         paddingVertical: 2,
         paddingHorizontal: 5,

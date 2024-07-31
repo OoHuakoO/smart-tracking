@@ -33,7 +33,7 @@ export function ActiveDevice(
 }
 
 export function CheckActiveDevice(
-    params: CheckActiveDeviceParams
+    params?: CheckActiveDeviceParams
 ): Promise<Response<CheckActiveDeviceResponse>> {
     return post<CheckActiveDeviceResponse>('/api/device/user/check', params);
 }
