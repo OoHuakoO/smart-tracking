@@ -12,6 +12,7 @@ import Button from '@src/components/core/button';
 import InputText from '@src/components/core/inputText';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
@@ -25,6 +26,7 @@ import {
 } from '@src/services/login';
 import {
     loginState,
+    OnlineState,
     PrivilegeCompanyState,
     useSetRecoilState
 } from '@src/store';
@@ -44,7 +46,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     let version = DeviceInfo.getVersion();
     let deviceId = DeviceInfo.getDeviceId();
     let deviceName = DeviceInfo.getDeviceName();
-
     const { navigation } = props;
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const setPrivilegeCompany = useSetRecoilState<string>(
@@ -61,6 +62,9 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const [modeDeviceLogin, setModeDeviceLogin] = useState<string>('Yes');
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const setToast = useSetRecoilState<Toast>(toastState);
+    const setOnlineState = useSetRecoilState<boolean>(OnlineState);
+
+    const { isConnected } = useNetInfo();
 
     const handleCreateDevice = useCallback(
         async (login: string, password: string) => {
@@ -132,7 +136,49 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         return privilege;
     }, [setPrivilegeCompany]);
 
-    // const handleOfflineLogin = useCallback(async (data: LoginParams) => {}, []);
+    const handleOfflineLogin = useCallback(
+        async (data: LoginParams) => {
+            try {
+                const response = await Login({
+                    login: data?.login,
+                    password: data?.password
+                });
+                if (
+                    response?.error ||
+                    data?.login === '' ||
+                    data?.password === ''
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog('Email Or Password Incorrect');
+                    return;
+                }
+                const loginObj = {
+                    session_id: '',
+                    uid: response?.result?.uid
+                };
+                setLogin(loginObj);
+                setOnlineState(false);
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
+                await AsyncStorage.setItem(
+                    'Settings',
+                    JSON.stringify({
+                        ...jsonSettings,
+                        login: data?.login,
+                        password: data?.password
+                    })
+                );
+                await AsyncStorage.setItem('Online', JSON.stringify(false));
+                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Login Successfully' });
+                }, 0);
+            } catch (err) {
+                throw err;
+            }
+        },
+        [setLogin, setOnlineState, setToast]
+    );
 
     const handleOnlineLogin = useCallback(
         async (data: LoginParams, forceLogin?: boolean) => {
@@ -166,8 +212,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     uid: response?.result?.uid
                 };
                 setLogin(loginObj);
-                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
-                await AsyncStorage.setItem('Online', JSON.stringify(true));
+                setOnlineState(true);
                 const settings = await AsyncStorage.getItem('Settings');
                 const jsonSettings: SettingParams = JSON.parse(settings);
                 await AsyncStorage.setItem(
@@ -178,6 +223,8 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                         password: data?.password
                     })
                 );
+                await AsyncStorage.setItem('Online', JSON.stringify(true));
+                await AsyncStorage.setItem('Login', JSON.stringify(loginObj));
                 setTimeout(() => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);
@@ -190,6 +237,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             handleCheckActiveDevice,
             handleCreateDevice,
             setLogin,
+            setOnlineState,
             setToast
         ]
     );
@@ -220,9 +268,17 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 password: form.getValues('password')
             });
         } else {
-            setVisiblePopupSelectModeCompany(false);
+            if (isConnected) {
+                handleOfflineLogin({
+                    login: form.getValues('login'),
+                    password: form.getValues('password')
+                });
+            } else {
+                // get user in database to login
+            }
         }
-    }, [form, handleOnlineLogin, modeCompany]);
+        setVisiblePopupSelectModeCompany(false);
+    }, [form, handleOfflineLogin, handleOnlineLogin, isConnected, modeCompany]);
 
     const handleConfirmDeviceLogin = useCallback(() => {
         if (modeDeviceLogin === 'Yes') {

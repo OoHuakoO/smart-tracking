@@ -10,6 +10,8 @@ import {
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNetInfo } from '@react-native-community/netinfo';
+import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
@@ -65,7 +67,12 @@ import {
     GetUseStatus
 } from '@src/services/downloadDB';
 import { CheckActiveDevice, LogoutDevice } from '@src/services/login';
-import { loginState, useRecoilValue, useSetRecoilState } from '@src/store';
+import {
+    loginState,
+    OnlineState,
+    useRecoilValue,
+    useSetRecoilState
+} from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { LoginState, Toast } from '@src/typings/common';
@@ -79,7 +86,6 @@ import {
 import { SettingParams } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
-import { getOnlineMode } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
@@ -104,7 +110,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
+    const onlineValue = useRecoilValue<boolean>(OnlineState);
     const setToast = useSetRecoilState<Toast>(toastState);
+    const { isConnected } = useNetInfo();
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -116,33 +124,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setShowProgressBar(false);
     }, []);
 
-    const handleInitFetch = useCallback(async () => {
-        try {
-            const online = await AsyncStorage.getItem('Online');
-            const onlineValue = JSON.parse(online);
-            form?.setValue('online', onlineValue);
-            const db = await getDBConnection();
-            await createTableAsset(db);
-            await createTableLocation(db);
-            await createTableUseStatus(db);
-            await createTableCategory(db);
-            await createTableDocumentOffline(db);
-            await createTableDocumentLine(db);
-            await createTableReportAssetNotFound(db);
-            await createTableReportDocumentLine(db);
-        } catch (err) {
-            console.log(err);
-            clearStateDialog();
-            setVisibleDialog(true);
-        }
-    }, [clearStateDialog, form]);
-
     const handleLogout = useCallback(
         async (loginAnotherDevoice?: boolean) => {
             try {
                 const settings = await AsyncStorage.getItem('Settings');
                 const jsonSettings: SettingParams = JSON.parse(settings);
-                if (!loginAnotherDevoice) {
+                if (!loginAnotherDevoice && isConnected) {
                     const response = await LogoutDevice({
                         login: jsonSettings?.login,
                         password: jsonSettings?.password,
@@ -167,7 +154,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 setVisibleDialog(true);
             }
         },
-        [clearStateDialog, deviceId, deviceName, setLogin, setToast]
+        [
+            clearStateDialog,
+            deviceId,
+            deviceName,
+            isConnected,
+            setLogin,
+            setToast
+        ]
     );
 
     const handleCloseDialog = useCallback(() => {
@@ -175,8 +169,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, []);
 
     const handleOpenDialogDownload = useCallback(async () => {
-        const isOnline = await getOnlineMode();
-        if (isOnline) {
+        if (isConnected) {
             const db = await getDBConnection();
             const countAsset = await getTotalAssets(db);
             if (countAsset > 0) {
@@ -202,15 +195,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setVisibleDialog(true);
             setTitleDialog(WARNING);
             setContentDialog(
-                `Online mode is close, please open online mode to download`
+                `Network Disconnected, please open internet to download`
             );
             setTypeDialog('warning');
         }
-    }, [clearStateDialog]);
+    }, [clearStateDialog, isConnected]);
 
     const handleOpenDialogUpload = useCallback(async () => {
-        const isOnline = await getOnlineMode();
-        if (isOnline) {
+        if (isConnected) {
             clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog('Upload');
@@ -222,11 +214,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setVisibleDialog(true);
             setTitleDialog(WARNING);
             setContentDialog(
-                `Online mode is close, please open online mode to upload`
+                `Network disconnected, please open internet to download`
             );
             setTypeDialog('warning');
         }
-    }, [clearStateDialog]);
+    }, [clearStateDialog, isConnected]);
 
     const handleResponseError = useCallback(
         (error: ErrorResponse | undefined): boolean => {
@@ -700,9 +692,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleCheckUserLogin = useCallback(async () => {
         try {
             const intervalId = setInterval(async () => {
-                const online = await AsyncStorage.getItem('Online');
-                const isOnline = JSON.parse(online);
-                if (isOnline) {
+                if (onlineValue) {
                     const response = await CheckActiveDevice();
                     if (response.error) {
                         clearStateDialog();
@@ -735,15 +725,36 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog(WARNING);
             setTypeDialog('warning');
         }
-    }, [clearStateDialog, deviceId]);
+    }, [clearStateDialog, deviceId, onlineValue]);
 
     useEffect(() => {
         handleCheckUserLogin();
     }, [handleCheckUserLogin]);
 
-    useEffect(() => {
-        handleInitFetch();
-    }, [handleInitFetch]);
+    useFocusEffect(
+        useCallback(() => {
+            const initState = async () => {
+                try {
+                    const db = await getDBConnection();
+                    await createTableAsset(db);
+                    await createTableLocation(db);
+                    await createTableUseStatus(db);
+                    await createTableCategory(db);
+                    await createTableDocumentOffline(db);
+                    await createTableDocumentLine(db);
+                    await createTableReportAssetNotFound(db);
+                    await createTableReportDocumentLine(db);
+                    console.log('onlineValue', onlineValue);
+                    form?.setValue('online', onlineValue);
+                } catch (err) {
+                    console.log(err);
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                }
+            };
+            initState();
+        }, [clearStateDialog, form, onlineValue])
+    );
 
     useEffect(() => {
         const onBackPress = () => {

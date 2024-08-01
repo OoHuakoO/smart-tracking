@@ -13,3 +13,8 @@ export const PrivilegeCompanyState: RecoilState<string> = atom({
     key: 'PrivilegeCompany',
     default: ''
 });
+
+export const OnlineState: RecoilState<boolean> = atom({
+    key: 'Online',
+    default: false
+});
