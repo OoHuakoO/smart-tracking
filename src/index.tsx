@@ -14,6 +14,7 @@ import { createTableDocumentOffline } from './db/documentOffline';
 import { createTableLocation } from './db/location';
 import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
 import { createTableReportDocumentLine } from './db/reportDocumentLine';
+import { createTableUserOffline } from './db/userOffline';
 import { createTableUseStatus } from './db/useStatus';
 import { LoginState } from './typings/common';
 import { RootStackParamsList } from './typings/navigation';
@@ -45,6 +46,7 @@ export default function App() {
             await createTableDocumentLine(db);
             await createTableReportAssetNotFound(db);
             await createTableReportDocumentLine(db);
+            await createTableUserOffline(db);
         } catch (error) {
             console.error(error);
         }

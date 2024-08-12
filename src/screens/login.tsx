@@ -18,6 +18,8 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
 import PopupDeviceLogin from '@src/components/views/popupDeviceLogin';
 import PopupSelectModeCompany from '@src/components/views/popupSelectModeCompany';
+import { getDBConnection } from '@src/db/config';
+import { getUserOffline } from '@src/db/userOffline';
 import {
     ActiveDevice,
     CheckActiveDevice,
@@ -139,6 +141,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleOfflineLogin = useCallback(
         async (data: LoginParams) => {
             try {
+                handleCreateDevice(data?.login, data?.password);
                 const response = await Login({
                     login: data?.login,
                     password: data?.password
@@ -177,7 +180,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 throw err;
             }
         },
-        [setLogin, setOnlineState, setToast]
+        [handleCreateDevice, setLogin, setOnlineState, setToast]
     );
 
     const handleOnlineLogin = useCallback(
@@ -261,7 +264,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         [handleCheckPrivilegeCompany, handleOnlineLogin]
     );
 
-    const handleConfirmSelectModeCompany = useCallback(() => {
+    const handleConfirmSelectModeCompany = useCallback(async () => {
         if (modeCompany === 'Online') {
             handleOnlineLogin({
                 login: form.getValues('login'),
@@ -274,6 +277,13 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     password: form.getValues('password')
                 });
             } else {
+                const db = await getDBConnection();
+                const filter = {
+                    user_name: form.getValues('login')
+                };
+                const userOffline = await getUserOffline(db, filter);
+                if (userOffline.length > 0) {
+                }
                 // get user in database to login
             }
         }
