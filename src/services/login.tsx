@@ -1,3 +1,4 @@
+import { Params } from '@src/typings/common';
 import {
     ActiveDeviceParams,
     ActiveDeviceResponse,
@@ -7,6 +8,7 @@ import {
     CheckMacAddressResponse,
     CreateDeviceParams,
     CreateDeviceResponse,
+    GetAllUserOfflineResponse,
     LoginParams,
     LoginResponse,
     LogoutDeviceParams,
@@ -50,4 +52,10 @@ export function CheckMacAddress(
     params: CheckMacAddressParams
 ): Promise<Response<CheckMacAddressResponse>> {
     return post<CheckMacAddressResponse>('/api/get/device/mac/address', params);
+}
+
+export function GetAllUserOffline(
+    params: Params
+): Promise<Response<GetAllUserOfflineResponse>> {
+    return post<GetAllUserOfflineResponse>('/api/all/user/register', params);
 }

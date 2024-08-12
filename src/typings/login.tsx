@@ -82,3 +82,17 @@ export interface CheckMacAddressParams {
 export interface CheckMacAddressResponse {
     data: DataResponse;
 }
+
+export interface UserList {
+    user_name: string;
+    user_id: string;
+    user_offline_mode: string;
+}
+
+export interface UserResponse {
+    user: UserList[];
+}
+
+export interface GetAllUserOfflineResponse {
+    data: UserResponse;
+}
