@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
         color: theme.colors.white
     },
     textMenu: {
+        margin: 5,
         fontFamily: 'DMSans-Medium'
     }
 });

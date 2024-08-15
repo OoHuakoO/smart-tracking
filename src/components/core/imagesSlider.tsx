@@ -28,6 +28,7 @@ const ImageSlider = () => {
                     <Image
                         style={styles.image}
                         source={require('../../../assets/images/Ads3.jpg')}
+                        resizeMode="cover"
                     />
                 </View>
             </Swiper>
