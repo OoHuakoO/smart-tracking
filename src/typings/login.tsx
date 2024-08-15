@@ -87,6 +87,7 @@ export interface UserList {
     user_name: string;
     user_id: string;
     user_offline_mode: string;
+    email: string;
 }
 
 export interface UserResponse {

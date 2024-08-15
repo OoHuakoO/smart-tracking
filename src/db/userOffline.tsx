@@ -8,6 +8,7 @@ export const createTableUserOffline = (db: SQLiteDatabase) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL UNIQUE,
             user_name TEXT,
+            email TEXT,
             user_offline_mode BOOLEAN
         );`;
             tx.executeSql(
@@ -43,6 +44,7 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
         `INSERT INTO userOffline (
             user_id,
             user_name,
+            email,
             user_offline_mode
         ) VALUES ` +
         userList
@@ -51,7 +53,8 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
                     `(
                   ${item.user_id},
                  '${item.user_name}',
-                 '${item.user_offline_mode}'
+                 '${item.email}',
+                  ${item.user_offline_mode}
                      )`
             )
             .join(',');
@@ -69,7 +72,7 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
 export const getUserOffline = async (
     db: SQLiteDatabase,
     filters?: {
-        user_name?: string;
+        email?: string;
     }
 ): Promise<UserList[]> => {
     let query = `SELECT * FROM userOffline`;
@@ -77,9 +80,9 @@ export const getUserOffline = async (
     const queryParams = [];
     const whereConditions = [];
 
-    if (filters?.user_name !== undefined) {
-        whereConditions.push(`userOffline.user_name = ?`);
-        queryParams.push(filters.user_name);
+    if (filters?.email !== undefined) {
+        whereConditions.push(`userOffline.email = ?`);
+        queryParams.push(filters.email);
     }
 
     if (whereConditions.length > 0) {
