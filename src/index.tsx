@@ -3,7 +3,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PrivateStack from '@src/stack/private';
 import PublicStack from '@src/stack/public';
-import { loginState, useRecoilState } from '@src/store';
+import {
+    loginState,
+    OnlineState,
+    useRecoilState,
+    useSetRecoilState
+} from '@src/store';
 import React, { useCallback, useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import { createTableAsset } from './db/asset';
@@ -18,11 +23,13 @@ import { createTableUserOffline } from './db/userOffline';
 import { createTableUseStatus } from './db/useStatus';
 import { LoginState } from './typings/common';
 import { RootStackParamsList } from './typings/navigation';
+import { getOnlineMode } from './utils/common';
 
 const Stack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function App() {
     const [login, setLogin] = useRecoilState<LoginState>(loginState);
+    const setOnlineMode = useSetRecoilState<boolean>(OnlineState);
 
     const getUserLogin = useCallback(async () => {
         try {
@@ -34,6 +41,15 @@ export default function App() {
             console.log(err);
         }
     }, [setLogin]);
+
+    const getUserOnlineMode = useCallback(async () => {
+        try {
+            const isOnline = await getOnlineMode();
+            setOnlineMode(isOnline);
+        } catch (err) {
+            console.log(err);
+        }
+    }, [setOnlineMode]);
 
     const loadDataDB = useCallback(async () => {
         try {
@@ -61,6 +77,10 @@ export default function App() {
     useEffect(() => {
         getUserLogin();
     }, [getUserLogin, loadDataDB]);
+
+    useEffect(() => {
+        getUserOnlineMode();
+    }, [getUserOnlineMode]);
 
     useEffect(() => {
         loadDataDB();
