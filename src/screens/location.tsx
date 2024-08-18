@@ -57,7 +57,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                 });
                 const totalPagesLocation = response?.result?.data?.total;
                 setCountLocation(totalPagesLocation);
-                setListLocation(response?.result?.data?.asset);
+                setListLocation(response?.result?.data?.assets);
             } else {
                 const newListLocation: LocationData[] = [];
                 const db = await getDBConnection();
@@ -95,7 +95,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
 
                     setListLocation([
                         ...listLocation,
-                        ...response?.result?.data?.asset
+                        ...response?.result?.data?.assets
                     ]);
                 } else {
                     const newListLocation: LocationData[] = [];

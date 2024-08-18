@@ -114,7 +114,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     setContentDialog('Something went wrong fetch location');
                     return;
                 }
-                setListLocation(response?.result?.data?.asset);
+                setListLocation(response?.result?.data?.assets);
             } else {
                 const db = await getDBConnection();
                 const listLocationDB = await getLocations(db);
@@ -150,7 +150,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             );
                             return;
                         }
-                        setListLocation(response?.result?.data?.locations);
+                        setListLocation(response?.result?.data?.assets);
                     } else {
                         const db = await getDBConnection();
                         const filter = {

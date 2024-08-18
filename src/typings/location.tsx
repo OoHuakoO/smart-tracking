@@ -7,7 +7,7 @@ export interface LocationSearchData {
 export interface GetLocationSearchData {
     total_page: number;
     current_page: number;
-    locations: LocationSearchData[];
+    assets: LocationSearchData[];
     total: number;
     uid: number;
 }

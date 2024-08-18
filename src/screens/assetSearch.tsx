@@ -71,7 +71,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                             or: { name: text, default_code: text }
                         }
                     });
-                    setListLocation(response?.result?.data?.locations);
+                    setListLocation(response?.result?.data?.assets);
                 } else {
                     const db = await getDBConnection();
                     const filter = {
@@ -176,7 +176,7 @@ const AssetSearch: FC<AssetsSearchScreenProps> = (props) => {
                         GetCategory({ page: 1, limit: 1000 })
                     ]);
 
-                setListLocation(responseLocation?.result?.data?.asset);
+                setListLocation(responseLocation?.result?.data?.assets);
                 setListUseState(responseUseStatus?.result?.data.data);
                 setListCategory(responseCategory?.result?.data.asset);
             } else {

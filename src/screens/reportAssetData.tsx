@@ -142,14 +142,14 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                     limit: 1000
                 });
 
-                locationResponse?.result?.data?.asset?.unshift({
+                locationResponse?.result?.data?.assets?.unshift({
                     location_id: 0,
                     location_code: ALL_LOCATION,
                     location_name: ALL_LOCATION
                 });
 
                 listLocationData = await createLocationDataListOnline(
-                    locationResponse?.result?.data?.asset || [],
+                    locationResponse?.result?.data?.assets || [],
                     route?.params?.title
                 );
             } else {

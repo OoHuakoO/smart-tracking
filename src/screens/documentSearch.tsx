@@ -54,7 +54,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                             or: { name: text, default_code: text }
                         }
                     });
-                    setListLocation(response?.result?.data?.locations);
+                    setListLocation(response?.result?.data?.assets);
                 } else {
                     const db = await getDBConnection();
                     const filter = {
@@ -103,7 +103,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     page: 1,
                     limit: 10
                 });
-                setListLocation(responseLocation?.result?.data?.asset);
+                setListLocation(responseLocation?.result?.data?.assets);
             } else {
                 const db = await getDBConnection();
                 const listLocationDB = await getLocations(db);

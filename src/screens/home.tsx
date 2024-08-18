@@ -242,7 +242,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 const results = await Promise.all(promises);
                 const assets = results.flatMap(
-                    (result) => result?.result?.data?.asset ?? []
+                    (result) => result?.result?.data?.assets ?? []
                 );
                 return assets;
             } catch (err) {

@@ -47,7 +47,7 @@ export interface LocationData {
 export interface GetLocationData {
     total_page: number;
     current_page: number;
-    asset: LocationData[];
+    assets: LocationData[];
     total: number;
 }
 
