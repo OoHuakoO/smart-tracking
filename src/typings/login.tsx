@@ -92,6 +92,9 @@ export interface UserList {
 
 export interface UserResponse {
     user: UserList[];
+    total_page: number;
+    current_page: number;
+    total: number;
 }
 
 export interface GetAllUserOfflineResponse {

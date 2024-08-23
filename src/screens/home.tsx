@@ -53,6 +53,7 @@ import {
     createTableReportDocumentLine,
     insertReportDocumentLine
 } from '@src/db/reportDocumentLine';
+import { createTableUserOffline, insertUserOffline } from '@src/db/userOffline';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
 import {
@@ -66,7 +67,11 @@ import {
     GetLocation,
     GetUseStatus
 } from '@src/services/downloadDB';
-import { CheckActiveDevice, LogoutDevice } from '@src/services/login';
+import {
+    CheckActiveDevice,
+    GetAllUserOffline,
+    LogoutDevice
+} from '@src/services/login';
 import {
     loginState,
     OnlineState,
@@ -83,7 +88,7 @@ import {
     LocationData,
     UseStatusData
 } from '@src/typings/downloadDB';
-import { SettingParams } from '@src/typings/login';
+import { SettingParams, UserList } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
 import { parseDateStringTime } from '@src/utils/time-manager';
@@ -363,6 +368,29 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadUserOffline = useCallback(
+        async (totalPages: number): Promise<UserList[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetAllUserOffline({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const users = results.flatMap(
+                    (result) => result?.result?.data?.user ?? []
+                );
+                return users;
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load user offline');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
     const handleDownload = useCallback(async () => {
         try {
             setDisableCloseDialog(true);
@@ -373,7 +401,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseUseStatus,
                 initialResponseCategory,
                 initialResponseAssetNotFound,
-                initialDocumentLine
+                initialDocumentLine,
+                initialUserOffline
             ] = await Promise.all([
                 GetAssets({ page: 1, limit: 200 }),
                 GetLocation({ page: 1, limit: 1000 }),
@@ -392,6 +421,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     search_term: {
                         and: { state: ['0', '1', '2'] }
                     }
+                }),
+                GetAllUserOffline({
+                    page: 1,
+                    limit: 1000
                 })
             ]);
 
@@ -410,9 +443,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const errorAssetNotFound = handleResponseError(
                 initialResponseAssetNotFound?.error
             );
-
             const errorDocumentLine = handleResponseError(
                 initialDocumentLine?.error
+            );
+            const errorUserOffline = handleResponseError(
+                initialUserOffline?.error
             );
 
             if (
@@ -421,7 +456,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 errorUseStatus ||
                 errorCategorys ||
                 errorAssetNotFound ||
-                errorDocumentLine
+                errorDocumentLine ||
+                errorUserOffline
             ) {
                 return;
             }
@@ -438,19 +474,23 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 initialResponseAssetNotFound?.result?.data?.total_pages;
             const totalPagesDocumentLine =
                 initialDocumentLine?.result?.data?.total_page;
+            const totalPagesUserOffline =
+                initialUserOffline?.result?.data?.total_page;
 
             const [
                 listLocation,
                 listUseStatus,
                 listCategory,
                 listAssetNotFound,
-                listDocumentLine
+                listDocumentLine,
+                listUserOffline
             ] = await Promise.all([
                 handleLoadLocation(totalPagesLocation),
                 handleLoadUseStatus(totalPagesUseStatus),
                 handleLoadCategory(totalPagesCategory),
                 handleLoadAssetNotFound(totalPagesAssetNotFound),
-                handleLoadDocumentLine(totalPagesDocumentLine)
+                handleLoadDocumentLine(totalPagesDocumentLine),
+                handleLoadUserOffline(totalPagesUserOffline)
             ]);
 
             const db = await getDBConnection();
@@ -475,6 +515,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await createTableCategory(db);
                 await createTableReportAssetNotFound(db);
                 await createTableReportDocumentLine(db);
+                await createTableUserOffline(db);
                 await insertLocationData(db, listLocation);
                 await insertUseStatusData(db, listUseStatus);
                 await insertCategoryData(db, listCategory);
@@ -483,6 +524,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 }
                 if (listDocumentLine?.length > 0) {
                     await insertReportDocumentLine(db, listDocumentLine);
+                }
+                if (listUserOffline?.length > 0) {
+                    await insertUserOffline(db, listUserOffline);
                 }
             }
             setTimeout(() => {
@@ -504,6 +548,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         handleLoadDocumentLine,
         handleLoadLocation,
         handleLoadUseStatus,
+        handleLoadUserOffline,
         handleResponseError,
         setToast
     ]);
@@ -744,7 +789,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableDocumentLine(db);
                     await createTableReportAssetNotFound(db);
                     await createTableReportDocumentLine(db);
-                    console.log('onlineValue', onlineValue);
                     form?.setValue('online', onlineValue);
                 } catch (err) {
                     console.log(err);

@@ -49,6 +49,7 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS category;');
             tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
             tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
+            tx.executeSql('DROP TABLE IF EXISTS userOffline');
         });
         console.log('Drop master table successfully');
     } catch (err) {

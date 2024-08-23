@@ -331,23 +331,21 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                             setContentDialog(
                                 `The user you are login is not found.`
                             );
-                            return;
                         }
                     } else {
                         setVisibleDialog(true);
                         setContentDialog(
                             `Please connect to the internet to login and download data before login without internet.`
                         );
-                        return;
                     }
                 }
             }
+            setVisiblePopupSelectModeCompany(false);
         } catch (err) {
             console.log(err);
             setVisibleDialog(true);
             setContentDialog(`Something went wrong login`);
         }
-        setVisiblePopupSelectModeCompany(false);
     }, [
         form,
         handleOfflineLogin,
