@@ -8,6 +8,7 @@ import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useEffect } from 'react';
 import {
     BackHandler,
+    Dimensions,
     SafeAreaView,
     ScrollView,
     StyleSheet,
@@ -23,6 +24,9 @@ type ReportScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'Report'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const ReportScreen: FC<ReportScreenProps> = (props) => {
     const { navigation } = props;
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%'
+        marginTop: isTablet ? '30%' : '50%'
     },
     wrapDetailList: {
         display: 'flex',

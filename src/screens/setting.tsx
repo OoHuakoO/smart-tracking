@@ -30,7 +30,6 @@ type SettingScreenProps = NativeStackScreenProps<
 >;
 
 const { width, height } = Dimensions.get('window');
-
 const isTablet = width >= 768 && height >= 768;
 
 const SettingScreen: FC<SettingScreenProps> = (props) => {

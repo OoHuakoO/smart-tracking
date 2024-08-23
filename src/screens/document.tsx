@@ -34,6 +34,7 @@ import { parseDateString, parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -52,6 +53,9 @@ type DocumentScreenProp = NativeStackScreenProps<
     PrivateStackParamsList,
     'Document'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation, route } = props;
@@ -564,7 +568,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%'
+        marginTop: isTablet ? '30%' : '50%'
     },
     wrapDetailList: {
         display: 'flex',

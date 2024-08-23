@@ -2,7 +2,13 @@ import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { theme } from '@src/theme';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import React, { FC } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    Dimensions,
+    Image,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Modal, Text } from 'react-native-paper';
 import {
@@ -32,6 +38,9 @@ interface PopupScanAssetProp {
     scanAssetData: AssetData;
     locationNew: string;
 }
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
     const {
@@ -290,7 +299,7 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     assetDetailSection: {
-        height: '100%',
+        height: isTablet ? '90%' : '100%',
         width: wp('90%'),
         backgroundColor: theme.colors.background,
         shadowColor: theme.colors.black,

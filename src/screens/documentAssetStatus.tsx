@@ -8,6 +8,7 @@ import { Text } from 'react-native-paper';
 
 import {
     BackHandler,
+    Dimensions,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -55,6 +56,9 @@ type DocumentAssetStatusScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'DocumentAssetStatus'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     props
@@ -505,7 +509,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: theme.colors.pureWhite,
-        fontSize: RFPercentage(4),
+        fontSize: RFPercentage(3.4),
         fontFamily: 'DMSans-Bold',
         marginBottom: 5
     },
@@ -520,7 +524,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '52%'
+        marginTop: isTablet ? '30%' : '52%'
     },
     wrapDetailList: {
         display: 'flex',

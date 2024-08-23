@@ -28,6 +28,7 @@ import {
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -44,6 +45,9 @@ type LocationListReportAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'LocationListReportAsset'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     props
@@ -503,7 +507,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%',
+        marginTop: isTablet ? '30%' : '50%',
         zIndex: 1,
         marginBottom: 20
     },

@@ -42,7 +42,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 32,
         letterSpacing: 0,
-        lineHeight: 40
+        lineHeight: 45
     },
 
     // Title

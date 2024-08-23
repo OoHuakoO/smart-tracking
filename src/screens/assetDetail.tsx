@@ -95,7 +95,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                 <View style={styles.assetDetail}>
                     <View style={styles.rowText}>
                         <Text variant="titleMedium" style={styles.assetTitle}>
-                            Serial Number
+                            SerialNumber
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.serial_no || '-'}
@@ -103,7 +103,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     </View>
                     <View style={styles.rowText}>
                         <Text variant="titleMedium" style={styles.assetTitle}>
-                            Brand Name
+                            BrandName
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
                             {route?.params?.assetData?.brand_name || '-'}

@@ -27,6 +27,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
     BackHandler,
+    Dimensions,
     Image,
     PermissionsAndroid,
     Platform,
@@ -53,6 +54,9 @@ type DocumentCreateNewAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'DocumentCreateNewAsset'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const { navigation, route } = props;
@@ -377,7 +381,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 </View>
                 <View style={styles.containerText}>
                     <Text
-                        variant="headlineSmall"
+                        variant="headlineMedium"
                         style={styles.addAssetNewText}
                     >
                         Add Asset New
@@ -591,7 +595,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%',
+        marginTop: isTablet ? '30%' : '50%',
         marginBottom: 2
     },
     containerMenu: {

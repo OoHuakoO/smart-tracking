@@ -18,6 +18,7 @@ import { getOnlineMode, handleMapReportStateValue } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     FlatList,
     SafeAreaView,
     StyleSheet,
@@ -35,6 +36,10 @@ type ReportAssetDataProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'ReportAssetData'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
+
 const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     const { navigation, route } = props;
     const [listLocation, setListLocation] = useState<LocationReportData[]>([]);
@@ -286,7 +291,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%',
+        marginTop: isTablet ? '30%' : '50%',
         zIndex: 1,
         marginBottom: 20
     },

@@ -35,6 +35,7 @@ import { parseDateStringTime } from '@src/utils/time-manager';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     FlatList,
     LogBox,
     PermissionsAndroid,
@@ -62,6 +63,9 @@ type DocumentCreateProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'DocumentCreate'
 >;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     LogBox.ignoreLogs([
@@ -759,7 +763,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant="headlineSmall" style={styles.textHeader}>
+                    <Text variant="headlineMedium" style={styles.textHeader}>
                         Add Asset
                     </Text>
                     <Text variant="headlineSmall" style={styles.textHeader}>
@@ -967,7 +971,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: '50%'
+        marginTop: isTablet ? '30%' : '50%'
     },
     wrapDetailList: {
         display: 'flex',
