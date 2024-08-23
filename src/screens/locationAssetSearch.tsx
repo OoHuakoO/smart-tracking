@@ -186,7 +186,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     )}
                 />
                 <Text variant="bodyLarge" style={styles.useStateSearch}>
-                    Use State
+                    Use Status
                 </Text>
 
                 <Dropdown
@@ -201,7 +201,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     maxHeight={300}
                     labelField="name"
                     valueField="name"
-                    placeholder={'Select UseState'}
+                    placeholder={'Select Use Status'}
                     value={searchUseState}
                     onFocus={() => setIsFocusUseState(true)}
                     onBlur={() => setIsFocusUseState(false)}
@@ -211,7 +211,7 @@ const LocationAssetSearch: FC<LocationAssetSearchProps> = (props) => {
                     renderItem={renderItemUseState}
                 />
 
-                <Text variant="bodyLarge">Catagory</Text>
+                <Text variant="bodyLarge">Category</Text>
 
                 <Dropdown
                     style={[

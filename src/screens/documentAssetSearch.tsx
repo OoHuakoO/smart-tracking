@@ -284,7 +284,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                     renderItem={renderItemLocation}
                 />
 
-                <Text variant="bodyLarge">Use State</Text>
+                <Text variant="bodyLarge">Use Status</Text>
 
                 <Dropdown
                     style={[
@@ -298,7 +298,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                     maxHeight={300}
                     labelField="name"
                     valueField="name"
-                    placeholder={'Select UseState'}
+                    placeholder={'Select Use Status'}
                     value={searchUseState}
                     onFocus={() => setIsFocusUseState(true)}
                     onBlur={() => setIsFocusUseState(false)}
@@ -308,7 +308,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
                     renderItem={renderItemUseState}
                 />
 
-                <Text variant="bodyLarge">Catagory</Text>
+                <Text variant="bodyLarge">Category</Text>
 
                 <Dropdown
                     style={[

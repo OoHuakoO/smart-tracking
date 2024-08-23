@@ -136,7 +136,7 @@ const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
                                 variant="titleMedium"
                                 style={styles.assetTitle}
                             >
-                                Use State
+                                Use Status
                             </Text>
                             <Dropdown
                                 style={[

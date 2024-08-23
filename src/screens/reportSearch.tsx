@@ -187,7 +187,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                 />
 
                 <Text variant="bodyLarge" style={styles.locationSearch}>
-                    Use State
+                    Use Status
                 </Text>
 
                 <Dropdown
@@ -202,7 +202,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                     maxHeight={300}
                     labelField="name"
                     valueField="name"
-                    placeholder={'Select UseState'}
+                    placeholder={'Select Use Status'}
                     value={searchUseState}
                     onFocus={() => setIsFocusUseState(true)}
                     onBlur={() => setIsFocusUseState(false)}
@@ -212,7 +212,7 @@ const ReportSearch: FC<ReportSearchProps> = (props) => {
                     renderItem={renderItemUseState}
                 />
 
-                <Text variant="bodyLarge">Catagory</Text>
+                <Text variant="bodyLarge">Category</Text>
 
                 <Dropdown
                     style={[

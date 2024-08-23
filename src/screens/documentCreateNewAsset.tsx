@@ -455,7 +455,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         )}
                     />
                     <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
-                        Catagory
+                        Category
                     </Text>
 
                     <Dropdown
@@ -480,7 +480,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     />
 
                     <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
-                        Status
+                        Use Status
                     </Text>
 
                     <Dropdown
@@ -495,7 +495,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         maxHeight={300}
                         labelField="name"
                         valueField="name"
-                        placeholder={'Select UseState'}
+                        placeholder={'Select Use Status'}
                         value={searchUseState}
                         onFocus={() => setIsFocusUseState(true)}
                         onBlur={() => setIsFocusUseState(false)}
