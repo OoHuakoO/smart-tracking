@@ -131,11 +131,15 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     );
 
     const handleCheckPrivilegeCompany = useCallback(async () => {
-        /// fetch api PrivilegeCompany
-        const privilege = 'Online';
-        await AsyncStorage.setItem('PrivilegeCompany', privilege);
-        setPrivilegeCompany(privilege);
-        return privilege;
+        try {
+            /// fetch api PrivilegeCompany
+            const privilege = 'Online/Offline';
+            await AsyncStorage.setItem('PrivilegeCompany', privilege);
+            setPrivilegeCompany(privilege);
+            return privilege;
+        } catch (err) {
+            throw err;
+        }
     }, [setPrivilegeCompany]);
 
     const handleOfflineLogin = useCallback(
@@ -250,7 +254,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             try {
                 const privilege = await handleCheckPrivilegeCompany();
                 if (privilege === 'Online') {
-                    handleOnlineLogin(data);
+                    await handleOnlineLogin(data);
                 } else {
                     Keyboard.dismiss();
                     setVisiblePopupSelectModeCompany(true);
@@ -265,70 +269,83 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     );
 
     const handleConfirmSelectModeCompany = useCallback(async () => {
-        if (modeCompany === 'Online') {
-            handleOnlineLogin({
-                login: form.getValues('login'),
-                password: form.getValues('password')
-            });
-        } else {
-            if (isConnected) {
-                handleOfflineLogin({
+        try {
+            if (modeCompany === 'Online') {
+                await handleOnlineLogin({
                     login: form.getValues('login'),
                     password: form.getValues('password')
                 });
             } else {
-                const db = await getDBConnection();
-                const filter = {
-                    email: form.getValues('login')
-                };
-                const userOffline = await getUserOffline(db);
-                if (userOffline.length > 0) {
-                    const userLoginOffline = await getUserOffline(db, filter);
-                    if (userLoginOffline.length > 0) {
-                        const loginObj = {
-                            session_id: '',
-                            uid: userLoginOffline[0]?.user_id
-                        };
-                        setLogin(loginObj);
-                        setOnlineState(false);
-                        const settings = await AsyncStorage.getItem('Settings');
-                        const jsonSettings: SettingParams =
-                            JSON.parse(settings);
-                        await AsyncStorage.setItem(
-                            'Settings',
-                            JSON.stringify({
-                                ...jsonSettings,
-                                login: form.getValues('login'),
-                                password: form.getValues('password')
-                            })
+                if (isConnected) {
+                    await handleOfflineLogin({
+                        login: form.getValues('login'),
+                        password: form.getValues('password')
+                    });
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        email: form.getValues('login')
+                    };
+                    const userOffline = await getUserOffline(db);
+                    if (userOffline.length > 0) {
+                        const userLoginOffline = await getUserOffline(
+                            db,
+                            filter
                         );
-                        await AsyncStorage.setItem(
-                            'Online',
-                            JSON.stringify(false)
-                        );
-                        await AsyncStorage.setItem(
-                            'Login',
-                            JSON.stringify(loginObj)
-                        );
-                        setTimeout(() => {
-                            setToast({
-                                open: true,
-                                text: 'Login Successfully'
-                            });
-                        }, 0);
+                        if (userLoginOffline.length > 0) {
+                            const loginObj = {
+                                session_id: '',
+                                uid: userLoginOffline[0]?.user_id
+                            };
+                            setLogin(loginObj);
+                            setOnlineState(false);
+                            const settings = await AsyncStorage.getItem(
+                                'Settings'
+                            );
+                            const jsonSettings: SettingParams =
+                                JSON.parse(settings);
+                            await AsyncStorage.setItem(
+                                'Settings',
+                                JSON.stringify({
+                                    ...jsonSettings,
+                                    login: form.getValues('login'),
+                                    password: form.getValues('password')
+                                })
+                            );
+                            await AsyncStorage.setItem(
+                                'Online',
+                                JSON.stringify(false)
+                            );
+                            await AsyncStorage.setItem(
+                                'Login',
+                                JSON.stringify(loginObj)
+                            );
+                            setTimeout(() => {
+                                setToast({
+                                    open: true,
+                                    text: 'Login Successfully'
+                                });
+                            }, 0);
+                        } else {
+                            setVisibleDialog(true);
+                            setContentDialog(
+                                `The user you are login is not found.`
+                            );
+                            return;
+                        }
                     } else {
                         setVisibleDialog(true);
                         setContentDialog(
-                            `The user you are login is not found.`
+                            `Please connect to the internet to login and download data before login without internet.`
                         );
+                        return;
                     }
-                } else {
-                    setVisibleDialog(true);
-                    setContentDialog(
-                        `Please connect to the internet to login and download data before login without internet.`
-                    );
                 }
             }
+        } catch (err) {
+            console.log(err);
+            setVisibleDialog(true);
+            setContentDialog(`Something went wrong login`);
         }
         setVisiblePopupSelectModeCompany(false);
     }, [
