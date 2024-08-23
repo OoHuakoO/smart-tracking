@@ -917,7 +917,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: hp('45%'),
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
