@@ -49,10 +49,7 @@ export function CreateDocument(
 export function AddDocumentLine(
     params: Params
 ): Promise<Response<PostPutDocumentLineResponse>> {
-    return postDelete<PostPutDocumentLineResponse>(
-        `/api/add/document/line`,
-        params
-    );
+    return post<PostPutDocumentLineResponse>(`/api/add/document/line`, params);
 }
 
 export function UpdateDocument(

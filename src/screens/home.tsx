@@ -69,6 +69,7 @@ import {
 } from '@src/services/downloadDB';
 import {
     CheckActiveDevice,
+    CheckMacAddress,
     GetAllUserOffline,
     LogoutDevice
 } from '@src/services/login';
@@ -368,6 +369,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleCheckMacAddress = useCallback(async (): Promise<boolean> => {
+        const response = await CheckMacAddress({ mac_address: await deviceId });
+        if (response?.result?.data?.device_offline_mode) {
+            return true;
+        }
+        return false;
+    }, [deviceId]);
+
     const handleLoadUserOffline = useCallback(
         async (totalPages: number): Promise<UserList[]> => {
             try {
@@ -393,146 +402,157 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleDownload = useCallback(async () => {
         try {
-            setDisableCloseDialog(true);
-            setShowProgressBar(true);
-            const [
-                initialResponseAssets,
-                initialResponseLocation,
-                initialResponseUseStatus,
-                initialResponseCategory,
-                initialResponseAssetNotFound,
-                initialDocumentLine,
-                initialUserOffline
-            ] = await Promise.all([
-                GetAssets({ page: 1, limit: 200 }),
-                GetLocation({ page: 1, limit: 1000 }),
-                GetUseStatus({ page: 1, limit: 1000 }),
-                GetCategory({ page: 1, limit: 1000 }),
-                GetAssetNotFoundSearch({
-                    page: 1,
-                    limit: 1000,
-                    search_term: {
-                        and: { state: STATE_ASSET }
+            const foundMacAddress = await handleCheckMacAddress();
+            if (foundMacAddress) {
+                setDisableCloseDialog(true);
+                setShowProgressBar(true);
+                const [
+                    initialResponseAssets,
+                    initialResponseLocation,
+                    initialResponseUseStatus,
+                    initialResponseCategory,
+                    initialResponseAssetNotFound,
+                    initialDocumentLine,
+                    initialUserOffline
+                ] = await Promise.all([
+                    GetAssets({ page: 1, limit: 200 }),
+                    GetLocation({ page: 1, limit: 1000 }),
+                    GetUseStatus({ page: 1, limit: 1000 }),
+                    GetCategory({ page: 1, limit: 1000 }),
+                    GetAssetNotFoundSearch({
+                        page: 1,
+                        limit: 1000,
+                        search_term: {
+                            and: { state: STATE_ASSET }
+                        }
+                    }),
+                    GetDocumentLineSearch({
+                        page: 1,
+                        limit: 1000,
+                        search_term: {
+                            and: { state: ['0', '1', '2'] }
+                        }
+                    }),
+                    GetAllUserOffline({
+                        page: 1,
+                        limit: 1000
+                    })
+                ]);
+
+                const errorAssets = handleResponseError(
+                    initialResponseAssets?.error
+                );
+                const errorLocation = handleResponseError(
+                    initialResponseLocation?.error
+                );
+                const errorUseStatus = handleResponseError(
+                    initialResponseUseStatus?.error
+                );
+                const errorCategorys = handleResponseError(
+                    initialResponseCategory?.error
+                );
+                const errorAssetNotFound = handleResponseError(
+                    initialResponseAssetNotFound?.error
+                );
+                const errorDocumentLine = handleResponseError(
+                    initialDocumentLine?.error
+                );
+                const errorUserOffline = handleResponseError(
+                    initialUserOffline?.error
+                );
+
+                if (
+                    errorAssets ||
+                    errorLocation ||
+                    errorUseStatus ||
+                    errorCategorys ||
+                    errorAssetNotFound ||
+                    errorDocumentLine ||
+                    errorUserOffline
+                ) {
+                    return;
+                }
+
+                const totalPagesAssets =
+                    initialResponseAssets?.result?.data?.total_page;
+                const totalPagesLocation =
+                    initialResponseLocation?.result?.data?.total_page;
+                const totalPagesUseStatus =
+                    initialResponseUseStatus?.result?.data?.total_page;
+                const totalPagesCategory =
+                    initialResponseCategory?.result?.data?.total_page;
+                const totalPagesAssetNotFound =
+                    initialResponseAssetNotFound?.result?.data?.total_pages;
+                const totalPagesDocumentLine =
+                    initialDocumentLine?.result?.data?.total_page;
+                const totalPagesUserOffline =
+                    initialUserOffline?.result?.data?.total_page;
+
+                const [
+                    listLocation,
+                    listUseStatus,
+                    listCategory,
+                    listAssetNotFound,
+                    listDocumentLine,
+                    listUserOffline
+                ] = await Promise.all([
+                    handleLoadLocation(totalPagesLocation),
+                    handleLoadUseStatus(totalPagesUseStatus),
+                    handleLoadCategory(totalPagesCategory),
+                    handleLoadAssetNotFound(totalPagesAssetNotFound),
+                    handleLoadDocumentLine(totalPagesDocumentLine),
+                    handleLoadUserOffline(totalPagesUserOffline)
+                ]);
+
+                const db = await getDBConnection();
+                await dropAllMasterTable(db);
+                await createTableAsset(db);
+
+                for (let index = 0; index < totalPagesAssets; index++) {
+                    const result = await GetAssets({
+                        page: index + 1,
+                        limit: 200
+                    });
+                    await insertAssetData(db, result?.result?.data?.asset);
+                }
+
+                if (
+                    listLocation?.length > 0 &&
+                    listUseStatus?.length > 0 &&
+                    listCategory?.length > 0
+                ) {
+                    await createTableLocation(db);
+                    await createTableUseStatus(db);
+                    await createTableCategory(db);
+                    await createTableReportAssetNotFound(db);
+                    await createTableReportDocumentLine(db);
+                    await createTableUserOffline(db);
+                    await insertLocationData(db, listLocation);
+                    await insertUseStatusData(db, listUseStatus);
+                    await insertCategoryData(db, listCategory);
+                    if (listAssetNotFound?.length > 0) {
+                        await insertReportAssetNotFound(db, listAssetNotFound);
                     }
-                }),
-                GetDocumentLineSearch({
-                    page: 1,
-                    limit: 1000,
-                    search_term: {
-                        and: { state: ['0', '1', '2'] }
+                    if (listDocumentLine?.length > 0) {
+                        await insertReportDocumentLine(db, listDocumentLine);
                     }
-                }),
-                GetAllUserOffline({
-                    page: 1,
-                    limit: 1000
-                })
-            ]);
-
-            const errorAssets = handleResponseError(
-                initialResponseAssets?.error
-            );
-            const errorLocation = handleResponseError(
-                initialResponseLocation?.error
-            );
-            const errorUseStatus = handleResponseError(
-                initialResponseUseStatus?.error
-            );
-            const errorCategorys = handleResponseError(
-                initialResponseCategory?.error
-            );
-            const errorAssetNotFound = handleResponseError(
-                initialResponseAssetNotFound?.error
-            );
-            const errorDocumentLine = handleResponseError(
-                initialDocumentLine?.error
-            );
-            const errorUserOffline = handleResponseError(
-                initialUserOffline?.error
-            );
-
-            if (
-                errorAssets ||
-                errorLocation ||
-                errorUseStatus ||
-                errorCategorys ||
-                errorAssetNotFound ||
-                errorDocumentLine ||
-                errorUserOffline
-            ) {
-                return;
-            }
-
-            const totalPagesAssets =
-                initialResponseAssets?.result?.data?.total_page;
-            const totalPagesLocation =
-                initialResponseLocation?.result?.data?.total_page;
-            const totalPagesUseStatus =
-                initialResponseUseStatus?.result?.data?.total_page;
-            const totalPagesCategory =
-                initialResponseCategory?.result?.data?.total_page;
-            const totalPagesAssetNotFound =
-                initialResponseAssetNotFound?.result?.data?.total_pages;
-            const totalPagesDocumentLine =
-                initialDocumentLine?.result?.data?.total_page;
-            const totalPagesUserOffline =
-                initialUserOffline?.result?.data?.total_page;
-
-            const [
-                listLocation,
-                listUseStatus,
-                listCategory,
-                listAssetNotFound,
-                listDocumentLine,
-                listUserOffline
-            ] = await Promise.all([
-                handleLoadLocation(totalPagesLocation),
-                handleLoadUseStatus(totalPagesUseStatus),
-                handleLoadCategory(totalPagesCategory),
-                handleLoadAssetNotFound(totalPagesAssetNotFound),
-                handleLoadDocumentLine(totalPagesDocumentLine),
-                handleLoadUserOffline(totalPagesUserOffline)
-            ]);
-
-            const db = await getDBConnection();
-            await dropAllMasterTable(db);
-            await createTableAsset(db);
-
-            for (let index = 0; index < totalPagesAssets; index++) {
-                const result = await GetAssets({
-                    page: index + 1,
-                    limit: 200
-                });
-                await insertAssetData(db, result?.result?.data?.asset);
-            }
-
-            if (
-                listLocation?.length > 0 &&
-                listUseStatus?.length > 0 &&
-                listCategory?.length > 0
-            ) {
-                await createTableLocation(db);
-                await createTableUseStatus(db);
-                await createTableCategory(db);
-                await createTableReportAssetNotFound(db);
-                await createTableReportDocumentLine(db);
-                await createTableUserOffline(db);
-                await insertLocationData(db, listLocation);
-                await insertUseStatusData(db, listUseStatus);
-                await insertCategoryData(db, listCategory);
-                if (listAssetNotFound?.length > 0) {
-                    await insertReportAssetNotFound(db, listAssetNotFound);
+                    if (listUserOffline?.length > 0) {
+                        await insertUserOffline(db, listUserOffline);
+                    }
                 }
-                if (listDocumentLine?.length > 0) {
-                    await insertReportDocumentLine(db, listDocumentLine);
-                }
-                if (listUserOffline?.length > 0) {
-                    await insertUserOffline(db, listUserOffline);
-                }
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Download Successfully' });
+                }, 0);
+                clearStateDialog();
+            } else {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(
+                    `This device does not have permission to download`
+                );
+                setTypeDialog('warning');
             }
-            setTimeout(() => {
-                setToast({ open: true, text: 'Download Successfully' });
-            }, 0);
-            clearStateDialog();
         } catch (err) {
             console.log(err);
             clearStateDialog();
@@ -543,6 +563,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [
         clearStateDialog,
+        handleCheckMacAddress,
         handleLoadAssetNotFound,
         handleLoadCategory,
         handleLoadDocumentLine,
@@ -555,149 +576,169 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleUpload = useCallback(async () => {
         try {
-            setDisableCloseDialog(true);
-            setShowProgressBar(true);
-            const db = await getDBConnection();
-            const filterAsset = {
-                is_sync_odoo: false
-            };
-            const listAsset = await getAsset(db, filterAsset, 1, 1000);
-
-            listAsset?.forEach(async (item) => {
-                let assetData: AssetData = {
-                    default_code: item?.default_code,
-                    name: item?.name,
-                    category_id: item?.category_id,
-                    quantity: 1,
-                    location_id: item?.location_id,
-                    user_id: loginValue?.uid,
-                    purchase_price: 0
+            const foundMacAddress = await handleCheckMacAddress();
+            if (foundMacAddress) {
+                setDisableCloseDialog(true);
+                setShowProgressBar(true);
+                const db = await getDBConnection();
+                const filterAsset = {
+                    is_sync_odoo: false
                 };
+                const listAsset = await getAsset(db, filterAsset, 1, 1000);
 
-                if (item?.image !== 'false') {
-                    assetData.image = item?.image;
-                }
-
-                if (item?.new_img) {
-                    assetData.new_img = item?.new_img;
-                }
-
-                const response = await CreateAsset({
-                    asset_data: assetData
-                });
-
-                if (response?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong save asset');
-                    return;
-                }
-                if (
-                    response?.result?.message === 'Asset created successfully'
-                ) {
-                    const filterUpdateAsset = {
-                        asset_id: response?.result?.data?.id,
-                        is_sync_odoo: true,
-                        id: item?.id
-                    };
-                    await updateAsset(db, filterUpdateAsset);
-
-                    const filterDocumentLine = {
-                        asset_id_update: response?.result?.data?.id,
-                        code: item?.default_code
+                listAsset?.forEach(async (item) => {
+                    let assetData: AssetData = {
+                        default_code: item?.default_code,
+                        name: item?.name,
+                        category_id: item?.category_id,
+                        quantity: 1,
+                        location_id: item?.location_id,
+                        user_id: loginValue?.uid,
+                        purchase_price: 0
                     };
 
-                    await updateDocumentLineData(db, filterDocumentLine);
-                }
-            });
+                    if (item?.image !== 'false') {
+                        assetData.image = item?.image;
+                    }
 
-            const filterDocument = {
-                state: STATE_DOCUMENT_NAME?.Draft
-            };
-            const listDocument = await getDocumentOffline(
-                db,
-                filterDocument,
-                null,
-                1,
-                1000
-            );
+                    if (item?.new_img) {
+                        assetData.new_img = item?.new_img;
+                    }
 
-            listDocument?.forEach(async (item) => {
-                const responseCreateDocument = await CreateDocument({
-                    location_id: item?.location_id,
-                    date_order: parseDateStringTime(item?.date_order)
-                });
-                if (responseCreateDocument?.error) {
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong create document');
-                    return;
-                }
-                const filterDocumentLine = {
-                    tracking_id: item?.id
-                };
-                const listDocumentLine = await getDocumentLine(
-                    db,
-                    filterDocumentLine
-                );
-                const mappingValueDocumentLine = listDocumentLine?.map(
-                    (documentLine) => {
-                        const documentData: DocumentAssetData = {
-                            id: documentLine?.asset_id,
-                            state: documentLine?.state,
-                            use_state: documentLine?.use_state_code,
-                            new_img: documentLine?.new_img ? true : false,
-                            date_check: parseDateStringTime(
-                                documentLine?.date_check
-                            )
+                    const response = await CreateAsset({
+                        asset_data: assetData
+                    });
+
+                    if (response?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog('Something went wrong save asset');
+                        return;
+                    }
+                    if (
+                        response?.result?.message ===
+                        'Asset created successfully'
+                    ) {
+                        const filterUpdateAsset = {
+                            asset_id: response?.result?.data?.id,
+                            is_sync_odoo: true,
+                            id: item?.id
+                        };
+                        await updateAsset(db, filterUpdateAsset);
+
+                        const filterDocumentLine = {
+                            asset_id_update: response?.result?.data?.id,
+                            code: item?.default_code
                         };
 
-                        if (documentLine?.image !== 'false') {
-                            documentData.image = documentLine?.image;
-                        }
-
-                        return documentData;
+                        await updateDocumentLineData(db, filterDocumentLine);
                     }
-                );
-
-                const responseAddDocumentLine = await AddDocumentLine({
-                    location_id: item?.location_id,
-                    asset_tracking_id: responseCreateDocument?.result?.data?.id,
-                    asset_ids: mappingValueDocumentLine
                 });
 
-                if (
-                    responseAddDocumentLine?.result?.message ===
-                    RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
-                ) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong add document line');
-                    return;
-                }
-                if (responseAddDocumentLine?.error) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong add document line');
-                    return;
-                }
-                if (responseAddDocumentLine?.result?.error) {
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog('Something went wrong add document line');
-                    return;
-                }
-                const documentObj = {
-                    id: item?.id,
-                    state: STATE_DOCUMENT_NAME.Done
+                const filterDocument = {
+                    state: STATE_DOCUMENT_NAME?.Draft
                 };
+                const listDocument = await getDocumentOffline(
+                    db,
+                    filterDocument,
+                    null,
+                    1,
+                    1000
+                );
 
-                await updateDocument(db, documentObj);
-            });
+                listDocument?.forEach(async (item) => {
+                    const responseCreateDocument = await CreateDocument({
+                        location_id: item?.location_id,
+                        date_order: parseDateStringTime(item?.date_order)
+                    });
+                    if (responseCreateDocument?.error) {
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            'Something went wrong create document'
+                        );
+                        return;
+                    }
+                    const filterDocumentLine = {
+                        tracking_id: item?.id
+                    };
+                    const listDocumentLine = await getDocumentLine(
+                        db,
+                        filterDocumentLine
+                    );
+                    const mappingValueDocumentLine = listDocumentLine?.map(
+                        (documentLine) => {
+                            const documentData: DocumentAssetData = {
+                                id: documentLine?.asset_id,
+                                state: documentLine?.state,
+                                use_state: documentLine?.use_state_code,
+                                new_img: documentLine?.new_img ? true : false,
+                                date_check: parseDateStringTime(
+                                    documentLine?.date_check
+                                )
+                            };
 
-            setTimeout(() => {
-                setToast({ open: true, text: 'Upload Successfully' });
-            }, 0);
+                            if (documentLine?.image !== 'false') {
+                                documentData.image = documentLine?.image;
+                            }
 
-            clearStateDialog();
+                            return documentData;
+                        }
+                    );
+
+                    const responseAddDocumentLine = await AddDocumentLine({
+                        location_id: item?.location_id,
+                        asset_tracking_id:
+                            responseCreateDocument?.result?.data?.id,
+                        asset_ids: mappingValueDocumentLine
+                    });
+
+                    if (
+                        responseAddDocumentLine?.result?.message ===
+                        RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                    ) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            'Something went wrong add document line'
+                        );
+                        return;
+                    }
+                    if (responseAddDocumentLine?.error) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            'Something went wrong add document line'
+                        );
+                        return;
+                    }
+                    if (responseAddDocumentLine?.result?.error) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            'Something went wrong add document line'
+                        );
+                        return;
+                    }
+                    const documentObj = {
+                        id: item?.id,
+                        state: STATE_DOCUMENT_NAME.Done
+                    };
+
+                    await updateDocument(db, documentObj);
+                });
+
+                setTimeout(() => {
+                    setToast({ open: true, text: 'Upload Successfully' });
+                }, 0);
+                clearStateDialog();
+            } else {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(
+                    `This device does not have permission to upload`
+                );
+                setTypeDialog('warning');
+            }
         } catch (err) {
             console.log(err);
             clearStateDialog();
@@ -706,7 +747,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setContentDialog(`Something went wrong upload`);
             setTypeDialog('warning');
         }
-    }, [clearStateDialog, loginValue?.uid, setToast]);
+    }, [clearStateDialog, handleCheckMacAddress, loginValue?.uid, setToast]);
 
     const handleConfirmDialog = useCallback(async () => {
         switch (typeDialog) {
