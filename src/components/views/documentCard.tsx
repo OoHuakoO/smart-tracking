@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
         marginLeft: 20
     },
     documentTitle: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: '#404040',
         marginBottom: 5
     },

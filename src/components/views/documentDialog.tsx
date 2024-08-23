@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
         padding: 10
     },
     dialogTitle: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 12,
         marginLeft: 10
     },

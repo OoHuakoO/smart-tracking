@@ -56,27 +56,13 @@ const styles = StyleSheet.create({
         color: theme.colors.additionalText,
         fontSize: 14
     },
-    buttonContainer: {
-        position: 'absolute',
-        right: 20,
-        top: 18
-    },
-    textContainer: {
-        marginLeft: 20
-    },
-    assetCode: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: theme.colors.textPrimary
-    },
     additionalText: {
         fontSize: 14,
         color: theme.colors.additionalText
     },
-
     locationText: {
         color: theme.colors.black,
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         marginLeft: 5
     }
 });

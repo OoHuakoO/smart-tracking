@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     textHeader: {
         color: theme.colors.pureWhite,
         fontSize: RFPercentage(4),
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 5
     },
     textDescription: {
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     textTotalDocument: {
         marginLeft: 20,
         marginTop: 20,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         fontSize: 15,
         marginBottom: 20
     },
@@ -558,16 +558,15 @@ const styles = StyleSheet.create({
 
     buttonText: {
         color: 'white',
-        fontWeight: '600',
+        fontFamily: 'DMSans-Bold',
         fontSize: 16
     },
-
     textReset: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: theme.colors.documentCheck
     },
     textCancel: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: theme.colors.documentCancel
     },
     flatListStyle: {

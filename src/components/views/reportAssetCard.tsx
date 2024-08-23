@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
         width: '60%'
     },
     assetCode: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: theme.colors.textPrimary,
         width: 0,
         flexGrow: 1,

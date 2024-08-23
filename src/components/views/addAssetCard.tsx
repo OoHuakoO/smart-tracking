@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     assetCode: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: theme.colors.textPrimary
     },
     additionalText: {

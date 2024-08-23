@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: '#FFFFFF',
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 10
     },
     textDescription: {
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     textTotalAsset: {
         marginLeft: 20,
         marginTop: 20,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         fontSize: 15,
         marginBottom: 20
     }

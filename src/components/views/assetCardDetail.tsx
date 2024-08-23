@@ -87,12 +87,7 @@ const styles = StyleSheet.create({
         width: '60%'
     },
     assetCode: {
-        // fontSize: 18,
-        fontWeight: 'bold'
-        // color: theme.colors.textPrimary,
-        // width: 0,
-        // flexGrow: 1,
-        // flex: 1
+        fontFamily: 'DMSans-Bold'
     },
     additionalText: {
         fontSize: 14,
@@ -108,7 +103,7 @@ const styles = StyleSheet.create({
     },
     locationText: {
         color: theme.colors.black,
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         alignContent: 'center',
         margin: 5
     },

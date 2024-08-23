@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20
     },
     buttonText: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: theme.colors.white
     }
 });

@@ -95,7 +95,7 @@ import { ErrorResponse } from '@src/utils/axios';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo, { isTablet } from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
 
@@ -906,7 +906,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     onPress={() => handleLogout(false)}
                 >
                     <View>
-                        <FontAwesomeIcon icon={faRightFromBracket} />
+                        <FontAwesomeIcon
+                            icon={faRightFromBracket}
+                            size={isTablet ? 30 : 20}
+                        />
                     </View>
                 </TouchableOpacity>
             </View>
@@ -939,11 +942,12 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         fontFamily: 'DMSans-Medium',
         textAlign: 'left',
-        marginBottom: 15
+        marginBottom: 20,
+        marginTop: 10
     },
     textMenu: {
         marginTop: 15,
-        fontWeight: 'bold'
+        fontFamily: 'DMSans-Bold'
     },
     modeSectionWrap: {
         display: 'flex',

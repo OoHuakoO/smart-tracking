@@ -75,7 +75,7 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
 const styles = StyleSheet.create({
     textMenu: {
         marginTop: 15,
-        fontWeight: 'bold'
+        fontFamily: 'DMSans-Bold'
     },
     menuContainer: {
         display: 'flex',

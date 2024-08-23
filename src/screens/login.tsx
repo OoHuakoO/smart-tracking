@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     },
     textLogin: {
         color: theme.colors.white,
-        fontWeight: '700'
+        fontFamily: 'DMSans-Bold'
     },
     textRetail: {
         textAlign: 'center'

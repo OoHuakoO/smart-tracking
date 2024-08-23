@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: theme.colors.pureWhite,
-        fontWeight: '600',
+        fontFamily: 'DMSans-Bold',
         fontSize: 16
     },
     rowText: {

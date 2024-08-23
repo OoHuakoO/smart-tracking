@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 25
     },
     textSearchAsset: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 15
     },
     closeButton: {
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         color: theme.colors.white,
-        fontWeight: '600'
+        fontFamily: 'DMSans-Bold'
     },
     assetSearch: {
         marginBottom: 8

@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: theme.colors.pureWhite,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 10
     },
     textDescription: {

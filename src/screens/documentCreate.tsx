@@ -953,7 +953,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: theme.colors.pureWhite,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 5
     },
     textDescription: {
@@ -980,7 +980,7 @@ const styles = StyleSheet.create({
     textTotalDocument: {
         marginLeft: 20,
         marginTop: 10,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         fontSize: 15,
         marginBottom: 20
     },
@@ -998,7 +998,7 @@ const styles = StyleSheet.create({
 
     buttonText: {
         color: theme.colors.pureWhite,
-        fontWeight: '600',
+        fontFamily: 'DMSans-Bold',
         fontSize: 16
     },
     dialogActionConfirm: {

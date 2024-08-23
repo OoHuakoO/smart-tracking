@@ -50,14 +50,14 @@ const styles = StyleSheet.create({
     totalAsset: {
         color: theme.colors.additionalText,
         fontSize: 14,
-        fontWeight: '500'
+        fontFamily: 'DMSans-Bold'
     },
     textContainer: {
         marginLeft: 20
     },
     assetCode: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         color: '#404040'
     },
     additionalText: {
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     },
     locationText: {
         color: theme.colors.black,
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         marginLeft: 5
     }
 });

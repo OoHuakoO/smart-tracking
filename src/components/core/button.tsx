@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center'
     },
     text: {
-        fontWeight: 'bold',
+        fontFamily: 'DMSans-Bold',
         fontSize: 20,
         lineHeight: 26
     }

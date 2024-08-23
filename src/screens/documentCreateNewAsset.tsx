@@ -424,7 +424,10 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 </TouchableOpacity>
 
                 <View style={styles.inputWraper}>
-                    <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
+                    <Text
+                        variant="bodyLarge"
+                        style={{ fontFamily: 'DMSans-Bold' }}
+                    >
                         Code
                     </Text>
                     <Controller
@@ -439,7 +442,10 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             />
                         )}
                     />
-                    <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
+                    <Text
+                        variant="bodyLarge"
+                        style={{ fontFamily: 'DMSans-Bold' }}
+                    >
                         Name
                     </Text>
                     <Controller
@@ -454,7 +460,10 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             />
                         )}
                     />
-                    <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
+                    <Text
+                        variant="bodyLarge"
+                        style={{ fontFamily: 'DMSans-Bold' }}
+                    >
                         Category
                     </Text>
 
@@ -479,7 +488,10 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         renderItem={renderItemCategory}
                     />
 
-                    <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
+                    <Text
+                        variant="bodyLarge"
+                        style={{ fontFamily: 'DMSans-Bold' }}
+                    >
                         Use Status
                     </Text>
 
@@ -524,7 +536,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             variant="bodyLarge"
                             style={{
                                 color: theme.colors.white,
-                                fontWeight: '600'
+                                fontFamily: 'DMSans-Bold'
                             }}
                         >
                             Save
@@ -565,7 +577,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: theme.colors.pureWhite,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 10
     },
     textDescription: {
@@ -639,7 +651,7 @@ const styles = StyleSheet.create({
     },
     addAssetNewText: {
         color: theme.colors.white,
-        fontWeight: '700'
+        fontFamily: 'DMSans-Bold'
     },
     dropdown: {
         height: 50,

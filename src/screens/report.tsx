@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         color: theme.colors.pureWhite,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         marginBottom: 5
     },
     textDescription: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     textTotalDocument: {
         marginLeft: 20,
         marginTop: 20,
-        fontWeight: '700',
+        fontFamily: 'DMSans-Bold',
         fontSize: 15
     },
     button: {
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
 
     buttonText: {
         color: theme.colors.white,
-        fontWeight: '600',
+        fontFamily: 'DMSans-Bold',
         fontSize: 16
     }
 });
