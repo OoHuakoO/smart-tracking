@@ -14,6 +14,7 @@ import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import {
     BackHandler,
+    Dimensions,
     ScrollView,
     StatusBar,
     StyleSheet,
@@ -27,6 +28,10 @@ type SettingScreenProps = NativeStackScreenProps<
     PublicStackParamsList,
     'Setting'
 >;
+
+const { width, height } = Dimensions.get('window');
+
+const isTablet = width >= 768 && height >= 768;
 
 const SettingScreen: FC<SettingScreenProps> = (props) => {
     const { navigation } = props;
@@ -137,16 +142,10 @@ const styles = StyleSheet.create({
     textHeader: {
         width: '100%',
         color: theme.colors.textPrimary,
-        fontWeight: '700',
         textAlign: 'left',
-        marginBottom: 15
-    },
-    modeSection: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 10
+        marginBottom: 15,
+        fontSize: isTablet ? 30 : 25,
+        fontFamily: 'DMSans-Bold'
     },
     statusTag: {
         display: 'flex',
@@ -157,17 +156,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-
     buttonConfirm: {
-        paddingVertical: 2,
-        paddingHorizontal: 5,
+        paddingVertical: isTablet ? 5 : 0,
+        paddingHorizontal: isTablet ? 20 : 10,
         backgroundColor: theme.colors.buttonConfirm,
         borderRadius: 10,
-        marginTop: 30
+        marginTop: 10
     },
     textConfirm: {
         fontFamily: 'DMSans-Medium',
-        color: theme.colors.white
+        color: theme.colors.white,
+        fontSize: isTablet ? 30 : 16
     }
 });
 

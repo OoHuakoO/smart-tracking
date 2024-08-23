@@ -30,7 +30,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 24,
         letterSpacing: 0,
-        lineHeight: 32
+        lineHeight: 45
     },
     headlineMedium: {
         fontFamily: 'DMSans-Regular',
@@ -56,7 +56,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
         letterSpacing: 0.15,
-        lineHeight: 24
+        lineHeight: 30
     },
     titleLarge: {
         fontFamily: 'DMSans-Regular',
@@ -101,6 +101,6 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
         letterSpacing: 0.15,
-        lineHeight: 24
+        lineHeight: 35
     }
 };

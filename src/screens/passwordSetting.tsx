@@ -20,9 +20,10 @@ type PasswordSettingScreenProps = NativeStackScreenProps<
     PublicStackParamsList,
     'Setting'
 >;
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const dialPadSize = width * 0.2;
 const dialPadTextSize = dialPadSize * 0.4;
+const isTablet = width >= 768 && height >= 768;
 
 const PasswordSettingScreen: FC<PasswordSettingScreenProps> = (props) => {
     const { navigation } = props;
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.backgroundPassword,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 20
+        paddingTop: isTablet ? 40 : 20
     },
     backToPrevious: {
         marginBottom: 20,
@@ -209,11 +210,13 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     pinText: {
-        color: theme.colors.white
+        color: theme.colors.white,
+        fontSize: isTablet ? 45 : 25
     },
     pinSubText: {
         color: theme.colors.white,
-        marginVertical: 30
+        marginVertical: 30,
+        fontSize: isTablet ? 25 : 18
     },
     dialPadContainer: {
         width: dialPadSize,
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         margin: 10,
-        borderRadius: 50
+        borderRadius: 100
     },
     dialPadText: {
         color: theme.colors.white,

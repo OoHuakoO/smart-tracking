@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     Keyboard,
     SafeAreaView,
     TouchableOpacity,
@@ -43,6 +44,9 @@ import DeviceInfo from 'react-native-device-info';
 import { Text } from 'react-native-paper';
 
 type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
     let version = DeviceInfo.getVersion();
@@ -510,8 +514,9 @@ const styles = StyleSheet.create({
     textSmartTrack: {
         color: theme.colors.textPrimary,
         textAlign: 'center',
-        fontWeight: '700',
-        marginTop: 40
+        fontFamily: 'DMSans-Bold',
+        marginTop: 40,
+        fontSize: isTablet ? 38 : 25
     },
     textVersion: {
         marginTop: 10,

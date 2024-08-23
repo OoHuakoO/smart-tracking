@@ -1,11 +1,15 @@
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import ActionButton from './actionButton';
 
 interface BackButtonProps {
     handlePress: () => void;
 }
+
+const { width, height } = Dimensions.get('window');
+
+const isTablet = width >= 768 && height >= 768;
 
 const BackButton: FC<BackButtonProps> = (props) => {
     const { handlePress } = props;
@@ -17,7 +21,7 @@ const BackButton: FC<BackButtonProps> = (props) => {
         >
             <ActionButton
                 icon="chevron-left"
-                size="small"
+                size={isTablet ? 'large' : 'small'}
                 backgroundColor={theme.colors.white}
             />
         </TouchableOpacity>
@@ -26,7 +30,8 @@ const BackButton: FC<BackButtonProps> = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginRight: 20
+        marginRight: 20,
+        marginVertical: 20
     }
 });
 
