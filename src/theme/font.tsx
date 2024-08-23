@@ -1,3 +1,8 @@
+import { Dimensions } from 'react-native';
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
+
 export const fontConfig = {
     // Display
     displaySmall: {
@@ -30,7 +35,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 24,
         letterSpacing: 0,
-        lineHeight: 45
+        lineHeight: isTablet ? 45 : 32
     },
     headlineMedium: {
         fontFamily: 'DMSans-Regular',
@@ -56,7 +61,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
         letterSpacing: 0.15,
-        lineHeight: 30
+        lineHeight: isTablet ? 30 : 24
     },
     titleLarge: {
         fontFamily: 'DMSans-Regular',
@@ -101,6 +106,6 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
         letterSpacing: 0.15,
-        lineHeight: 35
+        lineHeight: isTablet ? 35 : 24
     }
 };

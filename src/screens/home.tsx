@@ -1,6 +1,7 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    Dimensions,
     SafeAreaView,
     StatusBar,
     TouchableOpacity,
@@ -95,11 +96,14 @@ import { ErrorResponse } from '@src/utils/axios';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import DeviceInfo, { isTablet } from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
