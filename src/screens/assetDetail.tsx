@@ -17,7 +17,10 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    useSafeAreaInsets
+} from 'react-native-safe-area-context';
 
 type AssetsDetailScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -26,6 +29,7 @@ type AssetsDetailScreenProps = NativeStackScreenProps<
 
 const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
 
     useEffect(() => {
         const onBackPress = () => {
@@ -42,7 +46,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ marginTop: top }}>
             <View style={styles.topSectionList}>
                 <View style={styles.containerButton}>
                     <View style={styles.button}>

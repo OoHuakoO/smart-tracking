@@ -49,6 +49,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DocumentCreateNewAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -60,6 +61,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [dialogVisible, setDialogVisible] = useState(false);
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
@@ -363,7 +365,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

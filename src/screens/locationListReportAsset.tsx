@@ -40,6 +40,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type LocationListReportAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -53,6 +54,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     props
 ) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [loading, setLoading] = useState<boolean>(false);
     const [listReportAsset, setListReportAsset] = useState<ReportAssetData[]>(
         []
@@ -402,7 +404,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

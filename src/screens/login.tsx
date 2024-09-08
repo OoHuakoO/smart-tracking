@@ -42,6 +42,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
 
@@ -53,6 +54,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     let deviceId = DeviceInfo.getDeviceId();
     let deviceName = DeviceInfo.getDeviceName();
     const { navigation } = props;
+    const { top } = useSafeAreaInsets();
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const setPrivilegeCompany = useSetRecoilState<string>(
         PrivilegeCompanyState
@@ -418,7 +420,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

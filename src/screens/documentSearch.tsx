@@ -11,10 +11,17 @@ import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { BackHandler, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    BackHandler,
+    SafeAreaView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DocumentSearchScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -23,6 +30,7 @@ type DocumentSearchScreenProps = NativeStackScreenProps<
 
 const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     const { navigation } = props;
+    const { top } = useSafeAreaInsets();
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const [searchLocation, setSearchLocation] = useState<string>('');
     const [searchState, setSearchState] = useState<string>('');
@@ -143,7 +151,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}
@@ -305,7 +313,7 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                     </Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 };
 

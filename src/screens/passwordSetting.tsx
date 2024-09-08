@@ -14,7 +14,10 @@ import {
     View
 } from 'react-native';
 import { Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    useSafeAreaInsets
+} from 'react-native-safe-area-context';
 
 type PasswordSettingScreenProps = NativeStackScreenProps<
     PublicStackParamsList,
@@ -27,6 +30,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const PasswordSettingScreen: FC<PasswordSettingScreenProps> = (props) => {
     const { navigation } = props;
+    const { top } = useSafeAreaInsets();
     const dialPadContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, '<'];
     const pinLength = 5;
     const pinContainerSize = width / 2.5;
@@ -81,7 +85,7 @@ const PasswordSettingScreen: FC<PasswordSettingScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <View style={styles.backToPrevious}>
                 <BackButton handlePress={() => navigation.navigate('Login')} />
             </View>

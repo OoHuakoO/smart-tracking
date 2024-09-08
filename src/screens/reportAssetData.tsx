@@ -31,6 +31,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type ReportAssetDataProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -42,6 +43,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [listLocation, setListLocation] = useState<LocationReportData[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -205,7 +207,7 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

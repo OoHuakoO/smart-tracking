@@ -33,6 +33,7 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 
 import { Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DocumentAssetSearchScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -43,6 +44,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
     props
 ) => {
     const { navigation } = props;
+    const { top } = useSafeAreaInsets();
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const [searchLocation, setSearchLocation] = useState<string>('');
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
@@ -217,7 +219,7 @@ const DocumentAssetSearchScreen: FC<DocumentAssetSearchScreenProps> = (
     }, [navigation]);
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

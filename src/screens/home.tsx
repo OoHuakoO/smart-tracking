@@ -99,6 +99,7 @@ import { StyleSheet } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
@@ -107,6 +108,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     let deviceId = DeviceInfo.getDeviceId();
     let deviceName = DeviceInfo.getDeviceName();
     const form = useForm<SettingParams>({});
@@ -860,7 +862,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <KeepAwake />
             <Portal>
                 <AlertDialog

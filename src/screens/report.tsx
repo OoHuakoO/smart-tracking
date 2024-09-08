@@ -20,6 +20,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type ReportScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'Report'
@@ -30,7 +31,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const ReportScreen: FC<ReportScreenProps> = (props) => {
     const { navigation } = props;
-
+    const { top } = useSafeAreaInsets();
     useEffect(() => {
         const onBackPress = () => {
             navigation.navigate('Home');
@@ -46,7 +47,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <LinearGradient
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 0 }}

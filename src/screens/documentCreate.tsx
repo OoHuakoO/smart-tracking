@@ -57,6 +57,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRecoilValue } from 'recoil';
 
 type DocumentCreateProps = NativeStackScreenProps<
@@ -72,6 +73,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         'Non-serializable values were found in the navigation state'
     ]);
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [assetCode, setAssetCode] = useState('');
     const [listAssetCreate, setListAssetCreate] = useState<AssetData[]>([]);
     const [titleDialog, setTitleDialog] = useState<string>('');
@@ -735,7 +737,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     ]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textTitle={titleDialog}
                 textContent={contentDialog}

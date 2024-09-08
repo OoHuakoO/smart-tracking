@@ -22,7 +22,10 @@ import {
     View
 } from 'react-native';
 import { Button, Text } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    useSafeAreaInsets
+} from 'react-native-safe-area-context';
 
 type SettingScreenProps = NativeStackScreenProps<
     PublicStackParamsList,
@@ -34,6 +37,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const SettingScreen: FC<SettingScreenProps> = (props) => {
     const { navigation } = props;
+    const { top } = useSafeAreaInsets();
     const form = useForm<SettingParams>({});
     const setToast = useSetRecoilState<Toast>(toastState);
     const handleSaveSettings = useCallback(
@@ -77,7 +81,7 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <ScrollView style={styles.scrollView}>
                 <View>
                     <Text variant="headlineLarge" style={styles.textHeader}>

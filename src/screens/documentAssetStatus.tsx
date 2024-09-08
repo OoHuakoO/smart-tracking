@@ -51,6 +51,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DocumentAssetStatusScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -64,6 +65,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     props
 ) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [loading, setLoading] = useState<boolean>(false);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -330,7 +332,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textTitle={titleDialog}
                 textContent={contentDialog}

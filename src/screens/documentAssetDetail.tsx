@@ -42,7 +42,10 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+    SafeAreaView,
+    useSafeAreaInsets
+} from 'react-native-safe-area-context';
 
 type DocumentAssetDetailProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -51,6 +54,7 @@ type DocumentAssetDetailProps = NativeStackScreenProps<
 
 const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [dialogVisible, setDialogVisible] = useState(false);
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -321,7 +325,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{ marginTop: top }}>
             <AlertDialog
                 textContent={contentDialog}
                 visible={visibleDialog}

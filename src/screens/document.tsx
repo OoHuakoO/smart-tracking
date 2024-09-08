@@ -47,6 +47,7 @@ import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 type DocumentScreenProp = NativeStackScreenProps<
@@ -59,6 +60,7 @@ const isTablet = width >= 768 && height >= 768;
 
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation, route } = props;
+    const { top } = useSafeAreaInsets();
     const [dialogVisible, setDialogVisible] = useState(false);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
@@ -426,7 +428,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
                 textTitle={titleDialog}
                 textContent={contentDialog}
