@@ -256,57 +256,67 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     );
 
     const handleSelectCompanyModeOffline = useCallback(async () => {
-        if (isConnected) {
-            await handleOfflineLogin({
-                login: form.getValues('login'),
-                password: form.getValues('password')
-            });
-        } else {
-            const db = await getDBConnection();
-            const filter = {
-                email: form.getValues('login')
-            };
-            const userOffline = await getUserOffline(db);
-            if (userOffline.length > 0) {
-                const userLoginOffline = await getUserOffline(db, filter);
-                if (userLoginOffline.length > 0) {
-                    const loginObj = {
-                        session_id: '',
-                        uid: userLoginOffline[0]?.user_id
-                    };
-                    setLogin(loginObj);
-                    setOnlineState(false);
-                    const settings = await AsyncStorage.getItem('Settings');
-                    const jsonSettings: SettingParams = JSON.parse(settings);
-                    await AsyncStorage.setItem(
-                        'Settings',
-                        JSON.stringify({
-                            ...jsonSettings,
-                            login: form.getValues('login'),
-                            password: form.getValues('password')
-                        })
-                    );
-                    await AsyncStorage.setItem('Online', JSON.stringify(false));
-                    await AsyncStorage.setItem(
-                        'Login',
-                        JSON.stringify(loginObj)
-                    );
-                    setTimeout(() => {
-                        setToast({
-                            open: true,
-                            text: 'Login Successfully'
-                        });
-                    }, 0);
+        try {
+            if (isConnected) {
+                await handleOfflineLogin({
+                    login: form.getValues('login'),
+                    password: form.getValues('password')
+                });
+            } else {
+                const db = await getDBConnection();
+                const filter = {
+                    email: form.getValues('login')
+                };
+                const userOffline = await getUserOffline(db);
+                if (userOffline.length > 0) {
+                    const userLoginOffline = await getUserOffline(db, filter);
+                    if (userLoginOffline.length > 0) {
+                        const loginObj = {
+                            session_id: '',
+                            uid: userLoginOffline[0]?.user_id
+                        };
+                        setLogin(loginObj);
+                        setOnlineState(false);
+                        const settings = await AsyncStorage.getItem('Settings');
+                        const jsonSettings: SettingParams =
+                            JSON.parse(settings);
+                        await AsyncStorage.setItem(
+                            'Settings',
+                            JSON.stringify({
+                                ...jsonSettings,
+                                login: form.getValues('login'),
+                                password: form.getValues('password')
+                            })
+                        );
+                        await AsyncStorage.setItem(
+                            'Online',
+                            JSON.stringify(false)
+                        );
+                        await AsyncStorage.setItem(
+                            'Login',
+                            JSON.stringify(loginObj)
+                        );
+                        setTimeout(() => {
+                            setToast({
+                                open: true,
+                                text: 'Login Successfully'
+                            });
+                        }, 0);
+                    } else {
+                        setVisibleDialog(true);
+                        setContentDialog(
+                            `The user you are login is not found.`
+                        );
+                    }
                 } else {
                     setVisibleDialog(true);
-                    setContentDialog(`The user you are login is not found.`);
+                    setContentDialog(
+                        `Please connect to the internet to login and download data before login without internet.`
+                    );
                 }
-            } else {
-                setVisibleDialog(true);
-                setContentDialog(
-                    `Please connect to the internet to login and download data before login without internet.`
-                );
             }
+        } catch (err) {
+            throw err;
         }
     }, [
         form,

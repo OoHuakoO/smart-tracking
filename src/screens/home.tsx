@@ -149,6 +149,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         device_name: await deviceName
                     });
                     if (response?.error) {
+                        clearStateDialog();
                         setVisibleDialog(true);
                         setContentDialog('Logout Failed');
                         return;
@@ -616,6 +617,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     });
 
                     if (response?.error) {
+                        clearStateDialog();
                         setVisibleDialog(true);
                         setContentDialog('Something went wrong save asset');
                         return;
@@ -657,6 +659,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         date_order: parseDateStringTime(item?.date_order)
                     });
                     if (responseCreateDocument?.error) {
+                        clearStateDialog();
                         setVisibleDialog(true);
                         setContentDialog(
                             'Something went wrong create document'
@@ -837,6 +840,15 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableReportAssetNotFound(db);
                     await createTableReportDocumentLine(db);
                     form?.setValue('online', onlineValue);
+                    const countAsset = await getTotalAssets(db);
+                    if (countAsset === 0) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setTitleDialog('Data Not Found');
+                        setContentDialog('Please download the current data');
+                        setTypeDialog('download');
+                        setShowCancelDialog(true);
+                    }
                 } catch (err) {
                     console.log(err);
                     clearStateDialog();
