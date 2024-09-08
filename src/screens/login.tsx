@@ -138,8 +138,8 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     const handleCheckPrivilegeCompany = useCallback(async () => {
         try {
-            /// fetch api PrivilegeCompany
-            const privilege = 'Online/Offline';
+            /// fetch api PrivilegeCompany ex Online Offline Online&Offline
+            const privilege = 'Offline';
             await AsyncStorage.setItem('PrivilegeCompany', privilege);
             setPrivilegeCompany(privilege);
             return privilege;
@@ -255,15 +255,86 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         ]
     );
 
+    const handleSelectCompanyModeOffline = useCallback(async () => {
+        if (isConnected) {
+            await handleOfflineLogin({
+                login: form.getValues('login'),
+                password: form.getValues('password')
+            });
+        } else {
+            const db = await getDBConnection();
+            const filter = {
+                email: form.getValues('login')
+            };
+            const userOffline = await getUserOffline(db);
+            if (userOffline.length > 0) {
+                const userLoginOffline = await getUserOffline(db, filter);
+                if (userLoginOffline.length > 0) {
+                    const loginObj = {
+                        session_id: '',
+                        uid: userLoginOffline[0]?.user_id
+                    };
+                    setLogin(loginObj);
+                    setOnlineState(false);
+                    const settings = await AsyncStorage.getItem('Settings');
+                    const jsonSettings: SettingParams = JSON.parse(settings);
+                    await AsyncStorage.setItem(
+                        'Settings',
+                        JSON.stringify({
+                            ...jsonSettings,
+                            login: form.getValues('login'),
+                            password: form.getValues('password')
+                        })
+                    );
+                    await AsyncStorage.setItem('Online', JSON.stringify(false));
+                    await AsyncStorage.setItem(
+                        'Login',
+                        JSON.stringify(loginObj)
+                    );
+                    setTimeout(() => {
+                        setToast({
+                            open: true,
+                            text: 'Login Successfully'
+                        });
+                    }, 0);
+                } else {
+                    setVisibleDialog(true);
+                    setContentDialog(`The user you are login is not found.`);
+                }
+            } else {
+                setVisibleDialog(true);
+                setContentDialog(
+                    `Please connect to the internet to login and download data before login without internet.`
+                );
+            }
+        }
+    }, [
+        form,
+        handleOfflineLogin,
+        isConnected,
+        setLogin,
+        setOnlineState,
+        setToast
+    ]);
+
     const handleLogin = useCallback(
         async (data: LoginParams) => {
             try {
                 const privilege = await handleCheckPrivilegeCompany();
-                if (privilege === 'Online') {
-                    await handleOnlineLogin(data);
-                } else {
-                    Keyboard.dismiss();
-                    setVisiblePopupSelectModeCompany(true);
+                switch (privilege) {
+                    case 'Online':
+                        await handleOnlineLogin(data);
+                        break;
+                    case 'Offline':
+                        await handleSelectCompanyModeOffline();
+                        break;
+                    case 'Online&Offline':
+                        Keyboard.dismiss();
+                        setVisiblePopupSelectModeCompany(true);
+                        break;
+                    default:
+                        await handleOnlineLogin(data);
+                        break;
                 }
             } catch (err) {
                 console.log(err);
@@ -271,7 +342,11 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 setContentDialog(`Something went wrong login`);
             }
         },
-        [handleCheckPrivilegeCompany, handleOnlineLogin]
+        [
+            handleCheckPrivilegeCompany,
+            handleOnlineLogin,
+            handleSelectCompanyModeOffline
+        ]
     );
 
     const handleConfirmSelectModeCompany = useCallback(async () => {
@@ -282,69 +357,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     password: form.getValues('password')
                 });
             } else {
-                if (isConnected) {
-                    await handleOfflineLogin({
-                        login: form.getValues('login'),
-                        password: form.getValues('password')
-                    });
-                } else {
-                    const db = await getDBConnection();
-                    const filter = {
-                        email: form.getValues('login')
-                    };
-                    const userOffline = await getUserOffline(db);
-                    if (userOffline.length > 0) {
-                        const userLoginOffline = await getUserOffline(
-                            db,
-                            filter
-                        );
-                        if (userLoginOffline.length > 0) {
-                            const loginObj = {
-                                session_id: '',
-                                uid: userLoginOffline[0]?.user_id
-                            };
-                            setLogin(loginObj);
-                            setOnlineState(false);
-                            const settings = await AsyncStorage.getItem(
-                                'Settings'
-                            );
-                            const jsonSettings: SettingParams =
-                                JSON.parse(settings);
-                            await AsyncStorage.setItem(
-                                'Settings',
-                                JSON.stringify({
-                                    ...jsonSettings,
-                                    login: form.getValues('login'),
-                                    password: form.getValues('password')
-                                })
-                            );
-                            await AsyncStorage.setItem(
-                                'Online',
-                                JSON.stringify(false)
-                            );
-                            await AsyncStorage.setItem(
-                                'Login',
-                                JSON.stringify(loginObj)
-                            );
-                            setTimeout(() => {
-                                setToast({
-                                    open: true,
-                                    text: 'Login Successfully'
-                                });
-                            }, 0);
-                        } else {
-                            setVisibleDialog(true);
-                            setContentDialog(
-                                `The user you are login is not found.`
-                            );
-                        }
-                    } else {
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            `Please connect to the internet to login and download data before login without internet.`
-                        );
-                    }
-                }
+                await handleSelectCompanyModeOffline();
             }
             setVisiblePopupSelectModeCompany(false);
         } catch (err) {
@@ -352,16 +365,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog(`Something went wrong login`);
         }
-    }, [
-        form,
-        handleOfflineLogin,
-        handleOnlineLogin,
-        isConnected,
-        modeCompany,
-        setLogin,
-        setOnlineState,
-        setToast
-    ]);
+    }, [form, handleOnlineLogin, handleSelectCompanyModeOffline, modeCompany]);
 
     const handleConfirmDeviceLogin = useCallback(() => {
         if (modeDeviceLogin === 'Yes') {
