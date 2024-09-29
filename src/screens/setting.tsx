@@ -112,6 +112,19 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
                             />
                         )}
                     />
+
+                    <Controller
+                        name="mac_address"
+                        defaultValue=""
+                        control={form?.control}
+                        render={({ field }) => (
+                            <InputText
+                                {...field}
+                                placeholder="MacAddress"
+                                onChangeText={(value) => field?.onChange(value)}
+                            />
+                        )}
+                    />
                 </View>
 
                 <View style={styles.row}>

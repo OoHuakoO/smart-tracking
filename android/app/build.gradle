@@ -80,8 +80,8 @@ android {
         applicationId "com.smarttracking"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "2.0"
+        versionCode 1
+        versionName "1.0"
         resConfigs "en", "US"
     }
 
