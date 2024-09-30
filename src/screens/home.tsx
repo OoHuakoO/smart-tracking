@@ -69,8 +69,8 @@ import {
     GetUseStatus
 } from '@src/services/downloadDB';
 import {
-    CheckActiveDevice,
     CheckMacAddress,
+    CheckUserActive,
     GetAllUserOffline,
     LogoutDevice
 } from '@src/services/login';
@@ -96,7 +96,6 @@ import { ErrorResponse } from '@src/utils/axios';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Portal, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -109,8 +108,6 @@ const isTablet = width >= 768 && height >= 768;
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
     const { top } = useSafeAreaInsets();
-    let deviceId = DeviceInfo.getDeviceId();
-    let deviceName = DeviceInfo.getDeviceName();
     const form = useForm<SettingParams>({});
     const setLogin = useSetRecoilState<LoginState>(loginState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -139,15 +136,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleLogout = useCallback(
         async (loginAnotherDevoice?: boolean) => {
             try {
-                const settings = await AsyncStorage.getItem('Settings');
-                const jsonSettings: SettingParams = JSON.parse(settings);
                 if (!loginAnotherDevoice && isConnected) {
-                    const response = await LogoutDevice({
-                        login: jsonSettings?.login,
-                        password: jsonSettings?.password,
-                        mac_address: await deviceId,
-                        device_name: await deviceName
-                    });
+                    const response = await LogoutDevice();
                     if (response?.error) {
                         clearStateDialog();
                         setVisibleDialog(true);
@@ -155,8 +145,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         return;
                     }
                 }
-
-                setLogin({ session_id: '', uid: '' });
+                setLogin({ uid: '' });
                 await AsyncStorage.setItem('Login', '');
                 setTimeout(() => {
                     setToast({ open: true, text: 'Logout Successfully' });
@@ -167,14 +156,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 setVisibleDialog(true);
             }
         },
-        [
-            clearStateDialog,
-            deviceId,
-            deviceName,
-            isConnected,
-            setLogin,
-            setToast
-        ]
+        [clearStateDialog, isConnected, setLogin, setToast]
     );
 
     const handleCloseDialog = useCallback(() => {
@@ -377,12 +359,16 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     );
 
     const handleCheckMacAddress = useCallback(async (): Promise<boolean> => {
-        const response = await CheckMacAddress({ mac_address: await deviceId });
-        if (response?.result?.data?.device_offline_mode) {
+        const settings = await AsyncStorage.getItem('Settings');
+        const jsonSettings: SettingParams = JSON.parse(settings);
+        const response = await CheckMacAddress({
+            mac_address: jsonSettings?.mac_address
+        });
+        if (response?.result?.success) {
             return true;
         }
         return false;
-    }, [deviceId]);
+    }, []);
 
     const handleLoadUserOffline = useCallback(
         async (totalPages: number): Promise<UserList[]> => {
@@ -788,8 +774,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         try {
             const intervalId = setInterval(async () => {
                 if (onlineValue) {
-                    const response = await CheckActiveDevice();
-                    if (response.error) {
+                    const settings = await AsyncStorage.getItem('Settings');
+                    const jsonSettings: SettingParams = JSON.parse(settings);
+                    const response = await CheckUserActive({
+                        login: jsonSettings?.login,
+                        password: jsonSettings?.password
+                    });
+                    if (response?.error) {
                         clearStateDialog();
                         setVisibleDialog(true);
                         setTitleDialog(WARNING);
@@ -797,10 +788,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         return;
                     }
                     if (
-                        response?.result?.data?.mac_address &&
                         response?.result?.data?.mac_address !==
-                            (await deviceId) &&
-                        response?.result?.data?.user_active
+                            jsonSettings?.mac_address &&
+                        response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
                         setVisibleDialog(true);
@@ -820,7 +810,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog(WARNING);
             setTypeDialog('warning');
         }
-    }, [clearStateDialog, deviceId, onlineValue]);
+    }, [clearStateDialog, onlineValue]);
 
     useEffect(() => {
         handleCheckUserLogin();

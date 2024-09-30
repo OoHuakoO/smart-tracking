@@ -21,16 +21,11 @@ import PopupDeviceLogin from '@src/components/views/popupDeviceLogin';
 import PopupSelectModeCompany from '@src/components/views/popupSelectModeCompany';
 import { getDBConnection } from '@src/db/config';
 import { getUserOffline } from '@src/db/userOffline';
+import { CheckCompanyMode, CheckUserActive, Login } from '@src/services/login';
 import {
-    ActiveDevice,
-    CheckActiveDevice,
-    CreateDevice,
-    Login
-} from '@src/services/login';
-import {
+    CompanyModeState,
     loginState,
     OnlineState,
-    PrivilegeCompanyState,
     useSetRecoilState
 } from '@src/store';
 import { toastState } from '@src/store/toast';
@@ -51,14 +46,10 @@ const isTablet = width >= 768 && height >= 768;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
     let version = DeviceInfo.getVersion();
-    let deviceId = DeviceInfo.getDeviceId();
-    let deviceName = DeviceInfo.getDeviceName();
     const { navigation } = props;
     const { top } = useSafeAreaInsets();
     const setLogin = useSetRecoilState<LoginState>(loginState);
-    const setPrivilegeCompany = useSetRecoilState<string>(
-        PrivilegeCompanyState
-    );
+    const setPrivilegeCompany = useSetRecoilState<string>(CompanyModeState);
     const form = useForm<LoginParams>({});
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [visiblePopupSelectModeCompany, setVisiblePopupSelectModeCompany] =
@@ -74,55 +65,19 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
     const { isConnected } = useNetInfo();
 
-    const handleCreateDevice = useCallback(
-        async (login: string, password: string) => {
-            try {
-                const response = await CreateDevice({
-                    login: login,
-                    password: password,
-                    mac_address: await deviceId,
-                    device_name: await deviceName
-                });
-                if (response?.error) {
-                    throw response?.error;
-                }
-            } catch (err) {
-                throw err;
-            }
-        },
-        [deviceId, deviceName]
-    );
-
-    const handleActiveUser = useCallback(
-        async (login: string, password: string) => {
-            try {
-                const response = await ActiveDevice({
-                    login: login,
-                    password: password,
-                    mac_address: await deviceId,
-                    device_name: await deviceName
-                });
-                if (response?.error) {
-                    throw response?.error;
-                }
-            } catch (err) {
-                throw err;
-            }
-        },
-        [deviceId, deviceName]
-    );
-
-    const handleCheckActiveDevice = useCallback(
+    const handleCheckUserActive = useCallback(
         async (login: string, password: string): Promise<boolean> => {
             try {
-                const response = await CheckActiveDevice({ login, password });
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
+                const response = await CheckUserActive({ login, password });
                 if (response?.error) {
                     throw response.error;
                 }
                 if (
-                    response?.result?.data?.mac_address &&
-                    response?.result?.data?.mac_address !== (await deviceId) &&
-                    response?.result?.data?.user_active
+                    response?.result?.data?.mac_address !==
+                        jsonSettings?.mac_address &&
+                    response?.result?.data?.is_login
                 ) {
                     Keyboard.dismiss();
                     setVisiblePopupDeviceLogin(true);
@@ -133,16 +88,19 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 throw err;
             }
         },
-        [deviceId]
+        []
     );
 
-    const handleCheckPrivilegeCompany = useCallback(async () => {
+    const handleCheckCompanyMode = useCallback(async () => {
         try {
-            /// fetch api PrivilegeCompany ex Online Offline Online&Offline
-            const privilege = 'Offline';
-            await AsyncStorage.setItem('PrivilegeCompany', privilege);
-            setPrivilegeCompany(privilege);
-            return privilege;
+            const response = await CheckCompanyMode();
+            if (response?.error || !response?.result?.success) {
+                throw response.error;
+            }
+            const companyMode = response?.result?.data?.mode;
+            await AsyncStorage.setItem('CompanyMode', companyMode);
+            setPrivilegeCompany(companyMode);
+            return companyMode;
         } catch (err) {
             throw err;
         }
@@ -151,7 +109,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleOfflineLogin = useCallback(
         async (data: LoginParams) => {
             try {
-                handleCreateDevice(data?.login, data?.password);
                 const response = await Login({
                     login: data?.login,
                     password: data?.password
@@ -166,8 +123,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     return;
                 }
                 const loginObj = {
-                    session_id: '',
-                    uid: response?.result?.uid
+                    uid: response?.result?.data?.user_id
                 };
                 setLogin(loginObj);
                 setOnlineState(false);
@@ -190,14 +146,14 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 throw err;
             }
         },
-        [handleCreateDevice, setLogin, setOnlineState, setToast]
+        [setLogin, setOnlineState, setToast]
     );
 
     const handleOnlineLogin = useCallback(
         async (data: LoginParams, forceLogin?: boolean) => {
             try {
                 if (!forceLogin) {
-                    const foundActiveDevice = await handleCheckActiveDevice(
+                    const foundActiveDevice = await handleCheckUserActive(
                         data?.login,
                         data?.password
                     );
@@ -205,12 +161,12 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                         return;
                     }
                 }
-                handleCreateDevice(data?.login, data?.password);
-                handleActiveUser(data?.login, data?.password);
+
                 const response = await Login({
                     login: data?.login,
                     password: data?.password
                 });
+
                 if (
                     response?.error ||
                     data?.login === '' ||
@@ -222,7 +178,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 }
                 const loginObj = {
                     session_id: '',
-                    uid: response?.result?.uid
+                    uid: response?.result?.data?.user_id
                 };
                 setLogin(loginObj);
                 setOnlineState(true);
@@ -245,14 +201,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 throw err;
             }
         },
-        [
-            handleActiveUser,
-            handleCheckActiveDevice,
-            handleCreateDevice,
-            setLogin,
-            setOnlineState,
-            setToast
-        ]
+        [handleCheckUserActive, setLogin, setOnlineState, setToast]
     );
 
     const handleSelectCompanyModeOffline = useCallback(async () => {
@@ -272,7 +221,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     const userLoginOffline = await getUserOffline(db, filter);
                     if (userLoginOffline.length > 0) {
                         const loginObj = {
-                            session_id: '',
                             uid: userLoginOffline[0]?.user_id
                         };
                         setLogin(loginObj);
@@ -330,15 +278,15 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleLogin = useCallback(
         async (data: LoginParams) => {
             try {
-                const privilege = await handleCheckPrivilegeCompany();
-                switch (privilege) {
-                    case 'Online':
+                const companyMode = await handleCheckCompanyMode();
+                switch (companyMode) {
+                    case 'online':
                         await handleOnlineLogin(data);
                         break;
-                    case 'Offline':
+                    case 'offline':
                         await handleSelectCompanyModeOffline();
                         break;
-                    case 'Online&Offline':
+                    case 'switch':
                         Keyboard.dismiss();
                         setVisiblePopupSelectModeCompany(true);
                         break;
@@ -353,7 +301,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             }
         },
         [
-            handleCheckPrivilegeCompany,
+            handleCheckCompanyMode,
             handleOnlineLogin,
             handleSelectCompanyModeOffline
         ]

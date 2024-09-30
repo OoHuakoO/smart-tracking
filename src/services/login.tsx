@@ -1,8 +1,9 @@
 import { Params } from '@src/typings/common';
 import {
-    CheckActiveDeviceResponse,
+    CheckCompanyModeResponse,
     CheckMacAddressParams,
     CheckMacAddressResponse,
+    CheckUserActiveResponse,
     GetAllUserOfflineResponse,
     LoginParams,
     LoginResponse,
@@ -10,16 +11,22 @@ import {
 } from '@src/typings/login';
 import { Response, post } from '@src/utils/axios';
 
+export function CheckCompanyMode(): Promise<
+    Response<CheckCompanyModeResponse>
+> {
+    return post<CheckCompanyModeResponse>('/api/check/company/mode');
+}
+
 // Online Mode
 
 export function Login(params: LoginParams): Promise<Response<LoginResponse>> {
     return post<LoginResponse>('/api/user/login', params);
 }
 
-export function CheckActiveDevice(): Promise<
-    Response<CheckActiveDeviceResponse>
-> {
-    return post<CheckActiveDeviceResponse>('/api/user/check');
+export function CheckUserActive(
+    params: LoginParams
+): Promise<Response<CheckUserActiveResponse>> {
+    return post<CheckUserActiveResponse>('/api/user/check', params);
 }
 
 export function LogoutDevice(): Promise<Response<LogoutDeviceResponse>> {

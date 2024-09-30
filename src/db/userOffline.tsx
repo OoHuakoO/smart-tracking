@@ -8,8 +8,7 @@ export const createTableUserOffline = (db: SQLiteDatabase) => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL UNIQUE,
             user_name TEXT,
-            email TEXT,
-            user_offline_mode BOOLEAN
+            email TEXT
         );`;
             tx.executeSql(
                 query,
@@ -45,7 +44,6 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
             user_id,
             user_name,
             email,
-            user_offline_mode
         ) VALUES ` +
         userList
             .map(
@@ -53,8 +51,7 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
                     `(
                   ${item.user_id},
                  '${item.user_name}',
-                 '${item.email}',
-                  ${item.user_offline_mode}
+                 '${item.email}'
                      )`
             )
             .join(',');

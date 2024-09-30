@@ -21,13 +21,13 @@ export interface LoginResponse {
     data: LoginData;
 }
 
-export interface CheckActiveData {
+export interface CheckUserActiveData {
     is_login: boolean;
     mac_address: string;
 }
 
-export interface CheckActiveDeviceResponse {
-    data: CheckActiveData;
+export interface CheckUserActiveResponse {
+    data: CheckUserActiveData;
 }
 
 export interface LogoutDeviceResponse {
@@ -67,4 +67,12 @@ export interface UserResponse {
 
 export interface GetAllUserOfflineResponse {
     data: UserResponse;
+}
+
+export interface CheckCompanyModeData {
+    mode: string;
+}
+export interface CheckCompanyModeResponse {
+    success: boolean;
+    data: CheckCompanyModeData;
 }

@@ -76,8 +76,7 @@ export async function post<T = any>(
             ...data,
             db: jsonSettings?.db,
             login: data?.login ? data?.login : jsonSettings?.login,
-            password: data?.password ? data?.password : jsonSettings?.password,
-            mac_address: data?.mac_address
+            password: data?.password ? data?.password : jsonSettings?.password
         }
     };
     const res = await apiInstances.post<Response<T>>(url, convertData, config);

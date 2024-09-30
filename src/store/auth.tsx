@@ -9,8 +9,8 @@ export const loginState: RecoilState<LoginState> = atom({
     }
 });
 
-export const PrivilegeCompanyState: RecoilState<string> = atom({
-    key: 'PrivilegeCompany',
+export const CompanyModeState: RecoilState<string> = atom({
+    key: 'CompanyMode',
     default: ''
 });
 
