@@ -91,27 +91,33 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         []
     );
 
-    const handleCheckCompanyMode = useCallback(async () => {
-        try {
-            const response = await CheckCompanyMode();
-            if (response?.error || !response?.result?.success) {
-                throw response.error;
+    const handleCheckCompanyMode = useCallback(
+        async (data: LoginParams) => {
+            try {
+                const response = await CheckCompanyMode(data);
+                if (response?.error || !response?.result?.success) {
+                    throw response.error;
+                }
+                const companyMode = response?.result?.data?.mode;
+                await AsyncStorage.setItem('CompanyMode', companyMode);
+                setPrivilegeCompany(companyMode);
+                return companyMode;
+            } catch (err) {
+                throw err;
             }
-            const companyMode = response?.result?.data?.mode;
-            await AsyncStorage.setItem('CompanyMode', companyMode);
-            setPrivilegeCompany(companyMode);
-            return companyMode;
-        } catch (err) {
-            throw err;
-        }
-    }, [setPrivilegeCompany]);
+        },
+        [setPrivilegeCompany]
+    );
 
     const handleOfflineLogin = useCallback(
         async (data: LoginParams) => {
             try {
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
                 const response = await Login({
                     login: data?.login,
-                    password: data?.password
+                    password: data?.password,
+                    mac_address: jsonSettings?.mac_address
                 });
                 if (
                     response?.error ||
@@ -127,8 +133,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 };
                 setLogin(loginObj);
                 setOnlineState(false);
-                const settings = await AsyncStorage.getItem('Settings');
-                const jsonSettings: SettingParams = JSON.parse(settings);
                 await AsyncStorage.setItem(
                     'Settings',
                     JSON.stringify({
@@ -152,6 +156,8 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleOnlineLogin = useCallback(
         async (data: LoginParams, forceLogin?: boolean) => {
             try {
+                const settings = await AsyncStorage.getItem('Settings');
+                const jsonSettings: SettingParams = JSON.parse(settings);
                 if (!forceLogin) {
                     const foundActiveDevice = await handleCheckUserActive(
                         data?.login,
@@ -164,7 +170,8 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
 
                 const response = await Login({
                     login: data?.login,
-                    password: data?.password
+                    password: data?.password,
+                    mac_address: jsonSettings?.mac_address
                 });
 
                 if (
@@ -182,8 +189,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 };
                 setLogin(loginObj);
                 setOnlineState(true);
-                const settings = await AsyncStorage.getItem('Settings');
-                const jsonSettings: SettingParams = JSON.parse(settings);
                 await AsyncStorage.setItem(
                     'Settings',
                     JSON.stringify({
@@ -278,21 +283,42 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
     const handleLogin = useCallback(
         async (data: LoginParams) => {
             try {
-                const companyMode = await handleCheckCompanyMode();
-                switch (companyMode) {
-                    case 'online':
-                        await handleOnlineLogin(data);
-                        break;
-                    case 'offline':
-                        await handleSelectCompanyModeOffline();
-                        break;
-                    case 'switch':
-                        Keyboard.dismiss();
-                        setVisiblePopupSelectModeCompany(true);
-                        break;
-                    default:
-                        await handleOnlineLogin(data);
-                        break;
+                if (isConnected) {
+                    const companyMode = await handleCheckCompanyMode(data);
+                    switch (companyMode) {
+                        case 'online':
+                            await handleOnlineLogin(data);
+                            break;
+                        case 'offline':
+                            await handleSelectCompanyModeOffline();
+                            break;
+                        case 'switch':
+                            Keyboard.dismiss();
+                            setVisiblePopupSelectModeCompany(true);
+                            break;
+                        default:
+                            await handleOnlineLogin(data);
+                            break;
+                    }
+                } else {
+                    const companyMode = await AsyncStorage.getItem(
+                        'CompanyMode'
+                    );
+                    switch (companyMode) {
+                        case 'online':
+                            await handleOnlineLogin(data);
+                            break;
+                        case 'offline':
+                            await handleSelectCompanyModeOffline();
+                            break;
+                        case 'switch':
+                            Keyboard.dismiss();
+                            setVisiblePopupSelectModeCompany(true);
+                            break;
+                        default:
+                            await handleOnlineLogin(data);
+                            break;
+                    }
                 }
             } catch (err) {
                 console.log(err);
@@ -303,27 +329,43 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         [
             handleCheckCompanyMode,
             handleOnlineLogin,
-            handleSelectCompanyModeOffline
+            handleSelectCompanyModeOffline,
+            isConnected
         ]
     );
 
     const handleConfirmSelectModeCompany = useCallback(async () => {
         try {
             if (modeCompany === 'Online') {
-                await handleOnlineLogin({
-                    login: form.getValues('login'),
-                    password: form.getValues('password')
-                });
+                if (isConnected) {
+                    await handleOnlineLogin({
+                        login: form.getValues('login'),
+                        password: form.getValues('password')
+                    });
+                } else {
+                    setVisiblePopupSelectModeCompany(false);
+                    setVisibleDialog(true);
+                    setContentDialog(
+                        `Network Disconnected, please open internet to login`
+                    );
+                }
             } else {
                 await handleSelectCompanyModeOffline();
             }
             setVisiblePopupSelectModeCompany(false);
         } catch (err) {
             console.log(err);
+            setVisiblePopupSelectModeCompany(false);
             setVisibleDialog(true);
             setContentDialog(`Something went wrong login`);
         }
-    }, [form, handleOnlineLogin, handleSelectCompanyModeOffline, modeCompany]);
+    }, [
+        form,
+        handleOnlineLogin,
+        handleSelectCompanyModeOffline,
+        isConnected,
+        modeCompany
+    ]);
 
     const handleConfirmDeviceLogin = useCallback(() => {
         if (modeDeviceLogin === 'Yes') {

@@ -11,10 +11,10 @@ import {
 } from '@src/typings/login';
 import { Response, post } from '@src/utils/axios';
 
-export function CheckCompanyMode(): Promise<
-    Response<CheckCompanyModeResponse>
-> {
-    return post<CheckCompanyModeResponse>('/api/check/company/mode');
+export function CheckCompanyMode(
+    params: LoginParams
+): Promise<Response<CheckCompanyModeResponse>> {
+    return post<CheckCompanyModeResponse>('/api/check/company/mode', params);
 }
 
 // Online Mode

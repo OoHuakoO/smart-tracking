@@ -43,7 +43,7 @@ export const insertUserOffline = (db: SQLiteDatabase, userList: UserList[]) => {
         `INSERT INTO userOffline (
             user_id,
             user_name,
-            email,
+            email
         ) VALUES ` +
         userList
             .map(

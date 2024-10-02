@@ -12,6 +12,7 @@ export interface SettingParams {
 export interface LoginParams {
     login: string;
     password: string;
+    mac_address?: string;
 }
 
 export interface LoginData {

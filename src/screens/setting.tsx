@@ -58,6 +58,7 @@ const SettingScreen: FC<SettingScreenProps> = (props) => {
     const handleInitSetting = useCallback(async () => {
         const settings = await AsyncStorage.getItem('Settings');
         const jsonSettings: SettingParams = JSON.parse(settings);
+        form?.setValue('mac_address', jsonSettings?.mac_address);
         form?.setValue('server', jsonSettings?.server);
         form?.setValue('db', jsonSettings?.db);
     }, [form]);

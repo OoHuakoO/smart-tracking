@@ -364,7 +364,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         const response = await CheckMacAddress({
             mac_address: jsonSettings?.mac_address
         });
-        if (response?.result?.success) {
+        if (
+            response?.result?.success &&
+            response?.result?.data?.device_active
+        ) {
             return true;
         }
         return false;
@@ -773,7 +776,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleCheckUserLogin = useCallback(async () => {
         try {
             const intervalId = setInterval(async () => {
-                if (onlineValue) {
+                if (onlineValue && isConnected) {
                     const settings = await AsyncStorage.getItem('Settings');
                     const jsonSettings: SettingParams = JSON.parse(settings);
                     const response = await CheckUserActive({
@@ -810,7 +813,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTitleDialog(WARNING);
             setTypeDialog('warning');
         }
-    }, [clearStateDialog, onlineValue]);
+    }, [clearStateDialog, isConnected, onlineValue]);
 
     useEffect(() => {
         handleCheckUserLogin();
@@ -820,24 +823,28 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         useCallback(() => {
             const initState = async () => {
                 try {
-                    const db = await getDBConnection();
-                    await createTableAsset(db);
-                    await createTableLocation(db);
-                    await createTableUseStatus(db);
-                    await createTableCategory(db);
-                    await createTableDocumentOffline(db);
-                    await createTableDocumentLine(db);
-                    await createTableReportAssetNotFound(db);
-                    await createTableReportDocumentLine(db);
                     form?.setValue('online', onlineValue);
-                    const countAsset = await getTotalAssets(db);
-                    if (countAsset === 0) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setTitleDialog('Data Not Found');
-                        setContentDialog('Please download the current data');
-                        setTypeDialog('download');
-                        setShowCancelDialog(true);
+                    if (!onlineValue) {
+                        const db = await getDBConnection();
+                        await createTableAsset(db);
+                        await createTableLocation(db);
+                        await createTableUseStatus(db);
+                        await createTableCategory(db);
+                        await createTableDocumentOffline(db);
+                        await createTableDocumentLine(db);
+                        await createTableReportAssetNotFound(db);
+                        await createTableReportDocumentLine(db);
+                        const countAsset = await getTotalAssets(db);
+                        if (countAsset === 0) {
+                            clearStateDialog();
+                            setVisibleDialog(true);
+                            setTitleDialog('Data Not Found');
+                            setContentDialog(
+                                'Please download the current data'
+                            );
+                            setTypeDialog('download');
+                            setShowCancelDialog(true);
+                        }
                     }
                 } catch (err) {
                     console.log(err);
