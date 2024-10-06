@@ -15,5 +15,5 @@ export const CompanyModeState: RecoilState<string> = atom({
 
 export const OnlineState: RecoilState<boolean> = atom({
     key: 'Online',
-    default: false
+    default: undefined
 });

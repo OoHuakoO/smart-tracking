@@ -802,6 +802,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             `You have been logged out because there was a login from another device. If this wasn't you, please check the security of your account immediately.`
                         );
                         setTypeDialog('logout device');
+                        setDisableCloseDialog(true);
                     }
                 }
             }, 10000);
@@ -823,28 +824,23 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         useCallback(() => {
             const initState = async () => {
                 try {
-                    form?.setValue('online', onlineValue);
-                    if (!onlineValue) {
-                        const db = await getDBConnection();
-                        await createTableAsset(db);
-                        await createTableLocation(db);
-                        await createTableUseStatus(db);
-                        await createTableCategory(db);
-                        await createTableDocumentOffline(db);
-                        await createTableDocumentLine(db);
-                        await createTableReportAssetNotFound(db);
-                        await createTableReportDocumentLine(db);
-                        const countAsset = await getTotalAssets(db);
-                        if (countAsset === 0) {
-                            clearStateDialog();
-                            setVisibleDialog(true);
-                            setTitleDialog('Data Not Found');
-                            setContentDialog(
-                                'Please download the current data'
-                            );
-                            setTypeDialog('download');
-                            setShowCancelDialog(true);
-                        }
+                    const db = await getDBConnection();
+                    await createTableAsset(db);
+                    await createTableLocation(db);
+                    await createTableUseStatus(db);
+                    await createTableCategory(db);
+                    await createTableDocumentOffline(db);
+                    await createTableDocumentLine(db);
+                    await createTableReportAssetNotFound(db);
+                    await createTableReportDocumentLine(db);
+                    const countAsset = await getTotalAssets(db);
+                    if (countAsset === 0) {
+                        clearStateDialog();
+                        setVisibleDialog(true);
+                        setTitleDialog('Data Not Found');
+                        setContentDialog('Please download the current data');
+                        setTypeDialog('download');
+                        setShowCancelDialog(true);
                     }
                 } catch (err) {
                     console.log(err);
@@ -852,7 +848,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     setVisibleDialog(true);
                 }
             };
-            initState();
+            form?.setValue('online', onlineValue);
+            const debounceInit = setTimeout(() => {
+                if (onlineValue !== undefined && onlineValue === false) {
+                    initState();
+                }
+            }, 500);
+
+            return () => clearTimeout(debounceInit);
         }, [clearStateDialog, form, onlineValue])
     );
 
