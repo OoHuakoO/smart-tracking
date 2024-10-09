@@ -20,6 +20,8 @@ export interface LoginData {
 }
 export interface LoginResponse {
     data: LoginData;
+    message: string;
+    success: boolean;
 }
 
 export interface CheckUserActiveData {
@@ -76,4 +78,5 @@ export interface CheckCompanyModeData {
 export interface CheckCompanyModeResponse {
     success: boolean;
     data: CheckCompanyModeData;
+    message: string;
 }

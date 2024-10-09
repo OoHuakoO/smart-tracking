@@ -19,6 +19,11 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ToastComponent from '@src/components/core/toast';
 import PopupDeviceLogin from '@src/components/views/popupDeviceLogin';
 import PopupSelectModeCompany from '@src/components/views/popupSelectModeCompany';
+import {
+    ACCESS_DENIED,
+    EMAIL_PASSWORD_INCORRECT,
+    SETTING_INCORRECT
+} from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { getUserOffline } from '@src/db/userOffline';
 import { CheckCompanyMode, CheckUserActive, Login } from '@src/services/login';
@@ -95,8 +100,21 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
         async (data: LoginParams) => {
             try {
                 const response = await CheckCompanyMode(data);
-                if (response?.error || !response?.result?.success) {
-                    throw response.error;
+                if (
+                    response?.result?.message !== ACCESS_DENIED &&
+                    !response?.result?.success
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(SETTING_INCORRECT);
+                    return;
+                }
+                if (
+                    response?.result?.message === ACCESS_DENIED &&
+                    !response?.result?.success
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(EMAIL_PASSWORD_INCORRECT);
+                    return;
                 }
                 const companyMode = response?.result?.data?.mode;
                 await AsyncStorage.setItem('CompanyMode', companyMode);
@@ -120,12 +138,19 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     mac_address: jsonSettings?.mac_address
                 });
                 if (
-                    response?.error ||
-                    data?.login === '' ||
-                    data?.password === ''
+                    response?.result?.message !== ACCESS_DENIED &&
+                    !response?.result?.success
                 ) {
                     setVisibleDialog(true);
-                    setContentDialog('Email Or Password Incorrect');
+                    setContentDialog(SETTING_INCORRECT);
+                    return;
+                }
+                if (
+                    response?.result?.message === ACCESS_DENIED &&
+                    !response?.result?.success
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(EMAIL_PASSWORD_INCORRECT);
                     return;
                 }
                 const loginObj = {
@@ -175,14 +200,22 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 });
 
                 if (
-                    response?.error ||
-                    data?.login === '' ||
-                    data?.password === ''
+                    response?.result?.message !== ACCESS_DENIED &&
+                    !response?.result?.success
                 ) {
                     setVisibleDialog(true);
-                    setContentDialog('Email Or Password Incorrect');
+                    setContentDialog(SETTING_INCORRECT);
                     return;
                 }
+                if (
+                    response?.result?.message === ACCESS_DENIED &&
+                    !response?.result?.success
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(EMAIL_PASSWORD_INCORRECT);
+                    return;
+                }
+
                 const loginObj = {
                     session_id: '',
                     uid: response?.result?.data?.user_id
@@ -323,7 +356,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             } catch (err) {
                 console.log(err);
                 setVisibleDialog(true);
-                setContentDialog(`Something went wrong login`);
+                setContentDialog(SETTING_INCORRECT);
             }
         },
         [
@@ -357,7 +390,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             console.log(err);
             setVisiblePopupSelectModeCompany(false);
             setVisibleDialog(true);
-            setContentDialog(`Something went wrong login`);
+            setContentDialog(SETTING_INCORRECT);
         }
     }, [
         form,

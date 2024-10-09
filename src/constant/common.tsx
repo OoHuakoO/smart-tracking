@@ -58,3 +58,10 @@ export const RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND =
 export const RESPONSE_PUT_DOCUMENT_SUCCESS =
     'Asset tracking record updated successfully';
 export const STATE_ASSET = ['draft', 'running'];
+
+export const ACCESS_DENIED = 'Access Denied';
+
+export const EMAIL_PASSWORD_INCORRECT = 'Email Or Password Incorrect.';
+
+export const SETTING_INCORRECT =
+    'Incorrectly input some values in the settings.';
