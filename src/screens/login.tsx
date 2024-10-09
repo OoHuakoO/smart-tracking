@@ -484,6 +484,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                         />
                     )}
                 />
+
                 <TouchableOpacity onPress={form?.handleSubmit(handleLogin)}>
                     <Button mode="contained">
                         <Text variant="titleMedium" style={styles.textLogin}>
