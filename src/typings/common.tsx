@@ -9,6 +9,7 @@ export interface Params {
     date_order?: string;
     date_check?: string;
     document_data?: any;
+    android_id?: string;
 }
 
 export interface Toast {

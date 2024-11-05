@@ -215,3 +215,15 @@ export const removeDocumentOfflineByID = (db: SQLiteDatabase, id: number) => {
         throw new Error(`Error remove document : ${err.message}`);
     }
 };
+
+export const removeDocumentOffline = (db: SQLiteDatabase) => {
+    const deleteQuery = `DELETE FROM documentOffline`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery);
+        });
+        console.log(`remove document successfully`);
+    } catch (err) {
+        throw new Error(`Error remove document : ${err.message}`);
+    }
+};

@@ -645,7 +645,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 listDocument?.forEach(async (item) => {
                     const responseCreateDocument = await CreateDocument({
                         location_id: item?.location_id,
-                        date_order: parseDateStringTime(item?.date_order)
+                        date_order: parseDateStringTime(item?.date_order),
+                        android_id: item?.id?.toString()
                     });
                     if (responseCreateDocument?.error) {
                         clearStateDialog();

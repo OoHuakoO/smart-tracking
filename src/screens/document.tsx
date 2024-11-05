@@ -12,6 +12,7 @@ import {
     getDocumentOffline,
     getTotalDocument,
     insertDocumentOfflineData,
+    removeDocumentOffline,
     removeDocumentOfflineByID
 } from '@src/db/documentOffline';
 import { getLocationSuggestion, getLocations } from '@src/db/location';
@@ -104,6 +105,14 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         },
         [clearStateDialog]
     );
+
+    const handleOpenDialogConfirmRemoveAllDocument = useCallback(() => {
+        clearStateDialog();
+        setVisibleDialog(true);
+        setTitleDialog('Confirm Remove All');
+        setContentDialog('Do you want to remove all document ?');
+        setShowCancelDialog(true);
+    }, [clearStateDialog]);
 
     const handleFetchLocation = useCallback(async () => {
         try {
@@ -379,6 +388,23 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         ]
     );
 
+    const handleRemoveAllDocument = useCallback(async () => {
+        try {
+            clearStateDialog();
+            const db = await getDBConnection();
+            const listDocumentDB = await getDocumentOffline(db, null);
+            listDocumentDB.map(async (item) => {
+                await removeDocumentLineOfflineByTrackingID(db, item?.id);
+            });
+            await removeDocumentOffline(db);
+            await handleFetchDocument();
+        } catch (err) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setContentDialog('Something went wrong remove document');
+        }
+    }, [clearStateDialog, handleFetchDocument]);
+
     const handleRemoveDocument = useCallback(async () => {
         try {
             clearStateDialog();
@@ -389,7 +415,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         } catch (err) {
             clearStateDialog();
             setVisibleDialog(true);
-            setContentDialog('Something went wrong remove asset');
+            setContentDialog('Something went wrong remove document');
         }
     }, [clearStateDialog, handleFetchDocument, idDocument]);
 
@@ -398,11 +424,19 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             case 'Confirm':
                 await handleRemoveDocument();
                 break;
+            case 'Confirm Remove All':
+                await handleRemoveAllDocument();
+                break;
             default:
                 clearStateDialog();
                 break;
         }
-    }, [clearStateDialog, handleRemoveDocument, titleDialog]);
+    }, [
+        clearStateDialog,
+        handleRemoveAllDocument,
+        handleRemoveDocument,
+        titleDialog
+    ]);
 
     useEffect(() => {
         handleFetchDocument();
@@ -469,6 +503,19 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>
                     Total Document : {countTotalDocument}
                 </Text>
+                {!online && countTotalDocument > 0 && (
+                    <TouchableOpacity
+                        onPress={() =>
+                            handleOpenDialogConfirmRemoveAllDocument()
+                        }
+                        style={styles.buttonDeleteAll}
+                    >
+                        <Text variant="bodyLarge" style={styles.textDeleteAll}>
+                            Delete All
+                        </Text>
+                    </TouchableOpacity>
+                )}
+
                 <FlatList
                     style={styles.flatListStyle}
                     data={listDocument}
@@ -591,7 +638,12 @@ const styles = StyleSheet.create({
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
         fontSize: 15,
-        marginBottom: 20
+        marginBottom: 5
+    },
+    textDeleteAll: {
+        fontFamily: 'DMSans-Bold',
+        fontSize: 14,
+        color: theme.colors.error
     },
     drawer: {
         width: '80%'
@@ -604,6 +656,18 @@ const styles = StyleSheet.create({
     },
     flatListStyle: {
         marginBottom: 30
+    },
+    buttonDeleteAll: {
+        backgroundColor: theme.colors.background,
+        width: 100,
+        borderRadius: 15,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'flex-end',
+        marginRight: 20,
+        borderWidth: 2,
+        borderColor: theme.colors.error
     }
 });
 
