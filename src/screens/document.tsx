@@ -110,7 +110,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         clearStateDialog();
         setVisibleDialog(true);
         setTitleDialog('Confirm Remove All');
-        setContentDialog('Do you want to remove all document ?');
+        setContentDialog(
+            'Please verify if there are any documents that have not yet been uploaded, as this action will delete all documents.'
+        );
         setShowCancelDialog(true);
     }, [clearStateDialog]);
 
