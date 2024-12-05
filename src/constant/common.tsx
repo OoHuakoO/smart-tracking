@@ -63,5 +63,7 @@ export const ACCESS_DENIED = 'Access Denied';
 
 export const EMAIL_PASSWORD_INCORRECT = 'Email Or Password Incorrect.';
 
+export const USER_NOT_FOUND = 'User not found';
+
 export const SETTING_INCORRECT =
     'Incorrectly input some values in the settings.';

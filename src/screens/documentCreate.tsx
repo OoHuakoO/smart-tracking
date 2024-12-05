@@ -32,7 +32,7 @@ import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
     BackHandler,
     Dimensions,
@@ -94,6 +94,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [scanAssetData, setScanAssetData] = useState<AssetData>();
     const [online, setOnline] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
+    const inputRef = useRef(null);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -127,6 +128,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     }, []);
 
     const handleClosePopupScanAsset = useCallback(() => {
+        inputRef.current.focus();
         setVisiblePopupScanAsset(false);
     }, []);
 
@@ -272,6 +274,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 });
                 break;
             case 'Duplicate Asset':
+                inputRef.current.focus();
                 clearStateDialog();
                 break;
             case 'Confirm':
@@ -491,6 +494,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     }
                 }
             });
+
+            setAssetCode('');
+
             if (response?.error) {
                 clearStateDialog();
                 setVisibleDialog(true);
@@ -599,6 +605,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
             const asset = await getAsset(db, filter);
 
+            setAssetCode('');
+
             if (asset.length === 0) {
                 clearStateDialog();
                 setAssetCodeNew(code);
@@ -621,7 +629,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         async (code: string) => {
             try {
                 if (code === '' || code === undefined || code === null) return;
-                setAssetCode('');
+                inputRef.current.focus();
                 setSelectedImage(null);
                 const isOnline = await getOnlineMode();
                 if (isOnline) {
@@ -656,6 +664,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     const handleSaveEditAsset = useCallback(async () => {
         try {
+            inputRef.current.focus();
             const updatedScanAssetData = {
                 ...scanAssetData,
                 use_state: searchUseState,
@@ -785,6 +794,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         onPress={() => {
                             navigation.navigate('DocumentScanAsset', {
                                 onGoBack: (code: string) => {
+                                    setAssetCode(code);
                                     handleSearchAsset(code);
                                 }
                             });
@@ -799,13 +809,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         />
                     </TouchableOpacity>
                     <TextInput
+                        ref={inputRef}
                         style={styles.input}
                         value={assetCode}
+                        autoFocus
                         onChangeText={(text) => setAssetCode(text)}
                         placeholder="Input Code Or Scan"
                         placeholderTextColor={theme.colors.textBody}
                         blurOnSubmit={false}
-                        autoFocus
                         onSubmitEditing={() => {
                             handleSearchAsset(assetCode);
                         }}
@@ -824,9 +835,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
                 <View style={styles.searchButtonWrap}>
                     <SearchButton
-                        handlePress={() =>
-                            navigation.navigate('DocumentAssetSearch')
-                        }
+                        handlePress={() => {
+                            navigation.navigate('DocumentAssetSearch');
+                        }}
                     />
                 </View>
                 <Text variant="bodyLarge" style={styles.textTotalDocument}>

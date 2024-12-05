@@ -22,7 +22,8 @@ import PopupSelectModeCompany from '@src/components/views/popupSelectModeCompany
 import {
     ACCESS_DENIED,
     EMAIL_PASSWORD_INCORRECT,
-    SETTING_INCORRECT
+    SETTING_INCORRECT,
+    USER_NOT_FOUND
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { getUserOffline } from '@src/db/userOffline';
@@ -198,6 +199,15 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     password: data?.password,
                     mac_address: jsonSettings?.mac_address
                 });
+
+                if (
+                    response?.result?.message === USER_NOT_FOUND &&
+                    !response?.result?.success
+                ) {
+                    setVisibleDialog(true);
+                    setContentDialog(EMAIL_PASSWORD_INCORRECT);
+                    return;
+                }
 
                 if (
                     response?.result?.message !== ACCESS_DENIED &&
