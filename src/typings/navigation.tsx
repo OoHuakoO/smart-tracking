@@ -69,4 +69,7 @@ export type PrivateStackParamsList = {
     DocumentScanAsset: {
         onGoBack?: (code: string) => void;
     };
+    BranchSearchScreen: {
+        title: string;
+    };
 };

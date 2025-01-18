@@ -97,7 +97,7 @@ import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
 import KeepAwake from 'react-native-keep-awake';
-import { Portal, Text } from 'react-native-paper';
+import { Button, Portal, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
@@ -793,7 +793,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                            jsonSettings?.mac_address &&
+                        jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -938,6 +938,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
+            <TouchableOpacity onPress={() => navigation.navigate('BranchSearchScreen')}>
+                <Button style={styles.searchBranchButton}>
+                    <Text style={styles.text} variant="bodyLarge">
+                        Select branch
+                    </Text>
+                </Button>
+            </TouchableOpacity>
             <ShortcutMenu
                 navigation={navigation}
                 route={route}
@@ -978,7 +985,19 @@ const styles = StyleSheet.create({
     modeSection: {
         display: 'flex',
         flexDirection: 'row'
-    }
+    },
+    text: {
+        fontFamily: 'DMSans-Bold',
+        color: theme.colors.black
+    },
+    searchBranchButton: {
+        marginTop: 20,
+        paddingVertical: 0,
+        paddingHorizontal: 0,
+        width: 150,
+        backgroundColor: theme.colors.warning,
+        borderRadius: 10
+    },
 });
 
 export default HomeScreen;

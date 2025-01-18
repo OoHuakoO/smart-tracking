@@ -57,14 +57,14 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerMenu: {
-        width: wp('20%'),
-        height: hp('13%'),
+        width: wp('21%'),
+        height: hp('12%'),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
     },
     gradientBox: {
-        borderRadius: wp('5%')
+        borderRadius: wp('6%')
     },
     iconStyle: {
         color: theme.colors.white
