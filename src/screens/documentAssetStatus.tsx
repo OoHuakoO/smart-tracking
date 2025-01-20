@@ -387,6 +387,9 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {totalAssetDocument}
+                    </Text>
                     <View
                         style={[
                             styles.statusIndicator,

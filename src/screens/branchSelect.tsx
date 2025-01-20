@@ -24,15 +24,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type BranchSearchScreenProps = NativeStackScreenProps<
   PrivateStackParamsList,
-  'BranchSearchScreen'
+  'BranchSelectScreen'
 >;
 
-const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
+const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
   const { navigation } = props;
   const { top } = useSafeAreaInsets();
   const [listBranch, setListBranch] = useState<LocationSearchData[]>([]);
-  const [searchBranch, setSearchBranch] = useState<string>('');
-  const [searchState, setSearchState] = useState<string>('');
+  const [selectBranch, setSelectBranch] = useState<string>('');
+  const [selectState, setSelectState] = useState<string>('');
   const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
   const [contentDialog, setContentDialog] = useState<string>('');
   const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
     setVisibleDialog(false);
   }, []);
 
-  const handleOnChangeSearchBranch = useCallback(async (text: string) => {
+  const handleOnChangeSelectBranch = useCallback(async (text: string) => {
     try {
       if (text !== '') {
         const isOnline = await getOnlineMode();
@@ -108,11 +108,6 @@ const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
     return true;
   };
 
-  const handleClearInput = useCallback(() => {
-    setSearchBranch('');
-    setSearchState('');
-  }, []);
-
   useEffect(() => {
     handleInitFetch();
   }, [handleInitFetch]);
@@ -152,7 +147,7 @@ const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
       </TouchableOpacity>
 
       <Text variant="displaySmall" style={styles.textSearchAsset}>
-        Search Branch
+        Select Branch
       </Text>
 
       <Text variant="bodyLarge">Branch</Text>
@@ -172,33 +167,25 @@ const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
         valueField="location_name"
         placeholder={'Select Branch'}
         searchPlaceholder="Search"
-        value={searchBranch}
+        value={selectBranch}
         onFocus={() => setIsFocusBranch(true)}
         onBlur={() => setIsFocusBranch(false)}
         onChange={(item) => {
-          setSearchBranch(item?.location_name);
+          setSelectBranch(item?.location_name);
         }}
-        onChangeText={(text) => handleOnChangeSearchBranch(text)}
+        onChangeText={(text) => handleOnChangeSelectBranch(text)}
         searchQuery={handleSearchQuery}
         renderItem={renderItemBranch}
       />
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.buttonClear}
-          onPress={() => handleClearInput()}
-        >
-          <Text variant="bodyLarge" style={styles.buttonText}>
-            Clear
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={styles.buttonApply}
           onPress={() =>
             navigation.navigate('Document', {
               documentSearch: {
-                'location_id.name': searchBranch,
-                state: searchState
+                'location_id.name': selectBranch,
+                state: selectState
               }
             })
           }
@@ -297,4 +284,4 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans-Regular'
   }
 });
-export default BranchSearchScreen;
+export default BranchSelectScreen;

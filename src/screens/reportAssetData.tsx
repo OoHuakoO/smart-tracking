@@ -232,6 +232,9 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         จำนวนทรัพย์สินในแต่ละสถานที่
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch :
+                    </Text>
                 </View>
             </LinearGradient>
 

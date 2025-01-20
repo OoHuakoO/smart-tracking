@@ -555,7 +555,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 if (listDocumentDB.length > 0) {
                     if (
                         listDocumentDB[0].state ===
-                            STATE_DOCUMENT_NAME.Cancel ||
+                        STATE_DOCUMENT_NAME.Cancel ||
                         listDocumentDB[0].state === STATE_DOCUMENT_NAME.Done
                     ) {
                         isDuplicateAssetInListDocumentLineDB = false;
@@ -784,6 +784,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
+                    </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {documentValue.name || '-'}
                     </Text>
                 </View>
             </LinearGradient>

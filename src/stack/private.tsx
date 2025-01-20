@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AssetDetail from '@src/screens/assetDetail';
 import AssetSearch from '@src/screens/assetSearch';
 import AssetScreen from '@src/screens/assets';
-import BranchSearchScreen from '@src/screens/branchSearch';
+import BranchSearchScreen from '@src/screens/branchSelect';
 import Document from '@src/screens/document';
 import DocumentAssetDetail from '@src/screens/documentAssetDetail';
 import DocumentAssetSearch from '@src/screens/documentAssetSearch';
@@ -174,7 +174,7 @@ const PrivateStack = () => {
                 component={DocumentScanAsset}
             />
             <Stack.Screen
-                name="BranchSearchScreen"
+                name="BranchSelectScreen"
                 options={{
                     headerShown: false
                 }}

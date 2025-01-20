@@ -177,6 +177,9 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         สามารถดูสถานที่ทั้งหมดในบริษัทของคุณ
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {countTotalLocation}
+                    </Text>
                 </View>
             </LinearGradient>
 

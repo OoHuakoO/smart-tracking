@@ -249,6 +249,9 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {countTotalAsset}
+                    </Text>
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>

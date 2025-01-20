@@ -491,6 +491,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         เอกสารการตรวจนับทั้งหมด
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {countTotalDocument}
+                    </Text>
                 </View>
             </LinearGradient>
 

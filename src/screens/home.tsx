@@ -938,7 +938,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
-            <TouchableOpacity onPress={() => navigation.navigate('BranchSearchScreen')}>
+            <TouchableOpacity onPress={() => navigation.navigate('BranchSelectScreen')}>
                 <Button style={styles.searchBranchButton}>
                     <Text style={styles.text} variant="bodyLarge">
                         Select branch

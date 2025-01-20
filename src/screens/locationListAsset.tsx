@@ -231,6 +231,9 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {route?.params?.LocationData?.location_name}
+                    </Text>
                 </View>
             </LinearGradient>
 

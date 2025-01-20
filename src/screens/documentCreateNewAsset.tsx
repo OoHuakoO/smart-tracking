@@ -225,13 +225,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             state: MOVEMENT_ASSET_EN.New,
                             ...(selectedImage
                                 ? {
-                                      image: selectedImage,
-                                      new_img: true
-                                  }
+                                    image: selectedImage,
+                                    new_img: true
+                                }
                                 : {
-                                      image: false,
-                                      new_img: false
-                                  }),
+                                    image: false,
+                                    new_img: false
+                                }),
                             location: documentValue?.location,
                             category: searchCategory?.category_name
                         });
@@ -272,13 +272,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         state: MOVEMENT_ASSET_EN.New,
                         ...(selectedImage
                             ? {
-                                  image: selectedImage,
-                                  new_img: true
-                              }
+                                image: selectedImage,
+                                new_img: true
+                            }
                             : {
-                                  image: false,
-                                  new_img: false
-                              }),
+                                image: false,
+                                new_img: false
+                            }),
                         location: documentValue?.location,
                         category: searchCategory?.category_name
                     });
@@ -395,6 +395,9 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
+                    </Text>
+                    <Text variant="bodyLarge" style={styles.textDescription}>
+                        Branch : {documentValue.name || '-'}
                     </Text>
                 </View>
             </LinearGradient>
