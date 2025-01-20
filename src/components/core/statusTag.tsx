@@ -21,11 +21,10 @@ const StatusTag = ({ status }) => {
 
 const styles = StyleSheet.create({
     tag: {
-        paddingHorizontal: isTablet ? 10 : 4,
-        paddingVertical: isTablet ? 10 : 4,
+        paddingHorizontal: isTablet ? 20 : 15,
+        paddingVertical: isTablet ? 10 : 5,
         borderRadius: 5,
-        marginLeft: 10,
-        marginRight: 10,
+        marginLeft: 0,
         justifyContent: 'center'
     },
     tagText: {

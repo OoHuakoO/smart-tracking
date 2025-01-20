@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '90%',
         flexWrap: 'wrap',
-        marginLeft: 40
+        marginLeft: 25
     }
 });
 

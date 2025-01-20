@@ -1,0 +1,300 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import ActionButton from '@src/components/core/actionButton';
+import AlertDialog from '@src/components/core/alertDialog';
+import { getDBConnection } from '@src/db/config';
+import { getLocationSuggestion, getLocations } from '@src/db/location';
+import { GetLocation } from '@src/services/downloadDB';
+import { GetLocationSearch } from '@src/services/location';
+import { theme } from '@src/theme';
+import { LocationSearchData } from '@src/typings/location';
+import { PrivateStackParamsList } from '@src/typings/navigation';
+import { getOnlineMode } from '@src/utils/common';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import {
+  BackHandler,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native';
+
+import { Dropdown } from 'react-native-element-dropdown';
+import { Text } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+type BranchSearchScreenProps = NativeStackScreenProps<
+  PrivateStackParamsList,
+  'BranchSearchScreen'
+>;
+
+const BranchSearchScreen: FC<BranchSearchScreenProps> = (props) => {
+  const { navigation } = props;
+  const { top } = useSafeAreaInsets();
+  const [listBranch, setListBranch] = useState<LocationSearchData[]>([]);
+  const [searchBranch, setSearchBranch] = useState<string>('');
+  const [searchState, setSearchState] = useState<string>('');
+  const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
+  const [contentDialog, setContentDialog] = useState<string>('');
+  const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+
+  const handleCloseDialog = useCallback(() => {
+    setVisibleDialog(false);
+  }, []);
+
+  const handleOnChangeSearchBranch = useCallback(async (text: string) => {
+    try {
+      if (text !== '') {
+        const isOnline = await getOnlineMode();
+        if (isOnline) {
+          const response = await GetLocationSearch({
+            page: 1,
+            limit: 10,
+            search_term: {
+              or: { name: text, default_code: text }
+            }
+          });
+          setListBranch(response?.result?.data?.assets);
+        } else {
+          const db = await getDBConnection();
+          const filter = {
+            name: text,
+            code: text
+          };
+          const listLocationDB = await getLocationSuggestion(
+            db,
+            filter
+          );
+          setListBranch(listLocationDB);
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      setVisibleDialog(true);
+      setContentDialog('Something went wrong search location');
+    }
+  }, []);
+
+  const renderItemBranch = (item: LocationSearchData) => {
+    return (
+      <View style={styles.dropdownItem}>
+        <Text style={styles.dropdownItemText} variant="bodyLarge">
+          [{item?.location_code}] {item?.location_name}
+        </Text>
+      </View>
+    );
+  };
+
+  const handleInitFetch = useCallback(async () => {
+    try {
+      const isOnline = await getOnlineMode();
+      if (isOnline) {
+        const responseLocation = await GetLocation({
+          page: 1,
+          limit: 10
+        });
+        setListBranch(responseLocation?.result?.data?.assets);
+      } else {
+        const db = await getDBConnection();
+        const listLocationDB = await getLocations(db);
+        setListBranch(listLocationDB);
+      }
+    } catch (err) {
+      console.log(err);
+      setVisibleDialog(true);
+    }
+  }, []);
+
+  const handleSearchQuery = (): boolean => {
+    return true;
+  };
+
+  const handleClearInput = useCallback(() => {
+    setSearchBranch('');
+    setSearchState('');
+  }, []);
+
+  useEffect(() => {
+    handleInitFetch();
+  }, [handleInitFetch]);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      navigation.goBack();
+      return true;
+    };
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, [navigation]);
+
+  return (
+    <SafeAreaView style={[styles.container, { marginTop: top }]}>
+      <AlertDialog
+        textContent={contentDialog}
+        visible={visibleDialog}
+        handleClose={handleCloseDialog}
+        handleConfirm={handleCloseDialog}
+      />
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={() => navigation.goBack()}
+        style={styles.closeButton}
+      >
+        <ActionButton
+          icon={'close'}
+          size="small"
+          backgroundColor={theme.colors.white}
+        />
+      </TouchableOpacity>
+
+      <Text variant="displaySmall" style={styles.textSearchAsset}>
+        Search Branch
+      </Text>
+
+      <Text variant="bodyLarge">Branch</Text>
+
+      <Dropdown
+        style={[
+          styles.dropdown,
+          isFocusBranch && styles.dropdownSelect
+        ]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        data={listBranch}
+        search
+        maxHeight={300}
+        labelField="location_name"
+        valueField="location_name"
+        placeholder={'Select Branch'}
+        searchPlaceholder="Search"
+        value={searchBranch}
+        onFocus={() => setIsFocusBranch(true)}
+        onBlur={() => setIsFocusBranch(false)}
+        onChange={(item) => {
+          setSearchBranch(item?.location_name);
+        }}
+        onChangeText={(text) => handleOnChangeSearchBranch(text)}
+        searchQuery={handleSearchQuery}
+        renderItem={renderItemBranch}
+      />
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.buttonClear}
+          onPress={() => handleClearInput()}
+        >
+          <Text variant="bodyLarge" style={styles.buttonText}>
+            Clear
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttonApply}
+          onPress={() =>
+            navigation.navigate('Document', {
+              documentSearch: {
+                'location_id.name': searchBranch,
+                state: searchState
+              }
+            })
+          }
+        >
+          <Text variant="bodyLarge" style={styles.buttonText}>
+            Apply
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginHorizontal: 20
+  },
+  containerInput: {
+    marginHorizontal: 25
+  },
+  textSearchAsset: {
+    fontFamily: 'DMSans-Bold',
+    marginBottom: 15
+  },
+  closeButton: {
+    marginVertical: 20,
+    alignSelf: 'flex-end',
+    marginRight: 15
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20
+  },
+  buttonApply: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+    backgroundColor: theme.colors.buttonConfirm
+  },
+  buttonClear: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+    backgroundColor: theme.colors.buttonCancel
+  },
+  buttonText: {
+    color: theme.colors.white,
+    fontFamily: 'DMSans-Bold'
+  },
+  dropdown: {
+    height: 50,
+    borderColor: theme.colors.borderAutocomplete,
+    borderWidth: 1,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    color: theme.colors.textBody,
+    marginVertical: 8
+  },
+  dropdownSelect: {
+    borderColor: theme.colors.buttonConfirm
+  },
+  dropdownItem: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  dropdownItemText: {
+    flex: 1,
+    fontSize: 16,
+    color: theme.colors.blackGray,
+    fontFamily: 'DMSans-Regular'
+  },
+  placeholderStyle: {
+    fontFamily: 'DMSans-Regular',
+    fontSize: 16,
+    color: theme.colors.textBody
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+    color: theme.colors.blackGray,
+    fontFamily: 'DMSans-Regular'
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+    color: theme.colors.blackGray,
+    fontFamily: 'DMSans-Regular'
+  }
+});
+export default BranchSearchScreen;
