@@ -6,8 +6,16 @@ export interface GetBranchData {
     total_location: number;
 }
 
+export interface GetBranchSelectData {
+    total_page: number;
+    current_page: number;
+    assets: GetBranchData[];
+    total: number;
+    uid: number;
+}
+
 export interface GetBranchResponse {
     success: boolean;
     message: string;
-    data: GetBranchData;
+    data: GetBranchData[];
 }

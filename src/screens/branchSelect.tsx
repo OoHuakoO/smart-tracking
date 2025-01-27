@@ -1,12 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
-import { getDBConnection } from '@src/db/config';
-import { getLocationSuggestion, getLocations } from '@src/db/location';
-import { GetLocation } from '@src/services/downloadDB';
-import { GetLocationSearch } from '@src/services/location';
+import { GetBranches, GetBranchSearch } from '@src/services/branch';
 import { theme } from '@src/theme';
-import { LocationSearchData } from '@src/typings/location';
+import { GetBranchData } from '@src/typings/branch';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
@@ -30,9 +27,8 @@ type BranchSearchScreenProps = NativeStackScreenProps<
 const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
   const { navigation } = props;
   const { top } = useSafeAreaInsets();
-  const [listBranch, setListBranch] = useState<LocationSearchData[]>([]);
+  const [listBranch, setListBranch] = useState<GetBranchData[]>([]);
   const [selectBranch, setSelectBranch] = useState<string>('');
-  const [selectState, setSelectState] = useState<string>('');
   const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
   const [contentDialog, setContentDialog] = useState<string>('');
   const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
@@ -43,29 +39,29 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
 
   const handleOnChangeSelectBranch = useCallback(async (text: string) => {
     try {
-      if (text !== '') {
-        const isOnline = await getOnlineMode();
-        if (isOnline) {
-          const response = await GetLocationSearch({
-            page: 1,
-            limit: 10,
-            search_term: {
-              or: { name: text, default_code: text }
-            }
-          });
-          setListBranch(response?.result?.data?.assets);
-        } else {
-          const db = await getDBConnection();
-          const filter = {
-            name: text,
-            code: text
-          };
-          const listLocationDB = await getLocationSuggestion(
-            db,
-            filter
-          );
-          setListBranch(listLocationDB);
-        }
+      // if (text !== '') {
+      const isOnline = await getOnlineMode();
+      if (isOnline) {
+        const response = await GetBranchSearch({
+          page: 1,
+          limit: 10,
+          search_term: {
+            or: { name: text }
+          }
+        });
+        setListBranch(response?.result?.data);
+        // } else {
+        //   const db = await getDBConnection();
+        //   const filter = {
+        //     name: text,
+        //     code: text
+        //   };
+        //   const listLocationDB = await getLocationSuggestion(
+        //     db,
+        //     filter
+        //   );
+        //   setListBranch(listLocationDB);
+        // }
       }
     } catch (err) {
       console.log(err);
@@ -74,11 +70,11 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
     }
   }, []);
 
-  const renderItemBranch = (item: LocationSearchData) => {
+  const renderItemBranch = (item: GetBranchData) => {
     return (
       <View style={styles.dropdownItem}>
         <Text style={styles.dropdownItemText} variant="bodyLarge">
-          [{item?.location_code}] {item?.location_name}
+          [{item?.branch_code}] {item?.branch_name}
         </Text>
       </View>
     );
@@ -87,17 +83,17 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
   const handleInitFetch = useCallback(async () => {
     try {
       const isOnline = await getOnlineMode();
-      if (isOnline) {
-        const responseLocation = await GetLocation({
-          page: 1,
-          limit: 10
-        });
-        setListBranch(responseLocation?.result?.data?.assets);
-      } else {
-        const db = await getDBConnection();
-        const listLocationDB = await getLocations(db);
-        setListBranch(listLocationDB);
-      }
+      // if (isOnline) {
+      const responseBranch = await GetBranches({
+        page: 1,
+        limit: 10
+      });
+      setListBranch(responseBranch?.result?.data);
+      // } else {
+      //   const db = await getDBConnection();
+      //   const listLocationDB = await getLocations(db);
+      //   setListBranch(listLocationDB);
+      // }
     } catch (err) {
       console.log(err);
       setVisibleDialog(true);
@@ -163,15 +159,15 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
         data={listBranch}
         search
         maxHeight={300}
-        labelField="location_name"
-        valueField="location_name"
+        labelField="branch_name"
+        valueField="branch_name"
         placeholder={'Select Branch'}
         searchPlaceholder="Search"
         value={selectBranch}
         onFocus={() => setIsFocusBranch(true)}
         onBlur={() => setIsFocusBranch(false)}
         onChange={(item) => {
-          setSelectBranch(item?.location_name);
+          setSelectBranch(item?.branch_name);
         }}
         onChangeText={(text) => handleOnChangeSelectBranch(text)}
         searchQuery={handleSearchQuery}
@@ -181,21 +177,19 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.buttonApply}
-          onPress={() =>
-            navigation.navigate('Document', {
-              documentSearch: {
-                'location_id.name': selectBranch,
-                state: selectState
-              }
-            })
-          }
+          // onPress={() =>
+          //   navigation.navigate('BranchSelect', {
+          //     GetBranchData: selectBranch,
+          //   })
+          // }
+          onPress={() => navigation.navigate('Home')}
         >
           <Text variant="bodyLarge" style={styles.buttonText}>
             Apply
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 };
 
