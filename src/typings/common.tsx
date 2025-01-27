@@ -10,6 +10,8 @@ export interface Params {
     date_check?: string;
     document_data?: any;
     android_id?: string;
+    branch_id?: string;
+    user_id?: string;
 }
 
 export interface Toast {
