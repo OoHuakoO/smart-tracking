@@ -1,5 +1,4 @@
 import { AssetDataForPassParamsDocumentCreate, SearchAsset } from './asset';
-import { GetBranchData } from './branch';
 import { DocumentAssetData, SearchDocument } from './document';
 import { AssetData, LocationData } from './downloadDB';
 import { LocationReportData } from './report';
@@ -70,8 +69,8 @@ export type PrivateStackParamsList = {
     DocumentScanAsset: {
         onGoBack?: (code: string) => void;
     };
-    BranchSelectScreen: undefined
-    BranchSelect: {
-        GetBranchData: GetBranchData;
+    BranchSelectScreen: {
+        branchSelect: string;
+        onGoBack?: (code: string) => void;
     }
 };

@@ -46,7 +46,7 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
           page: 1,
           limit: 10,
           search_term: {
-            or: { name: text }
+            name: text
           }
         });
         setListBranch(response?.result?.data);
@@ -177,12 +177,15 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.buttonApply}
-          // onPress={() =>
-          //   navigation.navigate('BranchSelect', {
-          //     GetBranchData: selectBranch,
-          //   })
-          // }
-          onPress={() => navigation.navigate('Home')}
+          onPress={() =>
+            navigation.navigate('BranchSelectScreen', {
+              branchSelect: selectBranch,
+              onGoBack: (code: string) => {
+                setSelectBranch(code);
+                navigation.goBack();
+              }
+            })
+          }
         >
           <Text variant="bodyLarge" style={styles.buttonText}>
             Apply
