@@ -82,7 +82,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 }
                 if (
                     response?.result?.data?.mac_address !==
-                        jsonSettings?.mac_address &&
+                    jsonSettings?.mac_address &&
                     response?.result?.data?.is_login
                 ) {
                     Keyboard.dismiss();
