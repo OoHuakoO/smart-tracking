@@ -793,7 +793,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                        jsonSettings?.mac_address &&
+                            jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -938,7 +938,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
-            <TouchableOpacity onPress={() => navigation.navigate('BranchSelectScreen')}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('BranchSelectScreen')}
+            >
                 <Button style={styles.searchBranchButton}>
                     <Text style={styles.text} variant="bodyLarge">
                         Select branch
@@ -997,7 +999,7 @@ const styles = StyleSheet.create({
         width: 150,
         backgroundColor: theme.colors.warning,
         borderRadius: 10
-    },
+    }
 });
 
 export default HomeScreen;

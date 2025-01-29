@@ -1,4 +1,7 @@
-import { GetBranchResponse } from '@src/typings/branch';
+import {
+    GetBranchResponse,
+    GetBranchSearchResponse
+} from '@src/typings/branch';
 import { Params } from '@src/typings/common';
 import { Response, post } from '@src/utils/axios';
 
@@ -10,6 +13,6 @@ export function GetBranches(
 
 export function GetBranchSearch(
     params: Params
-): Promise<Response<GetBranchResponse>> {
-    return post<GetBranchResponse>('/api/branch/search', params);
+): Promise<Response<GetBranchSearchResponse>> {
+    return post<GetBranchSearchResponse>('/api/branch/search', params);
 }

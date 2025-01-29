@@ -9,6 +9,14 @@ export interface GetBranchData {
 export interface GetBranchSelectData {
     total_page: number;
     current_page: number;
+    asset: GetBranchData[];
+    total: number;
+    uid: number;
+}
+
+export interface GetBranchSearchSelectData {
+    total_page: number;
+    current_page: number;
     assets: GetBranchData[];
     total: number;
     uid: number;
@@ -17,5 +25,11 @@ export interface GetBranchSelectData {
 export interface GetBranchResponse {
     success: boolean;
     message: string;
-    data: GetBranchData[];
+    data: GetBranchSelectData;
+}
+
+export interface GetBranchSearchResponse {
+    success: boolean;
+    message: string;
+    data: GetBranchSearchSelectData;
 }
