@@ -6,6 +6,7 @@ import { getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { getLocations, getTotalLocations } from '@src/db/location';
 import { GetLocation } from '@src/services/downloadDB';
+import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 import { LocationData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -27,6 +28,7 @@ import {
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRecoilValue } from 'recoil';
 
 type LocationScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -46,6 +48,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+    const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -178,7 +181,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                         สามารถดูสถานที่ทั้งหมดในบริษัทของคุณ
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {countTotalLocation}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

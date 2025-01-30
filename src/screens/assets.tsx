@@ -7,6 +7,7 @@ import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { GetAssetSearch } from '@src/services/asset';
 import { GetAssets } from '@src/services/downloadDB';
+import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 import { SearchAsset } from '@src/typings/asset';
 import { AssetData } from '@src/typings/downloadDB';
@@ -31,6 +32,7 @@ import {
     SafeAreaView,
     useSafeAreaInsets
 } from 'react-native-safe-area-context';
+import { useRecoilValue } from 'recoil';
 
 type AssetsScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -50,6 +52,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+    const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -250,7 +253,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {countTotalAsset}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

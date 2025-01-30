@@ -6,6 +6,7 @@ import LocationListAssetCard from '@src/components/views/locationListAssetCard';
 import { getAsset, getTotalAssets } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
 import { GetAssetSearch } from '@src/services/asset';
+import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 import { SearchAsset } from '@src/typings/asset';
 import { AssetData } from '@src/typings/downloadDB';
@@ -28,6 +29,7 @@ import {
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRecoilValue } from 'recoil';
 type LocationListAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'LocationListAsset'
@@ -46,6 +48,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
+    const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -232,7 +235,7 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {route?.params?.LocationData?.location_name}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

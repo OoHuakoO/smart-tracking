@@ -24,7 +24,7 @@ import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetSearch } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
-import { documentState, loginState } from '@src/store';
+import { BranchState, documentState, loginState } from '@src/store';
 import { theme } from '@src/theme';
 import { AssetDataForPassParamsDocumentCreate } from '@src/typings/asset';
 import { DocumentState, LoginState } from '@src/typings/common';
@@ -95,6 +95,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [online, setOnline] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const inputRef = useRef(null);
+    const branchValue = useRecoilValue(BranchState);
 
     const clearStateDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -786,7 +787,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         Location : {documentValue?.location || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {documentValue.name || '-'}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>
