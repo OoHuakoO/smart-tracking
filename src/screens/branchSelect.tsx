@@ -1,7 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import { GetBranches, GetBranchSearch } from '@src/services/branch';
+import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 import { GetBranchData } from '@src/typings/branch';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -18,6 +20,7 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSetRecoilState } from 'recoil';
 
 type BranchSearchScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -32,6 +35,7 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
     const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const setBranchState = useSetRecoilState(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -93,9 +97,13 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
         }
     }, []);
 
-    const handleSelectBranch = useCallback(() => {
+    const handleSelectBranch = useCallback(async () => {
+        setBranchState(() => {
+            return selectBranch;
+        });
+        await AsyncStorage.setItem('Branch', selectBranch);
         navigation.navigate('Home');
-    }, [navigation]);
+    }, [selectBranch, navigation]);
 
     const handleSearchQuery = (): boolean => {
         return true;

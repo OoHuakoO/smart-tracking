@@ -13,7 +13,7 @@ import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
-import { documentState, loginState, useRecoilValue } from '@src/store';
+import { BranchState, documentState, loginState, useRecoilValue } from '@src/store';
 import { theme } from '@src/theme';
 import { DocumentState, LoginState } from '@src/typings/common';
 import {
@@ -76,6 +76,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const [online, setOnline] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const documentValue = useRecoilValue<DocumentState>(documentState);
+    const branchValue = useRecoilValue(BranchState);
     const form = useForm<AssetData>({});
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
@@ -397,7 +398,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         Location : {documentValue?.location || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {documentValue.name || '-'}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

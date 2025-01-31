@@ -19,7 +19,7 @@ import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
-import { documentState, loginState } from '@src/store';
+import { BranchState, documentState, loginState } from '@src/store';
 import { theme } from '@src/theme';
 import { DocumentState, LoginState } from '@src/typings/common';
 import { DocumentData, SearchDocument } from '@src/typings/document';
@@ -78,6 +78,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
     const [idDocument, setIdDocument] = useState<number>(0);
+    const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -492,7 +493,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         เอกสารการตรวจนับทั้งหมด
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {countTotalDocument}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

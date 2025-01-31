@@ -16,6 +16,7 @@ import {
 } from '@src/db/reportDocumentLine';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetDocumentLineSearch } from '@src/services/document';
+import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -41,6 +42,7 @@ import {
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRecoilValue } from 'recoil';
 
 type LocationListReportAssetProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -64,6 +66,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
     const [totalListReportAsset, setTotalListReportAsset] = useState<number>(0);
     const [page, setPage] = useState<number>(1);
+    const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -428,7 +431,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {totalListReportAsset}
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>

@@ -75,6 +75,7 @@ import {
     LogoutDevice
 } from '@src/services/login';
 import {
+    BranchState,
     loginState,
     OnlineState,
     useRecoilValue,
@@ -121,6 +122,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const loginValue = useRecoilValue<LoginState>(loginState);
     const onlineValue = useRecoilValue<boolean>(OnlineState);
     const setToast = useSetRecoilState<Toast>(toastState);
+    const branchValue = useRecoilValue(BranchState);
+
     const { isConnected } = useNetInfo();
 
     const clearStateDialog = useCallback(() => {
@@ -793,7 +796,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                            jsonSettings?.mac_address &&
+                        jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -938,15 +941,22 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 </Text>
             </View>
             <ImageSlider />
-            <TouchableOpacity
-                onPress={() => navigation.navigate('BranchSelectScreen')}
-            >
-                <Button style={styles.searchBranchButton}>
-                    <Text style={styles.text} variant="bodyLarge">
-                        Select branch
+            <View style={styles.modeBranchWrap}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('BranchSelectScreen')}
+                >
+                    <Button style={styles.searchBranchButton}>
+                        <Text style={styles.text} variant="bodyLarge">
+                            Select branch
+                        </Text>
+                    </Button>
+                </TouchableOpacity>
+                {branchValue.length > 0 && (
+                    <Text variant="bodyLarge" style={styles.textBranch}>
+                        Branch : {branchValue}
                     </Text>
-                </Button>
-            </TouchableOpacity>
+                )}
+            </View>
             <ShortcutMenu
                 navigation={navigation}
                 route={route}
@@ -982,7 +992,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10
+        marginBottom: 10,
     },
     modeSection: {
         display: 'flex',
@@ -994,12 +1004,21 @@ const styles = StyleSheet.create({
     },
     searchBranchButton: {
         marginTop: 20,
-        paddingVertical: 0,
-        paddingHorizontal: 0,
+        marginRight: 10,
         width: 150,
         backgroundColor: theme.colors.warning,
-        borderRadius: 10
-    }
+        borderRadius: 10,
+    },
+    modeBranchWrap: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center', // Aligns items vertically in the row
+    },
+    textBranch: {
+        fontFamily: 'DMSans-Bold',
+        textAlign: 'center',
+        marginTop: 20,
+    },
 });
 
 export default HomeScreen;

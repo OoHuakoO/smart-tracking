@@ -17,3 +17,9 @@ export const OnlineState: RecoilState<boolean> = atom({
     key: 'Online',
     default: undefined
 });
+
+export const BranchState: RecoilState<string> = atom({
+    key: 'Branch',
+    default: ''
+});
+

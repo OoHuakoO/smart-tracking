@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import BackButton from '@src/components/core/backButton';
 import ReportAssetStatusButton from '@src/components/views/reportAssetStatusButton';
 import { REPORT_TYPE } from '@src/constant';
+import { BranchState } from '@src/store';
 
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -21,6 +22,7 @@ import {
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRecoilValue } from 'recoil';
 type ReportScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'Report'
@@ -32,6 +34,8 @@ const isTablet = width >= 768 && height >= 768;
 const ReportScreen: FC<ReportScreenProps> = (props) => {
     const { navigation } = props;
     const { top } = useSafeAreaInsets();
+    const branchValue = useRecoilValue(BranchState);
+
     useEffect(() => {
         const onBackPress = () => {
             navigation.navigate('Home');
@@ -67,7 +71,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                         สามารถดูจำนวนและรายการทรัพย์สินของแต่ละสถานะ Asset
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch :
+                        Branch : {branchValue}
                     </Text>
                 </View>
             </LinearGradient>
