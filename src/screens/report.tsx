@@ -71,7 +71,7 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                         สามารถดูจำนวนและรายการทรัพย์สินของแต่ละสถานะ Asset
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {branchValue}
+                        Branch : {branchValue?.branchName}
                     </Text>
                 </View>
             </LinearGradient>

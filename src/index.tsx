@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PrivateStack from '@src/stack/private';
 import PublicStack from '@src/stack/public';
 import {
+    BranchState,
     loginState,
     OnlineState,
     useRecoilState,
@@ -21,7 +22,7 @@ import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
 import { createTableReportDocumentLine } from './db/reportDocumentLine';
 import { createTableUserOffline } from './db/userOffline';
 import { createTableUseStatus } from './db/useStatus';
-import { LoginState } from './typings/common';
+import { BranchStateProps, LoginState } from './typings/common';
 import { RootStackParamsList } from './typings/navigation';
 import { getOnlineMode } from './utils/common';
 
@@ -29,7 +30,19 @@ const Stack = createNativeStackNavigator<RootStackParamsList>();
 
 export default function App() {
     const [login, setLogin] = useRecoilState<LoginState>(loginState);
+    const setBranch = useSetRecoilState<BranchStateProps>(BranchState);
     const setOnlineMode = useSetRecoilState<boolean>(OnlineState);
+
+    const getBranch = useCallback(async () => {
+        try {
+            const branchValue = await AsyncStorage.getItem('Branch');
+            if (branchValue !== null && branchValue !== '') {
+                setBranch(JSON.parse(branchValue));
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }, [setBranch]);
 
     const getUserLogin = useCallback(async () => {
         try {
@@ -73,6 +86,10 @@ export default function App() {
             SplashScreen.hide();
         }, 500);
     }, []);
+
+    useEffect(() => {
+        getBranch();
+    }, [getBranch, loadDataDB]);
 
     useEffect(() => {
         getUserLogin();

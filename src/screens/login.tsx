@@ -82,7 +82,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 }
                 if (
                     response?.result?.data?.mac_address !==
-                    jsonSettings?.mac_address &&
+                        jsonSettings?.mac_address &&
                     response?.result?.data?.is_login
                 ) {
                     Keyboard.dismiss();
@@ -246,6 +246,7 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     setToast({ open: true, text: 'Login Successfully' });
                 }, 0);
             } catch (err) {
+                console.log('err', err);
                 throw err;
             }
         },
@@ -364,7 +365,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                     }
                 }
             } catch (err) {
-                console.log(err);
                 setVisibleDialog(true);
                 setContentDialog(SETTING_INCORRECT);
             }

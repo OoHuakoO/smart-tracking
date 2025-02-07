@@ -13,7 +13,12 @@ import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
 import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
-import { BranchState, documentState, loginState, useRecoilValue } from '@src/store';
+import {
+    BranchState,
+    documentState,
+    loginState,
+    useRecoilValue
+} from '@src/store';
 import { theme } from '@src/theme';
 import { DocumentState, LoginState } from '@src/typings/common';
 import {
@@ -226,13 +231,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             state: MOVEMENT_ASSET_EN.New,
                             ...(selectedImage
                                 ? {
-                                    image: selectedImage,
-                                    new_img: true
-                                }
+                                      image: selectedImage,
+                                      new_img: true
+                                  }
                                 : {
-                                    image: false,
-                                    new_img: false
-                                }),
+                                      image: false,
+                                      new_img: false
+                                  }),
                             location: documentValue?.location,
                             category: searchCategory?.category_name
                         });
@@ -273,13 +278,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         state: MOVEMENT_ASSET_EN.New,
                         ...(selectedImage
                             ? {
-                                image: selectedImage,
-                                new_img: true
-                            }
+                                  image: selectedImage,
+                                  new_img: true
+                              }
                             : {
-                                image: false,
-                                new_img: false
-                            }),
+                                  image: false,
+                                  new_img: false
+                              }),
                         location: documentValue?.location,
                         category: searchCategory?.category_name
                     });
@@ -398,7 +403,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         Location : {documentValue?.location || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {branchValue}
+                        Branch : {branchValue?.branchName}
                     </Text>
                 </View>
             </LinearGradient>

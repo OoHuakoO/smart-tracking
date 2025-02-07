@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BranchStateProps } from '@src/typings/common';
 import { SettingParams } from '@src/typings/login';
 import axios, {
     AxiosError,
@@ -69,14 +70,17 @@ export async function post<T = any>(
     config?: AxiosRequestConfig<any> | undefined
 ): Promise<Response<T>> {
     const settings = await AsyncStorage.getItem('Settings');
+    const branch = await AsyncStorage.getItem('Branch');
     const jsonSettings: SettingParams = JSON.parse(settings);
+    const jsonBranch: BranchStateProps = JSON.parse(branch);
     const convertData = {
         jsonrpc: '2.0',
         params: {
             ...data,
             db: jsonSettings?.db,
             login: data?.login ? data?.login : jsonSettings?.login,
-            password: data?.password ? data?.password : jsonSettings?.password
+            password: data?.password ? data?.password : jsonSettings?.password,
+            branch_id: jsonBranch?.branchId
         }
     };
     const res = await apiInstances.post<Response<T>>(url, convertData, config);

@@ -6,6 +6,7 @@ import { GetBranches, GetBranchSearch } from '@src/services/branch';
 import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
 import { GetBranchData } from '@src/typings/branch';
+import { BranchStateProps } from '@src/typings/common';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
@@ -20,7 +21,7 @@ import {
 import { Dropdown } from 'react-native-element-dropdown';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 
 type BranchSearchScreenProps = NativeStackScreenProps<
     PrivateStackParamsList,
@@ -31,11 +32,19 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
     const { navigation } = props;
     const { top } = useSafeAreaInsets();
     const [listBranch, setListBranch] = useState<GetBranchData[]>([]);
-    const [selectBranch, setSelectBranch] = useState<string>('');
     const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
-    const setBranchState = useSetRecoilState(BranchState);
+    const [branchState, setBranchState] =
+        useRecoilState<BranchStateProps>(BranchState);
+
+    const [selectBranchId, setSelectBranchId] = useState<number>(
+        branchState?.branchId
+    );
+
+    const [selectBranchName, setSelectBranchName] = useState<string>(
+        branchState?.branchName
+    );
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
@@ -48,7 +57,7 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
             if (isOnline) {
                 const response = await GetBranchSearch({
                     page: 1,
-                    limit: 10,
+                    limit: 1000,
                     search_term: {
                         name: text
                     }
@@ -84,11 +93,11 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
         );
     };
 
-    const handleInitDropdown = useCallback(async () => {
+    const handleInitFetch = useCallback(async () => {
         try {
             const responseBranch = await GetBranches({
                 page: 1,
-                limit: 10
+                limit: 1000
             });
             setListBranch(responseBranch?.result?.data?.asset);
         } catch (err) {
@@ -98,20 +107,22 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
     }, []);
 
     const handleSelectBranch = useCallback(async () => {
-        setBranchState(() => {
-            return selectBranch;
-        });
-        await AsyncStorage.setItem('Branch', selectBranch);
+        const selectBranch = {
+            branchId: selectBranchId,
+            branchName: selectBranchName
+        };
+        setBranchState(selectBranch);
+        await AsyncStorage.setItem('Branch', JSON.stringify(selectBranch));
         navigation.navigate('Home');
-    }, [selectBranch, navigation]);
+    }, [selectBranchId, selectBranchName, setBranchState, navigation]);
 
     const handleSearchQuery = (): boolean => {
         return true;
     };
 
     useEffect(() => {
-        handleInitDropdown();
-    }, [handleInitDropdown]);
+        handleInitFetch();
+    }, [handleInitFetch]);
 
     useEffect(() => {
         const onBackPress = () => {
@@ -168,11 +179,12 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
                 valueField="branch_name"
                 placeholder={'Select Branch'}
                 searchPlaceholder="Search"
-                value={selectBranch}
+                value={selectBranchName}
                 onFocus={() => setIsFocusBranch(true)}
                 onBlur={() => setIsFocusBranch(false)}
                 onChange={(item) => {
-                    setSelectBranch(item?.branch_name);
+                    setSelectBranchName(item?.branch_name);
+                    setSelectBranchId(item?.branch_id);
                 }}
                 onChangeText={(text) => handleOnChangeSelectBranch(text)}
                 searchQuery={handleSearchQuery}

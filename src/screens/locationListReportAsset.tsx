@@ -431,7 +431,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {branchValue}
+                        Branch : {branchValue?.branchName}
                     </Text>
                 </View>
             </LinearGradient>

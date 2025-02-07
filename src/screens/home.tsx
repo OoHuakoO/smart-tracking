@@ -796,7 +796,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                        jsonSettings?.mac_address &&
+                            jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -898,28 +898,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         <StatusTag
                             status={form.watch('online') ? 'Online' : 'Offline'}
                         />
-                        {/* <Controller
-                            name="online"
-                            defaultValue={true}
-                            control={form?.control}
-                            render={({ field }) => (
-                                <Switch
-                                    {...field}
-                                    trackColor={{
-                                        false: theme.colors.disableSwitch,
-                                        true: theme.colors.primary
-                                    }}
-                                    thumbColor={theme.colors.white}
-                                    onValueChange={async (value) => {
-                                        field?.onChange(value);
-                                        await AsyncStorage.setItem(
-                                            'Online',
-                                            JSON.stringify(value)
-                                        );
-                                    }}
-                                />
-                            )}
-                        /> */}
                     </View>
                 </View>
 
@@ -951,12 +929,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         </Text>
                     </Button>
                 </TouchableOpacity>
-                {branchValue.length > 0 && (
-                    <Text variant="bodyLarge" style={styles.textBranch}>
-                        Branch : {branchValue}
-                    </Text>
-                )}
             </View>
+
+            <Text variant="bodyLarge" style={styles.textBranch}>
+                Branch : {branchValue?.branchName}
+            </Text>
+
             <ShortcutMenu
                 navigation={navigation}
                 route={route}
@@ -992,7 +970,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        marginBottom: 10
     },
     modeSection: {
         display: 'flex',
@@ -1004,21 +982,19 @@ const styles = StyleSheet.create({
     },
     searchBranchButton: {
         marginTop: 20,
-        marginRight: 10,
         width: 150,
         backgroundColor: theme.colors.warning,
-        borderRadius: 10,
+        borderRadius: 10
     },
     modeBranchWrap: {
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'center', // Aligns items vertically in the row
+        alignItems: 'center'
     },
     textBranch: {
         fontFamily: 'DMSans-Bold',
-        textAlign: 'center',
-        marginTop: 20,
-    },
+        marginTop: 15
+    }
 });
 
 export default HomeScreen;

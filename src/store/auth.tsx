@@ -1,4 +1,4 @@
-import { LoginState } from '@src/typings/common';
+import { BranchStateProps, LoginState } from '@src/typings/common';
 import { atom, RecoilState } from 'recoil';
 
 export const loginState: RecoilState<LoginState> = atom({
@@ -18,8 +18,10 @@ export const OnlineState: RecoilState<boolean> = atom({
     default: undefined
 });
 
-export const BranchState: RecoilState<string> = atom({
+export const BranchState: RecoilState<BranchStateProps> = atom({
     key: 'Branch',
-    default: ''
+    default: {
+        branchId: 0,
+        branchName: 'no branch'
+    }
 });
-

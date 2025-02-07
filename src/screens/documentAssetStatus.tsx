@@ -40,7 +40,12 @@ import {
     GetDocumentById,
     UpdateDocument
 } from '@src/services/document';
-import { documentState, useRecoilValue, useSetRecoilState } from '@src/store';
+import {
+    BranchState,
+    documentState,
+    useRecoilValue,
+    useSetRecoilState
+} from '@src/store';
 import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode, handleMapMovementStateEN } from '@src/utils/common';
@@ -80,6 +85,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const [online, setOnline] = useState<boolean>(false);
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
+    const branchValue = useRecoilValue(BranchState);
 
     const isFocused = useIsFocused();
 
@@ -388,7 +394,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         Location: {documentValue?.location || '-'}
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {totalAssetDocument}
+                        Branch : {branchValue?.branchName}
                     </Text>
                     <View
                         style={[

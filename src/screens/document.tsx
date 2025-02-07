@@ -493,7 +493,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         เอกสารการตรวจนับทั้งหมด
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {branchValue}
+                        Branch : {branchValue?.branchName}
                     </Text>
                 </View>
             </LinearGradient>

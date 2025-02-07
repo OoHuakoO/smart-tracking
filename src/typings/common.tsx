@@ -30,3 +30,8 @@ export interface DocumentState {
     location: string;
     location_id: number;
 }
+
+export interface BranchStateProps {
+    branchId?: number;
+    branchName?: string;
+}

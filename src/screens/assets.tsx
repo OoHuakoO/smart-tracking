@@ -253,7 +253,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
                     <Text variant="bodyLarge" style={styles.textDescription}>
-                        Branch : {branchValue}
+                        Branch : {branchValue?.branchName}
                     </Text>
                 </View>
             </LinearGradient>
