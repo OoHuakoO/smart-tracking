@@ -19,6 +19,8 @@ export interface AssetData {
     purchase_price?: number;
     is_sync_odoo?: boolean;
     user_id?: string;
+    create_date?: string;
+    branch_id?: number;
 }
 
 export interface GetAssetsData {

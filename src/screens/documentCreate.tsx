@@ -32,6 +32,7 @@ import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { getOnlineMode, handleMapMovementStateValue } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
+import moment from 'moment';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
     BackHandler,
@@ -162,6 +163,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img,
+                        branch_id: branchValue?.branchId,
                         date_check: parseDateStringTime(
                             new Date(Date.now()).toISOString()
                         )
@@ -235,6 +237,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             setContentDialog('Something went wrong save asset');
         }
     }, [
+        branchValue?.branchId,
         clearStateDialog,
         documentValue?.id,
         documentValue?.location,
@@ -424,10 +427,21 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 asset.use_state?.toString() === 'false'
                     ? USE_STATE_ASSET_TH.Normal
                     : asset.use_state;
-            const state =
-                asset.location !== documentValue?.location
-                    ? MOVEMENT_ASSET_EN.Transfer
-                    : MOVEMENT_ASSET_EN.Normal;
+
+            const isToday = asset.create_date
+                ? moment(asset.create_date).isBetween(
+                      moment().startOf('day'),
+                      moment().endOf('day'),
+                      null,
+                      '[]'
+                  )
+                : false;
+
+            const state = isToday
+                ? MOVEMENT_ASSET_EN.New
+                : asset.location !== documentValue?.location
+                ? MOVEMENT_ASSET_EN.Transfer
+                : MOVEMENT_ASSET_EN.Normal;
 
             setScanAssetData({ ...asset, state, use_state });
             setSearchUseState(use_state);

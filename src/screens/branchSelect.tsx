@@ -1,7 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import { WARNING } from '@src/constant';
+import {
+    getBranch,
+    getBranchSuggestion,
+    insertBranchData
+} from '@src/db/branch';
+import { getDBConnection } from '@src/db/config';
 import { GetBranches, GetBranchSearch } from '@src/services/branch';
 import { BranchState } from '@src/store';
 import { theme } from '@src/theme';
@@ -12,6 +18,7 @@ import { getOnlineMode } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
+    LogBox,
     SafeAreaView,
     StyleSheet,
     TouchableOpacity,
@@ -29,82 +36,136 @@ type BranchSearchScreenProps = NativeStackScreenProps<
 >;
 
 const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
-    const { navigation } = props;
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state'
+    ]);
+    const { navigation, route } = props;
     const { top } = useSafeAreaInsets();
     const [listBranch, setListBranch] = useState<GetBranchData[]>([]);
     const [isFocusBranch, setIsFocusBranch] = useState<boolean>(false);
+    const [titleDialog, setTitleDialog] = useState<string>('');
+    const [typeDialog, setTypeDialog] = useState<string>('warning');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [disableCloseDialog, setDisableCloseDialog] =
+        useState<boolean>(false);
+    const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+
     const [branchState, setBranchState] =
         useRecoilState<BranchStateProps>(BranchState);
-
     const [selectBranchId, setSelectBranchId] = useState<number>(
         branchState?.branchId
     );
-
     const [selectBranchName, setSelectBranchName] = useState<string>(
         branchState?.branchName
     );
+
+    const clearStateDialog = useCallback(() => {
+        setVisibleDialog(false);
+        setTitleDialog('');
+        setContentDialog('');
+        setDisableCloseDialog(false);
+        setTypeDialog('warning');
+        setShowProgressBar(false);
+    }, []);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
 
-    const handleOnChangeSelectBranch = useCallback(async (text: string) => {
-        try {
-            // if (text !== '') {
-            const isOnline = await getOnlineMode();
-            if (isOnline) {
-                const response = await GetBranchSearch({
-                    page: 1,
-                    limit: 1000,
-                    search_term: {
-                        name: text
-                    }
-                });
-                setListBranch(response?.result?.data?.assets);
-                // } else {
-                //   const db = await getDBConnection();
-                //   const filter = {
-                //     name: text,
-                //     code: text
-                //   };
-                //   const listLocationDB = await getLocationSuggestion(
-                //     db,
-                //     filter
-                //   );
-                //   setListBranch(listLocationDB);
-                // }
+    const handleOnChangeSelectBranch = useCallback(
+        async (text: string) => {
+            try {
+                const isOnline = await getOnlineMode();
+                if (isOnline) {
+                    const response = await GetBranchSearch({
+                        page: 1,
+                        limit: 1000,
+                        search_term: {
+                            or: { name: text }
+                        },
+                        branch_id: 0
+                    });
+                    setListBranch(response?.result?.data?.assets);
+                } else {
+                    const db = await getDBConnection();
+                    const filter = {
+                        branch_code: text,
+                        branch_name: text
+                    };
+                    const listLocationDB = await getBranchSuggestion(
+                        db,
+                        filter
+                    );
+                    setListBranch(listLocationDB);
+                }
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(`Something went search branch`);
+                setTypeDialog('warning');
             }
-        } catch (err) {
-            console.log(err);
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong search location');
-        }
-    }, []);
-
-    const renderItemBranch = (item: GetBranchData) => {
-        return (
-            <View style={styles.dropdownItem}>
-                <Text style={styles.dropdownItemText} variant="bodyLarge">
-                    [{item?.branch_code}] {item?.branch_name}
-                </Text>
-            </View>
-        );
-    };
+        },
+        [clearStateDialog]
+    );
 
     const handleInitFetch = useCallback(async () => {
         try {
-            const responseBranch = await GetBranches({
-                page: 1,
-                limit: 1000
-            });
-            setListBranch(responseBranch?.result?.data?.asset);
+            const isOnline = await getOnlineMode();
+            if (isOnline) {
+                const responseBranch = await GetBranches({
+                    page: 1,
+                    limit: 1000
+                });
+                setListBranch(responseBranch?.result?.data?.assets);
+            } else {
+                const db = await getDBConnection();
+                const listBranchDB = await getBranch(db, 1, 1000);
+                if (listBranchDB?.length === 0) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setDisableCloseDialog(true);
+                    setTitleDialog('Branch Not Found');
+                    setContentDialog('Please download the branch data');
+                    setTypeDialog('branch');
+                    return;
+                }
+                setListBranch(listBranchDB);
+            }
         } catch (err) {
             console.log(err);
+            clearStateDialog();
             setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(`Something went wrong get branch`);
+            setTypeDialog('warning');
         }
-    }, []);
+    }, [clearStateDialog]);
+
+    const handleConfirmBranch = useCallback(async () => {
+        setShowProgressBar(true);
+        const db = await getDBConnection();
+        const responseBranch = await GetBranches({
+            page: 1,
+            limit: 1000
+        });
+        await insertBranchData(db, responseBranch?.result?.data?.assets);
+        await handleInitFetch();
+        clearStateDialog();
+    }, [clearStateDialog, handleInitFetch]);
+
+    const handleConfirmDialog = useCallback(async () => {
+        switch (typeDialog) {
+            case 'branch':
+                await handleConfirmBranch();
+                break;
+            default:
+                clearStateDialog();
+                break;
+        }
+    }, [clearStateDialog, handleConfirmBranch, typeDialog]);
 
     const handleSelectBranch = useCallback(async () => {
         const selectBranch = {
@@ -113,8 +174,15 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
         };
         setBranchState(selectBranch);
         await AsyncStorage.setItem('Branch', JSON.stringify(selectBranch));
-        navigation.navigate('Home');
-    }, [selectBranchId, selectBranchName, setBranchState, navigation]);
+        route?.params?.onGoBack(selectBranchId);
+        navigation.goBack();
+    }, [
+        selectBranchId,
+        selectBranchName,
+        setBranchState,
+        route?.params,
+        navigation
+    ]);
 
     const handleSearchQuery = (): boolean => {
         return true;
@@ -138,27 +206,29 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
         };
     }, [navigation]);
 
+    const renderItemBranch = (item: GetBranchData) => {
+        return (
+            <View style={styles.dropdownItem}>
+                <Text style={styles.dropdownItemText} variant="bodyLarge">
+                    [{item?.branch_code}] {item?.branch_name}
+                </Text>
+            </View>
+        );
+    };
+
     return (
         <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
+                textTitle={titleDialog}
                 textContent={contentDialog}
                 visible={visibleDialog}
                 handleClose={handleCloseDialog}
-                handleConfirm={handleCloseDialog}
+                disableClose={disableCloseDialog}
+                handleConfirm={handleConfirmDialog}
+                showProgressBar={showProgressBar}
             />
-            <TouchableOpacity
-                activeOpacity={0.5}
-                onPress={() => navigation.goBack()}
-                style={styles.closeButton}
-            >
-                <ActionButton
-                    icon={'close'}
-                    size="small"
-                    backgroundColor={theme.colors.white}
-                />
-            </TouchableOpacity>
 
-            <Text variant="displaySmall" style={styles.textSearchAsset}>
+            <Text variant="displaySmall" style={styles.textSelectBranch}>
                 Select Branch
             </Text>
 
@@ -193,7 +263,15 @@ const BranchSelectScreen: FC<BranchSearchScreenProps> = (props) => {
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    style={styles.buttonApply}
+                    disabled={!selectBranchId}
+                    style={[
+                        styles.buttonApply,
+                        {
+                            backgroundColor: selectBranchId
+                                ? theme.colors.buttonConfirm
+                                : theme.colors.borderAutocomplete
+                        }
+                    ]}
                     onPress={() => handleSelectBranch()}
                 >
                     <Text variant="bodyLarge" style={styles.buttonText}>
@@ -213,9 +291,10 @@ const styles = StyleSheet.create({
     containerInput: {
         marginHorizontal: 25
     },
-    textSearchAsset: {
+    textSelectBranch: {
         fontFamily: 'DMSans-Bold',
-        marginBottom: 15
+        marginBottom: 15,
+        marginTop: 50
     },
     closeButton: {
         marginVertical: 20,

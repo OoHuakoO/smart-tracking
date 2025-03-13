@@ -28,8 +28,10 @@ export const dropAllTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS category;');
             tx.executeSql('DROP TABLE IF EXISTS documentOffline');
             tx.executeSql('DROP TABLE IF EXISTS documentLineOffline');
+            tx.executeSql('DROP TABLE IF EXISTS userOffline');
             tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
             tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
+            tx.executeSql('DROP TABLE IF EXISTS branch');
         });
         console.log('Drop all table successfully');
     } catch (err) {
@@ -50,6 +52,7 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
             tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
             tx.executeSql('DROP TABLE IF EXISTS userOffline');
+            tx.executeSql('DROP TABLE IF EXISTS branch');
         });
         console.log('Drop master table successfully');
     } catch (err) {

@@ -80,7 +80,7 @@ export async function post<T = any>(
             db: jsonSettings?.db,
             login: data?.login ? data?.login : jsonSettings?.login,
             password: data?.password ? data?.password : jsonSettings?.password,
-            branch_id: jsonBranch?.branchId
+            branch_id: data?.branch_id === 0 ? null : jsonBranch?.branchId
         }
     };
     const res = await apiInstances.post<Response<T>>(url, convertData, config);

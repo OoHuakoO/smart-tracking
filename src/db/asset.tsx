@@ -23,7 +23,7 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             new_img BOOLEAN,
             owner TEXT,
             is_sync_odoo BOOLEAN DEFAULT TRUE,
-            created_date DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
+            create_date DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
 
             tx.executeSql(

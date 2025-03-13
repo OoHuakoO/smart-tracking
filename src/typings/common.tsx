@@ -10,7 +10,7 @@ export interface Params {
     date_check?: string;
     document_data?: any;
     android_id?: string;
-    branch_id?: string;
+    branch_id?: number;
     user_id?: string;
 }
 

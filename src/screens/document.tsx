@@ -215,7 +215,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                     documentSearch?.state
                                 )
                             },
-                            user_id: loginValue?.uid
+                            branch_id: branchValue?.branchId
                         }
                     }
                 });
@@ -254,7 +254,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [loginValue?.uid, route?.params?.documentSearch]);
+    }, [branchValue?.branchId, route?.params?.documentSearch]);
 
     const handleOnEndReached = async () => {
         try {
@@ -325,7 +325,8 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         location_id: location?.location_id,
                         date_order: parseDateStringTime(
                             new Date(Date.now()).toISOString()
-                        )
+                        ),
+                        branch_id: branchValue?.branchId
                     });
                     if (response?.error) {
                         setVisibleDialog(true);
@@ -383,6 +384,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
             }
         },
         [
+            branchValue?.branchId,
             handleFetchDocument,
             handleFetchLocation,
             navigation,

@@ -204,6 +204,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         location_id: documentValue?.location_id,
                         user_id: loginValue?.uid,
                         purchase_price: 0,
+                        branch_id: branchValue?.branchId,
                         ...(selectedImage && {
                             image: selectedImage,
                             new_img: true
@@ -297,6 +298,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             }
         },
         [
+            branchValue?.branchId,
             documentValue?.location,
             documentValue?.location_id,
             loginValue?.uid,

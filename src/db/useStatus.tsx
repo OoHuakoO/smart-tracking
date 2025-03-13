@@ -39,14 +39,14 @@ export const createTableUseStatus = (db: SQLiteDatabase) => {
 
 export const insertUseStatusData = (
     db: SQLiteDatabase,
-    useStatuses: UseStatusData[]
+    useStatus: UseStatusData[]
 ) => {
     const queryInsert =
         `INSERT INTO useStatus (
          use_status_id,
          name
     ) VALUES ` +
-        useStatuses
+        useStatus
             .map(
                 (item) =>
                     `(

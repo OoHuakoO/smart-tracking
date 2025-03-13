@@ -3,13 +3,13 @@ export interface GetBranchData {
     branch_code: string;
     branch_name: string;
     total_assets: number;
-    total_location: number;
+    total_locations: number;
 }
 
 export interface GetBranchSelectData {
     total_page: number;
     current_page: number;
-    asset: GetBranchData[];
+    assets: GetBranchData[];
     total: number;
     uid: number;
 }

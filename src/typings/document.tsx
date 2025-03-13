@@ -15,6 +15,7 @@ export interface DocumentAssetData {
     image?: string;
     mode?: string;
     date_check?: string;
+    branch_id?: number;
     // for offline upload asset
     asset_id_update?: number;
     use_state_code?: number;

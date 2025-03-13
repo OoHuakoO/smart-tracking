@@ -21,7 +21,7 @@ export const OnlineState: RecoilState<boolean> = atom({
 export const BranchState: RecoilState<BranchStateProps> = atom({
     key: 'Branch',
     default: {
-        branchId: 0,
+        branchId: null,
         branchName: 'no branch'
     }
 });

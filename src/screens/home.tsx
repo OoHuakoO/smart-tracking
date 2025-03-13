@@ -32,17 +32,20 @@ import {
     insertAssetData,
     updateAsset
 } from '@src/db/asset';
+import { createTableBranch, insertBranchData } from '@src/db/branch';
 import { createTableCategory, insertCategoryData } from '@src/db/category';
 import { dropAllMasterTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import {
     createTableDocumentLine,
     getDocumentLine,
+    removeDocumentLineOfflineByTrackingID,
     updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import {
     createTableDocumentOffline,
     getDocumentOffline,
+    removeDocumentOffline,
     updateDocument
 } from '@src/db/documentOffline';
 import { createTableLocation, insertLocationData } from '@src/db/location';
@@ -57,6 +60,7 @@ import {
 import { createTableUserOffline, insertUserOffline } from '@src/db/userOffline';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
+import { GetBranches } from '@src/services/branch';
 import {
     AddDocumentLine,
     CreateDocument,
@@ -83,7 +87,8 @@ import {
 } from '@src/store';
 import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
-import { LoginState, Toast } from '@src/typings/common';
+import { GetBranchData } from '@src/typings/branch';
+import { BranchStateProps, LoginState, Toast } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import {
     AssetData,
@@ -111,6 +116,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { top } = useSafeAreaInsets();
     const form = useForm<SettingParams>({});
     const setLogin = useSetRecoilState<LoginState>(loginState);
+    const setToast = useSetRecoilState<Toast>(toastState);
+    const setBranch = useSetRecoilState<BranchStateProps>(BranchState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
@@ -121,7 +128,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const onlineValue = useRecoilValue<boolean>(OnlineState);
-    const setToast = useSetRecoilState<Toast>(toastState);
     const branchValue = useRecoilValue(BranchState);
 
     const { isConnected } = useNetInfo();
@@ -148,8 +154,17 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         return;
                     }
                 }
+                const defaultBranch = {
+                    branchId: null,
+                    branchName: 'no branch'
+                };
                 setLogin({ uid: '' });
+                setBranch(defaultBranch);
                 await AsyncStorage.setItem('Login', '');
+                await AsyncStorage.setItem(
+                    'Branch',
+                    JSON.stringify(defaultBranch)
+                );
                 setTimeout(() => {
                     setToast({ open: true, text: 'Logout Successfully' });
                 }, 0);
@@ -159,7 +174,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 setVisibleDialog(true);
             }
         },
-        [clearStateDialog, isConnected, setLogin, setToast]
+        [clearStateDialog, isConnected, setBranch, setLogin, setToast]
     );
 
     const handleCloseDialog = useCallback(() => {
@@ -399,6 +414,29 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadBranch = useCallback(
+        async (totalPages: number): Promise<GetBranchData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetBranches({ page: i + 1, limit: 1000 })
+                );
+                const results = await Promise.all(promises);
+                const branches = results.flatMap(
+                    (result) => result?.result?.data?.assets ?? []
+                );
+                return branches;
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load branch');
+                return [];
+            }
+        },
+        [clearStateDialog]
+    );
+
     const handleDownload = useCallback(async () => {
         try {
             const foundMacAddress = await handleCheckMacAddress();
@@ -412,7 +450,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     initialResponseCategory,
                     initialResponseAssetNotFound,
                     initialDocumentLine,
-                    initialUserOffline
+                    initialUserOffline,
+                    initialBranch
                 ] = await Promise.all([
                     GetAssets({ page: 1, limit: 200 }),
                     GetLocation({ page: 1, limit: 1000 }),
@@ -433,6 +472,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         }
                     }),
                     GetAllUserOffline({
+                        page: 1,
+                        limit: 1000
+                    }),
+                    GetBranches({
                         page: 1,
                         limit: 1000
                     })
@@ -459,6 +502,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 const errorUserOffline = handleResponseError(
                     initialUserOffline?.error
                 );
+                const errorBranch = handleResponseError(initialBranch?.error);
 
                 if (
                     errorAssets ||
@@ -467,7 +511,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     errorCategorys ||
                     errorAssetNotFound ||
                     errorDocumentLine ||
-                    errorUserOffline
+                    errorUserOffline ||
+                    errorBranch
                 ) {
                     return;
                 }
@@ -486,6 +531,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     initialDocumentLine?.result?.data?.total_page;
                 const totalPagesUserOffline =
                     initialUserOffline?.result?.data?.total_page;
+                const totalPagesBranch =
+                    initialBranch?.result?.data?.total_page;
 
                 const [
                     listLocation,
@@ -493,14 +540,16 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     listCategory,
                     listAssetNotFound,
                     listDocumentLine,
-                    listUserOffline
+                    listUserOffline,
+                    listBranch
                 ] = await Promise.all([
                     handleLoadLocation(totalPagesLocation),
                     handleLoadUseStatus(totalPagesUseStatus),
                     handleLoadCategory(totalPagesCategory),
                     handleLoadAssetNotFound(totalPagesAssetNotFound),
                     handleLoadDocumentLine(totalPagesDocumentLine),
-                    handleLoadUserOffline(totalPagesUserOffline)
+                    handleLoadUserOffline(totalPagesUserOffline),
+                    handleLoadBranch(totalPagesBranch)
                 ]);
 
                 const db = await getDBConnection();
@@ -518,7 +567,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 if (
                     listLocation?.length > 0 &&
                     listUseStatus?.length > 0 &&
-                    listCategory?.length > 0
+                    listCategory?.length > 0 &&
+                    listBranch?.length > 0
                 ) {
                     await createTableLocation(db);
                     await createTableUseStatus(db);
@@ -526,9 +576,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableReportAssetNotFound(db);
                     await createTableReportDocumentLine(db);
                     await createTableUserOffline(db);
+                    await createTableBranch(db);
                     await insertLocationData(db, listLocation);
                     await insertUseStatusData(db, listUseStatus);
                     await insertCategoryData(db, listCategory);
+                    await insertBranchData(db, listBranch);
                     if (listAssetNotFound?.length > 0) {
                         await insertReportAssetNotFound(db, listAssetNotFound);
                     }
@@ -564,6 +616,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         clearStateDialog,
         handleCheckMacAddress,
         handleLoadAssetNotFound,
+        handleLoadBranch,
         handleLoadCategory,
         handleLoadDocumentLine,
         handleLoadLocation,
@@ -576,16 +629,29 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleUpload = useCallback(async () => {
         try {
             const foundMacAddress = await handleCheckMacAddress();
-            if (foundMacAddress) {
-                setDisableCloseDialog(true);
-                setShowProgressBar(true);
-                const db = await getDBConnection();
-                const filterAsset = {
-                    is_sync_odoo: false
-                };
-                const listAsset = await getAsset(db, filterAsset, 1, 1000);
 
-                listAsset?.forEach(async (item) => {
+            if (!foundMacAddress) {
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(
+                    `This device does not have permission to upload`
+                );
+                setTypeDialog('warning');
+                return;
+            }
+
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
+
+            const db = await getDBConnection();
+            const filterAsset = {
+                is_sync_odoo: false
+            };
+            const listAsset = await getAsset(db, filterAsset, 1, 1000);
+
+            for (const item of listAsset) {
+                try {
                     let assetData: AssetData = {
                         default_code: item?.default_code,
                         name: item?.name,
@@ -593,7 +659,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         quantity: 1,
                         location_id: item?.location_id,
                         user_id: loginValue?.uid,
-                        purchase_price: 0
+                        purchase_price: 0,
+                        branch_id: branchValue?.branchId
                     };
 
                     if (item?.image !== 'false') {
@@ -609,80 +676,81 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     });
 
                     if (response?.error) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setContentDialog('Something went wrong save asset');
-                        return;
+                        throw new Error('Something went wrong create asset');
                     }
+
                     if (
                         response?.result?.message ===
                         'Asset created successfully'
                     ) {
-                        const filterUpdateAsset = {
-                            asset_id: response?.result?.data?.id,
+                        const newAssetId = response?.result?.data?.id;
+
+                        await updateAsset(db, {
+                            asset_id: newAssetId,
                             is_sync_odoo: true,
                             id: item?.id
-                        };
-                        await updateAsset(db, filterUpdateAsset);
+                        });
 
-                        const filterDocumentLine = {
-                            asset_id_update: response?.result?.data?.id,
+                        await updateDocumentLineData(db, {
+                            asset_id_update: newAssetId,
                             code: item?.default_code
-                        };
-
-                        await updateDocumentLineData(db, filterDocumentLine);
+                        });
                     }
-                });
+                } catch (error) {
+                    console.error('Asset Upload Error:', error);
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog(error.message);
+                    return;
+                }
+            }
 
-                const filterDocument = {
-                    state: STATE_DOCUMENT_NAME?.Draft
-                };
-                const listDocument = await getDocumentOffline(
-                    db,
-                    filterDocument,
-                    null,
-                    1,
-                    1000
-                );
+            const sort = { date_order: true };
+            const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
+            const listDocument = await getDocumentOffline(
+                db,
+                filterDocument,
+                sort,
+                1,
+                1000
+            );
 
-                listDocument?.forEach(async (item) => {
+            for (const item of listDocument) {
+                try {
                     const responseCreateDocument = await CreateDocument({
                         location_id: item?.location_id,
                         date_order: parseDateStringTime(item?.date_order),
-                        android_id: item?.id?.toString()
+                        android_id: item?.id?.toString(),
+                        branch_id: branchValue?.branchId
                     });
+
                     if (responseCreateDocument?.error) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            'Something went wrong create document'
+                        throw new Error(
+                            'Something went wrong creating document'
                         );
-                        return;
                     }
-                    const filterDocumentLine = {
-                        tracking_id: item?.id
-                    };
+
+                    const filterDocumentLine = { tracking_id: item?.id };
                     const listDocumentLine = await getDocumentLine(
                         db,
                         filterDocumentLine
                     );
-                    const mappingValueDocumentLine = listDocumentLine?.map(
+
+                    const mappingValueDocumentLine = listDocumentLine.map(
                         (documentLine) => {
-                            const documentData: DocumentAssetData = {
+                            return {
                                 id: documentLine?.asset_id,
                                 state: documentLine?.state,
                                 use_state: documentLine?.use_state_code,
                                 new_img: documentLine?.new_img ? true : false,
+                                branch_id: branchValue?.branchId,
                                 date_check: parseDateStringTime(
                                     documentLine?.date_check
-                                )
+                                ),
+                                ...(documentLine?.image !== 'false' && {
+                                    image: documentLine?.image
+                                })
                             };
-
-                            if (documentLine?.image !== 'false') {
-                                documentData.image = documentLine?.image;
-                            }
-
-                            return documentData;
                         }
                     );
 
@@ -695,52 +763,30 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
                     if (
                         responseAddDocumentLine?.result?.message ===
-                        RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                            RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
+                        responseAddDocumentLine?.error ||
+                        responseAddDocumentLine?.result?.error
                     ) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            'Something went wrong add document line'
+                        throw new Error(
+                            'Something went wrong adding document line'
                         );
-                        return;
                     }
-                    if (responseAddDocumentLine?.error) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            'Something went wrong add document line'
-                        );
-                        return;
-                    }
-                    if (responseAddDocumentLine?.result?.error) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setContentDialog(
-                            'Something went wrong add document line'
-                        );
-                        return;
-                    }
-                    const documentObj = {
+
+                    await updateDocument(db, {
                         id: item?.id,
                         state: STATE_DOCUMENT_NAME.Done
-                    };
-
-                    await updateDocument(db, documentObj);
-                });
-
-                setTimeout(() => {
-                    setToast({ open: true, text: 'Upload Successfully' });
-                }, 0);
-                clearStateDialog();
-            } else {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog(
-                    `This device does not have permission to upload`
-                );
-                setTypeDialog('warning');
+                    });
+                } catch (error) {
+                    console.error('Document Upload Error:', error);
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog(error.message);
+                    return;
+                }
             }
+
+            setToast({ open: true, text: 'Upload Successfully' });
+            clearStateDialog();
         } catch (err) {
             console.log(err);
             clearStateDialog();
@@ -749,7 +795,43 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setContentDialog(`Something went wrong upload`);
             setTypeDialog('warning');
         }
-    }, [clearStateDialog, handleCheckMacAddress, loginValue?.uid, setToast]);
+    }, [
+        branchValue?.branchId,
+        clearStateDialog,
+        handleCheckMacAddress,
+        loginValue?.uid,
+        setToast
+    ]);
+
+    const handleSelectBranch = useCallback(() => {
+        navigation.navigate('BranchSelectScreen');
+        clearStateDialog();
+    }, [clearStateDialog, navigation]);
+
+    const handleNavigateBranch = useCallback(() => {
+        clearStateDialog();
+        navigation.navigate('BranchSelectScreen', {
+            onGoBack: async (branch_id: number) => {
+                if (branch_id !== branchValue?.branchId && !onlineValue) {
+                    const db = await getDBConnection();
+                    const listDocumentDB = await getDocumentOffline(db, null);
+                    listDocumentDB.map(async (item) => {
+                        await removeDocumentLineOfflineByTrackingID(
+                            db,
+                            item?.id
+                        );
+                    });
+                    await removeDocumentOffline(db);
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setTitleDialog(WARNING);
+                    setContentDialog('Please download the data current branch');
+                    setTypeDialog('download');
+                    setDisableCloseDialog(true);
+                }
+            }
+        });
+    }, [branchValue?.branchId, clearStateDialog, navigation, onlineValue]);
 
     const handleConfirmDialog = useCallback(async () => {
         switch (typeDialog) {
@@ -765,6 +847,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             case 'warning':
                 clearStateDialog();
                 break;
+            case 'warning branch':
+                handleNavigateBranch();
+                break;
+            case 'branch':
+                await handleSelectBranch();
+                break;
             default:
                 clearStateDialog();
                 break;
@@ -773,6 +861,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         clearStateDialog,
         handleDownload,
         handleLogout,
+        handleNavigateBranch,
+        handleSelectBranch,
         handleUpload,
         typeDialog
     ]);
@@ -820,6 +910,47 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [clearStateDialog, isConnected, onlineValue]);
 
+    const handleCheckBranchStorage = useCallback(async () => {
+        if (!branchValue?.branchId) {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setDisableCloseDialog(true);
+            setContentDialog('Please select a branch before starting.');
+            setTypeDialog('branch');
+        }
+    }, [branchValue?.branchId, clearStateDialog]);
+
+    const handleNavigateSelectBranch = useCallback(() => {
+        if (isConnected) {
+            if (!onlineValue) {
+                setVisibleDialog(true);
+                setShowCancelDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog(
+                    `If you want to change the branch, all data from the old branch will be deleted. Are you sure?`
+                );
+                setTypeDialog('warning branch');
+                return;
+            }
+            handleNavigateBranch();
+        } else {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(
+                `Network Disconnected, please open internet to select branch`
+            );
+            setTypeDialog('warning');
+        }
+    }, [clearStateDialog, handleNavigateBranch, isConnected, onlineValue]);
+
+    useFocusEffect(
+        useCallback(() => {
+            handleCheckBranchStorage();
+        }, [handleCheckBranchStorage])
+    );
+
     useEffect(() => {
         handleCheckUserLogin();
     }, [handleCheckUserLogin]);
@@ -837,14 +968,19 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableDocumentLine(db);
                     await createTableReportAssetNotFound(db);
                     await createTableReportDocumentLine(db);
-                    const countAsset = await getTotalAssets(db);
-                    if (countAsset === 0) {
-                        clearStateDialog();
-                        setVisibleDialog(true);
-                        setTitleDialog('Data Not Found');
-                        setContentDialog('Please download the current data');
-                        setTypeDialog('download');
-                        setShowCancelDialog(true);
+                    await createTableBranch(db);
+                    if (branchValue?.branchId) {
+                        const countAsset = await getTotalAssets(db);
+                        if (countAsset === 0) {
+                            clearStateDialog();
+                            setVisibleDialog(true);
+                            setTitleDialog('Data Not Found');
+                            setContentDialog(
+                                'Please download the current data'
+                            );
+                            setTypeDialog('download');
+                            setDisableCloseDialog(true);
+                        }
                     }
                 } catch (err) {
                     console.log(err);
@@ -860,7 +996,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }, 500);
 
             return () => clearTimeout(debounceInit);
-        }, [clearStateDialog, form, onlineValue])
+        }, [branchValue?.branchId, clearStateDialog, form, onlineValue])
     );
 
     useEffect(() => {
@@ -920,9 +1056,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             </View>
             <ImageSlider />
             <View style={styles.modeBranchWrap}>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('BranchSelectScreen')}
-                >
+                <TouchableOpacity onPress={() => handleNavigateSelectBranch()}>
                     <Button style={styles.searchBranchButton}>
                         <Text style={styles.text} variant="bodyLarge">
                             Select branch

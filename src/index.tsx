@@ -13,6 +13,7 @@ import {
 import React, { useCallback, useEffect } from 'react';
 import SplashScreen from 'react-native-splash-screen';
 import { createTableAsset } from './db/asset';
+import { createTableBranch } from './db/branch';
 import { createTableCategory } from './db/category';
 import { getDBConnection } from './db/config';
 import { createTableDocumentLine } from './db/documentLineOffline';
@@ -76,6 +77,7 @@ export default function App() {
             await createTableReportAssetNotFound(db);
             await createTableReportDocumentLine(db);
             await createTableUserOffline(db);
+            await createTableBranch(db);
         } catch (error) {
             console.error(error);
         }
