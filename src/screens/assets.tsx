@@ -41,6 +41,7 @@ type AssetsScreenProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const AssetsScreen: FC<AssetsScreenProps> = (props) => {
     const { navigation, route } = props;
@@ -246,13 +247,13 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant="headlineLarge" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
                         Asset
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'

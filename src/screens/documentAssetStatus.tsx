@@ -65,6 +65,7 @@ type DocumentAssetStatusScreenProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     props
@@ -385,15 +386,15 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 )} */}
 
                 <View style={styles.containerText}>
-                    <Text variant="headlineLarge" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
                         {online
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                     <View
@@ -469,7 +470,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
@@ -485,7 +486,7 @@ const styles = StyleSheet.create({
     resetCancel: {
         position: 'absolute',
         right: 15,
-        top: 30,
+        top: isTablet ? 35 : 20,
         borderWidth: 2,
         borderColor: theme.colors.documentCancel,
         backgroundColor: theme.colors.white,
@@ -506,10 +507,10 @@ const styles = StyleSheet.create({
     },
     statusIndicator: {
         alignSelf: 'flex-start',
-        paddingHorizontal: 20,
-        paddingVertical: 5,
+        paddingHorizontal: isSmallMb ? 15 : 20,
+        paddingVertical: isSmallMb ? 3 : 5,
         borderRadius: 25,
-        marginTop: 10,
+        marginTop: isSmallMb ? 5 : 10,
         flexDirection: 'row'
     },
     statusText: {
@@ -535,7 +536,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '30%' : '52%'
+        marginTop: isTablet ? '35%' : '52%'
     },
     wrapDetailList: {
         display: 'flex',
@@ -582,7 +583,7 @@ const styles = StyleSheet.create({
     },
     textCancel: {
         fontFamily: 'DMSans-Bold',
-        color: theme.colors.documentCancel
+        color: theme.colors.documentCancel,
     },
     flatListStyle: {
         marginBottom: 30

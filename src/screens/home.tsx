@@ -110,6 +110,7 @@ type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
     const { navigation, route } = props;
@@ -763,7 +764,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
                     if (
                         responseAddDocumentLine?.result?.message ===
-                            RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
+                        RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
                         responseAddDocumentLine?.error ||
                         responseAddDocumentLine?.result?.error
                     ) {
@@ -886,7 +887,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                            jsonSettings?.mac_address &&
+                        jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -1049,23 +1050,18 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     </View>
                 </TouchableOpacity>
             </View>
-            <View>
-                <Text variant="displayMedium" style={styles.textHeader}>
-                    Welcome
-                </Text>
-            </View>
             <ImageSlider />
             <View style={styles.modeBranchWrap}>
                 <TouchableOpacity onPress={() => handleNavigateSelectBranch()}>
                     <Button style={styles.searchBranchButton}>
-                        <Text style={styles.text} variant="bodyLarge">
+                        <Text style={styles.text} variant={isTablet ? "headlineSmall" : isSmallMb ? 'bodySmall' : 'bodyLarge'}>
                             Select branch
                         </Text>
                     </Button>
                 </TouchableOpacity>
             </View>
 
-            <Text variant="bodyLarge" style={styles.textBranch}>
+            <Text variant={isTablet ? "headlineSmall" : isSmallMb ? 'bodyLarge' : 'titleLarge'} style={styles.textBranch}>
                 Branch : {branchValue?.branchName}
             </Text>
 
@@ -1077,7 +1073,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 online={form.getValues('online')}
             />
             <ToastComponent />
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
 
@@ -1085,26 +1081,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: StatusBar.currentHeight,
-        marginHorizontal: 20
-    },
-    textHeader: {
-        width: '100%',
-        color: theme.colors.textPrimary,
-        fontFamily: 'DMSans-Medium',
-        textAlign: 'left',
-        marginBottom: 20,
-        marginTop: 10
-    },
-    textMenu: {
-        marginTop: 15,
-        fontFamily: 'DMSans-Bold'
+        marginHorizontal: isSmallMb ? 10 : 20
     },
     modeSectionWrap: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10
+        marginBottom: isSmallMb ? 5 : 10,
     },
     modeSection: {
         display: 'flex',
@@ -1112,23 +1096,23 @@ const styles = StyleSheet.create({
     },
     text: {
         fontFamily: 'DMSans-Bold',
-        color: theme.colors.black
+        color: theme.colors.black,
     },
     searchBranchButton: {
-        marginTop: 20,
-        width: 150,
+        marginTop: isSmallMb ? 15 : 20,
+        width: '100%',
         backgroundColor: theme.colors.warning,
         borderRadius: 10
+    },
+    textBranch: {
+        fontFamily: 'DMSans-Bold',
+        marginTop: isSmallMb ? 10 : 20,
     },
     modeBranchWrap: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
     },
-    textBranch: {
-        fontFamily: 'DMSans-Bold',
-        marginTop: 15
-    }
 });
 
 export default HomeScreen;
