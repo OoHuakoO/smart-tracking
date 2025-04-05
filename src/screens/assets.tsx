@@ -250,10 +250,10 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                     <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
                         Asset
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         สามารถดูทรัพย์สินทั้งหมดในระบบ
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -264,7 +264,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                         handlePress={() => navigation.navigate('AssetSearch')}
                     />
                 </View>
-                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
                     Total Asset : {countTotalAsset}
                 </Text>
 
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -321,16 +321,17 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch'
     },
     containerText: {
-        marginHorizontal: 20
+        marginHorizontal: 20,
     },
     textHeader: {
         color: theme.colors.pureWhite,
         fontFamily: 'DMSans-Bold',
-        marginBottom: 10
+        marginBottom: 10,
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
@@ -362,7 +363,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     },
     drawer: {

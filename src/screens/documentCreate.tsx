@@ -799,10 +799,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -960,7 +960,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginTop: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginBottom: 10,
         marginHorizontal: 15,
         display: 'flex',
@@ -995,7 +995,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,

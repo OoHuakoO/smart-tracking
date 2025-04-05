@@ -366,7 +366,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         style={styles.resetCancel}
                         onPress={handleOpenDialogConfirmCancelDocument}
                     >
-                        <Text variant="bodySmall" style={styles.textCancel}>
+                        <Text variant={isTablet ? "bodyMedium" : "bodySmall"} style={styles.textCancel}>
                             Cancel
                         </Text>
                     </TouchableOpacity>
@@ -386,15 +386,15 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 )} */}
 
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
+                    <Text variant="headlineSmall" style={styles.textHeader}>
                         {online
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                     <View
@@ -411,7 +411,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             </LinearGradient>
 
             <View style={styles.listSection}>
-                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalDocument}>
                     Total Asset : {totalAssetDocument}
                 </Text>
                 <FlatList
@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
         color: theme.colors.pureWhite
     },
     containerText: {
-        marginHorizontal: 20
+        marginHorizontal: isTablet ? 15 : 20
     },
     textHeader: {
         color: theme.colors.pureWhite,
@@ -527,7 +527,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
@@ -550,7 +551,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     },
     button: {

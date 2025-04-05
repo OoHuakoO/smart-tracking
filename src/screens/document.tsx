@@ -60,7 +60,6 @@ const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
 const isSmallMb = width < 400;
 
-
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation, route } = props;
     const { top } = useSafeAreaInsets();
@@ -493,10 +492,10 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
                         Document
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         เอกสารการตรวจนับทั้งหมด
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -510,7 +509,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         }
                     />
                 </View>
-                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalDocument}>
                     Total Document : {countTotalDocument}
                 </Text>
                 {!online && countTotalDocument > 0 && (
@@ -601,7 +600,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -618,7 +617,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
@@ -647,7 +647,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 5
     },
     textDeleteAll: {

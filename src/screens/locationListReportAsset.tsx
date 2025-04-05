@@ -428,10 +428,10 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
                         {route?.params?.LocationData?.location_name}
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
-                    <Text variant={isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -448,7 +448,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         }
                     />
                 </View>
-                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
                     Total Asset: {totalListReportAsset}
                 </Text>
 
@@ -490,7 +490,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -542,7 +542,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     }
 });
