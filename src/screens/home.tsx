@@ -764,7 +764,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
                     if (
                         responseAddDocumentLine?.result?.message ===
-                        RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
+                            RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
                         responseAddDocumentLine?.error ||
                         responseAddDocumentLine?.result?.error
                     ) {
@@ -887,7 +887,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                     if (
                         response?.result?.data?.mac_address !==
-                        jsonSettings?.mac_address &&
+                            jsonSettings?.mac_address &&
                         response?.result?.data?.is_login
                     ) {
                         clearStateDialog();
@@ -1054,14 +1054,32 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             <View style={styles.modeBranchWrap}>
                 <TouchableOpacity onPress={() => handleNavigateSelectBranch()}>
                     <Button style={styles.searchBranchButton}>
-                        <Text style={styles.text} variant={isTablet ? "headlineSmall" : isSmallMb ? 'bodySmall' : 'bodyLarge'}>
+                        <Text
+                            style={styles.text}
+                            variant={
+                                isTablet
+                                    ? 'headlineSmall'
+                                    : isSmallMb
+                                    ? 'bodySmall'
+                                    : 'bodyLarge'
+                            }
+                        >
                             Select branch
                         </Text>
                     </Button>
                 </TouchableOpacity>
             </View>
 
-            <Text variant={isTablet ? "headlineSmall" : isSmallMb ? 'bodyLarge' : 'titleLarge'} style={styles.textBranch}>
+            <Text
+                variant={
+                    isTablet
+                        ? 'headlineSmall'
+                        : isSmallMb
+                        ? 'bodyLarge'
+                        : 'titleLarge'
+                }
+                style={styles.textBranch}
+            >
                 Branch : {branchValue?.branchName}
             </Text>
 
@@ -1073,7 +1091,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 online={form.getValues('online')}
             />
             <ToastComponent />
-        </SafeAreaView >
+        </SafeAreaView>
     );
 };
 
@@ -1088,7 +1106,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: isSmallMb ? 5 : 10,
+        marginBottom: isSmallMb ? 5 : 10
     },
     modeSection: {
         display: 'flex',
@@ -1096,7 +1114,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontFamily: 'DMSans-Bold',
-        color: theme.colors.black,
+        color: theme.colors.black
     },
     searchBranchButton: {
         marginTop: isSmallMb ? 15 : 20,
@@ -1106,13 +1124,13 @@ const styles = StyleSheet.create({
     },
     textBranch: {
         fontFamily: 'DMSans-Bold',
-        marginTop: isSmallMb ? 10 : 20,
+        marginTop: isSmallMb ? 10 : 20
     },
     modeBranchWrap: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
-    },
+    }
 });
 
 export default HomeScreen;

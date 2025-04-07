@@ -67,10 +67,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                         style={styles.image}
                         source={
                             route?.params?.assetData?.image?.toString() !==
-                                'false'
+                            'false'
                                 ? {
-                                    uri: `data:image/png;base64,${route?.params?.assetData?.image}`
-                                }
+                                      uri: `data:image/png;base64,${route?.params?.assetData?.image}`
+                                  }
                                 : require('../../assets/images/default_image.jpg')
                         }
                         resizeMode="cover"
@@ -90,7 +90,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                     <AssetTagStatus
                         status={
                             route?.params?.assetData?.use_state?.toString() !==
-                                'false'
+                            'false'
                                 ? route?.params?.assetData?.use_state
                                 : USE_STATE_ASSET_TH.Normal
                         }

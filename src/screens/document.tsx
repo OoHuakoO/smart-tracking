@@ -489,13 +489,34 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
+                    <Text
+                        variant={isSmallMb ? 'headlineSmall' : 'headlineLarge'}
+                        style={styles.textHeader}
+                    >
                         Document
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         เอกสารการตรวจนับทั้งหมด
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -509,7 +530,10 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         }
                     />
                 </View>
-                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalDocument}>
+                <Text
+                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    style={styles.textTotalDocument}
+                >
                     Total Document : {countTotalDocument}
                 </Text>
                 {!online && countTotalDocument > 0 && (
@@ -618,7 +642,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     },
     listSection: {
         flex: 1,

@@ -229,13 +229,34 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                     <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
+                    <Text
+                        variant={isSmallMb ? 'headlineSmall' : 'headlineLarge'}
+                        style={styles.textHeader}
+                    >
                         {route?.params?.LocationData?.location_name}
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -251,7 +272,10 @@ const LocationListAssetScreen: FC<LocationListAssetProps> = (props) => {
                         }
                     />
                 </View>
-                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
+                <Text
+                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    style={styles.textTotalAsset}
+                >
                     Total Asset : {countTotalAsset}
                 </Text>
 
@@ -318,7 +342,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     },
     listSection: {
         flex: 1,

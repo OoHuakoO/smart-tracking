@@ -30,7 +30,16 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
     return (
         <View>
             <View>
-                <Text variant={isTablet ? "headlineLarge" : isSmallMb ? 'titleLarge' : "titleLarge"} style={styles.textMenu}>
+                <Text
+                    variant={
+                        isTablet
+                            ? 'headlineLarge'
+                            : isSmallMb
+                            ? 'titleLarge'
+                            : 'titleLarge'
+                    }
+                    style={styles.textMenu}
+                >
                     Menu
                 </Text>
             </View>

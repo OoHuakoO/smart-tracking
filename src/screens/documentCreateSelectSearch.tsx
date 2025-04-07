@@ -248,7 +248,10 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>
-                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
+                <Text
+                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    style={styles.textTotalAsset}
+                >
                     Total Asset : {countTotalAsset}
                 </Text>
 
@@ -315,7 +318,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     },
     listSection: {
         flex: 1,

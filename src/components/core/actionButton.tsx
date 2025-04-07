@@ -31,7 +31,7 @@ const ActionButton: FC<ActionButtonProps> = (props) => {
 
 const styles = StyleSheet.create({
     fab: {
-        borderRadius: 100,
+        borderRadius: 100
     }
 });
 

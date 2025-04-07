@@ -425,13 +425,34 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
+                    <Text
+                        variant={isSmallMb ? 'titleMedium' : 'headlineMedium'}
+                        style={styles.textHeader}
+                    >
                         {route?.params?.LocationData?.location_name}
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -448,7 +469,10 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         }
                     />
                 </View>
-                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
+                <Text
+                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    style={styles.textTotalAsset}
+                >
                     Total Asset: {totalListReportAsset}
                 </Text>
 

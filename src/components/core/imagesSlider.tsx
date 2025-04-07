@@ -37,7 +37,7 @@ const ImageSlider = () => {
 const styles = StyleSheet.create({
     container: {
         height: isTablet ? 300 : isSmallMb ? 120 : 150,
-        marginTop: 10,
+        marginTop: 10
     },
     slide1: {
         flex: 1,

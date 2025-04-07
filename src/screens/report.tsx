@@ -65,13 +65,34 @@ const ReportScreen: FC<ReportScreenProps> = (props) => {
                     />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
+                    <Text
+                        variant={isSmallMb ? 'headlineSmall' : 'headlineLarge'}
+                        style={styles.textHeader}
+                    >
                         Report
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         สามารถดูจำนวนและรายการทรัพย์สินของแต่ละสถานะ Asset
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -160,7 +181,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     },
     listSection: {
         flex: 1,

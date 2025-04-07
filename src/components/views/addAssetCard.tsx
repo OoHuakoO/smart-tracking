@@ -50,8 +50,8 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                     source={
                         imageSource?.toString() !== 'false'
                             ? {
-                                uri: `data:image/png;base64,${imageSource}`
-                            }
+                                  uri: `data:image/png;base64,${imageSource}`
+                              }
                             : require('../../../assets/images/default_image.jpg')
                     }
                     resizeMode="cover"
@@ -65,20 +65,20 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
                     <Text variant="bodyLarge">{assetName}</Text>
                 </View>
                 <Text variant="bodyMedium">
-                    Status { }
+                    Status {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
                 </Text>
                 <Text variant="bodyMedium">
-                    Movement { }
+                    Movement {}
                     <Text style={styles.additionalText}>{assetMovement}</Text>
                 </Text>
                 <Text variant="bodyMedium">
-                    Location { }
+                    Location {}
                     <Text style={styles.additionalText}>{assetLocation}</Text>
                 </Text>
                 {assetMovement === MOVEMENT_ASSET_EN.Transfer && (
                     <Text variant="bodyMedium">
-                        New Location { }
+                        New Location {}
                         <Text style={styles.additionalText}>
                             {assetNewLocation}
                         </Text>

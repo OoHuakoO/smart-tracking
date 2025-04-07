@@ -175,13 +175,34 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                     <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant={isSmallMb ? "headlineSmall" : "headlineLarge"} style={styles.textHeader}>
+                    <Text
+                        variant={isSmallMb ? 'headlineSmall' : 'headlineLarge'}
+                        style={styles.textHeader}
+                    >
                         Location
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         สามารถดูสถานที่ทั้งหมดในบริษัทของคุณ
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -283,7 +304,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     }
 });
 

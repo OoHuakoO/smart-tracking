@@ -366,7 +366,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         style={styles.resetCancel}
                         onPress={handleOpenDialogConfirmCancelDocument}
                     >
-                        <Text variant={isTablet ? "bodyMedium" : "bodySmall"} style={styles.textCancel}>
+                        <Text
+                            variant={isTablet ? 'bodyMedium' : 'bodySmall'}
+                            style={styles.textCancel}
+                        >
                             Cancel
                         </Text>
                     </TouchableOpacity>
@@ -391,10 +394,28 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Location: {documentValue?.location || '-'}
                     </Text>
-                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
+                    <Text
+                        variant={
+                            isTablet
+                                ? 'titleLarge'
+                                : isSmallMb
+                                ? 'bodyMedium'
+                                : 'bodyLarge'
+                        }
+                        style={styles.textDescription}
+                    >
                         Branch : {branchValue?.branchName}
                     </Text>
                     <View
@@ -411,7 +432,10 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             </LinearGradient>
 
             <View style={styles.listSection}>
-                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalDocument}>
+                <Text
+                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    style={styles.textTotalDocument}
+                >
                     Total Asset : {totalAssetDocument}
                 </Text>
                 <FlatList
@@ -528,7 +552,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0,
+        padding: isTablet ? 5 : 0
     },
     listSection: {
         flex: 1,
@@ -583,7 +607,7 @@ const styles = StyleSheet.create({
     },
     textCancel: {
         fontFamily: 'DMSans-Bold',
-        color: theme.colors.documentCancel,
+        color: theme.colors.documentCancel
     },
     flatListStyle: {
         marginBottom: 30
