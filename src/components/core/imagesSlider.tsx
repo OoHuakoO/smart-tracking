@@ -4,6 +4,7 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import Swiper from 'react-native-swiper';
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const ImageSlider = () => {
     return (
@@ -35,7 +36,8 @@ const ImageSlider = () => {
 
 const styles = StyleSheet.create({
     container: {
-        height: isTablet ? 300 : 150
+        height: isTablet ? 300 : isSmallMb ? 120 : 150,
+        marginTop: 10,
     },
     slide1: {
         flex: 1,

@@ -1,6 +1,7 @@
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import ActionButton from './actionButton';
 
 interface SearchButtonProps {
@@ -17,7 +18,7 @@ const SearchButton: FC<SearchButtonProps> = (props) => {
         >
             <ActionButton
                 icon={'magnify'}
-                size="small"
+                size={isTablet ? "medium" : "small"}
                 backgroundColor={theme.colors.white}
             />
         </TouchableOpacity>

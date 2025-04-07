@@ -248,7 +248,7 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
                 </View>
             </LinearGradient>
             <View style={styles.listSection}>
-                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
                     Total Asset : {countTotalAsset}
                 </Text>
 
@@ -291,13 +291,13 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -314,7 +314,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
@@ -346,7 +347,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     },
     drawer: {

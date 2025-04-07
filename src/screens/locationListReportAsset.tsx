@@ -51,6 +51,7 @@ type LocationListReportAssetProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
     props
@@ -424,13 +425,13 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     <BackButton handlePress={() => navigation.goBack()} />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant="headlineLarge" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
                         {route?.params?.LocationData?.location_name}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         รายละเอียดทรัพย์สินภายในสถานที่นี้
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -447,7 +448,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                         }
                     />
                 </View>
-                <Text variant="bodyLarge" style={styles.textTotalAsset}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalAsset}>
                     Total Asset: {totalListReportAsset}
                 </Text>
 
@@ -483,13 +484,13 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -541,7 +542,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     }
 });

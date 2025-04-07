@@ -65,6 +65,7 @@ type DocumentAssetStatusScreenProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     props
@@ -365,7 +366,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         style={styles.resetCancel}
                         onPress={handleOpenDialogConfirmCancelDocument}
                     >
-                        <Text variant="bodySmall" style={styles.textCancel}>
+                        <Text variant={isTablet ? "bodyMedium" : "bodySmall"} style={styles.textCancel}>
                             Cancel
                         </Text>
                     </TouchableOpacity>
@@ -385,15 +386,15 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 )} */}
 
                 <View style={styles.containerText}>
-                    <Text variant="headlineLarge" style={styles.textHeader}>
+                    <Text variant="headlineSmall" style={styles.textHeader}>
                         {online
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location: {documentValue?.location || '-'}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                     <View
@@ -410,7 +411,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             </LinearGradient>
 
             <View style={styles.listSection}>
-                <Text variant="bodyLarge" style={styles.textTotalDocument}>
+                <Text variant={isTablet ? "titleLarge" : "bodyLarge"} style={styles.textTotalDocument}>
                     Total Asset : {totalAssetDocument}
                 </Text>
                 <FlatList
@@ -469,13 +470,13 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -485,7 +486,7 @@ const styles = StyleSheet.create({
     resetCancel: {
         position: 'absolute',
         right: 15,
-        top: 30,
+        top: isTablet ? 35 : 20,
         borderWidth: 2,
         borderColor: theme.colors.documentCancel,
         backgroundColor: theme.colors.white,
@@ -506,17 +507,17 @@ const styles = StyleSheet.create({
     },
     statusIndicator: {
         alignSelf: 'flex-start',
-        paddingHorizontal: 20,
-        paddingVertical: 5,
+        paddingHorizontal: isSmallMb ? 15 : 20,
+        paddingVertical: isSmallMb ? 3 : 5,
         borderRadius: 25,
-        marginTop: 10,
+        marginTop: isSmallMb ? 5 : 10,
         flexDirection: 'row'
     },
     statusText: {
         color: theme.colors.pureWhite
     },
     containerText: {
-        marginHorizontal: 20
+        marginHorizontal: isTablet ? 15 : 20
     },
     textHeader: {
         color: theme.colors.pureWhite,
@@ -526,7 +527,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
@@ -535,7 +537,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '30%' : '52%'
+        marginTop: isTablet ? '35%' : '52%'
     },
     wrapDetailList: {
         display: 'flex',
@@ -549,7 +551,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginTop: 20,
         fontFamily: 'DMSans-Bold',
-        fontSize: 15,
         marginBottom: 20
     },
     button: {
@@ -582,7 +583,7 @@ const styles = StyleSheet.create({
     },
     textCancel: {
         fontFamily: 'DMSans-Bold',
-        color: theme.colors.documentCancel
+        color: theme.colors.documentCancel,
     },
     flatListStyle: {
         marginBottom: 30

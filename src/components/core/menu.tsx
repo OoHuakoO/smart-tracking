@@ -2,7 +2,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -16,6 +16,10 @@ interface MenuProps {
     menuName: string;
     menuPage: () => void;
 }
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const Menu: FC<MenuProps> = (props) => {
     const { icon, menuName, menuPage } = props;
@@ -31,7 +35,7 @@ const Menu: FC<MenuProps> = (props) => {
                     <View style={styles.containerMenu}>
                         <FontAwesomeIcon
                             icon={icon}
-                            size={45}
+                            size={isTablet ? 70 : isSmallMb ? 37 : 45}
                             style={styles.iconStyle}
                         />
                     </View>
@@ -57,8 +61,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerMenu: {
-        width: wp('21%'),
-        height: hp('12%'),
+        width: isTablet ? wp('19%') : wp('21%'),
+        height: isSmallMb || isTablet ? hp('14%') : hp('12%'),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
@@ -70,7 +74,7 @@ const styles = StyleSheet.create({
         color: theme.colors.white
     },
     textMenu: {
-        marginTop: 10,
+        marginTop: isSmallMb ? 5 : 10,
         fontFamily: 'DMSans-Medium'
     }
 });

@@ -63,6 +63,7 @@ type DocumentCreateNewAssetProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
 
 const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const { navigation, route } = props;
@@ -232,13 +233,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             state: MOVEMENT_ASSET_EN.New,
                             ...(selectedImage
                                 ? {
-                                      image: selectedImage,
-                                      new_img: true
-                                  }
+                                    image: selectedImage,
+                                    new_img: true
+                                }
                                 : {
-                                      image: false,
-                                      new_img: false
-                                  }),
+                                    image: false,
+                                    new_img: false
+                                }),
                             location: documentValue?.location,
                             category: searchCategory?.category_name
                         });
@@ -279,13 +280,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         state: MOVEMENT_ASSET_EN.New,
                         ...(selectedImage
                             ? {
-                                  image: selectedImage,
-                                  new_img: true
-                              }
+                                image: selectedImage,
+                                new_img: true
+                            }
                             : {
-                                  image: false,
-                                  new_img: false
-                              }),
+                                image: false,
+                                new_img: false
+                            }),
                         location: documentValue?.location,
                         category: searchCategory?.category_name
                     });
@@ -391,20 +392,20 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                 </View>
                 <View style={styles.containerText}>
                     <Text
-                        variant="headlineMedium"
+                        variant={isSmallMb ? "headlineSmall" : "headlineMedium"}
                         style={styles.addAssetNewText}
                     >
                         Add Asset New
                     </Text>
-                    <Text variant="headlineSmall" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
                         {online
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -576,13 +577,13 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '35%',
+        height: '37%',
         width: wp('100%'),
         position: 'absolute',
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -599,7 +600,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,

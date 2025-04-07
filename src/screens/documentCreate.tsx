@@ -68,6 +68,8 @@ type DocumentCreateProps = NativeStackScreenProps<
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 768 && height >= 768;
+const isSmallMb = width < 400;
+
 
 const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     LogBox.ignoreLogs([
@@ -430,18 +432,18 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
             const isToday = asset.create_date
                 ? moment(asset.create_date).isBetween(
-                      moment().startOf('day'),
-                      moment().endOf('day'),
-                      null,
-                      '[]'
-                  )
+                    moment().startOf('day'),
+                    moment().endOf('day'),
+                    null,
+                    '[]'
+                )
                 : false;
 
             const state = isToday
                 ? MOVEMENT_ASSET_EN.New
                 : asset.location !== documentValue?.location
-                ? MOVEMENT_ASSET_EN.Transfer
-                : MOVEMENT_ASSET_EN.Normal;
+                    ? MOVEMENT_ASSET_EN.Transfer
+                    : MOVEMENT_ASSET_EN.Normal;
 
             setScanAssetData({ ...asset, state, use_state });
             setSearchUseState(use_state);
@@ -570,7 +572,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 if (listDocumentDB.length > 0) {
                     if (
                         listDocumentDB[0].state ===
-                            STATE_DOCUMENT_NAME.Cancel ||
+                        STATE_DOCUMENT_NAME.Cancel ||
                         listDocumentDB[0].state === STATE_DOCUMENT_NAME.Done
                     ) {
                         isDuplicateAssetInListDocumentLineDB = false;
@@ -789,18 +791,18 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     />
                 </View>
                 <View style={styles.containerText}>
-                    <Text variant="headlineMedium" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
                         Add Asset
                     </Text>
-                    <Text variant="headlineSmall" style={styles.textHeader}>
+                    <Text variant={isSmallMb ? "titleMedium" : "headlineMedium"} style={styles.textHeader}>
                         {online
                             ? `${documentValue?.name} - ${documentValue?.id}`
                             : `Document : ${documentValue?.id}`}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Location : {documentValue?.location || '-'}
                     </Text>
-                    <Text variant="bodyLarge" style={styles.textDescription}>
+                    <Text variant={isTablet ? "titleLarge" : isSmallMb ? "bodyMedium" : "bodyLarge"} style={styles.textDescription}>
                         Branch : {branchValue?.branchName}
                     </Text>
                 </View>
@@ -958,7 +960,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginTop: 15,
+        marginVertical: isTablet ? 0 : 15,
         marginBottom: 10,
         marginHorizontal: 15,
         display: 'flex',
@@ -993,7 +995,8 @@ const styles = StyleSheet.create({
     },
     textDescription: {
         fontFamily: 'Sarabun-Regular',
-        color: theme.colors.pureWhite
+        color: theme.colors.pureWhite,
+        padding: isTablet ? 5 : 0,
     },
     listSection: {
         flex: 1,
