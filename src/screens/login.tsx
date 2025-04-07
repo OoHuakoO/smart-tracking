@@ -23,6 +23,7 @@ import {
     ACCESS_DENIED,
     EMAIL_PASSWORD_INCORRECT,
     SETTING_INCORRECT,
+    USER_NON_ACTIVE,
     USER_NOT_FOUND
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
@@ -80,6 +81,11 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                 if (response?.error) {
                     throw response.error;
                 }
+                if (!response?.result?.data?.user_active) {
+                    setVisibleDialog(true);
+                    setContentDialog(USER_NON_ACTIVE);
+                    return true;
+                }
                 if (
                     response?.result?.data?.mac_address !==
                         jsonSettings?.mac_address &&
@@ -133,6 +139,18 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
             try {
                 const settings = await AsyncStorage.getItem('Settings');
                 const jsonSettings: SettingParams = JSON.parse(settings);
+
+                const responseCheckUserActive = await CheckUserActive({
+                    login: data?.login,
+                    password: data?.password
+                });
+
+                if (!responseCheckUserActive?.result?.data?.user_active) {
+                    setVisibleDialog(true);
+                    setContentDialog(USER_NON_ACTIVE);
+                    return;
+                }
+
                 const response = await Login({
                     login: data?.login,
                     password: data?.password,

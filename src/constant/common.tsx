@@ -67,3 +67,5 @@ export const USER_NOT_FOUND = 'User not found';
 
 export const SETTING_INCORRECT =
     'Incorrectly input some values in the settings.';
+
+export const USER_NON_ACTIVE = 'This user is not active yet.';

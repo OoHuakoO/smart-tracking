@@ -69,7 +69,8 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
       image,
       use_state,
       new_img,
-      owner
+      owner,
+      create_date
     ) VALUES ` +
         assets
             .map(
@@ -88,7 +89,8 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
                     '${item.image}',
                     '${item.use_state}',
                     ${item.new_img},
-                    '${item.owner}'
+                    '${item.owner}',
+                    '${item.create_date}'
                     )`
             )
             .join(',');

@@ -27,6 +27,7 @@ export interface LoginResponse {
 export interface CheckUserActiveData {
     is_login: boolean;
     mac_address: string;
+    user_active: boolean;
 }
 
 export interface CheckUserActiveResponse {
