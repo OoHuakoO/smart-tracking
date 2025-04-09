@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import { RFPercentage } from 'react-native-responsive-fontsize';
@@ -17,8 +18,8 @@ interface MenuProps {
     menuPage: () => void;
 }
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
+
 const isSmallMb = width < 400;
 
 const Menu: FC<MenuProps> = (props) => {
@@ -35,7 +36,7 @@ const Menu: FC<MenuProps> = (props) => {
                     <View style={styles.containerMenu}>
                         <FontAwesomeIcon
                             icon={icon}
-                            size={isTablet ? 70 : isSmallMb ? 37 : 45}
+                            size={isTablet() ? 70 : isSmallMb ? 37 : 45}
                             style={styles.iconStyle}
                         />
                     </View>
@@ -61,8 +62,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     containerMenu: {
-        width: isTablet ? wp('19%') : wp('21%'),
-        height: isSmallMb || isTablet ? hp('14%') : hp('12%'),
+        width: isTablet() ? wp('19%') : wp('21%'),
+        height: isSmallMb || isTablet() ? hp('14%') : hp('12%'),
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'

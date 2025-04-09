@@ -1,9 +1,9 @@
 import { theme } from '@src/theme';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, View } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import Swiper from 'react-native-swiper';
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
 const isSmallMb = width < 400;
 
 const ImageSlider = () => {
@@ -36,7 +36,7 @@ const ImageSlider = () => {
 
 const styles = StyleSheet.create({
     container: {
-        height: isTablet ? 300 : isSmallMb ? 120 : 150,
+        height: isTablet() ? 300 : isSmallMb ? 120 : 150,
         marginTop: 10
     },
     slide1: {

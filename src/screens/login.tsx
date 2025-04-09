@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
-    Dimensions,
     Keyboard,
     SafeAreaView,
     TouchableOpacity,
@@ -42,14 +41,11 @@ import { LoginParams, SettingParams } from '@src/typings/login';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo, { isTablet } from 'react-native-device-info';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type LoginScreenProps = NativeStackScreenProps<PublicStackParamsList, 'Login'>;
-
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
 
 const LoginScreen: FC<LoginScreenProps> = (props) => {
     let version = DeviceInfo.getVersion();
@@ -584,7 +580,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'DMSans-Bold',
         marginTop: 40,
-        fontSize: isTablet ? 38 : 25
+        fontSize: isTablet() ? 38 : 25
     },
     textVersion: {
         marginTop: 10,

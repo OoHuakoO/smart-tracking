@@ -50,6 +50,7 @@ import { DocumentState } from '@src/typings/common';
 import { DocumentAssetData } from '@src/typings/document';
 import { getOnlineMode, handleMapMovementStateEN } from '@src/utils/common';
 import { parseDateString } from '@src/utils/time-manager';
+import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { RFPercentage } from 'react-native-responsive-fontsize';
 import {
@@ -63,8 +64,7 @@ type DocumentAssetStatusScreenProps = NativeStackScreenProps<
     'DocumentAssetStatus'
 >;
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
 const isSmallMb = width < 400;
 
 const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
@@ -367,7 +367,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         onPress={handleOpenDialogConfirmCancelDocument}
                     >
                         <Text
-                            variant={isTablet ? 'bodyMedium' : 'bodySmall'}
+                            variant={isTablet() ? 'bodyMedium' : 'bodySmall'}
                             style={styles.textCancel}
                         >
                             Cancel
@@ -396,7 +396,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -408,7 +408,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -433,7 +433,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
             <View style={styles.listSection}>
                 <Text
-                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    variant={isTablet() ? 'titleLarge' : 'bodyLarge'}
                     style={styles.textTotalDocument}
                 >
                     Total Asset : {totalAssetDocument}
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: isTablet ? 0 : 15,
+        marginVertical: isTablet() ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     resetCancel: {
         position: 'absolute',
         right: 15,
-        top: isTablet ? 35 : 20,
+        top: isTablet() ? 35 : 20,
         borderWidth: 2,
         borderColor: theme.colors.documentCancel,
         backgroundColor: theme.colors.white,
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
         color: theme.colors.pureWhite
     },
     containerText: {
-        marginHorizontal: isTablet ? 15 : 20
+        marginHorizontal: isTablet() ? 15 : 20
     },
     textHeader: {
         color: theme.colors.pureWhite,
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0
+        padding: isTablet() ? 5 : 0
     },
     listSection: {
         flex: 1,
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '35%' : '52%'
+        marginTop: isTablet() ? '35%' : '52%'
     },
     wrapDetailList: {
         display: 'flex',

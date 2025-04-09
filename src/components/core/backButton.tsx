@@ -1,9 +1,9 @@
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
-import { Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import ActionButton from './actionButton';
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+
 interface BackButtonProps {
     handlePress: () => void;
 }
@@ -28,7 +28,7 @@ const BackButton: FC<BackButtonProps> = (props) => {
 const styles = StyleSheet.create({
     container: {
         marginRight: 20,
-        marginVertical: isTablet ? 20 : 0
+        marginVertical: isTablet() ? 20 : 0
     }
 });
 

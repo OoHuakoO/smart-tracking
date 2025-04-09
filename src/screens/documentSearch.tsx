@@ -42,7 +42,6 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
     const stateList: State[] = [
         { label: 'Draft', value: 'draft' },
         { label: 'Check', value: 'open' },
-        { label: 'Done', value: 'done' },
         { label: 'Cancelled', value: 'cancel' }
     ];
 
@@ -221,73 +220,6 @@ const DocumentSearchScreen: FC<DocumentSearchScreenProps> = (props) => {
                 }}
                 renderItem={renderItemUseState}
             />
-            {/*
-            <Text variant="bodyLarge">Start From</Text>
-
-            <TouchableOpacity
-                onPress={() => {
-                    setOpenStart(true);
-                    setDateStart(new Date());
-                    setDateEnd(null);
-                }}
-            >
-                <InputText
-                    placeholder="Date"
-                    value={
-                        dateStart ? parseDateString(dateStart.toString()) : null
-                    }
-                    readOnly
-                />
-            </TouchableOpacity>
-
-            {openDateStart && (
-                <DatePicker
-                    modal
-                    mode="date"
-                    open={openDateStart}
-                    date={dateStart}
-                    onConfirm={(date) => {
-                        setOpenStart(false);
-                        setDateStart(date);
-                    }}
-                    onCancel={() => {
-                        setOpenStart(false);
-                    }}
-                />
-            )}
-
-            <Text variant="bodyLarge">End Date</Text>
-
-            <TouchableOpacity
-                onPress={() => {
-                    setOpenEnd(true);
-                    setDateEnd(new Date());
-                }}
-            >
-                <InputText
-                    placeholder="Date"
-                    value={dateEnd ? parseDateString(dateEnd.toString()) : null}
-                    readOnly
-                />
-            </TouchableOpacity>
-
-            {openDateEnd && (
-                <DatePicker
-                    modal
-                    mode="date"
-                    open={openDateEnd}
-                    date={dateEnd}
-                    minimumDate={dateStart}
-                    onConfirm={(date) => {
-                        setOpenEnd(false);
-                        setDateEnd(date);
-                    }}
-                    onCancel={() => {
-                        setOpenEnd(false);
-                    }}
-                />
-            )} */}
-
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.buttonClear}

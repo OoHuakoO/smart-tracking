@@ -42,6 +42,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import { Dropdown } from 'react-native-element-dropdown';
 import {
     MediaType,
@@ -61,8 +62,7 @@ type DocumentCreateNewAssetProps = NativeStackScreenProps<
     'DocumentCreateNewAsset'
 >;
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
 const isSmallMb = width < 400;
 
 const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
@@ -407,7 +407,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -419,7 +419,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: isTablet ? 0 : 15,
+        marginVertical: isTablet() ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -622,7 +622,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0
+        padding: isTablet() ? 5 : 0
     },
     listSection: {
         flex: 1,
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '30%' : '50%',
+        marginTop: isTablet() ? '30%' : '50%',
         marginBottom: 2
     },
     containerMenu: {

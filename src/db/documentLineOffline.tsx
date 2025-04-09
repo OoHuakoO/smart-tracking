@@ -270,6 +270,18 @@ export const updateDocumentLineData = (
     }
 };
 
+export const removeDocumentLineOffline = (db: SQLiteDatabase) => {
+    const deleteQuery = `DELETE FROM documentLineOffline`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(deleteQuery);
+        });
+        console.log(`remove document line successfully`);
+    } catch (err) {
+        throw new Error(`Error remove document : ${err.message}`);
+    }
+};
+
 export const removeDocumentLineByAssetId = (
     db: SQLiteDatabase,
     assetId: number

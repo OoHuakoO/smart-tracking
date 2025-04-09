@@ -7,11 +7,9 @@ import SettingScreen from '@src/screens/setting';
 import { theme } from '@src/theme';
 import { PublicStackParamsList } from '@src/typings/navigation';
 import React, { useCallback } from 'react';
-import { Dimensions } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 
 const Stack = createNativeStackNavigator<PublicStackParamsList>();
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
 
 const PublicStack = () => {
     const navigation = useNavigation<NavigationProp<PublicStackParamsList>>();
@@ -38,7 +36,7 @@ const PublicStack = () => {
                     headerTintColor: theme.colors.white,
                     headerTitleStyle: {
                         fontFamily: 'DMSans-Bold',
-                        fontSize: isTablet ? 35 : 20
+                        fontSize: isTablet() ? 35 : 20
                     },
                     headerLeft: BackButtonComponent
                 }}

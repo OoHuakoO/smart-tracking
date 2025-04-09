@@ -7,13 +7,10 @@ import DocumentCard from '@src/components/views/documentCard';
 import DocumentDialog from '@src/components/views/documentDialog';
 import { STATE_DOCUMENT_NAME } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
-import { removeDocumentLineOfflineByTrackingID } from '@src/db/documentLineOffline';
 import {
     getDocumentOffline,
     getTotalDocument,
-    insertDocumentOfflineData,
-    removeDocumentOffline,
-    removeDocumentOfflineByID
+    insertDocumentOfflineData
 } from '@src/db/documentOffline';
 import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
@@ -42,6 +39,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -56,16 +54,13 @@ type DocumentScreenProp = NativeStackScreenProps<
     'Document'
 >;
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
 const isSmallMb = width < 400;
 
 const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const { navigation, route } = props;
     const { top } = useSafeAreaInsets();
     const [dialogVisible, setDialogVisible] = useState(false);
-    const [titleDialog, setTitleDialog] = useState<string>('');
-    const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [countTotalDocument, setCountDocument] = useState<number>(0);
     const [listDocument, setListDocument] = useState<DocumentData[]>([]);
@@ -78,45 +73,15 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [locationSearch, setLocationSearch] = useState<string>('');
     const [listLocation, setListLocation] = useState<LocationSearchData[]>([]);
     const setDocument = useSetRecoilState<DocumentState>(documentState);
-    const [idDocument, setIdDocument] = useState<number>(0);
     const branchValue = useRecoilValue(BranchState);
 
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
 
-    const clearStateDialog = useCallback(() => {
-        setVisibleDialog(false);
-        setTitleDialog('');
-        setContentDialog('');
-        setShowCancelDialog(false);
-    }, []);
-
     const toggleDialog = useCallback(() => {
         setDialogVisible(!dialogVisible);
     }, [dialogVisible]);
-
-    const handleOpenDialogConfirmRemoveDocument = useCallback(
-        (id: number) => {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog('Confirm');
-            setContentDialog('Do you want to remove this document ?');
-            setShowCancelDialog(true);
-            setIdDocument(id);
-        },
-        [clearStateDialog]
-    );
-
-    const handleOpenDialogConfirmRemoveAllDocument = useCallback(() => {
-        clearStateDialog();
-        setVisibleDialog(true);
-        setTitleDialog('Confirm Remove All');
-        setContentDialog(
-            'Please verify if there are any documents that have not yet been uploaded, as this action will delete all documents.'
-        );
-        setShowCancelDialog(true);
-    }, [clearStateDialog]);
 
     const handleFetchLocation = useCallback(async () => {
         try {
@@ -346,15 +311,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     setDocument(documentObj);
                 } else {
                     const db = await getDBConnection();
-                    const documentInsert = {
-                        state: STATE_DOCUMENT_NAME.Draft,
-                        location: location?.location_name,
-                        location_id: location?.location_id
-                    };
-                    await insertDocumentOfflineData(
-                        db,
-                        documentInsert as DocumentData
-                    );
                     const sort = {
                         date_order: true
                     };
@@ -363,10 +319,23 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                         null,
                         sort
                     );
+                    const documentInsert = {
+                        tracking_id:
+                            listDocumentDB?.length > 0
+                                ? listDocumentDB[0]?.tracking_id + 1
+                                : 1,
+                        state: STATE_DOCUMENT_NAME.Draft,
+                        location: location?.location_name,
+                        location_id: location?.location_id
+                    };
+                    await insertDocumentOfflineData(
+                        db,
+                        documentInsert as DocumentData
+                    );
                     const documentObj = {
                         id:
                             listDocumentDB?.length > 0
-                                ? listDocumentDB[0]?.id
+                                ? listDocumentDB[0]?.tracking_id + 1
                                 : 1,
                         state: STATE_DOCUMENT_NAME.Draft,
                         location: location?.location_name,
@@ -394,56 +363,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
         ]
     );
 
-    const handleRemoveAllDocument = useCallback(async () => {
-        try {
-            clearStateDialog();
-            const db = await getDBConnection();
-            const listDocumentDB = await getDocumentOffline(db, null);
-            listDocumentDB.map(async (item) => {
-                await removeDocumentLineOfflineByTrackingID(db, item?.id);
-            });
-            await removeDocumentOffline(db);
-            await handleFetchDocument();
-        } catch (err) {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong remove document');
-        }
-    }, [clearStateDialog, handleFetchDocument]);
-
-    const handleRemoveDocument = useCallback(async () => {
-        try {
-            clearStateDialog();
-            const db = await getDBConnection();
-            await removeDocumentOfflineByID(db, idDocument);
-            await removeDocumentLineOfflineByTrackingID(db, idDocument);
-            await handleFetchDocument();
-        } catch (err) {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setContentDialog('Something went wrong remove document');
-        }
-    }, [clearStateDialog, handleFetchDocument, idDocument]);
-
-    const handleConfirmDialog = useCallback(async () => {
-        switch (titleDialog) {
-            case 'Confirm':
-                await handleRemoveDocument();
-                break;
-            case 'Confirm Remove All':
-                await handleRemoveAllDocument();
-                break;
-            default:
-                clearStateDialog();
-                break;
-        }
-    }, [
-        clearStateDialog,
-        handleRemoveAllDocument,
-        handleRemoveDocument,
-        titleDialog
-    ]);
-
     useEffect(() => {
         handleFetchDocument();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -470,12 +389,10 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     return (
         <SafeAreaView style={[styles.container, { marginTop: top }]}>
             <AlertDialog
-                textTitle={titleDialog}
                 textContent={contentDialog}
                 visible={visibleDialog}
                 handleClose={handleCloseDialog}
-                handleConfirm={handleConfirmDialog}
-                showCloseDialog={showCancelDialog}
+                handleConfirm={handleCloseDialog}
             />
             <LinearGradient
                 start={{ x: 0, y: 1 }}
@@ -497,7 +414,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -509,7 +426,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     </Text>
                     <Text
                         variant={
-                            isTablet
+                            isTablet()
                                 ? 'titleLarge'
                                 : isSmallMb
                                 ? 'bodyMedium'
@@ -531,23 +448,11 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     />
                 </View>
                 <Text
-                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    variant={isTablet() ? 'titleLarge' : 'bodyLarge'}
                     style={styles.textTotalDocument}
                 >
                     Total Document : {countTotalDocument}
                 </Text>
-                {!online && countTotalDocument > 0 && (
-                    <TouchableOpacity
-                        onPress={() =>
-                            handleOpenDialogConfirmRemoveAllDocument()
-                        }
-                        style={styles.buttonDeleteAll}
-                    >
-                        <Text variant="bodyLarge" style={styles.textDeleteAll}>
-                            Delete All
-                        </Text>
-                    </TouchableOpacity>
-                )}
 
                 <FlatList
                     style={styles.flatListStyle}
@@ -579,9 +484,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                     dateInfo={item?.date_order}
                                     documentStatus={item?.state}
                                     id={item?.id}
-                                    handleRemoveDocument={
-                                        handleOpenDialogConfirmRemoveDocument
-                                    }
                                 />
                             </TouchableOpacity>
                         </View>
@@ -624,7 +526,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: isTablet ? 0 : 15,
+        marginVertical: isTablet() ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -642,7 +544,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0
+        padding: isTablet() ? 5 : 0
     },
     listSection: {
         flex: 1,
@@ -651,7 +553,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '30%' : '50%'
+        marginTop: isTablet() ? '30%' : '50%'
     },
     wrapDetailList: {
         display: 'flex',

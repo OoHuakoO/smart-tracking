@@ -14,13 +14,13 @@ import { PublicStackParamsList } from '@src/typings/navigation';
 import { Controller, useForm } from 'react-hook-form';
 import {
     BackHandler,
-    Dimensions,
     ScrollView,
     StatusBar,
     StyleSheet,
     TouchableOpacity,
     View
 } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import { Button, Text } from 'react-native-paper';
 import {
     SafeAreaView,
@@ -31,9 +31,6 @@ type SettingScreenProps = NativeStackScreenProps<
     PublicStackParamsList,
     'Setting'
 >;
-
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
 
 const SettingScreen: FC<SettingScreenProps> = (props) => {
     const { navigation } = props;
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
         color: theme.colors.textPrimary,
         textAlign: 'left',
         marginBottom: 15,
-        fontSize: isTablet ? 30 : 25,
+        fontSize: isTablet() ? 30 : 25,
         fontFamily: 'DMSans-Bold'
     },
     statusTag: {
@@ -174,8 +171,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     buttonConfirm: {
-        paddingVertical: isTablet ? 5 : 0,
-        paddingHorizontal: isTablet ? 20 : 10,
+        paddingVertical: isTablet() ? 5 : 0,
+        paddingHorizontal: isTablet() ? 20 : 10,
         backgroundColor: theme.colors.buttonConfirm,
         borderRadius: 10,
         marginTop: 10
@@ -183,7 +180,7 @@ const styles = StyleSheet.create({
     textConfirm: {
         fontFamily: 'DMSans-Medium',
         color: theme.colors.white,
-        fontSize: isTablet ? 30 : 16
+        fontSize: isTablet() ? 30 : 16
     }
 });
 

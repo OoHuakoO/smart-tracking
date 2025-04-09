@@ -102,15 +102,12 @@ export const handleMapDocumentStateName = (
             return STATE_DOCUMENT_VALUE.Draft;
         case STATE_DOCUMENT_NAME.Check:
             return STATE_DOCUMENT_VALUE.Check;
-        case STATE_DOCUMENT_NAME.Done:
-            return STATE_DOCUMENT_VALUE.Done;
         case STATE_DOCUMENT_NAME.Cancel:
             return STATE_DOCUMENT_VALUE.Cancel;
         default:
             return [
                 STATE_DOCUMENT_VALUE.Draft,
                 STATE_DOCUMENT_VALUE.Check,
-                STATE_DOCUMENT_VALUE.Done,
                 STATE_DOCUMENT_VALUE.Cancel
             ];
     }

@@ -1,8 +1,8 @@
 import { theme } from '@src/theme';
 import React from 'react';
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+import { StyleSheet, Text, View } from 'react-native';
+import { isTablet } from 'react-native-device-info';
+
 const StatusTag = ({ status }) => {
     let tagColor = theme.colors.toggleOnline;
 
@@ -21,15 +21,15 @@ const StatusTag = ({ status }) => {
 
 const styles = StyleSheet.create({
     tag: {
-        paddingHorizontal: isTablet ? 20 : 15,
-        paddingVertical: isTablet ? 10 : 5,
+        paddingHorizontal: isTablet() ? 20 : 15,
+        paddingVertical: isTablet() ? 10 : 5,
         borderRadius: 5,
         marginLeft: 0,
         justifyContent: 'center'
     },
     tagText: {
         color: '#0D0E0F',
-        fontSize: isTablet ? 20 : 13,
+        fontSize: isTablet() ? 20 : 13,
         fontFamily: 'DMSans-Bold'
     }
 });

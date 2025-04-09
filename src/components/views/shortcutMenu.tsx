@@ -10,6 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import { Text } from 'react-native-paper';
 import Menu from '../core/menu';
 
@@ -20,8 +21,7 @@ interface ShortcutMenuProps
     online?: boolean;
 }
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
 const isSmallMb = width < 400;
 
 const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
@@ -32,7 +32,7 @@ const ShortcutMenu: FC<ShortcutMenuProps> = (props) => {
             <View>
                 <Text
                     variant={
-                        isTablet
+                        isTablet()
                             ? 'headlineLarge'
                             : isSmallMb
                             ? 'titleLarge'

@@ -161,6 +161,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 };
                 setLogin({ uid: '' });
                 setBranch(defaultBranch);
+                const db = await getDBConnection();
+                await dropAllMasterTable(db);
                 await AsyncStorage.setItem('Login', '');
                 await AsyncStorage.setItem(
                     'Branch',

@@ -23,6 +23,7 @@ export interface DocumentAssetData {
 
 export interface DocumentData {
     id: number;
+    tracking_id?: number;
     name?: string;
     location_id?: number;
     location?: string;

@@ -14,12 +14,12 @@ import { getOnlineMode, removeKeyEmpty } from '@src/utils/common';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import {
     BackHandler,
-    Dimensions,
     FlatList,
     StyleSheet,
     TouchableOpacity,
     View
 } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
 import {
@@ -35,9 +35,6 @@ type DocumentCreateSelectSearchProps = NativeStackScreenProps<
     PrivateStackParamsList,
     'DocumentCreateSelectSearch'
 >;
-
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
 
 const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
     props
@@ -249,7 +246,7 @@ const DocumentCreateSelectSearch: FC<DocumentCreateSelectSearchProps> = (
             </LinearGradient>
             <View style={styles.listSection}>
                 <Text
-                    variant={isTablet ? 'titleLarge' : 'bodyLarge'}
+                    variant={isTablet() ? 'titleLarge' : 'bodyLarge'}
                     style={styles.textTotalAsset}
                 >
                     Total Asset : {countTotalAsset}
@@ -300,7 +297,7 @@ const styles = StyleSheet.create({
         display: 'flex'
     },
     backToPrevious: {
-        marginVertical: isTablet ? 0 : 15,
+        marginVertical: isTablet() ? 0 : 15,
         marginHorizontal: 15,
         display: 'flex',
         flexDirection: 'column',
@@ -318,7 +315,7 @@ const styles = StyleSheet.create({
     textDescription: {
         fontFamily: 'Sarabun-Regular',
         color: theme.colors.pureWhite,
-        padding: isTablet ? 5 : 0
+        padding: isTablet() ? 5 : 0
     },
     listSection: {
         flex: 1,
@@ -327,7 +324,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        marginTop: isTablet ? '30%' : '50%',
+        marginTop: isTablet() ? '30%' : '50%',
         zIndex: 1,
         marginBottom: 20
     },

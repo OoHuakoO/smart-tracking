@@ -6,6 +6,7 @@ export const createTableDocumentOffline = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS documentOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tracking_id INTEGER NOT NULL,
             state TEXT,
             location_id INTEGER,
             location TEXT,
@@ -45,11 +46,13 @@ export const insertDocumentOfflineData = (
 ) => {
     const queryInsert =
         `INSERT INTO documentOffline (
+          tracking_id,
           state,
           location_id,
           location
         ) VALUES ` +
         `(
+           ${documents.tracking_id},
           '${documents.state}',
            ${documents.location_id},
           '${documents.location}'
@@ -93,7 +96,7 @@ export const getDocumentOffline = async (
     }
 
     if (filters?.tracking_id !== undefined) {
-        whereConditions.push(`documentOffline.id = ?`);
+        whereConditions.push(`documentOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
     }
 
@@ -171,9 +174,9 @@ export const updateDocument = (db: SQLiteDatabase, document: DocumentData) => {
         queryParams.push(document.state);
     }
 
-    if (document.id !== undefined) {
-        whereConditions.push(`id = ?`);
-        queryParams.push(document.id);
+    if (document.tracking_id !== undefined) {
+        whereConditions.push(`tracking_id = ?`);
+        queryParams.push(document.tracking_id);
     }
 
     const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
