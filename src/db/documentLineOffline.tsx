@@ -20,6 +20,7 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             image TEXT,
             new_img BOOLEAN,
             is_cancel BOOLEAN DEFAULT FALSE,
+            is_sync_odoo BOOLEAN DEFAULT FALSE,
             date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
             tx.executeSql(
@@ -71,7 +72,8 @@ export const insertDocumentLineData = (
           use_state,
           use_state_code,
           image,
-          new_img
+          new_img,
+          is_sync_odoo
         ) VALUES ` +
         documentLine
             .map(
@@ -88,7 +90,8 @@ export const insertDocumentLineData = (
                 '${item.use_state}',
                  ${item.use_state_code},
                 '${item.image}',
-                 ${item.new_img}
+                 ${item.new_img},
+                 ${item.is_sync_odoo}
                 )`
             )
             .join(',');
@@ -116,6 +119,7 @@ export const getDocumentLine = async (
         name?: string;
         'category_id.name'?: string;
         is_cancel?: boolean;
+        is_sync_odoo?: boolean;
     },
     sort?: {
         date_check?: boolean;
@@ -141,6 +145,11 @@ export const getDocumentLine = async (
     if (filters?.is_cancel !== undefined) {
         whereConditions.push(`documentLineOffline.is_cancel = ?`);
         queryParams.push(filters.is_cancel);
+    }
+
+    if (filters?.is_sync_odoo !== undefined) {
+        whereConditions.push(`documentLineOffline.is_sync_odoo = ?`);
+        queryParams.push(filters.is_sync_odoo);
     }
 
     if (filters && filters['category_id.name'] !== undefined) {

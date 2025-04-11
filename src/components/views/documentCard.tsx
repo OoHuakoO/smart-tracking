@@ -45,14 +45,10 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
             break;
     }
 
-    switch (isSyncOdoo) {
-        case true:
-            backgroundColorSyncOdoo = '#63CA7F';
-            break;
-
-        default:
-            backgroundColorSyncOdoo = theme.colors.borderAutocomplete;
-            break;
+    if (isSyncOdoo) {
+        backgroundColorSyncOdoo = '#63CA7F';
+    } else {
+        backgroundColorSyncOdoo = theme.colors.borderAutocomplete;
     }
 
     return (

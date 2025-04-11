@@ -218,7 +218,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img,
-                        mode: 'offline'
+                        is_sync_odoo: false
                     });
                     await removeReportAssetNotFoundByCode(
                         db,
@@ -551,7 +551,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
             const listDocumentLineDB = await getDocumentLine(
                 db,
-                filterDocumentLine
+                filterDocumentLine,
+                null,
+                1,
+                1000
             );
 
             const duplicateDocumentLine = listDocumentLineDB?.filter(
@@ -624,6 +627,15 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         async (code: string) => {
             try {
                 if (code === '' || code === undefined || code === null) return;
+                if (code.toLowerCase().includes('error')) {
+                    clearStateDialog();
+                    setVisibleDialog(true);
+                    setContentDialog(
+                        'Cannot find the code. Please try Scan again.'
+                    );
+                    return;
+                }
+
                 inputRef.current.focus();
                 setSelectedImage(null);
                 const isOnline = await getOnlineMode();

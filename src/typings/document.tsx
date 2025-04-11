@@ -19,6 +19,7 @@ export interface DocumentAssetData {
     is_cancel?: boolean;
     asset_id_update?: number;
     use_state_code?: number;
+    is_sync_odoo?: boolean;
 }
 
 export interface DocumentData {

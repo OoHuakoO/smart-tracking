@@ -30,7 +30,6 @@ import { getDBConnection } from '@src/db/config';
 import {
     getDocumentLine,
     getTotalDocumentLine,
-    removeDocumentLineByAssetId,
     updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import { updateDocument } from '@src/db/documentOffline';
@@ -138,8 +137,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 setListAssetDocument(response?.result?.data?.asset?.assets);
             } else {
                 const db = await getDBConnection();
-                const filter = {
-                    tracking_id: documentValue?.id
+                let filter = {
+                    tracking_id: documentValue?.id,
+                    ...(documentValue?.state === STATE_DOCUMENT_NAME.Draft && {
+                        is_cancel: false
+                    })
                 };
                 const sort = {
                     date_check: true
@@ -163,7 +165,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             setVisibleDialog(true);
             setContentDialog('Something went wrong fetch document');
         }
-    }, [clearStateDialog, documentValue?.id]);
+    }, [clearStateDialog, documentValue?.id, documentValue?.state]);
 
     const handleOpenDialogConfirmRemoveAsset = useCallback(
         (id: number, code: string) => {
@@ -282,7 +284,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     default_code: codeAsset
                 };
                 const db = await getDBConnection();
-                await removeDocumentLineByAssetId(db, idAsset);
+                await updateDocumentLineData(db, {
+                    tracking_id: documentValue?.id,
+                    asset_id: idAsset,
+                    is_cancel: true
+                });
                 const asset = await getAsset(db, filter);
                 if (asset?.length > 0) {
                     await insertReportAssetNotFound(db, [

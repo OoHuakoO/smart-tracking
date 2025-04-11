@@ -59,3 +59,16 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
         throw new Error(`Error drop master table: ${err.message}`);
     }
 };
+
+export const clearDocumentTable = (db: SQLiteDatabase) => {
+    try {
+        db.transaction((tx) => {
+            tx.executeSql('DELETE FROM documentOffline;');
+            tx.executeSql('DELETE FROM documentLineOffline;');
+            tx.executeSql('DELETE FROM reportAssetNotFound;');
+        });
+        console.log('Delete data document table successfully');
+    } catch (err) {
+        throw new Error(`Error drop master table: ${err.message}`);
+    }
+};

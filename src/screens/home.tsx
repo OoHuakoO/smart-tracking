@@ -1,13 +1,3 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import {
-    BackHandler,
-    Dimensions,
-    SafeAreaView,
-    StatusBar,
-    TouchableOpacity,
-    View
-} from 'react-native';
-
 import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +11,7 @@ import ToastComponent from '@src/components/core/toast';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
 import {
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    SOMETHING_WENT_WRONG,
     STATE_ASSET,
     STATE_DOCUMENT_NAME,
     WARNING
@@ -34,36 +25,35 @@ import {
 } from '@src/db/asset';
 import { createTableBranch, insertBranchData } from '@src/db/branch';
 import { createTableCategory, insertCategoryData } from '@src/db/category';
-import { dropAllMasterTable } from '@src/db/common';
+import { clearDataAllTable, clearDocumentTable } from '@src/db/common';
 import { getDBConnection } from '@src/db/config';
 import {
     createTableDocumentLine,
     getDocumentLine,
     insertDocumentLineData,
-    removeDocumentLineOfflineByTrackingID,
     updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import {
     createTableDocumentOffline,
     getDocumentOffline,
-    insertListDocumentOfflineData,
-    removeDocumentOffline,
-    updateDocument
+    insertListDocumentOfflineData
 } from '@src/db/documentOffline';
 import { createTableLocation, insertLocationData } from '@src/db/location';
 import {
     createTableReportAssetNotFound,
     insertReportAssetNotFound
 } from '@src/db/reportAssetNotFound';
-import { createTableUserOffline, insertUserOffline } from '@src/db/userOffline';
+import { insertUserOffline } from '@src/db/userOffline';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetBranches } from '@src/services/branch';
 import {
     AddDocumentLine,
     CreateDocument,
+    DeleteDocumentLine,
     GetDocumentLineSearch,
-    GetDocumentSearch
+    GetDocumentSearch,
+    UpdateDocumentLine
 } from '@src/services/document';
 import {
     GetAssets,
@@ -103,8 +93,17 @@ import {
     handleMapDocumentStateValue
 } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { StyleSheet } from 'react-native';
+import {
+    BackHandler,
+    Dimensions,
+    SafeAreaView,
+    StatusBar,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Button, Portal, Text } from 'react-native-paper';
@@ -113,7 +112,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
 const { width } = Dimensions.get('window');
-
 const isSmallMb = width < 400;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
@@ -147,6 +145,17 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setShowProgressBar(false);
     }, []);
 
+    const showDialogWarning = useCallback(
+        (message: string) => {
+            clearStateDialog();
+            setVisibleDialog(true);
+            setTitleDialog(WARNING);
+            setContentDialog(message);
+            setTypeDialog('warning');
+        },
+        [clearStateDialog]
+    );
+
     const handleLogout = useCallback(
         async (loginAnotherDevoice?: boolean) => {
             try {
@@ -166,7 +175,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 setLogin({ uid: '' });
                 setBranch(defaultBranch);
                 const db = await getDBConnection();
-                await dropAllMasterTable(db);
+                await clearDataAllTable(db);
                 await AsyncStorage.setItem('Login', '');
                 await AsyncStorage.setItem(
                     'Branch',
@@ -211,15 +220,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setShowCancelDialog(true);
             return;
         } else {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setContentDialog(
-                `Network Disconnected, please open internet to download`
+            return showDialogWarning(
+                'Network Disconnected, please open internet to download'
             );
-            setTypeDialog('warning');
         }
-    }, [clearStateDialog, isConnected]);
+    }, [clearStateDialog, isConnected, showDialogWarning]);
 
     const handleOpenDialogUpload = useCallback(async () => {
         if (isConnected) {
@@ -230,15 +235,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTypeDialog('upload');
             setShowCancelDialog(true);
         } else {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setContentDialog(
+            return showDialogWarning(
                 `Network disconnected, please open internet to download`
             );
-            setTypeDialog('warning');
         }
-    }, [clearStateDialog, isConnected]);
+    }, [clearStateDialog, isConnected, showDialogWarning]);
 
     const handleResponseError = useCallback(
         (error: ErrorResponse | undefined): boolean => {
@@ -281,14 +282,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 );
                 return assets;
             } catch (err) {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load location');
+                showDialogWarning('Something went wrong load location');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadUseStatus = useCallback(
@@ -304,14 +302,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return assets;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load use status');
+                showDialogWarning('Something went wrong load use status');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadCategory = useCallback(
@@ -327,14 +322,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return categorys;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load category');
+                showDialogWarning('Something went wrong load category');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadAssetNotFound = useCallback(
@@ -356,14 +348,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return categorys;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load asset not found');
+                showDialogWarning('Something went wrong load asset not found');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadDocumentLine = useCallback(
@@ -388,14 +377,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return assets;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load documentLine');
+                showDialogWarning('Something went wrong load documentLine');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadUserOffline = useCallback(
@@ -411,14 +397,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return users;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load user offline');
+                showDialogWarning('Something went wrong load user offline');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadBranch = useCallback(
@@ -434,14 +417,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return branches;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load branch');
+                showDialogWarning('Something went wrong load branch');
                 return [];
             }
         },
-        [clearStateDialog]
+        [showDialogWarning]
     );
 
     const handleLoadDocument = useCallback(
@@ -468,243 +448,221 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 return branches;
             } catch (err) {
                 console.log(err);
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog('Something went wrong load document');
+                showDialogWarning('Something went wrong load document');
                 return [];
             }
         },
-        [branchValue?.branchId, clearStateDialog]
+        [branchValue?.branchId, showDialogWarning]
     );
 
     const handleDownload = useCallback(async () => {
         try {
             const foundMacAddress = await handleCheckMacAddress();
-            if (foundMacAddress) {
-                setDisableCloseDialog(true);
-                setShowProgressBar(true);
-                const [
-                    initialResponseAssets,
-                    initialResponseLocation,
-                    initialResponseUseStatus,
-                    initialResponseCategory,
-                    initialResponseAssetNotFound,
-                    initialDocumentLine,
-                    initialUserOffline,
-                    initialBranch,
-                    initialDocument
-                ] = await Promise.all([
-                    GetAssets({ page: 1, limit: 200 }),
-                    GetLocation({ page: 1, limit: 1000 }),
-                    GetUseStatus({ page: 1, limit: 1000 }),
-                    GetCategory({ page: 1, limit: 1000 }),
-                    GetAssetNotFoundSearch({
-                        page: 1,
-                        limit: 1000,
-                        search_term: {
-                            and: { state: STATE_ASSET }
-                        }
-                    }),
-                    GetDocumentLineSearch({
-                        page: 1,
-                        limit: 1000,
-                        search_term: {
-                            and: { state: ['0', '1', '2'] }
-                        }
-                    }),
-                    GetAllUserOffline({
-                        page: 1,
-                        limit: 1000
-                    }),
-                    GetBranches({
-                        page: 1,
-                        limit: 1000
-                    }),
-                    GetDocumentSearch({
-                        page: 1,
-                        limit: 10,
-                        search_term: {
-                            and: {
-                                state: handleMapDocumentStateName(
-                                    STATE_DOCUMENT_NAME.DocumentDownload
-                                ),
-                                branch_id: branchValue?.branchId
-                            }
-                        }
-                    })
-                ]);
-
-                const errorAssets = handleResponseError(
-                    initialResponseAssets?.error
-                );
-                const errorLocation = handleResponseError(
-                    initialResponseLocation?.error
-                );
-                const errorUseStatus = handleResponseError(
-                    initialResponseUseStatus?.error
-                );
-                const errorCategorys = handleResponseError(
-                    initialResponseCategory?.error
-                );
-                const errorAssetNotFound = handleResponseError(
-                    initialResponseAssetNotFound?.error
-                );
-                const errorDocumentLine = handleResponseError(
-                    initialDocumentLine?.error
-                );
-                const errorUserOffline = handleResponseError(
-                    initialUserOffline?.error
-                );
-                const errorBranch = handleResponseError(initialBranch?.error);
-                const errorDocument = handleResponseError(
-                    initialDocument?.error
-                );
-
-                if (
-                    errorAssets ||
-                    errorLocation ||
-                    errorUseStatus ||
-                    errorCategorys ||
-                    errorAssetNotFound ||
-                    errorDocumentLine ||
-                    errorUserOffline ||
-                    errorBranch ||
-                    errorDocument
-                ) {
-                    return;
-                }
-
-                const totalPagesAssets =
-                    initialResponseAssets?.result?.data?.total_page;
-                const totalPagesLocation =
-                    initialResponseLocation?.result?.data?.total_page;
-                const totalPagesUseStatus =
-                    initialResponseUseStatus?.result?.data?.total_page;
-                const totalPagesCategory =
-                    initialResponseCategory?.result?.data?.total_page;
-                const totalPagesAssetNotFound =
-                    initialResponseAssetNotFound?.result?.data?.total_pages;
-                const totalPagesDocumentLine =
-                    initialDocumentLine?.result?.data?.total_page;
-                const totalPagesUserOffline =
-                    initialUserOffline?.result?.data?.total_page;
-                const totalPagesBranch =
-                    initialBranch?.result?.data?.total_page;
-                const totalPagesDocument =
-                    initialDocument?.result?.data?.total_page;
-
-                const [
-                    listLocation,
-                    listUseStatus,
-                    listCategory,
-                    listAssetNotFound,
-                    listDocumentLine,
-                    listUserOffline,
-                    listBranch,
-                    listDocument
-                ] = await Promise.all([
-                    handleLoadLocation(totalPagesLocation),
-                    handleLoadUseStatus(totalPagesUseStatus),
-                    handleLoadCategory(totalPagesCategory),
-                    handleLoadAssetNotFound(totalPagesAssetNotFound),
-                    handleLoadDocumentLine(totalPagesDocumentLine),
-                    handleLoadUserOffline(totalPagesUserOffline),
-                    handleLoadBranch(totalPagesBranch),
-                    handleLoadDocument(totalPagesDocument)
-                ]);
-
-                const db = await getDBConnection();
-                await dropAllMasterTable(db);
-                await createTableAsset(db);
-
-                for (let index = 0; index < totalPagesAssets; index++) {
-                    const result = await GetAssets({
-                        page: index + 1,
-                        limit: 200
-                    });
-                    await insertAssetData(db, result?.result?.data?.asset);
-                }
-
-                if (
-                    listLocation?.length > 0 &&
-                    listUseStatus?.length > 0 &&
-                    listCategory?.length > 0 &&
-                    listBranch?.length > 0
-                ) {
-                    await createTableLocation(db);
-                    await createTableUseStatus(db);
-                    await createTableCategory(db);
-                    await createTableReportAssetNotFound(db);
-                    await createTableUserOffline(db);
-                    await createTableBranch(db);
-                    await createTableDocumentOffline(db);
-                    await createTableDocumentLine(db);
-                    await insertLocationData(db, listLocation);
-                    await insertUseStatusData(db, listUseStatus);
-                    await insertCategoryData(db, listCategory);
-                    await insertBranchData(db, listBranch);
-                    if (listDocument?.length > 0) {
-                        const newListDocumentLine = listDocument?.map(
-                            (document) => {
-                                return {
-                                    ...document,
-                                    state: handleMapDocumentStateValue(
-                                        document.state
-                                    ),
-                                    is_sync_odoo: true
-                                };
-                            }
-                        );
-                        await insertListDocumentOfflineData(
-                            db,
-                            newListDocumentLine
-                        );
-                    }
-                    if (listDocumentLine?.length > 0) {
-                        const newListDocumentLine = listDocumentLine?.map(
-                            (documentLine) => {
-                                const filterUseStatus = listUseStatus.filter(
-                                    (item) =>
-                                        documentLine.use_state === item?.name
-                                );
-                                return {
-                                    ...documentLine,
-                                    image: '',
-                                    new_img: false,
-                                    use_state_code: filterUseStatus[0]?.id
-                                };
-                            }
-                        );
-                        await insertDocumentLineData(db, newListDocumentLine);
-                    }
-                    if (listAssetNotFound?.length > 0) {
-                        await insertReportAssetNotFound(db, listAssetNotFound);
-                    }
-                    if (listUserOffline?.length > 0) {
-                        await insertUserOffline(db, listUserOffline);
-                    }
-                }
-                setTimeout(() => {
-                    setToast({ open: true, text: 'Download Successfully' });
-                }, 0);
-                clearStateDialog();
-            } else {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog(
+            if (!foundMacAddress) {
+                return showDialogWarning(
                     `This device does not have permission to download`
                 );
-                setTypeDialog('warning');
             }
+
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
+
+            const [
+                initialResponseAssets,
+                initialResponseLocation,
+                initialResponseUseStatus,
+                initialResponseCategory,
+                initialResponseAssetNotFound,
+                initialDocumentLine,
+                initialUserOffline,
+                initialBranch,
+                initialDocument
+            ] = await Promise.all([
+                GetAssets({ page: 1, limit: 200 }),
+                GetLocation({ page: 1, limit: 1000 }),
+                GetUseStatus({ page: 1, limit: 1000 }),
+                GetCategory({ page: 1, limit: 1000 }),
+                GetAssetNotFoundSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: STATE_ASSET }
+                    }
+                }),
+                GetDocumentLineSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: ['0', '1', '2'] }
+                    }
+                }),
+                GetAllUserOffline({
+                    page: 1,
+                    limit: 1000
+                }),
+                GetBranches({
+                    page: 1,
+                    limit: 1000
+                }),
+                GetDocumentSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: {
+                        and: {
+                            state: handleMapDocumentStateName(
+                                STATE_DOCUMENT_NAME.DocumentDownload
+                            ),
+                            branch_id: branchValue?.branchId
+                        }
+                    }
+                })
+            ]);
+
+            const errorAssets = handleResponseError(
+                initialResponseAssets?.error
+            );
+            const errorLocation = handleResponseError(
+                initialResponseLocation?.error
+            );
+            const errorUseStatus = handleResponseError(
+                initialResponseUseStatus?.error
+            );
+            const errorCategorys = handleResponseError(
+                initialResponseCategory?.error
+            );
+            const errorAssetNotFound = handleResponseError(
+                initialResponseAssetNotFound?.error
+            );
+            const errorDocumentLine = handleResponseError(
+                initialDocumentLine?.error
+            );
+            const errorUserOffline = handleResponseError(
+                initialUserOffline?.error
+            );
+            const errorBranch = handleResponseError(initialBranch?.error);
+            const errorDocument = handleResponseError(initialDocument?.error);
+
+            if (
+                errorAssets ||
+                errorLocation ||
+                errorUseStatus ||
+                errorCategorys ||
+                errorAssetNotFound ||
+                errorDocumentLine ||
+                errorUserOffline ||
+                errorBranch ||
+                errorDocument
+            ) {
+                return;
+            }
+
+            const totalPagesAssets =
+                initialResponseAssets?.result?.data?.total_page;
+            const totalPagesLocation =
+                initialResponseLocation?.result?.data?.total_page;
+            const totalPagesUseStatus =
+                initialResponseUseStatus?.result?.data?.total_page;
+            const totalPagesCategory =
+                initialResponseCategory?.result?.data?.total_page;
+            const totalPagesAssetNotFound =
+                initialResponseAssetNotFound?.result?.data?.total_pages;
+            const totalPagesDocumentLine =
+                initialDocumentLine?.result?.data?.total_page;
+            const totalPagesUserOffline =
+                initialUserOffline?.result?.data?.total_page;
+            const totalPagesBranch = initialBranch?.result?.data?.total_page;
+            const totalPagesDocument =
+                initialDocument?.result?.data?.total_page;
+
+            const [
+                listLocation,
+                listUseStatus,
+                listCategory,
+                listAssetNotFound,
+                listDocumentLine,
+                listUserOffline,
+                listBranch,
+                listDocument
+            ] = await Promise.all([
+                handleLoadLocation(totalPagesLocation),
+                handleLoadUseStatus(totalPagesUseStatus),
+                handleLoadCategory(totalPagesCategory),
+                handleLoadAssetNotFound(totalPagesAssetNotFound),
+                handleLoadDocumentLine(totalPagesDocumentLine),
+                handleLoadUserOffline(totalPagesUserOffline),
+                handleLoadBranch(totalPagesBranch),
+                handleLoadDocument(totalPagesDocument)
+            ]);
+
+            const db = await getDBConnection();
+            await clearDataAllTable(db);
+
+            for (let index = 0; index < totalPagesAssets; index++) {
+                const result = await GetAssets({
+                    page: index + 1,
+                    limit: 200
+                });
+                await insertAssetData(db, result?.result?.data?.asset);
+            }
+
+            if (
+                listLocation?.length > 0 &&
+                listUseStatus?.length > 0 &&
+                listCategory?.length > 0 &&
+                listBranch?.length > 0
+            ) {
+                await insertLocationData(db, listLocation);
+                await insertUseStatusData(db, listUseStatus);
+                await insertCategoryData(db, listCategory);
+                await insertBranchData(db, listBranch);
+                if (listDocument?.length > 0) {
+                    const newListDocumentLine = listDocument?.map(
+                        (document) => {
+                            return {
+                                ...document,
+                                state: handleMapDocumentStateValue(
+                                    document.state
+                                ),
+                                is_sync_odoo: true
+                            };
+                        }
+                    );
+                    await insertListDocumentOfflineData(
+                        db,
+                        newListDocumentLine
+                    );
+                }
+                if (listDocumentLine?.length > 0) {
+                    const newListDocumentLine = listDocumentLine?.map(
+                        (documentLine) => {
+                            const filterUseStatus = listUseStatus.filter(
+                                (item) => documentLine.use_state === item?.name
+                            );
+                            return {
+                                ...documentLine,
+                                is_sync_odoo: true,
+                                image: '',
+                                new_img: false,
+                                use_state_code: filterUseStatus[0]?.id
+                            };
+                        }
+                    );
+                    await insertDocumentLineData(db, newListDocumentLine);
+                }
+                if (listAssetNotFound?.length > 0) {
+                    await insertReportAssetNotFound(db, listAssetNotFound);
+                }
+                if (listUserOffline?.length > 0) {
+                    await insertUserOffline(db, listUserOffline);
+                }
+            }
+            setTimeout(() => {
+                setToast({ open: true, text: 'Download Successfully' });
+            }, 0);
+            clearStateDialog();
         } catch (err) {
             console.log(err);
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setContentDialog(`Something went wrong download`);
-            setTypeDialog('warning');
+            showDialogWarning(`Something went wrong download`);
         }
     }, [
         branchValue?.branchId,
@@ -719,36 +677,39 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         handleLoadUseStatus,
         handleLoadUserOffline,
         handleResponseError,
-        setToast
+        setToast,
+        showDialogWarning
     ]);
 
-    const handleUpload = useCallback(async () => {
-        try {
-            const foundMacAddress = await handleCheckMacAddress();
+    const mapUploadDocumentLines = useCallback(
+        (documentLines) => {
+            return documentLines.map((line) => ({
+                id: line?.asset_id,
+                state: line?.state,
+                use_state: line?.use_state_code,
+                new_img: line?.new_img ? true : false,
+                branch_id: branchValue?.branchId,
+                date_check: parseDateStringTime(line?.date_check),
+                ...(line?.image !== 'false' && { image: line?.image })
+            }));
+        },
+        [branchValue?.branchId]
+    );
 
-            if (!foundMacAddress) {
-                clearStateDialog();
-                setVisibleDialog(true);
-                setTitleDialog(WARNING);
-                setContentDialog(
-                    `This device does not have permission to upload`
-                );
-                setTypeDialog('warning');
-                return;
-            }
+    const mapUploadDeleteDocumentLines = useCallback((documentLines) => {
+        return documentLines.map((line) => ({
+            id: line?.asset_id
+        }));
+    }, []);
 
-            setDisableCloseDialog(true);
-            setShowProgressBar(true);
-
-            const db = await getDBConnection();
-            const filterAsset = {
-                is_sync_odoo: false
-            };
+    const uploadUnsyncedAssets = useCallback(
+        async (db) => {
+            const filterAsset = { is_sync_odoo: false };
             const listAsset = await getAsset(db, filterAsset, 1, 1000);
 
             for (const item of listAsset) {
                 try {
-                    let assetData: AssetData = {
+                    const assetData: AssetData = {
                         default_code: item?.default_code,
                         name: item?.name,
                         category_id: item?.category_id,
@@ -756,16 +717,10 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         location_id: item?.location_id,
                         user_id: loginValue?.uid,
                         purchase_price: 0,
-                        branch_id: branchValue?.branchId
+                        branch_id: branchValue?.branchId,
+                        ...(item?.image !== 'false' && { image: item?.image }),
+                        ...(item?.new_img && { new_img: item?.new_img })
                     };
-
-                    if (item?.image !== 'false') {
-                        assetData.image = item?.image;
-                    }
-
-                    if (item?.new_img) {
-                        assetData.new_img = item?.new_img;
-                    }
 
                     const response = await CreateAsset({
                         asset_data: assetData
@@ -775,12 +730,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         throw new Error('Something went wrong create asset');
                     }
 
+                    const newAssetId = response?.result?.data?.id;
                     if (
                         response?.result?.message ===
                         'Asset created successfully'
                     ) {
-                        const newAssetId = response?.result?.data?.id;
-
                         await updateAsset(db, {
                             asset_id: newAssetId,
                             is_sync_odoo: true,
@@ -794,24 +748,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     }
                 } catch (error) {
                     console.error('Asset Upload Error:', error);
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog(error.message);
-                    return;
+                    throw error;
                 }
             }
+        },
+        [branchValue?.branchId, loginValue?.uid]
+    );
 
-            const sort = { date_order: true };
+    const uploadNewDocuments = useCallback(
+        async (db) => {
             const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
-            const listDocument = await getDocumentOffline(
-                db,
-                filterDocument,
-                sort,
-                1,
-                1000
-            );
+            const listDocumentNew = (
+                await getDocumentOffline(db, filterDocument, null, 1, 1000)
+            ).filter((doc) => !doc?.is_sync_odoo);
 
-            for (const item of listDocument) {
+            for (const item of listDocumentNew) {
                 try {
                     const responseCreateDocument = await CreateDocument({
                         location_id: item?.location_id,
@@ -826,77 +777,319 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         );
                     }
 
-                    const filterDocumentLine = { tracking_id: item?.id };
                     const listDocumentLine = await getDocumentLine(
                         db,
-                        filterDocumentLine
+                        {
+                            tracking_id: item?.tracking_id,
+                            is_cancel: false
+                        },
+                        null,
+                        1,
+                        1000
                     );
 
-                    const mappingValueDocumentLine = listDocumentLine.map(
-                        (documentLine) => {
-                            return {
-                                id: documentLine?.asset_id,
-                                state: documentLine?.state,
-                                use_state: documentLine?.use_state_code,
-                                new_img: documentLine?.new_img ? true : false,
-                                branch_id: branchValue?.branchId,
-                                date_check: parseDateStringTime(
-                                    documentLine?.date_check
-                                ),
-                                ...(documentLine?.image !== 'false' && {
-                                    image: documentLine?.image
-                                })
-                            };
+                    if (listDocumentLine.length > 0) {
+                        const asset_ids =
+                            mapUploadDocumentLines(listDocumentLine);
+
+                        const responseAddDocumentLine = await AddDocumentLine({
+                            location_id: item?.location_id,
+                            asset_tracking_id:
+                                responseCreateDocument?.result?.data?.id,
+                            asset_ids
+                        });
+
+                        if (
+                            responseAddDocumentLine?.result?.message ===
+                                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
+                            responseAddDocumentLine?.error ||
+                            responseAddDocumentLine?.result?.error
+                        ) {
+                            throw new Error(
+                                'Something went wrong adding document line'
+                            );
                         }
-                    );
-
-                    const responseAddDocumentLine = await AddDocumentLine({
-                        location_id: item?.location_id,
-                        asset_tracking_id:
-                            responseCreateDocument?.result?.data?.id,
-                        asset_ids: mappingValueDocumentLine
-                    });
-
-                    if (
-                        responseAddDocumentLine?.result?.message ===
-                            RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
-                        responseAddDocumentLine?.error ||
-                        responseAddDocumentLine?.result?.error
-                    ) {
-                        throw new Error(
-                            'Something went wrong adding document line'
-                        );
                     }
-
-                    await updateDocument(db, {
-                        id: item?.id,
-                        state: STATE_DOCUMENT_NAME.Done
-                    });
                 } catch (error) {
                     console.error('Document Upload Error:', error);
-                    clearStateDialog();
-                    setVisibleDialog(true);
-                    setContentDialog(error.message);
-                    return;
+                    throw error;
                 }
             }
+        },
+        [branchValue?.branchId, mapUploadDocumentLines]
+    );
 
-            setToast({ open: true, text: 'Upload Successfully' });
+    const updateExistingDocuments = useCallback(
+        async (db) => {
+            const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
+            const listDocumentOdoo = (
+                await getDocumentOffline(db, filterDocument, null, 1, 1000)
+            ).filter((doc) => doc?.is_sync_odoo);
+
+            for (const item of listDocumentOdoo) {
+                try {
+                    const listNewDocumentLine = await getDocumentLine(
+                        db,
+                        {
+                            tracking_id: item?.tracking_id,
+                            is_sync_odoo: false,
+                            is_cancel: false
+                        },
+                        null,
+                        1,
+                        1000
+                    );
+
+                    if (listNewDocumentLine.length > 0) {
+                        const asset_ids =
+                            mapUploadDocumentLines(listNewDocumentLine);
+
+                        const responseAdd = await AddDocumentLine({
+                            location_id: item?.location_id,
+                            asset_tracking_id: item?.tracking_id,
+                            asset_ids
+                        });
+                        if (
+                            responseAdd?.result?.message ===
+                                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND ||
+                            responseAdd?.error ||
+                            responseAdd?.result?.error
+                        ) {
+                            throw new Error(
+                                'Something went wrong updating add document line'
+                            );
+                        }
+                    }
+
+                    const listEditDocumentLine = await getDocumentLine(
+                        db,
+                        {
+                            tracking_id: item?.tracking_id,
+                            is_sync_odoo: true,
+                            is_cancel: false
+                        },
+                        null,
+                        1,
+                        1000
+                    );
+
+                    if (listEditDocumentLine.length > 0) {
+                        const asset_ids_edit =
+                            mapUploadDocumentLines(listEditDocumentLine);
+                        const responseUpdate = await UpdateDocumentLine({
+                            location_id: item?.location_id,
+                            asset_tracking_id: item?.tracking_id,
+                            asset_ids: asset_ids_edit
+                        });
+                        if (
+                            responseUpdate?.error ||
+                            responseUpdate.result?.error
+                        ) {
+                            throw new Error(
+                                'Something went wrong updating updated document line'
+                            );
+                        }
+                    }
+
+                    const listDeleteDocumentLine = await getDocumentLine(
+                        db,
+                        {
+                            tracking_id: item?.tracking_id,
+                            is_sync_odoo: true,
+                            is_cancel: true
+                        },
+                        null,
+                        1,
+                        1000
+                    );
+
+                    if (listDeleteDocumentLine?.length > 0) {
+                        const asset_ids_delete = mapUploadDeleteDocumentLines(
+                            listDeleteDocumentLine
+                        );
+
+                        const responseDelete = await DeleteDocumentLine({
+                            asset_tracking_id: item?.tracking_id,
+                            asset_ids: asset_ids_delete
+                        });
+
+                        if (
+                            responseDelete?.error ||
+                            responseDelete?.result?.message ===
+                                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                        ) {
+                            throw new Error(
+                                'Something went wrong updating  delete document line'
+                            );
+                        }
+                    }
+                } catch (error) {
+                    console.error('Document Upload Error:', error);
+                    throw error;
+                }
+            }
+        },
+        [mapUploadDeleteDocumentLines, mapUploadDocumentLines]
+    );
+
+    const handleDownloadDocument = useCallback(
+        async (db) => {
+            const [
+                initialResponseAssetNotFound,
+                initialDocumentLine,
+                initialDocument,
+                initialResponseUseStatus
+            ] = await Promise.all([
+                GetAssetNotFoundSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: STATE_ASSET }
+                    }
+                }),
+                GetDocumentLineSearch({
+                    page: 1,
+                    limit: 1000,
+                    search_term: {
+                        and: { state: ['0', '1', '2'] }
+                    }
+                }),
+                GetDocumentSearch({
+                    page: 1,
+                    limit: 10,
+                    search_term: {
+                        and: {
+                            state: handleMapDocumentStateName(
+                                STATE_DOCUMENT_NAME.DocumentDownload
+                            ),
+                            branch_id: branchValue?.branchId
+                        }
+                    }
+                }),
+                GetUseStatus({ page: 1, limit: 1000 })
+            ]);
+
+            const errorAssetNotFound = handleResponseError(
+                initialResponseAssetNotFound?.error
+            );
+            const errorDocumentLine = handleResponseError(
+                initialDocumentLine?.error
+            );
+            const errorDocument = handleResponseError(initialDocument?.error);
+            const errorUseStatus = handleResponseError(
+                initialResponseUseStatus?.error
+            );
+
+            if (
+                errorAssetNotFound ||
+                errorDocumentLine ||
+                errorDocument ||
+                errorUseStatus
+            ) {
+                return;
+            }
+
+            const totalPagesAssetNotFound =
+                initialResponseAssetNotFound?.result?.data?.total_pages;
+            const totalPagesDocumentLine =
+                initialDocumentLine?.result?.data?.total_page;
+            const totalPagesDocument =
+                initialDocument?.result?.data?.total_page;
+            const totalPagesUseStatus =
+                initialResponseUseStatus?.result?.data?.total_page;
+
+            const [
+                listAssetNotFound,
+                listDocumentLine,
+                listDocument,
+                listUseStatus
+            ] = await Promise.all([
+                handleLoadAssetNotFound(totalPagesAssetNotFound),
+                handleLoadDocumentLine(totalPagesDocumentLine),
+                handleLoadDocument(totalPagesDocument),
+                handleLoadUseStatus(totalPagesUseStatus)
+            ]);
+
+            await clearDocumentTable(db);
+
+            if (listDocument?.length > 0) {
+                const newListDocumentLine = listDocument?.map((document) => {
+                    return {
+                        ...document,
+                        state: handleMapDocumentStateValue(document.state),
+                        is_sync_odoo: true
+                    };
+                });
+                await insertListDocumentOfflineData(db, newListDocumentLine);
+            }
+            if (listDocumentLine?.length > 0) {
+                const newListDocumentLine = listDocumentLine?.map(
+                    (documentLine) => {
+                        const filterUseStatus = listUseStatus.filter(
+                            (item) => documentLine.use_state === item?.name
+                        );
+                        return {
+                            ...documentLine,
+                            is_sync_odoo: true,
+                            image: '',
+                            new_img: false,
+                            use_state_code: filterUseStatus[0]?.id || 1
+                        };
+                    }
+                );
+                await insertDocumentLineData(db, newListDocumentLine);
+            }
+            if (listAssetNotFound?.length > 0) {
+                await insertReportAssetNotFound(db, listAssetNotFound);
+            }
+        },
+        [
+            branchValue?.branchId,
+            handleLoadAssetNotFound,
+            handleLoadDocument,
+            handleLoadDocumentLine,
+            handleLoadUseStatus,
+            handleResponseError
+        ]
+    );
+
+    const handleUpload = useCallback(async () => {
+        try {
+            const foundMacAddress = await handleCheckMacAddress();
+
+            if (!foundMacAddress) {
+                return showDialogWarning(
+                    `This device does not have permission to upload`
+                );
+            }
+
+            setDisableCloseDialog(true);
+            setShowProgressBar(true);
+
+            const db = await getDBConnection();
+
+            await uploadUnsyncedAssets(db);
+            await uploadNewDocuments(db);
+            await updateExistingDocuments(db);
+            await handleDownloadDocument(db);
+
+            setTimeout(() => {
+                setToast({ open: true, text: 'Upload Successfully' });
+            }, 0);
             clearStateDialog();
         } catch (err) {
             console.log(err);
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setContentDialog(`Something went wrong upload`);
-            setTypeDialog('warning');
+            return showDialogWarning('Something went wrong upload');
         }
     }, [
-        branchValue?.branchId,
         clearStateDialog,
         handleCheckMacAddress,
-        loginValue?.uid,
-        setToast
+        handleDownloadDocument,
+        setToast,
+        showDialogWarning,
+        updateExistingDocuments,
+        uploadNewDocuments,
+        uploadUnsyncedAssets
     ]);
 
     const handleSelectBranch = useCallback(() => {
@@ -909,15 +1102,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         navigation.navigate('BranchSelectScreen', {
             onGoBack: async (branch_id: number) => {
                 if (branch_id !== branchValue?.branchId && !onlineValue) {
-                    const db = await getDBConnection();
-                    const listDocumentDB = await getDocumentOffline(db, null);
-                    listDocumentDB.map(async (item) => {
-                        await removeDocumentLineOfflineByTrackingID(
-                            db,
-                            item?.id
-                        );
-                    });
-                    await removeDocumentOffline(db);
                     clearStateDialog();
                     setVisibleDialog(true);
                     setTitleDialog(WARNING);
@@ -999,12 +1183,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             return () => clearInterval(intervalId);
         } catch (err) {
             console.log(err);
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setTypeDialog('warning');
+            showDialogWarning(SOMETHING_WENT_WRONG);
         }
-    }, [clearStateDialog, isConnected, onlineValue]);
+    }, [clearStateDialog, isConnected, onlineValue, showDialogWarning]);
 
     const handleCheckBranchStorage = useCallback(async () => {
         if (!branchValue?.branchId) {
@@ -1031,15 +1212,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }
             handleNavigateBranch();
         } else {
-            clearStateDialog();
-            setVisibleDialog(true);
-            setTitleDialog(WARNING);
-            setContentDialog(
+            showDialogWarning(
                 `Network Disconnected, please open internet to select branch`
             );
-            setTypeDialog('warning');
         }
-    }, [clearStateDialog, handleNavigateBranch, isConnected, onlineValue]);
+    }, [handleNavigateBranch, isConnected, onlineValue, showDialogWarning]);
 
     useFocusEffect(
         useCallback(() => {
