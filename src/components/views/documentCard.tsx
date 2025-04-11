@@ -11,11 +11,20 @@ interface DocumentScreenProp {
     documentStatus: string;
     online: boolean;
     id: number;
+    isSyncOdoo: boolean;
 }
 const DocumentCard: FC<DocumentScreenProp> = (props) => {
-    const { documentTitle, locationInfo, dateInfo, documentStatus } = props;
+    const {
+        documentTitle,
+        locationInfo,
+        dateInfo,
+        documentStatus,
+        online,
+        isSyncOdoo
+    } = props;
     let backgroundColor = theme.colors.black;
     let borderColor = theme.colors.black;
+    let backgroundColorSyncOdoo = theme.colors.borderAutocomplete;
 
     switch (documentStatus) {
         case STATE_DOCUMENT_NAME.Draft:
@@ -36,6 +45,16 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
             break;
     }
 
+    switch (isSyncOdoo) {
+        case true:
+            backgroundColorSyncOdoo = '#63CA7F';
+            break;
+
+        default:
+            backgroundColorSyncOdoo = theme.colors.borderAutocomplete;
+            break;
+    }
+
     return (
         <View style={[styles.cardContainer, { borderColor }]}>
             <View style={styles.textContainer}>
@@ -48,13 +67,30 @@ const DocumentCard: FC<DocumentScreenProp> = (props) => {
                 <Text variant="bodyMedium" style={styles.additionalText}>
                     Date : {dateInfo}
                 </Text>
-                <View style={[styles.statusContainer, { backgroundColor }]}>
-                    <Text
-                        variant="bodyMedium"
-                        style={styles.documentStatusText}
-                    >
-                        {documentStatus}
-                    </Text>
+                <View style={styles.rowStatus}>
+                    <View style={[styles.statusContainer, { backgroundColor }]}>
+                        <Text
+                            variant="bodyMedium"
+                            style={styles.documentStatusText}
+                        >
+                            {documentStatus}
+                        </Text>
+                    </View>
+                    {!online && (
+                        <View
+                            style={[
+                                styles.statusContainer,
+                                { backgroundColor: backgroundColorSyncOdoo }
+                            ]}
+                        >
+                            <Text
+                                variant="bodyMedium"
+                                style={styles.documentStatusText}
+                            >
+                                {isSyncOdoo ? 'Sync Odoo' : 'Not Sync Odoo'}
+                            </Text>
+                        </View>
+                    )}
                 </View>
             </View>
         </View>
@@ -65,7 +101,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flexDirection: 'row',
         width: wp('90%'),
-        height: 120,
+        height: 130,
         backgroundColor: '#EDEDED',
         alignItems: 'center',
         paddingVertical: 5,
@@ -99,7 +135,8 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         paddingHorizontal: 12,
         borderRadius: 20,
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
+        marginRight: 10
     },
     deleteIconContainer: {
         position: 'absolute',
@@ -113,6 +150,10 @@ const styles = StyleSheet.create({
     },
     documentStatusText: {
         color: '#ffffff'
+    },
+    rowStatus: {
+        marginTop: 3,
+        flexDirection: 'row'
     }
 });
 

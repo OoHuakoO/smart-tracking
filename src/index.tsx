@@ -20,7 +20,6 @@ import { createTableDocumentLine } from './db/documentLineOffline';
 import { createTableDocumentOffline } from './db/documentOffline';
 import { createTableLocation } from './db/location';
 import { createTableReportAssetNotFound } from './db/reportAssetNotFound';
-import { createTableReportDocumentLine } from './db/reportDocumentLine';
 import { createTableUserOffline } from './db/userOffline';
 import { createTableUseStatus } from './db/useStatus';
 import { BranchStateProps, LoginState } from './typings/common';
@@ -75,7 +74,6 @@ export default function App() {
             await createTableDocumentOffline(db);
             await createTableDocumentLine(db);
             await createTableReportAssetNotFound(db);
-            await createTableReportDocumentLine(db);
             await createTableUserOffline(db);
             await createTableBranch(db);
         } catch (error) {

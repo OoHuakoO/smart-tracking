@@ -104,6 +104,8 @@ export const handleMapDocumentStateName = (
             return STATE_DOCUMENT_VALUE.Check;
         case STATE_DOCUMENT_NAME.Cancel:
             return STATE_DOCUMENT_VALUE.Cancel;
+        case STATE_DOCUMENT_NAME.DocumentDownload:
+            return [STATE_DOCUMENT_VALUE.Draft, STATE_DOCUMENT_VALUE.Check];
         default:
             return [
                 STATE_DOCUMENT_VALUE.Draft,

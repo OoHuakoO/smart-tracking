@@ -7,9 +7,11 @@ export const createTableDocumentOffline = (db: SQLiteDatabase) => {
             const query = `CREATE TABLE IF NOT EXISTS documentOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             tracking_id INTEGER NOT NULL,
+            name TEXT,
             state TEXT,
             location_id INTEGER,
             location TEXT,
+            is_sync_odoo BOOLEAN DEFAULT FALSE,
             date_order DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
             tx.executeSql(
@@ -47,16 +49,55 @@ export const insertDocumentOfflineData = (
     const queryInsert =
         `INSERT INTO documentOffline (
           tracking_id,
+          name,
           state,
           location_id,
           location
         ) VALUES ` +
         `(
-           ${documents.tracking_id},
+           ${documents.tracking_id || documents.id},
+          '${documents.name}',
           '${documents.state}',
            ${documents.location_id},
           '${documents.location}'
           )`;
+    try {
+        db.transaction((tx) => {
+            tx.executeSql(queryInsert);
+        });
+        console.log('documentOffline inserted successfully');
+    } catch (err) {
+        throw new Error(`Error inserting documentOffline: ${err.message}`);
+    }
+};
+
+export const insertListDocumentOfflineData = (
+    db: SQLiteDatabase,
+    documents: DocumentData[]
+) => {
+    const queryInsert =
+        `INSERT INTO documentOffline (
+          tracking_id,
+          name,
+          state,
+          location_id,
+          location,
+          is_sync_odoo,
+          date_order
+        ) VALUES ` +
+        documents
+            .map(
+                (item) => `(
+                ${item.tracking_id || item.id},
+                '${item.name}',
+                '${item.state}',
+                ${item.location_id},
+                '${item.location}',
+                ${item.is_sync_odoo},
+                '${item.date_order}'
+                )`
+            )
+            .join(',');
     try {
         db.transaction((tx) => {
             tx.executeSql(queryInsert);

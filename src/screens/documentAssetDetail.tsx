@@ -10,7 +10,6 @@ import {
 } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import { updateDocumentLineData } from '@src/db/documentLineOffline';
-import { updateReportDocumentLine } from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { UpdateDocumentLine } from '@src/services/document';
 import { GetUseStatus } from '@src/services/downloadDB';
@@ -251,7 +250,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     };
 
                     await updateDocumentLineData(db, documentLine);
-                    await updateReportDocumentLine(db, documentLine);
                 }
                 navigation.replace('DocumentAssetStatus');
                 return;

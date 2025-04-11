@@ -8,7 +8,6 @@ import PopupScanAsset from '@src/components/views/popupScanAsset';
 import {
     MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
-    STATE_DOCUMENT_NAME,
     USE_STATE_ASSET_TH
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
@@ -17,9 +16,7 @@ import {
     getDocumentLine,
     insertDocumentLineData
 } from '@src/db/documentLineOffline';
-import { getDocumentOffline } from '@src/db/documentOffline';
 import { removeReportAssetNotFoundByCode } from '@src/db/reportAssetNotFound';
-import { insertReportDocumentLine } from '@src/db/reportDocumentLine';
 import { getUseStatus } from '@src/db/useStatus';
 import { GetAssetSearch } from '@src/services/asset';
 import { AddDocumentLine, GetDocumentLineSearch } from '@src/services/document';
@@ -229,7 +226,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                     );
                 });
                 await insertDocumentLineData(db, documentLine);
-                await insertReportDocumentLine(db, documentLine);
             }
             navigation.navigate('DocumentAssetStatus');
         } catch (err) {
@@ -543,12 +539,14 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleCheckDuplicateOffline = useCallback(
         async (code: string) => {
             const db = await getDBConnection();
+            let isDuplicateAssetInListDocumentLineDB = false;
+
             const isDuplicateAssetInListAssetCreate = listAssetCreate.some(
                 (item) => item?.default_code === code
             );
 
             const filterDocumentLine = {
-                code: code
+                default_code: code
             };
 
             const listDocumentLineDB = await getDocumentLine(
@@ -556,30 +554,12 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 filterDocumentLine
             );
 
-            let isDuplicateAssetInListDocumentLineDB = true;
+            const duplicateDocumentLine = listDocumentLineDB?.filter(
+                (documentLine) => !documentLine.is_cancel
+            );
 
-            if (listDocumentLineDB.length > 0) {
-                const filterDocument = {
-                    tracking_id: listDocumentLineDB[0].tracking_id
-                };
-
-                const listDocumentDB = await getDocumentOffline(
-                    db,
-                    filterDocument
-                );
-                if (listDocumentDB.length > 0) {
-                    if (
-                        listDocumentDB[0].state ===
-                            STATE_DOCUMENT_NAME.Cancel ||
-                        listDocumentDB[0].state === STATE_DOCUMENT_NAME.Done
-                    ) {
-                        isDuplicateAssetInListDocumentLineDB = false;
-                    } else {
-                        isDuplicateAssetInListDocumentLineDB = true;
-                    }
-                }
-            } else {
-                isDuplicateAssetInListDocumentLineDB = false;
+            if (duplicateDocumentLine?.length > 0) {
+                isDuplicateAssetInListDocumentLineDB = true;
             }
 
             if (
@@ -592,7 +572,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
                 if (isDuplicateAssetInListDocumentLineDB) {
                     setContentDialog(
-                        `${code} is duplicate in document ${listDocumentLineDB[0]?.tracking_id}`
+                        `${code} is duplicate in document ${duplicateDocumentLine[0]?.tracking_id}`
                     );
                 }
                 if (isDuplicateAssetInListAssetCreate) {

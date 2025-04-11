@@ -14,6 +14,7 @@ export interface SearchQueryReport {
     default_code?: string;
     use_state?: string;
     asset_name?: string;
+    is_cancel?: boolean;
 }
 
 export interface ReportAssetData {

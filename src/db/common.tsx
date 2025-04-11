@@ -7,11 +7,11 @@ export const clearDataAllTable = (db: SQLiteDatabase) => {
             tx.executeSql('DELETE FROM location;');
             tx.executeSql('DELETE FROM useStatus;');
             tx.executeSql('DELETE FROM category;');
-            tx.executeSql('DELETE FROM documentOnline;');
             tx.executeSql('DELETE FROM documentOffline;');
             tx.executeSql('DELETE FROM documentLineOffline;');
+            tx.executeSql('DELETE FROM userOffline');
             tx.executeSql('DELETE FROM reportAssetNotFound;');
-            tx.executeSql('DELETE FROM reportDocumentLine;');
+            tx.executeSql('DELETE FROM branch');
         });
         console.log('Data deleted from all tables successfully');
     } catch (err) {
@@ -30,7 +30,6 @@ export const dropAllTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS documentLineOffline');
             tx.executeSql('DROP TABLE IF EXISTS userOffline');
             tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
-            tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
             tx.executeSql('DROP TABLE IF EXISTS branch');
         });
         console.log('Drop all table successfully');
@@ -52,7 +51,6 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
             tx.executeSql('DROP TABLE IF EXISTS documentOffline');
             tx.executeSql('DROP TABLE IF EXISTS documentLineOffline');
             tx.executeSql('DROP TABLE IF EXISTS reportAssetNotFound');
-            tx.executeSql('DROP TABLE IF EXISTS reportDocumentLine');
             tx.executeSql('DROP TABLE IF EXISTS userOffline');
             tx.executeSql('DROP TABLE IF EXISTS branch');
         });

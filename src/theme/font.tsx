@@ -32,7 +32,7 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 24,
         letterSpacing: 0,
-        lineHeight: isTablet ? 45 : 32
+        lineHeight: isTablet() ? 45 : 32
     },
     headlineMedium: {
         fontFamily: 'DMSans-Regular',
@@ -103,6 +103,6 @@ export const fontConfig = {
         fontFamily: 'DMSans-Regular',
         fontSize: 16,
         letterSpacing: 0.15,
-        lineHeight: isTablet ? 35 : 24
+        lineHeight: isTablet() ? 35 : 24
     }
 };

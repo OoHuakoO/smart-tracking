@@ -39,12 +39,14 @@ import { getDBConnection } from '@src/db/config';
 import {
     createTableDocumentLine,
     getDocumentLine,
+    insertDocumentLineData,
     removeDocumentLineOfflineByTrackingID,
     updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import {
     createTableDocumentOffline,
     getDocumentOffline,
+    insertListDocumentOfflineData,
     removeDocumentOffline,
     updateDocument
 } from '@src/db/documentOffline';
@@ -53,10 +55,6 @@ import {
     createTableReportAssetNotFound,
     insertReportAssetNotFound
 } from '@src/db/reportAssetNotFound';
-import {
-    createTableReportDocumentLine,
-    insertReportDocumentLine
-} from '@src/db/reportDocumentLine';
 import { createTableUserOffline, insertUserOffline } from '@src/db/userOffline';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
 import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
@@ -64,7 +62,8 @@ import { GetBranches } from '@src/services/branch';
 import {
     AddDocumentLine,
     CreateDocument,
-    GetDocumentLineSearch
+    GetDocumentLineSearch,
+    GetDocumentSearch
 } from '@src/services/document';
 import {
     GetAssets,
@@ -89,7 +88,7 @@ import { toastState } from '@src/store/toast';
 import { theme } from '@src/theme';
 import { GetBranchData } from '@src/typings/branch';
 import { BranchStateProps, LoginState, Toast } from '@src/typings/common';
-import { DocumentAssetData } from '@src/typings/document';
+import { DocumentAssetData, DocumentData } from '@src/typings/document';
 import {
     AssetData,
     CategoryData,
@@ -99,17 +98,22 @@ import {
 import { SettingParams, UserList } from '@src/typings/login';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import { ErrorResponse } from '@src/utils/axios';
+import {
+    handleMapDocumentStateName,
+    handleMapDocumentStateValue
+} from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
 import { useForm } from 'react-hook-form';
 import { StyleSheet } from 'react-native';
+import { isTablet } from 'react-native-device-info';
 import KeepAwake from 'react-native-keep-awake';
 import { Button, Portal, Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type HomeScreenProps = NativeStackScreenProps<PrivateStackParamsList, 'Home'>;
 
-const { width, height } = Dimensions.get('window');
-const isTablet = width >= 768 && height >= 768;
+const { width } = Dimensions.get('window');
+
 const isSmallMb = width < 400;
 
 const HomeScreen: FC<HomeScreenProps> = (props) => {
@@ -250,6 +254,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleCheckMacAddress = useCallback(async (): Promise<boolean> => {
+        const settings = await AsyncStorage.getItem('Settings');
+        const jsonSettings: SettingParams = JSON.parse(settings);
+        const response = await CheckMacAddress({
+            mac_address: jsonSettings?.mac_address
+        });
+        if (
+            response?.result?.success &&
+            response?.result?.data?.device_active
+        ) {
+            return true;
+        }
+        return false;
+    }, []);
+
     const handleLoadLocation = useCallback(
         async (totalPages: number): Promise<LocationData[]> => {
             try {
@@ -379,21 +398,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
-    const handleCheckMacAddress = useCallback(async (): Promise<boolean> => {
-        const settings = await AsyncStorage.getItem('Settings');
-        const jsonSettings: SettingParams = JSON.parse(settings);
-        const response = await CheckMacAddress({
-            mac_address: jsonSettings?.mac_address
-        });
-        if (
-            response?.result?.success &&
-            response?.result?.data?.device_active
-        ) {
-            return true;
-        }
-        return false;
-    }, []);
-
     const handleLoadUserOffline = useCallback(
         async (totalPages: number): Promise<UserList[]> => {
             try {
@@ -440,6 +444,40 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         [clearStateDialog]
     );
 
+    const handleLoadDocument = useCallback(
+        async (totalPages: number): Promise<DocumentData[]> => {
+            try {
+                const promises = Array.from({ length: totalPages }, (_, i) =>
+                    GetDocumentSearch({
+                        page: i + 1,
+                        limit: 1000,
+                        search_term: {
+                            and: {
+                                state: handleMapDocumentStateName(
+                                    STATE_DOCUMENT_NAME.DocumentDownload
+                                ),
+                                branch_id: branchValue?.branchId
+                            }
+                        }
+                    })
+                );
+                const results = await Promise.all(promises);
+                const branches = results.flatMap(
+                    (result) => result?.result?.data?.documents ?? []
+                );
+                return branches;
+            } catch (err) {
+                console.log(err);
+                clearStateDialog();
+                setVisibleDialog(true);
+                setTitleDialog(WARNING);
+                setContentDialog('Something went wrong load document');
+                return [];
+            }
+        },
+        [branchValue?.branchId, clearStateDialog]
+    );
+
     const handleDownload = useCallback(async () => {
         try {
             const foundMacAddress = await handleCheckMacAddress();
@@ -454,7 +492,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     initialResponseAssetNotFound,
                     initialDocumentLine,
                     initialUserOffline,
-                    initialBranch
+                    initialBranch,
+                    initialDocument
                 ] = await Promise.all([
                     GetAssets({ page: 1, limit: 200 }),
                     GetLocation({ page: 1, limit: 1000 }),
@@ -481,6 +520,18 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     GetBranches({
                         page: 1,
                         limit: 1000
+                    }),
+                    GetDocumentSearch({
+                        page: 1,
+                        limit: 10,
+                        search_term: {
+                            and: {
+                                state: handleMapDocumentStateName(
+                                    STATE_DOCUMENT_NAME.DocumentDownload
+                                ),
+                                branch_id: branchValue?.branchId
+                            }
+                        }
                     })
                 ]);
 
@@ -506,6 +557,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     initialUserOffline?.error
                 );
                 const errorBranch = handleResponseError(initialBranch?.error);
+                const errorDocument = handleResponseError(
+                    initialDocument?.error
+                );
 
                 if (
                     errorAssets ||
@@ -515,7 +569,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     errorAssetNotFound ||
                     errorDocumentLine ||
                     errorUserOffline ||
-                    errorBranch
+                    errorBranch ||
+                    errorDocument
                 ) {
                     return;
                 }
@@ -536,6 +591,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     initialUserOffline?.result?.data?.total_page;
                 const totalPagesBranch =
                     initialBranch?.result?.data?.total_page;
+                const totalPagesDocument =
+                    initialDocument?.result?.data?.total_page;
 
                 const [
                     listLocation,
@@ -544,7 +601,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     listAssetNotFound,
                     listDocumentLine,
                     listUserOffline,
-                    listBranch
+                    listBranch,
+                    listDocument
                 ] = await Promise.all([
                     handleLoadLocation(totalPagesLocation),
                     handleLoadUseStatus(totalPagesUseStatus),
@@ -552,7 +610,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     handleLoadAssetNotFound(totalPagesAssetNotFound),
                     handleLoadDocumentLine(totalPagesDocumentLine),
                     handleLoadUserOffline(totalPagesUserOffline),
-                    handleLoadBranch(totalPagesBranch)
+                    handleLoadBranch(totalPagesBranch),
+                    handleLoadDocument(totalPagesDocument)
                 ]);
 
                 const db = await getDBConnection();
@@ -577,18 +636,50 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableUseStatus(db);
                     await createTableCategory(db);
                     await createTableReportAssetNotFound(db);
-                    await createTableReportDocumentLine(db);
                     await createTableUserOffline(db);
                     await createTableBranch(db);
+                    await createTableDocumentOffline(db);
+                    await createTableDocumentLine(db);
                     await insertLocationData(db, listLocation);
                     await insertUseStatusData(db, listUseStatus);
                     await insertCategoryData(db, listCategory);
                     await insertBranchData(db, listBranch);
-                    if (listAssetNotFound?.length > 0) {
-                        await insertReportAssetNotFound(db, listAssetNotFound);
+                    if (listDocument?.length > 0) {
+                        const newListDocumentLine = listDocument?.map(
+                            (document) => {
+                                return {
+                                    ...document,
+                                    state: handleMapDocumentStateValue(
+                                        document.state
+                                    ),
+                                    is_sync_odoo: true
+                                };
+                            }
+                        );
+                        await insertListDocumentOfflineData(
+                            db,
+                            newListDocumentLine
+                        );
                     }
                     if (listDocumentLine?.length > 0) {
-                        await insertReportDocumentLine(db, listDocumentLine);
+                        const newListDocumentLine = listDocumentLine?.map(
+                            (documentLine) => {
+                                const filterUseStatus = listUseStatus.filter(
+                                    (item) =>
+                                        documentLine.use_state === item?.name
+                                );
+                                return {
+                                    ...documentLine,
+                                    image: '',
+                                    new_img: false,
+                                    use_state_code: filterUseStatus[0]?.id
+                                };
+                            }
+                        );
+                        await insertDocumentLineData(db, newListDocumentLine);
+                    }
+                    if (listAssetNotFound?.length > 0) {
+                        await insertReportAssetNotFound(db, listAssetNotFound);
                     }
                     if (listUserOffline?.length > 0) {
                         await insertUserOffline(db, listUserOffline);
@@ -616,11 +707,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             setTypeDialog('warning');
         }
     }, [
+        branchValue?.branchId,
         clearStateDialog,
         handleCheckMacAddress,
         handleLoadAssetNotFound,
         handleLoadBranch,
         handleLoadCategory,
+        handleLoadDocument,
         handleLoadDocumentLine,
         handleLoadLocation,
         handleLoadUseStatus,
@@ -970,7 +1063,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     await createTableDocumentOffline(db);
                     await createTableDocumentLine(db);
                     await createTableReportAssetNotFound(db);
-                    await createTableReportDocumentLine(db);
                     await createTableBranch(db);
                     if (branchValue?.branchId) {
                         const countAsset = await getTotalAssets(db);
@@ -1047,7 +1139,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     <View>
                         <FontAwesomeIcon
                             icon={faRightFromBracket}
-                            size={isTablet ? 30 : 20}
+                            size={isTablet() ? 30 : 20}
                         />
                     </View>
                 </TouchableOpacity>
@@ -1059,7 +1151,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         <Text
                             style={styles.text}
                             variant={
-                                isTablet
+                                isTablet()
                                     ? 'headlineSmall'
                                     : isSmallMb
                                     ? 'bodySmall'
@@ -1074,7 +1166,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
             <Text
                 variant={
-                    isTablet
+                    isTablet()
                         ? 'headlineSmall'
                         : isSmallMb
                         ? 'bodyLarge'
@@ -1122,7 +1214,7 @@ const styles = StyleSheet.create({
         marginTop: isSmallMb ? 15 : 20,
         width: '100%',
         backgroundColor: theme.colors.warning,
-        borderRadius: 10
+        borderRadius: 20
     },
     textBranch: {
         fontFamily: 'DMSans-Bold',

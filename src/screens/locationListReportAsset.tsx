@@ -7,13 +7,13 @@ import ReportAssetCard from '@src/components/views/reportAssetCard';
 import { ALL_LOCATION, REPORT_TYPE, STATE_ASSET } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import {
+    getDocumentLine,
+    getTotalDocumentLine
+} from '@src/db/documentLineOffline';
+import {
     getReportAssetNotFound,
     getTotalReportAssetNotFound
 } from '@src/db/reportAssetNotFound';
-import {
-    getReportDocumentLine,
-    getTotalReportDocumentLine
-} from '@src/db/reportDocumentLine';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetDocumentLineSearch } from '@src/services/document';
 import { BranchState } from '@src/store';
@@ -255,18 +255,18 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 location:
                     locationName !== ALL_LOCATION ? locationName : undefined,
                 'category_id.name': searchQuery?.['category_id.name'],
-                state: handleMapReportStateValue(title)
+                state: handleMapReportStateValue(title),
+                is_cancel: false
             };
 
-            const listReportDocumentLine = await getReportDocumentLine(
+            const listReportDocumentLine = await getDocumentLine(
                 db,
                 filter,
+                null,
                 page
             );
-            const totalDocumentLine = await getTotalReportDocumentLine(
-                db,
-                filter
-            );
+
+            const totalDocumentLine = await getTotalDocumentLine(db, filter);
 
             setTotalListReportAsset(totalDocumentLine);
             listReportDocumentLine?.map((document) => {

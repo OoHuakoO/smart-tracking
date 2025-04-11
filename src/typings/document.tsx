@@ -16,7 +16,7 @@ export interface DocumentAssetData {
     mode?: string;
     date_check?: string;
     branch_id?: number;
-    // for offline upload asset
+    is_cancel?: boolean;
     asset_id_update?: number;
     use_state_code?: number;
 }
@@ -32,6 +32,7 @@ export interface DocumentData {
     owner?: string;
     owner_id?: number;
     assets?: DocumentAssetData[];
+    is_sync_odoo?: boolean;
 }
 
 export interface GetDocumentSearchData {

@@ -23,13 +23,13 @@ const styles = StyleSheet.create({
     tag: {
         paddingHorizontal: isTablet() ? 20 : 15,
         paddingVertical: isTablet() ? 10 : 5,
-        borderRadius: 5,
+        borderRadius: 15,
         marginLeft: 0,
         justifyContent: 'center'
     },
     tagText: {
         color: '#0D0E0F',
-        fontSize: isTablet() ? 20 : 13,
+        fontSize: isTablet() ? 20 : 15,
         fontFamily: 'DMSans-Bold'
     }
 });

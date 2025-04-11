@@ -19,6 +19,7 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             use_state_code INTEGER,
             image TEXT,
             new_img BOOLEAN,
+            is_cancel BOOLEAN DEFAULT FALSE,
             date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
             tx.executeSql(
@@ -107,7 +108,14 @@ export const getDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
         tracking_id?: number;
-        code?: string;
+        default_code?: string;
+        default_code_for_or?: string;
+        location?: string;
+        state?: string | string[];
+        use_state?: string;
+        name?: string;
+        'category_id.name'?: string;
+        is_cancel?: boolean;
     },
     sort?: {
         date_check?: boolean;
@@ -120,14 +128,63 @@ export const getDocumentLine = async (
     const queryParams = [];
     const whereConditions = [];
 
+    if (filters?.location !== undefined) {
+        whereConditions.push(`documentLineOffline.location = ?`);
+        queryParams.push(filters.location);
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`documentLineOffline.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.is_cancel !== undefined) {
+        whereConditions.push(`documentLineOffline.is_cancel = ?`);
+        queryParams.push(filters.is_cancel);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`documentLineOffline.category = ?`);
+        queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`documentLineOffline.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`documentLineOffline.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
+    }
+
+    if (filters?.state !== undefined) {
+        if (Array.isArray(filters.state)) {
+            const statePlaceholders = filters.state.map(() => '?').join(', ');
+            whereConditions.push(
+                `documentLineOffline.state IN (${statePlaceholders})`
+            );
+            queryParams.push(...filters.state);
+        } else {
+            whereConditions.push(`documentLineOffline.state = ?`);
+            queryParams.push(filters.state);
+        }
+    }
+
     if (filters?.tracking_id !== undefined) {
         whereConditions.push(`documentLineOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
     }
 
-    if (filters?.code !== undefined) {
+    if (filters?.default_code !== undefined) {
         whereConditions.push(`documentLineOffline.code = ?`);
-        queryParams.push(filters.code);
+        queryParams.push(filters.default_code);
     }
 
     if (whereConditions.length > 0) {
@@ -162,6 +219,14 @@ export const getTotalDocumentLine = async (
     db: SQLiteDatabase,
     filters?: {
         tracking_id?: number;
+        location?: string;
+        state?: string | string[];
+        use_state?: string;
+        default_code?: string;
+        default_code_for_or?: string;
+        name?: string;
+        'category_id.name'?: string;
+        is_cancel?: boolean;
     }
 ): Promise<number> => {
     let queryTotal = `SELECT COUNT(*) as total FROM documentLineOffline`;
@@ -171,6 +236,60 @@ export const getTotalDocumentLine = async (
     if (filters?.tracking_id !== undefined) {
         whereConditions.push(`documentLineOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
+    }
+
+    if (filters?.location !== undefined) {
+        whereConditions.push(`documentLineOffline.location = ?`);
+        queryParams.push(filters.location);
+    }
+
+    if (filters?.state !== undefined) {
+        if (Array.isArray(filters.state)) {
+            const statePlaceholders = filters.state.map(() => '?').join(', ');
+            whereConditions.push(
+                `documentLineOffline.state IN (${statePlaceholders})`
+            );
+            queryParams.push(...filters.state);
+        } else {
+            whereConditions.push(`documentLineOffline.state = ?`);
+            queryParams.push(filters.state);
+        }
+    }
+
+    if (filters?.use_state !== undefined) {
+        whereConditions.push(`documentLineOffline.use_state = ?`);
+        queryParams.push(filters.use_state);
+    }
+
+    if (filters?.is_cancel !== undefined) {
+        whereConditions.push(`documentLineOffline.is_cancel = ?`);
+        queryParams.push(filters.is_cancel);
+    }
+
+    if (filters?.default_code !== undefined) {
+        whereConditions.push(`documentLineOffline.code = ?`);
+        queryParams.push(filters.default_code);
+    }
+
+    if (filters && filters['category_id.name'] !== undefined) {
+        whereConditions.push(`documentLineOffline.category = ?`);
+        queryParams.push(filters['category_id.name']);
+    }
+
+    if (
+        filters?.name !== undefined ||
+        filters?.default_code_for_or !== undefined
+    ) {
+        const nameOrCodeConditions = [];
+        if (filters?.name !== undefined) {
+            nameOrCodeConditions.push(`documentLineOffline.name LIKE ?`);
+            queryParams.push(`%${filters.name}%`);
+        }
+        if (filters?.default_code_for_or !== undefined) {
+            nameOrCodeConditions.push(`documentLineOffline.code LIKE ?`);
+            queryParams.push(`%${filters.default_code_for_or}%`);
+        }
+        whereConditions.push(`(${nameOrCodeConditions.join(' OR ')})`);
     }
 
     if (whereConditions.length > 0) {
@@ -222,6 +341,11 @@ export const updateDocumentLineData = (
     if (documentLine.asset_id_update !== undefined) {
         setClauses.push(`asset_id = ?`);
         queryParams.push(documentLine.asset_id_update);
+    }
+
+    if (documentLine.is_cancel !== undefined) {
+        setClauses.push(`is_cancel = ?`);
+        queryParams.push(documentLine.is_cancel);
     }
 
     if (documentLine.asset_id !== undefined) {

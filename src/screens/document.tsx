@@ -5,7 +5,7 @@ import BackButton from '@src/components/core/backButton';
 import SearchButton from '@src/components/core/searchButton';
 import DocumentCard from '@src/components/views/documentCard';
 import DocumentDialog from '@src/components/views/documentDialog';
-import { STATE_DOCUMENT_NAME } from '@src/constant';
+import { DRAFT_TRACKING, STATE_DOCUMENT_NAME } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
 import {
     getDocumentOffline,
@@ -16,9 +16,9 @@ import { getLocationSuggestion, getLocations } from '@src/db/location';
 import { CreateDocument, GetDocumentSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
 import { GetLocationSearch } from '@src/services/location';
-import { BranchState, documentState, loginState } from '@src/store';
+import { BranchState, documentState } from '@src/store';
 import { theme } from '@src/theme';
-import { DocumentState, LoginState } from '@src/typings/common';
+import { DocumentState } from '@src/typings/common';
 import { DocumentData, SearchDocument } from '@src/typings/document';
 import { LocationSearchData } from '@src/typings/location';
 import { PrivateStackParamsList } from '@src/typings/navigation';
@@ -67,7 +67,6 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [stopFetchMore, setStopFetchMore] = useState<boolean>(true);
-    const loginValue = useRecoilValue<LoginState>(loginState);
     const [page, setPage] = useState<number>(1);
     const [online, setOnline] = useState<boolean>(false);
     const [locationSearch, setLocationSearch] = useState<string>('');
@@ -202,6 +201,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                     documentSearch,
                     sort
                 );
+
                 listDocumentDB?.map((item) => {
                     item.date_order = parseDateString(item?.date_order);
                 });
@@ -242,7 +242,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                         documentSearch?.state
                                     )
                                 },
-                                user_id: loginValue?.uid
+                                branch_id: branchValue?.branchId
                             }
                         }
                     });
@@ -324,6 +324,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             listDocumentDB?.length > 0
                                 ? listDocumentDB[0]?.tracking_id + 1
                                 : 1,
+                        name: DRAFT_TRACKING,
                         state: STATE_DOCUMENT_NAME.Draft,
                         location: location?.location_name,
                         location_id: location?.location_id
@@ -463,7 +464,9 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                 activeOpacity={0.9}
                                 onPress={() => {
                                     const documentObj = {
-                                        id: item?.id,
+                                        id: online
+                                            ? item?.id
+                                            : item?.tracking_id,
                                         name: item?.name,
                                         state: item?.state,
                                         location: item?.location,
@@ -478,12 +481,13 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                                     documentTitle={
                                         online
                                             ? `${item?.name} - ${item?.id}`
-                                            : `Document ${item?.id}`
+                                            : `${item?.name} - ${item?.tracking_id}`
                                     }
                                     locationInfo={item?.location}
                                     dateInfo={item?.date_order}
                                     documentStatus={item?.state}
                                     id={item?.id}
+                                    isSyncOdoo={item?.is_sync_odoo}
                                 />
                             </TouchableOpacity>
                         </View>

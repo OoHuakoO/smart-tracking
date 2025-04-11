@@ -30,11 +30,11 @@ import { getDBConnection } from '@src/db/config';
 import {
     getDocumentLine,
     getTotalDocumentLine,
-    removeDocumentLineByAssetId
+    removeDocumentLineByAssetId,
+    updateDocumentLineData
 } from '@src/db/documentLineOffline';
 import { updateDocument } from '@src/db/documentOffline';
 import { insertReportAssetNotFound } from '@src/db/reportAssetNotFound';
-import { removeReportDocumentLineByCode } from '@src/db/reportDocumentLine';
 import {
     DeleteDocumentLine,
     GetDocumentById,
@@ -186,19 +186,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         setContentDialog('Do you want to cancel this document ?');
     }, [clearStateDialog]);
 
-    // const handleOpenDialogResetToDraftDocument = useCallback(() => {
-    //     clearStateDialog();
-    //     setVisibleDialog(true);
-    //     setTitleDialog('Confirm Reset to Draft');
-    //     setShowCancelDialog(true);
-    //     setContentDialog('Do you want to reset to draft this document ?');
-    // }, [clearStateDialog]);
-
     const handleCancelDocument = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
             const documentObj = {
                 id: documentValue?.id,
+                tracking_id: documentValue?.id,
                 state: STATE_DOCUMENT_NAME.Cancel,
                 location: documentValue?.location,
                 location_id: documentValue?.location_id
@@ -223,6 +216,31 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             } else {
                 const db = await getDBConnection();
                 await updateDocument(db, documentObj);
+                await updateDocumentLineData(db, {
+                    tracking_id: documentObj.tracking_id,
+                    is_cancel: true
+                });
+                const filter = {
+                    tracking_id: documentObj.tracking_id,
+                    is_cancel: true
+                };
+                const listDocumentLine = await getDocumentLine(
+                    db,
+                    filter,
+                    null,
+                    1,
+                    1000
+                );
+                const listInsertDocumentLine = listDocumentLine.map(
+                    (documentLine) => {
+                        return {
+                            ...documentLine,
+                            default_code: documentLine?.code,
+                            use_state: documentLine?.use_state as string
+                        };
+                    }
+                );
+                await insertReportAssetNotFound(db, listInsertDocumentLine);
                 clearStateDialog();
                 setDocument(documentObj);
             }
@@ -265,7 +283,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 };
                 const db = await getDBConnection();
                 await removeDocumentLineByAssetId(db, idAsset);
-                await removeReportDocumentLineByCode(db, codeAsset);
                 const asset = await getAsset(db, filter);
                 if (asset?.length > 0) {
                     await insertReportAssetNotFound(db, [
@@ -374,19 +391,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                         </Text>
                     </TouchableOpacity>
                 )}
-
-                {/* {(documentValue?.state === STATE_DOCUMENT_NAME.Cancel ||
-                    documentValue?.state === STATE_DOCUMENT_NAME.Check) && (
-                    <TouchableOpacity
-                        activeOpacity={0.5}
-                        style={styles.resetCheck}
-                        onPress={handleOpenDialogResetToDraftDocument}
-                    >
-                        <Text variant="bodySmall" style={styles.textReset}>
-                            Reset to Draft
-                        </Text>
-                    </TouchableOpacity>
-                )} */}
 
                 <View style={styles.containerText}>
                     <Text variant="headlineSmall" style={styles.textHeader}>

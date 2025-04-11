@@ -4,9 +4,9 @@ import BackButton from '@src/components/core/backButton';
 import ReportAssetDataCard from '@src/components/views/reportAssetDataCard';
 import { ALL_LOCATION, REPORT_TYPE, STATE_ASSET } from '@src/constant';
 import { getDBConnection } from '@src/db/config';
+import { getTotalDocumentLine } from '@src/db/documentLineOffline';
 import { getLocations } from '@src/db/location';
 import { getTotalReportAssetNotFound } from '@src/db/reportAssetNotFound';
-import { getTotalReportDocumentLine } from '@src/db/reportDocumentLine';
 import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetDocumentLineSearch } from '@src/services/document';
 import { GetLocation } from '@src/services/downloadDB';
@@ -124,10 +124,8 @@ const ReportAssetDataScreen: FC<ReportAssetDataProps> = (props) => {
                         );
                     } else {
                         filter.state = handleMapReportStateValue(title);
-                        totalAsset = await getTotalReportDocumentLine(
-                            db,
-                            filter
-                        );
+                        filter.is_cancel = false;
+                        totalAsset = await getTotalDocumentLine(db, filter);
                     }
 
                     return {

@@ -9,7 +9,8 @@ export const STATE_DOCUMENT_NAME = {
     Draft: 'Draft',
     Check: 'Check',
     Done: 'Done',
-    Cancel: 'Cancelled'
+    Cancel: 'Cancelled',
+    DocumentDownload: 'DocumentDownload'
 };
 
 export const USE_STATE_ASSET = {
@@ -69,3 +70,5 @@ export const SETTING_INCORRECT =
     'Incorrectly input some values in the settings.';
 
 export const USER_NON_ACTIVE = 'This user is not active yet.';
+
+export const DRAFT_TRACKING = 'Draft Tracking';
