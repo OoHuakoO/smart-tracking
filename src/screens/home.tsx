@@ -8,6 +8,7 @@ import AlertDialog from '@src/components/core/alertDialog';
 import ImageSlider from '@src/components/core/imagesSlider';
 import StatusTag from '@src/components/core/statusTag';
 import ToastComponent from '@src/components/core/toast';
+import PopupDocumentDoneOdoo from '@src/components/views/popupDocumentDoneOdoo';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
 import {
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
@@ -53,6 +54,7 @@ import {
     AddDocumentLine,
     CreateDocument,
     DeleteDocumentLine,
+    GetDocumentById,
     GetDocumentLineSearch,
     GetDocumentSearch,
     UpdateDocument,
@@ -125,6 +127,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const setToast = useSetRecoilState<Toast>(toastState);
     const setBranch = useSetRecoilState<BranchStateProps>(BranchState);
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
+    const [visibleDocumentDoneDialog, setVisibleDocumentDoneDialog] =
+        useState<boolean>(false);
     const [titleDialog, setTitleDialog] = useState<string>('');
     const [contentDialog, setContentDialog] = useState<string>('');
     const [disableCloseDialog, setDisableCloseDialog] =
@@ -132,6 +136,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [typeDialog, setTypeDialog] = useState<string>('warning');
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [showProgressBar, setShowProgressBar] = useState<boolean>(false);
+    const [showProgressBarDocumentDone, setShowProgressBarDocumentDone] =
+        useState<boolean>(false);
+    const [listTrackingID, setListTrackingId] = useState<number[]>([]);
     const loginValue = useRecoilValue<LoginState>(loginState);
     const onlineValue = useRecoilValue<boolean>(OnlineState);
     const branchValue = useRecoilValue(BranchState);
@@ -199,6 +206,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleCloseDialog = useCallback(() => {
         setVisibleDialog(false);
     }, []);
+
+    const handleCloseDocumentDoneDialog = useCallback(() => {
+        setVisibleDocumentDoneDialog(false);
+        setTimeout(() => {
+            setToast({ open: true, text: 'Upload Successfully' });
+        }, 0);
+    }, [setToast]);
 
     const handleOpenDialogDownload = useCallback(async () => {
         if (isConnected) {
@@ -644,8 +658,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             return {
                                 ...documentLine,
                                 is_sync_odoo: true,
-                                image: '',
-                                new_img: false,
                                 use_state_code: filterUseStatus[0]?.id
                             };
                         }
@@ -759,18 +771,28 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     );
 
     const uploadNewDocuments = useCallback(
-        async (db) => {
-            const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
+        async (db, isDocumentDone) => {
+            const filterDocument = {
+                ...(isDocumentDone
+                    ? { tracking_ids: listTrackingID }
+                    : { state: STATE_DOCUMENT_NAME?.Draft })
+            };
+
             const listDocumentNew = (
                 await getDocumentOffline(db, filterDocument, null, 1, 1000)
-            ).filter((doc) => !doc?.is_sync_odoo);
+            ).filter((doc) => {
+                if (!isDocumentDone) {
+                    return !doc?.is_sync_odoo;
+                }
+                return true;
+            });
 
             for (const item of listDocumentNew) {
                 try {
                     const responseCreateDocument = await CreateDocument({
                         location_id: item?.location_id,
                         date_order: parseDateStringTime(item?.date_order),
-                        android_id: item?.id?.toString(),
+                        android_id: item?.tracking_id?.toString(),
                         branch_id: branchValue?.branchId
                     });
 
@@ -819,11 +841,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 }
             }
         },
-        [branchValue?.branchId, mapUploadDocumentLines]
+        [branchValue?.branchId, listTrackingID, mapUploadDocumentLines]
     );
 
     const updateExistingDocuments = useCallback(
-        async (db) => {
+        async (db): Promise<number[]> => {
+            let listTrackingIDDocumentDone: number[] = [];
             const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
             const filterCancelDocument = { state: STATE_DOCUMENT_NAME?.Cancel };
             const listDocumentOdoo = (
@@ -841,23 +864,42 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             ).filter((doc) => doc?.is_sync_odoo);
 
             for (const item of listCancelDocumentOdoo) {
-                const response = await UpdateDocument({
-                    document_data: {
-                        id: item?.tracking_id,
-                        state: STATE_DOCUMENT_VALUE.Cancel
+                try {
+                    const responseCancelDocument = await UpdateDocument({
+                        document_data: {
+                            id: item?.tracking_id,
+                            android_id: item?.tracking_id?.toString(),
+                            state: STATE_DOCUMENT_VALUE.Cancel
+                        }
+                    });
+                    if (
+                        responseCancelDocument?.result?.message !==
+                        RESPONSE_PUT_DOCUMENT_SUCCESS
+                    ) {
+                        throw new Error(
+                            'Something went wrong updating cancel document'
+                        );
                     }
-                });
-                if (
-                    response?.result?.message !== RESPONSE_PUT_DOCUMENT_SUCCESS
-                ) {
-                    throw new Error(
-                        'Something went wrong updating cancel document'
-                    );
+                } catch (error) {
+                    console.error('Document Upload Error:', error);
+                    throw error;
                 }
             }
 
             for (const item of listDocumentOdoo) {
                 try {
+                    const responseGetDocument = await GetDocumentById(
+                        item?.tracking_id
+                    );
+
+                    if (
+                        responseGetDocument?.result?.data?.asset?.state ===
+                        STATE_DOCUMENT_VALUE.Done
+                    ) {
+                        listTrackingIDDocumentDone.push(item?.tracking_id);
+                        continue;
+                    }
+
                     const listNewDocumentLine = await getDocumentLine(
                         db,
                         {
@@ -958,6 +1000,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     throw error;
                 }
             }
+            return listTrackingIDDocumentDone;
         },
         [mapUploadDeleteDocumentLines, mapUploadDocumentLines]
     );
@@ -1099,10 +1142,17 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             const db = await getDBConnection();
 
             await uploadUnsyncedAssets(db);
-            await uploadNewDocuments(db);
-            await updateExistingDocuments(db);
+            await uploadNewDocuments(db, false);
+            const listTrackingIDDocumentDone = await updateExistingDocuments(
+                db
+            );
+            if (listTrackingIDDocumentDone?.length > 0) {
+                setListTrackingId(listTrackingIDDocumentDone);
+                setVisibleDocumentDoneDialog(true);
+                clearStateDialog();
+                return;
+            }
             await handleDownloadDocument(db);
-
             setTimeout(() => {
                 setToast({ open: true, text: 'Upload Successfully' });
             }, 0);
@@ -1176,6 +1226,18 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         handleUpload,
         typeDialog
     ]);
+
+    const handleConfirmDocumentDoneDialog = useCallback(async () => {
+        const db = await getDBConnection();
+        setShowProgressBarDocumentDone(true);
+        await uploadNewDocuments(db, true);
+        await handleDownloadDocument(db);
+        setVisibleDocumentDoneDialog(false);
+        setShowProgressBarDocumentDone(false);
+        setTimeout(() => {
+            setToast({ open: true, text: 'Upload Successfully' });
+        }, 0);
+    }, [handleDownloadDocument, setToast, uploadNewDocuments]);
 
     const handleCheckUserLogin = useCallback(async () => {
         try {
@@ -1328,6 +1390,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     showCloseDialog={showCancelDialog}
                     handleConfirm={handleConfirmDialog}
                     showProgressBar={showProgressBar}
+                />
+                <PopupDocumentDoneOdoo
+                    showProgressBar={showProgressBarDocumentDone}
+                    visible={visibleDocumentDoneDialog}
+                    listTrackingID={listTrackingID}
+                    handleClose={handleCloseDocumentDoneDialog}
+                    handleConfirm={handleConfirmDocumentDoneDialog}
                 />
             </Portal>
             <View style={styles.modeSectionWrap}>

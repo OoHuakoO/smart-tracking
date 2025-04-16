@@ -114,6 +114,7 @@ export const getDocumentOffline = async (
         state?: string;
         'location_id.name'?: string;
         tracking_id?: number;
+        tracking_ids?: number[];
     },
     sort?: {
         date_order?: boolean;
@@ -139,6 +140,22 @@ export const getDocumentOffline = async (
     if (filters?.tracking_id !== undefined) {
         whereConditions.push(`documentOffline.tracking_id = ?`);
         queryParams.push(filters.tracking_id);
+    }
+
+    if (
+        Array.isArray(filters?.tracking_ids) &&
+        filters.tracking_ids.length > 0
+    ) {
+        if (filters.tracking_ids.length > 1) {
+            const placeholders = filters.tracking_ids.map(() => '?').join(', ');
+            whereConditions.push(
+                `documentOffline.tracking_id IN (${placeholders})`
+            );
+            queryParams.push(...filters.tracking_ids);
+        } else {
+            whereConditions.push(`documentOffline.tracking_id = ?`);
+            queryParams.push(filters.tracking_ids[0]);
+        }
     }
 
     if (whereConditions.length > 0) {
