@@ -11,9 +11,11 @@ import ToastComponent from '@src/components/core/toast';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
 import {
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
+    RESPONSE_PUT_DOCUMENT_SUCCESS,
     SOMETHING_WENT_WRONG,
     STATE_ASSET,
     STATE_DOCUMENT_NAME,
+    STATE_DOCUMENT_VALUE,
     WARNING
 } from '@src/constant';
 import {
@@ -53,6 +55,7 @@ import {
     DeleteDocumentLine,
     GetDocumentLineSearch,
     GetDocumentSearch,
+    UpdateDocument,
     UpdateDocumentLine
 } from '@src/services/document';
 import {
@@ -822,9 +825,36 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const updateExistingDocuments = useCallback(
         async (db) => {
             const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
+            const filterCancelDocument = { state: STATE_DOCUMENT_NAME?.Cancel };
             const listDocumentOdoo = (
                 await getDocumentOffline(db, filterDocument, null, 1, 1000)
             ).filter((doc) => doc?.is_sync_odoo);
+
+            const listCancelDocumentOdoo = (
+                await getDocumentOffline(
+                    db,
+                    filterCancelDocument,
+                    null,
+                    1,
+                    1000
+                )
+            ).filter((doc) => doc?.is_sync_odoo);
+
+            for (const item of listCancelDocumentOdoo) {
+                const response = await UpdateDocument({
+                    document_data: {
+                        id: item?.tracking_id,
+                        state: STATE_DOCUMENT_VALUE.Cancel
+                    }
+                });
+                if (
+                    response?.result?.message !== RESPONSE_PUT_DOCUMENT_SUCCESS
+                ) {
+                    throw new Error(
+                        'Something went wrong updating cancel document'
+                    );
+                }
+            }
 
             for (const item of listDocumentOdoo) {
                 try {
