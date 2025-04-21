@@ -578,7 +578,7 @@ const styles = StyleSheet.create({
         width: wp('80%'),
         alignSelf: 'center',
         display: 'flex',
-        marginTop: 30
+        marginTop: 10
     },
     assetTitle: {
         fontSize: 14,
@@ -644,7 +644,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
-        marginTop: 20,
+        marginTop: 5,
         marginBottom: 20
     },
     buttonText: {

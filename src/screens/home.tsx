@@ -207,13 +207,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         setVisibleDialog(false);
     }, []);
 
-    const handleCloseDocumentDoneDialog = useCallback(() => {
-        setVisibleDocumentDoneDialog(false);
-        setTimeout(() => {
-            setToast({ open: true, text: 'Upload Successfully' });
-        }, 0);
-    }, [setToast]);
-
     const handleOpenDialogDownload = useCallback(async () => {
         if (isConnected) {
             const db = await getDBConnection();
@@ -1104,8 +1097,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         return {
                             ...documentLine,
                             is_sync_odoo: true,
-                            image: '',
-                            new_img: false,
                             use_state_code: filterUseStatus[0]?.id || 1
                         };
                     }
@@ -1125,6 +1116,16 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             handleResponseError
         ]
     );
+
+    const handleCloseDocumentDoneDialog = useCallback(async () => {
+        const db = await getDBConnection();
+        setShowProgressBarDocumentDone(true);
+        await handleDownloadDocument(db);
+        setVisibleDocumentDoneDialog(false);
+        setTimeout(() => {
+            setToast({ open: true, text: 'Upload Successfully' });
+        }, 0);
+    }, [handleDownloadDocument, setToast]);
 
     const handleUpload = useCallback(async () => {
         try {

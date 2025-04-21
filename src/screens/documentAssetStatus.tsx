@@ -222,27 +222,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     tracking_id: documentObj.tracking_id,
                     is_cancel: true
                 });
-                const filter = {
-                    tracking_id: documentObj.tracking_id,
-                    is_cancel: true
-                };
-                const listDocumentLine = await getDocumentLine(
-                    db,
-                    filter,
-                    null,
-                    1,
-                    1000
-                );
-                const listInsertDocumentLine = listDocumentLine.map(
-                    (documentLine) => {
-                        return {
-                            ...documentLine,
-                            default_code: documentLine?.code,
-                            use_state: documentLine?.use_state as string
-                        };
-                    }
-                );
-                await insertReportAssetNotFound(db, listInsertDocumentLine);
                 clearStateDialog();
                 setDocument(documentObj);
             }
