@@ -7,20 +7,13 @@ import BackButton from '@src/components/core/backButton';
 import InputText from '@src/components/core/inputText';
 import PopUpDialog from '@src/components/views/popupCameraDialog';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
-import { getLastAsset, insertNewAssetData } from '@src/db/asset';
 import { getCategory } from '@src/db/category';
 import { getDBConnection } from '@src/db/config';
 import { getUseStatus } from '@src/db/useStatus';
-import { CreateAsset } from '@src/services/asset';
 import { GetCategory, GetUseStatus } from '@src/services/downloadDB';
-import {
-    BranchState,
-    documentState,
-    loginState,
-    useRecoilValue
-} from '@src/store';
+import { BranchState, documentState, useRecoilValue } from '@src/store';
 import { theme } from '@src/theme';
-import { DocumentState, LoginState } from '@src/typings/common';
+import { DocumentState } from '@src/typings/common';
 import {
     AssetData,
     CategoryData,
@@ -80,7 +73,6 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const [contentDialog, setContentDialog] = useState<string>('');
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [online, setOnline] = useState<boolean>(false);
-    const loginValue = useRecoilValue<LoginState>(loginState);
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const branchValue = useRecoilValue(BranchState);
     const form = useForm<AssetData>({});
@@ -195,103 +187,25 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const handleSaveAsset = useCallback(
         async (data: AssetData) => {
             try {
-                const isOnline = await getOnlineMode();
-                if (isOnline) {
-                    const assetData = {
-                        default_code: data?.default_code,
-                        name: data?.name,
-                        category_id: searchCategory?.category_id,
-                        quantity: 1,
-                        location_id: documentValue?.location_id,
-                        user_id: loginValue?.uid,
-                        purchase_price: 0,
-                        branch_id: branchValue?.branchId,
-                        ...(selectedImage && {
-                            image: selectedImage,
-                            new_img: true
-                        })
-                    };
-
-                    const response = await CreateAsset({
-                        asset_data: assetData
-                    });
-
-                    if (response?.error) {
-                        setVisibleDialog(true);
-                        setContentDialog('Something went wrong save asset');
-                        return;
-                    }
-                    if (
-                        response?.result?.message ===
-                        'Asset created successfully'
-                    ) {
-                        route?.params?.onGoBack({
-                            asset_id: response?.result?.data?.id,
-                            default_code: data?.default_code,
-                            name: data?.name,
-                            use_state: searchUseState,
-                            state: MOVEMENT_ASSET_EN.New,
-                            ...(selectedImage
-                                ? {
-                                      image: selectedImage,
-                                      new_img: true
-                                  }
-                                : {
-                                      image: false,
-                                      new_img: false
-                                  }),
-                            location: documentValue?.location,
-                            category: searchCategory?.category_name
-                        });
-                        navigation.goBack();
-                    }
-                } else {
-                    const db = await getDBConnection();
-                    const lastAsset = await getLastAsset(db);
-                    const assetID =
-                        lastAsset.length > 0 ? lastAsset[0].asset_id + 1 : 1;
-                    const assetData = [
-                        {
-                            asset_id: assetID,
-                            default_code: data?.default_code,
-                            name: data?.name,
-                            description: '',
-                            category_id: searchCategory?.category_id,
-                            category: searchCategory?.category_name,
-                            quantity: 1,
-                            serial_no: '',
-                            brand_name: '',
-                            use_state: searchUseState,
-                            location_id: documentValue?.location_id,
-                            location: documentValue?.location,
-                            purchase_price: 0,
-                            image: selectedImage ? selectedImage : 'false',
-                            new_img: selectedImage ? true : false,
-                            owner: '',
-                            is_sync_odoo: false
-                        }
-                    ];
-                    await insertNewAssetData(db, assetData);
-                    route?.params?.onGoBack({
-                        asset_id: assetID,
-                        default_code: data?.default_code,
-                        name: data?.name,
-                        use_state: searchUseState,
-                        state: MOVEMENT_ASSET_EN.New,
-                        ...(selectedImage
-                            ? {
-                                  image: selectedImage,
-                                  new_img: true
-                              }
-                            : {
-                                  image: false,
-                                  new_img: false
-                              }),
-                        location: documentValue?.location,
-                        category: searchCategory?.category_name
-                    });
-                    navigation.goBack();
-                }
+                route?.params?.onGoBack({
+                    default_code: data?.default_code,
+                    name: data?.name,
+                    use_state: searchUseState,
+                    state: MOVEMENT_ASSET_EN.New,
+                    ...(selectedImage
+                        ? {
+                              image: selectedImage,
+                              new_img: true
+                          }
+                        : {
+                              image: false,
+                              new_img: false
+                          }),
+                    location: documentValue?.location,
+                    category_id: searchCategory?.category_id,
+                    category: searchCategory?.category_name
+                });
+                navigation.goBack();
             } catch (err) {
                 console.log(err);
                 setVisibleDialog(true);
@@ -299,10 +213,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             }
         },
         [
-            branchValue?.branchId,
             documentValue?.location,
-            documentValue?.location_id,
-            loginValue?.uid,
             navigation,
             route?.params,
             searchCategory?.category_id,
@@ -475,7 +386,9 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                         control={form?.control}
                         render={({ field }) => (
                             <InputText
+                                readOnly
                                 {...field}
+                                backgroundColor={theme.colors.greySoft}
                                 borderColor="#828282"
                                 onChangeText={(value) => field?.onChange(value)}
                             />

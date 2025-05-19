@@ -80,7 +80,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const [visibleDialog, setVisibleDialog] = useState<boolean>(false);
     const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
     const [assetCodeNew, setAssetCodeNew] = useState<string>('');
-    const [idAsset, setIdAsset] = useState<number>(0);
+    const [assetCodeRemove, setAssetCodeRemove] = useState<string>('');
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
@@ -107,7 +107,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         try {
             setListAssetCreate((prev) => {
                 const listAssetFilter = prev.filter(
-                    (item) => item?.asset_id !== idAsset
+                    (item) => item?.default_code !== assetCodeRemove
                 );
                 return listAssetFilter;
             });
@@ -117,7 +117,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
             setVisibleDialog(true);
             setContentDialog('Something went wrong remove asset');
         }
-    }, [clearStateDialog, idAsset]);
+    }, [clearStateDialog, assetCodeRemove]);
 
     const toggleDialogCamera = () => {
         setVisibleDialogCamera(!visibleDialogCamera);
@@ -153,8 +153,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         (item) => item?.name === assetCreate?.use_state
                     );
                     return {
-                        id: assetCreate?.asset_id,
+                        default_code: assetCreate?.default_code,
                         state: handleMapMovementStateValue(assetCreate?.state),
+                        asset_name: assetCreate?.name,
+                        category_id: assetCreate?.category_id,
                         use_state:
                             listUseStateFilter.length > 0
                                 ? listUseStateFilter[0].id
@@ -202,11 +204,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         (item) => item?.name === assetCreate?.use_state
                     );
                     documentLine.push({
-                        asset_id: assetCreate?.asset_id,
                         tracking_id: documentValue?.id,
                         code: assetCreate?.default_code,
                         name: assetCreate?.name,
                         category: assetCreate?.category,
+                        category_id: assetCreate?.category_id,
                         location_id: documentValue?.location_id,
                         location_old: assetCreate?.location,
                         location: documentValue?.location,
@@ -298,13 +300,13 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     ]);
 
     const handleOpenDialogConfirmRemoveAsset = useCallback(
-        (id: number) => {
+        (code: string) => {
             clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog('Confirm');
             setContentDialog('Do you want to remove this asset ?');
             setShowCancelDialog(true);
-            setIdAsset(id);
+            setAssetCodeRemove(code);
         },
         [clearStateDialog]
     );
@@ -403,7 +405,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         (assetData: AssetDataForPassParamsDocumentCreate) => {
             setListAssetCreate((prev) => {
                 return prev.map((item) => {
-                    if (item?.asset_id === assetData?.asset_id) {
+                    if (item?.default_code === assetData?.default_code) {
                         return {
                             ...item,
                             image: assetData?.image as string,
@@ -471,6 +473,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 isDuplicateAssetInDocumentLine ||
                 isDuplicateAssetInListAssetCreate
             ) {
+                setAssetCode('');
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog('Duplicate Asset');
@@ -496,6 +499,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleOnlineSearch = useCallback(
         async (code: string) => {
             if (await handleCheckDuplicateOnline(code)) return;
+
             const response = await GetAssetSearch({
                 page: 1,
                 limit: 10,
@@ -569,6 +573,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 isDuplicateAssetInListDocumentLineDB ||
                 isDuplicateAssetInListAssetCreate
             ) {
+                setAssetCode('');
                 clearStateDialog();
                 setVisibleDialog(true);
                 setTitleDialog('Duplicate Asset');
@@ -594,7 +599,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleOfflineSearch = useCallback(
         async (code: string) => {
             const db = await getDBConnection();
-
             if (await handleCheckDuplicateOffline(code)) return;
 
             const filter = {
@@ -886,7 +890,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 onPress={() =>
                                     navigation.navigate('DocumentAssetDetail', {
                                         assetData: {
-                                            asset_id: item?.asset_id,
                                             code: item?.default_code,
                                             name: item?.name,
                                             category: item?.category,
@@ -911,7 +914,6 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                     assetStatus={item?.use_state}
                                     assetMovement={item?.state}
                                     assetLocation={item?.location}
-                                    assetId={item?.asset_id}
                                     assetNewLocation={documentValue?.location}
                                     handleRemoveAsset={
                                         handleOpenDialogConfirmRemoveAsset
@@ -920,7 +922,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.asset_id.toString()}
+                    keyExtractor={(item) => item.default_code.toString()}
                 />
                 <TouchableOpacity
                     style={[

@@ -21,10 +21,8 @@ import {
 } from '@src/constant';
 import {
     createTableAsset,
-    getAsset,
     getTotalAssets,
-    insertAssetData,
-    updateAsset
+    insertAssetData
 } from '@src/db/asset';
 import { createTableBranch, insertBranchData } from '@src/db/branch';
 import { createTableCategory, insertCategoryData } from '@src/db/category';
@@ -33,8 +31,7 @@ import { getDBConnection } from '@src/db/config';
 import {
     createTableDocumentLine,
     getDocumentLine,
-    insertDocumentLineData,
-    updateDocumentLineData
+    insertDocumentLineData
 } from '@src/db/documentLineOffline';
 import {
     createTableDocumentOffline,
@@ -48,7 +45,7 @@ import {
 } from '@src/db/reportAssetNotFound';
 import { insertUserOffline } from '@src/db/userOffline';
 import { createTableUseStatus, insertUseStatusData } from '@src/db/useStatus';
-import { CreateAsset, GetAssetNotFoundSearch } from '@src/services/asset';
+import { GetAssetNotFoundSearch } from '@src/services/asset';
 import { GetBranches } from '@src/services/branch';
 import {
     AddDocumentLine,
@@ -139,7 +136,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const [showProgressBarDocumentDone, setShowProgressBarDocumentDone] =
         useState<boolean>(false);
     const [listTrackingID, setListTrackingId] = useState<number[]>([]);
-    const loginValue = useRecoilValue<LoginState>(loginState);
     const onlineValue = useRecoilValue<boolean>(OnlineState);
     const branchValue = useRecoilValue(BranchState);
 
@@ -467,6 +463,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleDownload = useCallback(async () => {
         try {
+            setShowProgressBar(true);
             const foundMacAddress = await handleCheckMacAddress();
             if (!foundMacAddress) {
                 return showDialogWarning(
@@ -475,7 +472,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }
 
             setDisableCloseDialog(true);
-            setShowProgressBar(true);
 
             const [
                 initialResponseAssets,
@@ -692,7 +688,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const mapUploadDocumentLines = useCallback(
         (documentLines) => {
             return documentLines.map((line) => ({
-                id: line?.asset_id,
+                default_code: line?.code,
+                asset_name: line?.name,
+                category_id: line?.category_id,
                 state: line?.state,
                 use_state: line?.use_state_code,
                 new_img: line?.new_img ? true : false,
@@ -706,62 +704,45 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const mapUploadDeleteDocumentLines = useCallback((documentLines) => {
         return documentLines.map((line) => ({
-            id: line?.asset_id
+            default_code: line?.code
         }));
     }, []);
 
-    const uploadUnsyncedAssets = useCallback(
-        async (db) => {
-            const filterAsset = { is_sync_odoo: false };
-            const listAsset = await getAsset(db, filterAsset, 1, 1000);
+    const checkIsEmptyDocument = useCallback(async (db): Promise<boolean> => {
+        const filterDocument = {
+            state: STATE_DOCUMENT_NAME?.Draft
+        };
+        const listDocument = await getDocumentOffline(
+            db,
+            filterDocument,
+            null,
+            1,
+            1000
+        );
 
-            for (const item of listAsset) {
-                try {
-                    const assetData: AssetData = {
-                        default_code: item?.default_code,
-                        name: item?.name,
-                        category_id: item?.category_id,
-                        quantity: 1,
-                        location_id: item?.location_id,
-                        user_id: loginValue?.uid,
-                        purchase_price: 0,
-                        branch_id: branchValue?.branchId,
-                        ...(item?.image !== 'false' && { image: item?.image }),
-                        ...(item?.new_img && { new_img: item?.new_img })
-                    };
+        for (const item of listDocument) {
+            try {
+                const listDocumentLine = await getDocumentLine(
+                    db,
+                    {
+                        tracking_id: item?.tracking_id,
+                        is_cancel: false
+                    },
+                    null,
+                    1,
+                    1000
+                );
 
-                    const response = await CreateAsset({
-                        asset_data: assetData
-                    });
-
-                    if (response?.error) {
-                        throw new Error('Something went wrong create asset');
-                    }
-
-                    const newAssetId = response?.result?.data?.id;
-                    if (
-                        response?.result?.message ===
-                        'Asset created successfully'
-                    ) {
-                        await updateAsset(db, {
-                            asset_id: newAssetId,
-                            is_sync_odoo: true,
-                            id: item?.id
-                        });
-
-                        await updateDocumentLineData(db, {
-                            asset_id_update: newAssetId,
-                            code: item?.default_code
-                        });
-                    }
-                } catch (error) {
-                    console.error('Asset Upload Error:', error);
-                    throw error;
+                if (listDocumentLine.length === 0) {
+                    return true;
                 }
+            } catch (error) {
+                console.error('Document Upload Error:', error);
+                throw error;
             }
-        },
-        [branchValue?.branchId, loginValue?.uid]
-    );
+        }
+        return false;
+    }, []);
 
     const uploadNewDocuments = useCallback(
         async (db, isDocumentDone) => {
@@ -828,6 +809,36 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             );
                         }
                     }
+
+                    const responseCheckDocument = await UpdateDocument({
+                        document_data: {
+                            id: responseCreateDocument?.result?.data?.id,
+                            state: STATE_DOCUMENT_VALUE.Check
+                        }
+                    });
+
+                    if (
+                        responseCheckDocument?.result?.message !==
+                        RESPONSE_PUT_DOCUMENT_SUCCESS
+                    ) {
+                        throw new Error(
+                            'Something went wrong updating check document'
+                        );
+                    }
+                    const responseDoneDocument = await UpdateDocument({
+                        document_data: {
+                            id: responseCreateDocument?.result?.data?.id,
+                            state: STATE_DOCUMENT_VALUE.Done
+                        }
+                    });
+                    if (
+                        responseDoneDocument?.result?.message !==
+                        RESPONSE_PUT_DOCUMENT_SUCCESS
+                    ) {
+                        throw new Error(
+                            'Something went wrong updating done document'
+                        );
+                    }
                 } catch (error) {
                     console.error('Document Upload Error:', error);
                     throw error;
@@ -840,10 +851,19 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const updateExistingDocuments = useCallback(
         async (db): Promise<number[]> => {
             let listTrackingIDDocumentDone: number[] = [];
-            const filterDocument = { state: STATE_DOCUMENT_NAME?.Draft };
+            const filterDraftDocument = {
+                state: STATE_DOCUMENT_NAME?.Draft
+            };
+            const filterCheckDocument = {
+                state: STATE_DOCUMENT_NAME?.Check
+            };
             const filterCancelDocument = { state: STATE_DOCUMENT_NAME?.Cancel };
-            const listDocumentOdoo = (
-                await getDocumentOffline(db, filterDocument, null, 1, 1000)
+            const listDraftDocumentOdoo = (
+                await getDocumentOffline(db, filterDraftDocument, null, 1, 1000)
+            ).filter((doc) => doc?.is_sync_odoo);
+
+            const listCheckDocumentOdoo = (
+                await getDocumentOffline(db, filterCheckDocument, null, 1, 1000)
             ).filter((doc) => doc?.is_sync_odoo);
 
             const listCancelDocumentOdoo = (
@@ -861,7 +881,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     const responseCancelDocument = await UpdateDocument({
                         document_data: {
                             id: item?.tracking_id,
-                            android_id: item?.tracking_id?.toString(),
                             state: STATE_DOCUMENT_VALUE.Cancel
                         }
                     });
@@ -879,7 +898,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 }
             }
 
-            for (const item of listDocumentOdoo) {
+            for (const item of listDraftDocumentOdoo) {
                 try {
                     const responseGetDocument = await GetDocumentById(
                         item?.tracking_id
@@ -887,7 +906,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
                     if (
                         responseGetDocument?.result?.data?.asset?.state ===
-                        STATE_DOCUMENT_VALUE.Done
+                            STATE_DOCUMENT_VALUE.Done ||
+                        responseGetDocument?.result?.data?.asset?.state ===
+                            STATE_DOCUMENT_VALUE.Check
                     ) {
                         listTrackingIDDocumentDone.push(item?.tracking_id);
                         continue;
@@ -988,11 +1009,59 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             );
                         }
                     }
+
+                    const responseCheckDocument = await UpdateDocument({
+                        document_data: {
+                            id: item?.tracking_id,
+                            state: STATE_DOCUMENT_VALUE.Check
+                        }
+                    });
+                    if (
+                        responseCheckDocument?.result?.message !==
+                        RESPONSE_PUT_DOCUMENT_SUCCESS
+                    ) {
+                        throw new Error(
+                            'Something went wrong updating check document'
+                        );
+                    }
+
+                    const responseDoneDocument = await UpdateDocument({
+                        document_data: {
+                            id: item?.tracking_id,
+                            state: STATE_DOCUMENT_VALUE.Done
+                        }
+                    });
+                    if (
+                        responseDoneDocument?.result?.message !==
+                        RESPONSE_PUT_DOCUMENT_SUCCESS
+                    ) {
+                        throw new Error(
+                            'Something went wrong updating done document'
+                        );
+                    }
                 } catch (error) {
                     console.error('Document Upload Error:', error);
                     throw error;
                 }
             }
+
+            for (const item of listCheckDocumentOdoo) {
+                const responseDoneDocument = await UpdateDocument({
+                    document_data: {
+                        id: item?.tracking_id,
+                        state: STATE_DOCUMENT_VALUE.Done
+                    }
+                });
+                if (
+                    responseDoneDocument?.result?.message !==
+                    RESPONSE_PUT_DOCUMENT_SUCCESS
+                ) {
+                    throw new Error(
+                        'Something went wrong updating done document'
+                    );
+                }
+            }
+
             return listTrackingIDDocumentDone;
         },
         [mapUploadDeleteDocumentLines, mapUploadDocumentLines]
@@ -1001,11 +1070,13 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleDownloadDocument = useCallback(
         async (db) => {
             const [
+                initialResponseAssets,
                 initialResponseAssetNotFound,
                 initialDocumentLine,
                 initialDocument,
                 initialResponseUseStatus
             ] = await Promise.all([
+                GetAssets({ page: 1, limit: 200 }),
                 GetAssetNotFoundSearch({
                     page: 1,
                     limit: 1000,
@@ -1035,6 +1106,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 GetUseStatus({ page: 1, limit: 1000 })
             ]);
 
+            const errorAssets = handleResponseError(
+                initialResponseAssets?.error
+            );
             const errorAssetNotFound = handleResponseError(
                 initialResponseAssetNotFound?.error
             );
@@ -1050,11 +1124,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 errorAssetNotFound ||
                 errorDocumentLine ||
                 errorDocument ||
-                errorUseStatus
+                errorUseStatus ||
+                errorAssets
             ) {
                 return;
             }
 
+            const totalPagesAssets =
+                initialResponseAssets?.result?.data?.total_page;
             const totalPagesAssetNotFound =
                 initialResponseAssetNotFound?.result?.data?.total_pages;
             const totalPagesDocumentLine =
@@ -1077,6 +1154,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             ]);
 
             await clearDocumentTable(db);
+
+            for (let index = 0; index < totalPagesAssets; index++) {
+                const result = await GetAssets({
+                    page: index + 1,
+                    limit: 200
+                });
+                await insertAssetData(db, result?.result?.data?.asset);
+            }
 
             if (listDocument?.length > 0) {
                 const newListDocumentLine = listDocument?.map((document) => {
@@ -1129,8 +1214,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
     const handleUpload = useCallback(async () => {
         try {
-            const foundMacAddress = await handleCheckMacAddress();
+            setShowProgressBar(true);
 
+            const foundMacAddress = await handleCheckMacAddress();
             if (!foundMacAddress) {
                 return showDialogWarning(
                     `This device does not have permission to upload`
@@ -1138,11 +1224,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             }
 
             setDisableCloseDialog(true);
-            setShowProgressBar(true);
 
             const db = await getDBConnection();
-
-            await uploadUnsyncedAssets(db);
+            if (await checkIsEmptyDocument(db)) {
+                showDialogWarning(
+                    'Some documents have no assets. Please cancel or add assets.'
+                );
+                return;
+            }
             await uploadNewDocuments(db, false);
             const listTrackingIDDocumentDone = await updateExistingDocuments(
                 db
@@ -1163,14 +1252,14 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             return showDialogWarning('Something went wrong upload');
         }
     }, [
+        checkIsEmptyDocument,
         clearStateDialog,
         handleCheckMacAddress,
         handleDownloadDocument,
         setToast,
         showDialogWarning,
         updateExistingDocuments,
-        uploadNewDocuments,
-        uploadUnsyncedAssets
+        uploadNewDocuments
     ]);
 
     const handleSelectBranch = useCallback(() => {

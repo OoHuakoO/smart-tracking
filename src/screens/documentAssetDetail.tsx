@@ -203,7 +203,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                         asset_tracking_id: documentValue?.id,
                         asset_ids: [
                             {
-                                id: route?.params?.assetData?.asset_id,
+                                default_code: route?.params?.assetData?.code,
                                 state: handleMapMovementStateValue(
                                     route?.params?.assetData?.state
                                 ),
@@ -245,7 +245,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                             image: getImage()
                         }),
                         new_img: selectedImage ? true : false,
-                        asset_id: route?.params?.assetData?.asset_id,
                         tracking_id: documentValue?.id
                     };
 
@@ -256,7 +255,6 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
             }
             if (route?.params?.routeBefore === 'DocumentCreate') {
                 route?.params?.onGoBack({
-                    asset_id: route?.params?.assetData?.asset_id,
                     default_code: route?.params?.assetData?.code,
                     name: route?.params?.assetData?.name,
                     use_state: searchUseState,

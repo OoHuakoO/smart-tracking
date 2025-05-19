@@ -1,7 +1,6 @@
 import { AssetData } from './downloadDB';
 
 export interface AssetDataForPassParamsDocumentCreate {
-    asset_id: number;
     default_code: string;
     name: string;
     state: string;
@@ -9,6 +8,7 @@ export interface AssetDataForPassParamsDocumentCreate {
     location: string;
     image?: string | boolean;
     new_img?: boolean;
+    category_id?: number;
     category?: string;
 }
 

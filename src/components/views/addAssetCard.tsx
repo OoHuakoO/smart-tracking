@@ -9,20 +9,18 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 
 interface AddAssetCardProps {
     imageSource?: any;
-    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string;
     assetMovement: string;
     assetLocation: string;
     assetNewLocation: string;
-    handleRemoveAsset: (id: number) => void;
+    handleRemoveAsset: (code: string) => void;
 }
 
 const AddAssetCard: FC<AddAssetCardProps> = (props) => {
     const {
         imageSource,
-        assetId,
         assetCode,
         assetName,
         assetStatus,
@@ -35,7 +33,7 @@ const AddAssetCard: FC<AddAssetCardProps> = (props) => {
     return (
         <View style={styles.cardContainer}>
             <TouchableOpacity
-                onPress={() => handleRemoveAsset(assetId)}
+                onPress={() => handleRemoveAsset(assetCode)}
                 activeOpacity={0.5}
                 style={styles.deleteIconContainer}
             >

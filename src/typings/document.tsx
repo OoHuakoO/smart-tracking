@@ -5,6 +5,7 @@ export interface DocumentAssetData {
     code?: string;
     name?: string;
     category?: string;
+    category_id?: number;
     serial_no?: string;
     location_id?: number;
     location_old?: string;

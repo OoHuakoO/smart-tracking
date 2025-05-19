@@ -354,9 +354,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                             Keyboard.dismiss();
                             setVisiblePopupSelectModeCompany(true);
                             break;
-                        default:
-                            await handleOnlineLogin(data);
-                            break;
                     }
                 } else {
                     const companyMode = await AsyncStorage.getItem(
@@ -372,9 +369,6 @@ const LoginScreen: FC<LoginScreenProps> = (props) => {
                         case 'switch':
                             Keyboard.dismiss();
                             setVisiblePopupSelectModeCompany(true);
-                            break;
-                        default:
-                            await handleOnlineLogin(data);
                             break;
                     }
                 }

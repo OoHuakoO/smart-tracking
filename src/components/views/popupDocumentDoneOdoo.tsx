@@ -25,6 +25,7 @@ const PopupDocumentDoneOdoo: FC<PopupDocumentDoneOdooProps> = (props) => {
                 visible={visible}
                 onDismiss={handleClose}
                 style={styles.dialogContainer}
+                dismissable={false}
             >
                 <Dialog.Title>
                     <Text variant="titleLarge">
@@ -33,8 +34,8 @@ const PopupDocumentDoneOdoo: FC<PopupDocumentDoneOdooProps> = (props) => {
                 </Dialog.Title>
                 <Dialog.Content>
                     <Text variant="titleMedium" style={styles.dialogContent}>
-                        Documents are done and can't be edited anymore. Want to
-                        create new ones?
+                        Documents are done / check can't be edited anymore. Want
+                        to create new ones?
                     </Text>
                     <Text variant="titleMedium" style={styles.documentText}>
                         Document : {listTrackingID?.join(', ')}

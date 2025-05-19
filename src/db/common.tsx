@@ -63,6 +63,7 @@ export const dropAllMasterTable = (db: SQLiteDatabase) => {
 export const clearDocumentTable = (db: SQLiteDatabase) => {
     try {
         db.transaction((tx) => {
+            tx.executeSql('DELETE FROM asset;');
             tx.executeSql('DELETE FROM documentOffline;');
             tx.executeSql('DELETE FROM documentLineOffline;');
             tx.executeSql('DELETE FROM reportAssetNotFound;');

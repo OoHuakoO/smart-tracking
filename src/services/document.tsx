@@ -55,7 +55,7 @@ export function AddDocumentLine(
 export function UpdateDocument(
     params: Params
 ): Promise<Response<PutDocumentResponse>> {
-    return put<PutDocumentResponse>(`/api/asset/tracking/update`, params);
+    return post<PutDocumentResponse>(`/api/asset/tracking/update`, params);
 }
 
 export function UpdateDocumentLine(

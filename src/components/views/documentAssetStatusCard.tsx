@@ -9,14 +9,13 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 interface DocumentAssetStatusProps {
     imageSource?: any;
-    assetId: number;
     assetCode: string;
     assetName: string;
     assetStatus: string | number;
     assetMovement: string;
     assetDate: string;
     documentStatus: string;
-    handleRemoveAsset: (id: number, code: string) => void;
+    handleRemoveAsset: (code: string) => void;
 }
 
 const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
@@ -28,15 +27,14 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
         assetMovement,
         assetDate,
         documentStatus,
-        handleRemoveAsset,
-        assetId
+        handleRemoveAsset
     } = props;
 
     return (
         <View style={styles.cardContainer}>
             {documentStatus === STATE_DOCUMENT_NAME.Draft && (
                 <TouchableOpacity
-                    onPress={() => handleRemoveAsset(assetId, assetCode)}
+                    onPress={() => handleRemoveAsset(assetCode)}
                     activeOpacity={0.5}
                     style={styles.deleteIconContainer}
                 >
@@ -70,15 +68,15 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
                     <Text variant="bodyLarge">{assetName}</Text>
                 </View>
                 <Text variant="bodyMedium">
-                    Status {}
+                    Status : {}
                     <Text style={styles.additionalText}>{assetStatus}</Text>
                 </Text>
                 <Text variant="bodyMedium">
-                    Movement {}
+                    Movement : {}
                     <Text style={styles.additionalText}>{assetMovement}</Text>
                 </Text>
                 <Text variant="bodyMedium">
-                    Date {}
+                    Date : {}
                     <Text style={styles.additionalText}>{assetDate}</Text>
                 </Text>
             </View>

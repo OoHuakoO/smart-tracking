@@ -16,6 +16,7 @@ interface InputTextProps extends TextInputProps {
     placeholder?: string;
     width?: number;
     borderColor?: string;
+    backgroundColor?: string;
     secureText?: boolean;
     isPasswordVisible?: boolean;
     handleVisiblePassword?: () => void;
@@ -27,6 +28,7 @@ const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
         errorText,
         width,
         borderColor,
+        backgroundColor,
         secureText,
         isPasswordVisible,
         handleVisiblePassword
@@ -37,7 +39,10 @@ const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
                 style={[
                     styles.input,
                     { width: width || '100%' },
-                    { borderColor: borderColor || 'gray' }
+                    {
+                        borderColor: borderColor || 'gray',
+                        backgroundColor: backgroundColor
+                    }
                 ]}
                 placeholder={placeholder}
                 {...(isPasswordVisible !== undefined && {

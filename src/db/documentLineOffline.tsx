@@ -6,11 +6,11 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
         (tx) => {
             const query = `CREATE TABLE IF NOT EXISTS documentLineOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            asset_id INTEGER NOT NULL,
             tracking_id INTEGER NOT NULL,
             code TEXT NOT NULL,
             name TEXT NOT NULL,
             category TEXT,
+            category_id INTEGER,
             location_id INTEGER,
             location_old TEXT,
             location TEXT,
@@ -60,11 +60,11 @@ export const insertDocumentLineData = (
 ) => {
     const queryInsert =
         `INSERT INTO documentLineOffline (
-          asset_id,
           tracking_id,
           code,
           name,
           category,
+          category_id,
           location_id,
           location_old,
           location,
@@ -78,11 +78,11 @@ export const insertDocumentLineData = (
         documentLine
             .map(
                 (item) => `(
-                ${item.asset_id},
                 ${item.tracking_id},
                 '${item.code}',
                 '${item.name}',
                 '${item.category}',
+                 ${item.category_id},
                  ${item.location_id},
                 '${item.location_old}',
                 '${item.location}',
@@ -347,19 +347,9 @@ export const updateDocumentLineData = (
         queryParams.push(documentLine.new_img ? 1 : 0);
     }
 
-    if (documentLine.asset_id_update !== undefined) {
-        setClauses.push(`asset_id = ?`);
-        queryParams.push(documentLine.asset_id_update);
-    }
-
     if (documentLine.is_cancel !== undefined) {
         setClauses.push(`is_cancel = ?`);
         queryParams.push(documentLine.is_cancel);
-    }
-
-    if (documentLine.asset_id !== undefined) {
-        whereConditions.push(`asset_id = ?`);
-        queryParams.push(documentLine.asset_id);
     }
 
     if (documentLine.code !== undefined) {
@@ -412,21 +402,6 @@ export const removeDocumentLineOffline = (db: SQLiteDatabase) => {
         console.log(`remove document line successfully`);
     } catch (err) {
         throw new Error(`Error remove document : ${err.message}`);
-    }
-};
-
-export const removeDocumentLineByAssetId = (
-    db: SQLiteDatabase,
-    assetId: number
-) => {
-    const deleteQuery = `DELETE FROM documentLineOffline WHERE asset_id = ?`;
-    try {
-        db.transaction((tx) => {
-            tx.executeSql(deleteQuery, [assetId]);
-        });
-        console.log(`remove document line assetId: ${assetId} successfully`);
-    } catch (err) {
-        throw new Error(`Error remove document line: ${err.message}`);
     }
 };
 

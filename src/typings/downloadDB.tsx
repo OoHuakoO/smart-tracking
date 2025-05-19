@@ -17,7 +17,6 @@ export interface AssetData {
     owner?: string;
     new_img?: boolean;
     purchase_price?: number;
-    is_sync_odoo?: boolean;
     user_id?: string;
     create_date?: string;
     branch_id?: number;

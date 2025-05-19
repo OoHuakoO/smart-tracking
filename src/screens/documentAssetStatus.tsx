@@ -20,6 +20,7 @@ import { useIsFocused } from '@react-navigation/native';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
+    MOVEMENT_ASSET_NORMAL_TH,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     RESPONSE_PUT_DOCUMENT_SUCCESS,
     STATE_DOCUMENT_NAME,
@@ -80,7 +81,6 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     const [listAssetDocument, setListAssetDocument] = useState<
         DocumentAssetData[]
     >([]);
-    const [idAsset, setIdAsset] = useState<number>(0);
     const [codeAsset, setCodeAsset] = useState<string>('');
     const [online, setOnline] = useState<boolean>(false);
     const documentValue = useRecoilValue<DocumentState>(documentState);
@@ -168,13 +168,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
     }, [clearStateDialog, documentValue?.id, documentValue?.state]);
 
     const handleOpenDialogConfirmRemoveAsset = useCallback(
-        (id: number, code: string) => {
+        (code: string) => {
             clearStateDialog();
             setVisibleDialog(true);
             setTitleDialog('Confirm');
             setContentDialog('Do you want to remove this asset ?');
             setShowCancelDialog(true);
-            setIdAsset(id);
             setCodeAsset(code);
         },
         [clearStateDialog]
@@ -245,7 +244,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             if (isOnline) {
                 const response = await DeleteDocumentLine({
                     asset_tracking_id: documentValue?.id,
-                    asset_ids: [{ id: idAsset }]
+                    asset_ids: [{ default_code: codeAsset }]
                 });
                 if (
                     response?.result?.message ===
@@ -265,7 +264,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 const db = await getDBConnection();
                 await updateDocumentLineData(db, {
                     tracking_id: documentValue?.id,
-                    asset_id: idAsset,
+                    code: codeAsset,
                     is_cancel: true
                 });
                 const asset = await getAsset(db, filter);
@@ -283,7 +282,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
             }
             setListAssetDocument((prev) => {
                 const listAssetFilter = prev.filter(
-                    (item) => item?.asset_id !== idAsset
+                    (item) => item?.code !== codeAsset
                 );
                 setTotalAssetDocument(listAssetFilter.length);
                 return listAssetFilter;
@@ -298,8 +297,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         clearStateDialog,
         codeAsset,
         documentValue?.id,
-        handleFetchDocumentById,
-        idAsset
+        handleFetchDocumentById
     ]);
 
     const handleConfirmDialog = useCallback(async () => {
@@ -443,11 +441,14 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                 style={styles.searchButton}
                             >
                                 <DocumentAssetStatusCard
-                                    assetId={item?.asset_id}
                                     imageSource={item?.image}
                                     assetCode={item?.code}
                                     assetName={item?.name}
-                                    assetStatus={item?.use_state}
+                                    assetStatus={
+                                        item?.use_state
+                                            ? item?.use_state
+                                            : MOVEMENT_ASSET_NORMAL_TH
+                                    }
                                     assetMovement={item?.state}
                                     assetDate={item?.date_check}
                                     documentStatus={documentValue?.state}
@@ -458,7 +459,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.asset_id.toString()}
+                    keyExtractor={(item) => item.code.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                 />

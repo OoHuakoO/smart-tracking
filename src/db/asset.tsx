@@ -22,7 +22,6 @@ export const createTableAsset = (db: SQLiteDatabase) => {
             use_state TEXT,
             new_img BOOLEAN,
             owner TEXT,
-            is_sync_odoo BOOLEAN DEFAULT TRUE,
             create_date DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
         );`;
 
@@ -115,69 +114,6 @@ export const insertAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
     }
 };
 
-export const insertNewAssetData = (db: SQLiteDatabase, assets: AssetData[]) => {
-    const queryInsert =
-        `INSERT INTO asset (
-      asset_id,
-      default_code,
-      name,
-      description,
-      category_id,
-      category,
-      serial_no,
-      brand_name,
-      quantity,
-      location_id,
-      location,
-      image,
-      use_state,
-      new_img,
-      owner,
-      is_sync_odoo
-    ) VALUES ` +
-        assets
-            .map(
-                (item) => `(
-                    ${item.asset_id},
-                    '${item.default_code}',
-                    '${item.name}',
-                    '${item.description}',
-                    ${item.category_id},
-                    '${item.category}',
-                    '${item.serial_no}',
-                    '${item.brand_name}',
-                    ${item.quantity},
-                    ${item.location_id},
-                    '${item.location}',
-                    '${item.image}',
-                    '${item.use_state}',
-                    ${item.new_img},
-                    '${item.owner}',
-                    ${item.is_sync_odoo}
-                    )`
-            )
-            .join(',');
-
-    try {
-        db.transaction(
-            (tx) => {
-                tx.executeSql(queryInsert);
-            },
-            (error) => {
-                console.log('Transaction insertAssetData error:', error);
-            },
-            () => {
-                console.log(
-                    'Transaction insertAssetData completed successfully'
-                );
-            }
-        );
-        console.log('All assets inserted successfully');
-    } catch (err) {
-        throw new Error(`Error inserting assets: ${err.message}`);
-    }
-};
-
 export const getLastAsset = async (
     db: SQLiteDatabase
 ): Promise<AssetData[]> => {
@@ -209,7 +145,6 @@ export const getAsset = async (
         'category_id.name'?: string;
         use_state?: string;
         'location_id.name'?: string;
-        is_sync_odoo?: boolean;
     },
     page: number = 1,
     limit: number = 10
@@ -243,12 +178,6 @@ export const getAsset = async (
     if (filters?.use_state !== undefined) {
         whereConditions.push(`asset.use_state = ?`);
         queryParams.push(filters.use_state);
-    }
-
-    if (filters?.is_sync_odoo !== undefined) {
-        const isSyncOdooValue = filters.is_sync_odoo ? 1 : 0;
-        whereConditions.push(`asset.is_sync_odoo = ?`);
-        queryParams.push(isSyncOdooValue);
     }
 
     if (
@@ -408,57 +337,5 @@ export const getTotalAssets = async (
         }
     } catch (err) {
         throw new Error(`Error calculating total assets :  ${err.message}`);
-    }
-};
-
-export const updateAsset = (db: SQLiteDatabase, asset: AssetData) => {
-    const setClauses = [];
-    const queryParams = [];
-    const whereConditions = [];
-
-    if (asset.asset_id !== undefined) {
-        setClauses.push(`asset_id = ?`);
-        queryParams.push(asset.asset_id);
-    }
-
-    if (asset.is_sync_odoo !== undefined) {
-        const isSyncOdooValue = asset.is_sync_odoo ? 1 : 0;
-        setClauses.push(`is_sync_odoo = ?`);
-        queryParams.push(isSyncOdooValue);
-    }
-
-    if (asset.id !== undefined) {
-        whereConditions.push(`id = ?`);
-        queryParams.push(asset.id);
-    }
-
-    const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
-
-    const queryUpdate = `UPDATE asset SET ${setClauses.join(
-        ', '
-    )} ${whereClause}`;
-
-    try {
-        db.transaction((tx) => {
-            tx.executeSql(
-                queryUpdate,
-                queryParams,
-                () => {
-                    console.log('Table asset update successfully');
-                },
-                (_, error) => {
-                    console.log(
-                        'Error occurred while update the asset:',
-                        error
-                    );
-                    throw new Error(
-                        `Failed to update asset table: ${error.message}`
-                    );
-                }
-            );
-        });
-        console.log('Asset updated successfully');
-    } catch (err) {
-        throw new Error(`Error updating asset : ${err.message}`);
     }
 };
