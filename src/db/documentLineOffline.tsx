@@ -87,7 +87,11 @@ export const insertDocumentLineData = (
                 '${item.location_old}',
                 '${item.location}',
                 '${item.state}',
-                '${item.use_state}',
+                ${
+                    item.use_state === null || item.use_state === undefined
+                        ? null
+                        : `'${item.use_state}'`
+                },
                  ${item.use_state_code},
                 '${item.image}',
                  ${item.new_img},

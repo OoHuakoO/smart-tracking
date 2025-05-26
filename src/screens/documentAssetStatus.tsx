@@ -20,7 +20,6 @@ import { useIsFocused } from '@react-navigation/native';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
-    MOVEMENT_ASSET_NORMAL_TH,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     RESPONSE_PUT_DOCUMENT_SUCCESS,
     STATE_DOCUMENT_NAME,
@@ -426,7 +425,21 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     Total Asset : {totalAssetDocument}
                 </Text>
                 <FlatList
-                    data={listAssetDocument}
+                    data={[...listAssetDocument].sort((a, b) => {
+                        const parseDate = (
+                            dateStr: string | undefined | null
+                        ): number => {
+                            if (!dateStr) return 0;
+                            const parts = dateStr.split('/');
+                            if (parts.length !== 3) return 0;
+                            const [day, month, year] = parts;
+                            const isoDateStr = `${year}-${month}-${day}`;
+                            return new Date(isoDateStr).getTime();
+                        };
+                        const aTime = parseDate(a?.date_check);
+                        const bTime = parseDate(b?.date_check);
+                        return bTime - aTime;
+                    })}
                     style={styles.flatListStyle}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
@@ -444,11 +457,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                     imageSource={item?.image}
                                     assetCode={item?.code}
                                     assetName={item?.name}
-                                    assetStatus={
-                                        item?.use_state
-                                            ? item?.use_state
-                                            : MOVEMENT_ASSET_NORMAL_TH
-                                    }
+                                    assetStatus={item?.use_state}
                                     assetMovement={item?.state}
                                     assetDate={item?.date_check}
                                     documentStatus={documentValue?.state}

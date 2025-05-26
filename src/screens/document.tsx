@@ -457,7 +457,11 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
 
                 <FlatList
                     style={styles.flatListStyle}
-                    data={listDocument}
+                    data={[...listDocument].sort((a, b) => {
+                        const aId = online ? a?.id : a?.tracking_id;
+                        const bId = online ? b?.id : b?.tracking_id;
+                        return bId - aId;
+                    })}
                     renderItem={({ item }) => (
                         <View style={styles.wrapDetailList}>
                             <TouchableOpacity

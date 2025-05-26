@@ -647,7 +647,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             return {
                                 ...documentLine,
                                 is_sync_odoo: true,
-                                use_state_code: filterUseStatus[0]?.id
+                                use_state_code: filterUseStatus[0]?.id || null,
+                                use_state: documentLine?.use_state || null
                             };
                         }
                     );
@@ -1182,7 +1183,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         return {
                             ...documentLine,
                             is_sync_odoo: true,
-                            use_state_code: filterUseStatus[0]?.id || 1
+                            use_state_code: filterUseStatus[0]?.id || null,
+                            use_state: documentLine?.use_state || null
                         };
                     }
                 );
