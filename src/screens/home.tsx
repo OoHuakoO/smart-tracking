@@ -367,10 +367,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 const promises = Array.from({ length: totalPages }, (_, i) =>
                     GetDocumentLineSearch({
                         page: i + 1,
-                        limit: 1000,
-                        search_term: {
-                            and: { state: ['0', '1', '2'] }
-                        }
+                        limit: 1000
                     })
                 );
                 const results = await Promise.all(promises);
@@ -497,10 +494,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 }),
                 GetDocumentLineSearch({
                     page: 1,
-                    limit: 1000,
-                    search_term: {
-                        and: { state: ['0', '1', '2'] }
-                    }
+                    limit: 1000
                 }),
                 GetAllUserOffline({
                     page: 1,
@@ -647,8 +641,8 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                             return {
                                 ...documentLine,
                                 is_sync_odoo: true,
-                                use_state_code: filterUseStatus[0]?.id || null,
-                                use_state: documentLine?.use_state || null
+                                name: documentLine?.asset_name,
+                                use_state_code: filterUseStatus[0]?.id
                             };
                         }
                     );
@@ -696,6 +690,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 use_state: line?.use_state_code,
                 new_img: line?.new_img ? true : false,
                 branch_id: branchValue?.branchId,
+                quantity: line?.quantity,
                 date_check: parseDateStringTime(line?.date_check),
                 ...(line?.image !== 'false' && { image: line?.image })
             }));
@@ -879,6 +874,19 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
             for (const item of listCancelDocumentOdoo) {
                 try {
+                    const responseGetDocument = await GetDocumentById(
+                        item?.tracking_id
+                    );
+
+                    if (
+                        responseGetDocument?.result?.data?.asset?.state ===
+                            STATE_DOCUMENT_VALUE.Done ||
+                        responseGetDocument?.result?.data?.asset?.state ===
+                            STATE_DOCUMENT_VALUE.Check
+                    ) {
+                        continue;
+                    }
+
                     const responseCancelDocument = await UpdateDocument({
                         document_data: {
                             id: item?.tracking_id,
@@ -913,6 +921,39 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     ) {
                         listTrackingIDDocumentDone.push(item?.tracking_id);
                         continue;
+                    }
+
+                    const listDeleteDocumentLine = await getDocumentLine(
+                        db,
+                        {
+                            tracking_id: item?.tracking_id,
+                            is_sync_odoo: true,
+                            is_cancel: true
+                        },
+                        null,
+                        1,
+                        1000
+                    );
+
+                    if (listDeleteDocumentLine?.length > 0) {
+                        const asset_ids_delete = mapUploadDeleteDocumentLines(
+                            listDeleteDocumentLine
+                        );
+
+                        const responseDelete = await DeleteDocumentLine({
+                            asset_tracking_id: item?.tracking_id,
+                            asset_ids: asset_ids_delete
+                        });
+
+                        if (
+                            responseDelete?.error ||
+                            responseDelete?.result?.message ===
+                                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
+                        ) {
+                            throw new Error(
+                                'Something went wrong updating  delete document line'
+                            );
+                        }
                     }
 
                     const listNewDocumentLine = await getDocumentLine(
@@ -974,39 +1015,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         ) {
                             throw new Error(
                                 'Something went wrong updating updated document line'
-                            );
-                        }
-                    }
-
-                    const listDeleteDocumentLine = await getDocumentLine(
-                        db,
-                        {
-                            tracking_id: item?.tracking_id,
-                            is_sync_odoo: true,
-                            is_cancel: true
-                        },
-                        null,
-                        1,
-                        1000
-                    );
-
-                    if (listDeleteDocumentLine?.length > 0) {
-                        const asset_ids_delete = mapUploadDeleteDocumentLines(
-                            listDeleteDocumentLine
-                        );
-
-                        const responseDelete = await DeleteDocumentLine({
-                            asset_tracking_id: item?.tracking_id,
-                            asset_ids: asset_ids_delete
-                        });
-
-                        if (
-                            responseDelete?.error ||
-                            responseDelete?.result?.message ===
-                                RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND
-                        ) {
-                            throw new Error(
-                                'Something went wrong updating  delete document line'
                             );
                         }
                     }
@@ -1087,10 +1095,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 }),
                 GetDocumentLineSearch({
                     page: 1,
-                    limit: 1000,
-                    search_term: {
-                        and: { state: ['0', '1', '2'] }
-                    }
+                    limit: 1000
                 }),
                 GetDocumentSearch({
                     page: 1,
@@ -1182,9 +1187,9 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                         );
                         return {
                             ...documentLine,
+                            name: documentLine?.asset_name,
                             is_sync_odoo: true,
-                            use_state_code: filterUseStatus[0]?.id || null,
-                            use_state: documentLine?.use_state || null
+                            use_state_code: filterUseStatus[0]?.id
                         };
                     }
                 );

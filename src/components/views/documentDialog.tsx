@@ -51,7 +51,7 @@ const DocumentDialog: FC<DocumentDialogProp> = (props) => {
                                 </Text>
                             </TouchableOpacity>
                         )}
-                        keyExtractor={(item) => item.location_id.toString()}
+                        keyExtractor={(item) => item?.location_id?.toString()}
                     />
 
                     <View style={styles.buttonContainer}>

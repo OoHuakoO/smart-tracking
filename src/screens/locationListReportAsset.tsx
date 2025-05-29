@@ -220,7 +220,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                 document?.assets.map((asset) => {
                     listReportAsset.push({
                         code: asset?.code,
-                        name: asset?.name,
+                        name: asset?.asset_name,
                         category: asset?.category,
                         location_old: asset?.location_old,
                         location: asset?.location,
@@ -493,7 +493,7 @@ const LocationListReportAssetScreen: FC<LocationListReportAssetProps> = (
                     )}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
-                    keyExtractor={(item, index) => index.toString()}
+                    keyExtractor={(item, index) => index?.toString()}
                     onEndReached={handleOnEndReached}
                     onEndReachedThreshold={0.1}
                     onScrollBeginDrag={() => setStopFetchMore(false)}

@@ -1,7 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AssetTagStatus from '@src/components/views/assetTagStatus';
-import { USE_STATE_ASSET_TH } from '@src/constant';
 import { theme } from '@src/theme';
 import { PrivateStackParamsList } from '@src/typings/navigation';
 import React, { FC, useEffect } from 'react';
@@ -92,7 +91,7 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             route?.params?.assetData?.use_state?.toString() !==
                             'false'
                                 ? route?.params?.assetData?.use_state
-                                : USE_STATE_ASSET_TH.Normal
+                                : '-'
                         }
                     />
                 </View>
@@ -102,7 +101,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             SerialNumber
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.serial_no || '-'}
+                            {route?.params?.assetData?.serial_no &&
+                            route?.params?.assetData?.serial_no !== 'false'
+                                ? route?.params?.assetData?.serial_no
+                                : '-'}
                         </Text>
                     </View>
                     <View style={styles.rowText}>
@@ -110,7 +112,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             BrandName
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.brand_name || '-'}
+                            {route?.params?.assetData?.brand_name &&
+                            route?.params?.assetData?.brand_name !== 'false'
+                                ? route?.params?.assetData?.brand_name
+                                : '-'}
                         </Text>
                     </View>
                     <View style={styles.rowText}>
@@ -118,7 +123,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             Category
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.category || '-'}
+                            {route?.params?.assetData?.category &&
+                            route?.params?.assetData?.category !== 'false'
+                                ? route?.params?.assetData?.category
+                                : '-'}
                         </Text>
                     </View>
                     <View style={styles.rowText}>
@@ -126,7 +134,10 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             Location
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location || '-'}
+                            {route?.params?.assetData?.location &&
+                            route?.params?.assetData?.location !== 'false'
+                                ? route?.params?.assetData?.location
+                                : '-'}
                         </Text>
                     </View>
 
@@ -135,7 +146,18 @@ const AssetDetail: FC<AssetsDetailScreenProps> = (props) => {
                             Owner
                         </Text>
                         <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.owner || '-'}
+                            {route?.params?.assetData?.owner &&
+                            route?.params?.assetData?.owner !== 'false'
+                                ? route?.params?.assetData?.owner
+                                : '-'}
+                        </Text>
+                    </View>
+                    <View style={styles.rowText}>
+                        <Text variant="titleMedium" style={styles.assetTitle}>
+                            Quantity
+                        </Text>
+                        <Text variant="bodyLarge" style={styles.assetDes}>
+                            {route?.params?.assetData?.quantity || '-'}
                         </Text>
                     </View>
                 </View>

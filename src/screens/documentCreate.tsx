@@ -6,9 +6,11 @@ import SearchButton from '@src/components/core/searchButton';
 import AddAssetCard from '@src/components/views/addAssetCard';
 import PopupScanAsset from '@src/components/views/popupScanAsset';
 import {
+    CONFIRM,
     MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
-    USE_STATE_ASSET_TH
+    USE_STATE_ASSET_TH,
+    WARNING
 } from '@src/constant';
 import { getAsset } from '@src/db/asset';
 import { getDBConnection } from '@src/db/config';
@@ -84,6 +86,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const documentValue = useRecoilValue<DocumentState>(documentState);
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
+    const [quantityInput, setQuantityInput] = useState<string>('1');
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isFocusUseState, setIsFocusUseState] = useState<boolean>(false);
     const [visiblePopupScanAsset, setVisiblePopupScanAsset] =
@@ -144,6 +147,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         setSearchUseState(name);
     }, []);
 
+    const handleSetQuantityInput = useCallback((value: string) => {
+        setQuantityInput(value);
+    }, []);
+
     const handleSaveAsset = useCallback(async () => {
         try {
             const isOnline = await getOnlineMode();
@@ -166,7 +173,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         branch_id: branchValue?.branchId,
                         date_check: parseDateStringTime(
                             new Date(Date.now()).toISOString()
-                        )
+                        ),
+                        quantity: parseInt(assetCreate?.quantityInput, 10)
                     };
                 });
                 const response = await AddDocumentLine({
@@ -220,7 +228,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                 : 2,
                         image: assetCreate?.image,
                         new_img: assetCreate?.new_img,
-                        is_sync_odoo: false
+                        is_sync_odoo: false,
+                        quantity: parseInt(assetCreate?.quantityInput, 10)
                     });
                     await removeReportAssetNotFoundByCode(
                         db,
@@ -252,7 +261,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
     const handleCloseDialog = useCallback(() => {
         switch (titleDialog) {
-            case 'Warning':
+            case WARNING:
                 navigation.goBack();
                 break;
             default:
@@ -280,10 +289,10 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 inputRef.current.focus();
                 clearStateDialog();
                 break;
-            case 'Confirm':
+            case CONFIRM:
                 handleRemoveAsset();
                 break;
-            case 'Warning':
+            case WARNING:
                 handleSaveAsset();
                 break;
             default:
@@ -303,7 +312,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
         (code: string) => {
             clearStateDialog();
             setVisibleDialog(true);
-            setTitleDialog('Confirm');
+            setTitleDialog(CONFIRM);
             setContentDialog('Do you want to remove this asset ?');
             setShowCancelDialog(true);
             setAssetCodeRemove(code);
@@ -314,7 +323,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     const handleOpenDialogWarningBackScreen = useCallback(() => {
         clearStateDialog();
         setVisibleDialog(true);
-        setTitleDialog('Warning');
+        setTitleDialog(WARNING);
         setContentDialog(
             'Do you want to save asset before back previous screen ?'
         );
@@ -410,7 +419,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             ...item,
                             image: assetData?.image as string,
                             new_img: assetData?.new_img,
-                            use_state: assetData?.use_state
+                            use_state: assetData?.use_state,
+                            quantityInput: assetData?.quantityInput
                         };
                     }
                     return item;
@@ -444,6 +454,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
 
             setScanAssetData({ ...asset, state, use_state });
             setSearchUseState(use_state);
+            setQuantityInput(asset?.quantity?.toString());
             setVisiblePopupScanAsset(true);
             clearStateDialog();
         },
@@ -659,16 +670,16 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     );
 
     const getImage = useCallback((): string => {
-        if (scanAssetData?.image.toString() !== 'false' && selectedImage) {
+        if (scanAssetData?.image?.toString() !== 'false' && selectedImage) {
             return selectedImage;
         }
-        if (scanAssetData?.image.toString() === 'false' && selectedImage) {
+        if (scanAssetData?.image?.toString() === 'false' && selectedImage) {
             return selectedImage;
         }
-        if (scanAssetData?.image.toString() !== 'false' && !selectedImage) {
+        if (scanAssetData?.image?.toString() !== 'false' && !selectedImage) {
             return scanAssetData?.image;
         }
-        if (scanAssetData?.image.toString() === 'false' && !selectedImage) {
+        if (scanAssetData?.image?.toString() === 'false' && !selectedImage) {
             return 'false';
         }
     }, [scanAssetData?.image, selectedImage]);
@@ -680,9 +691,9 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                 ...scanAssetData,
                 use_state: searchUseState,
                 image: getImage() !== 'false' ? getImage() : false,
-                new_img: selectedImage ? true : false
+                new_img: selectedImage ? true : false,
+                quantityInput: quantityInput
             };
-
             setListAssetCreate((prev) => {
                 return [updatedScanAssetData as AssetData, ...prev];
             });
@@ -698,6 +709,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
     }, [
         clearStateDialog,
         getImage,
+        quantityInput,
         scanAssetData,
         searchUseState,
         selectedImage
@@ -898,7 +910,8 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                                             state: item?.state,
                                             use_state: item?.use_state,
                                             new_img: item?.new_img,
-                                            image: item?.image
+                                            image: item?.image,
+                                            quantityInput: item?.quantityInput
                                         },
                                         routeBefore: route?.name,
                                         onGoBack:
@@ -922,7 +935,7 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.default_code.toString()}
+                    keyExtractor={(item) => item.default_code?.toString()}
                 />
                 <TouchableOpacity
                     style={[
@@ -956,9 +969,11 @@ const DocumentCreateScreen: FC<DocumentCreateProps> = (props) => {
                         handleSetFalseIsFocusUseState
                     }
                     handleSetSearchUseState={handleSetSearchUseState}
+                    handleSetQuantityInput={handleSetQuantityInput}
                     handleSaveEditAsset={handleSaveEditAsset}
                     scanAssetData={scanAssetData}
                     locationNew={documentValue?.location}
+                    quantityInput={quantityInput}
                 />
             </View>
         </SafeAreaView>

@@ -496,7 +496,7 @@ const DocumentScreen: FC<DocumentScreenProp> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.id.toString()}
+                    keyExtractor={(item) => item?.id?.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                     onEndReached={handleOnEndReached}

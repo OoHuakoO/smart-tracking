@@ -1,3 +1,4 @@
+import { CONFIRM } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -71,7 +72,7 @@ const PopupSelectModeCompany: FC<PopupSelectModeCompanyProps> = (props) => {
                     <TouchableOpacity onPress={handleConfirm}>
                         <Button style={styles.dialogActionConfirm}>
                             <Text style={styles.text} variant="bodyLarge">
-                                Confirm
+                                {CONFIRM}
                             </Text>
                         </Button>
                     </TouchableOpacity>

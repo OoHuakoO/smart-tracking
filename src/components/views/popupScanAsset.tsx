@@ -1,3 +1,4 @@
+import InputText from '@src/components/core/inputText';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { theme } from '@src/theme';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
@@ -29,9 +30,11 @@ interface PopupScanAssetProp {
     handleSetTrueIsFocusUseState: () => void;
     handleSetFalseIsFocusUseState: () => void;
     handleSetSearchUseState: (name: string) => void;
+    handleSetQuantityInput: (value: string) => void;
     handleSaveEditAsset: () => void;
     scanAssetData: AssetData;
     locationNew: string;
+    quantityInput: string;
 }
 
 const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
@@ -50,9 +53,11 @@ const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
         handleSetTrueIsFocusUseState,
         handleSetFalseIsFocusUseState,
         handleSetSearchUseState,
+        handleSetQuantityInput,
         handleSaveEditAsset,
         scanAssetData,
-        locationNew
+        locationNew,
+        quantityInput
     } = props;
 
     const renderItemUseState = (item: UseStatusData) => {
@@ -160,7 +165,27 @@ const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
                                 renderItem={renderItemUseState}
                             />
                         </View>
-
+                        <View style={styles.rowText}>
+                            <Text
+                                variant="titleMedium"
+                                style={styles.assetTitle}
+                            >
+                                Quantity
+                            </Text>
+                            <InputText
+                                style={styles.inputQuantity}
+                                borderColor="#828282"
+                                alignItems="flex-start"
+                                value={quantityInput}
+                                onChangeText={(value) => {
+                                    const trimmed = value;
+                                    const isOnlyDigits = /^\d*$/.test(trimmed);
+                                    if (isOnlyDigits) {
+                                        handleSetQuantityInput(trimmed);
+                                    }
+                                }}
+                            />
+                        </View>
                         <View style={styles.rowText}>
                             <Text
                                 variant="titleMedium"
@@ -363,6 +388,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: theme.colors.blackGray,
         marginBottom: 11,
+        width: '60%'
+    },
+    inputQuantity: {
+        height: 35,
+        borderColor: theme.colors.borderAutocomplete,
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        color: theme.colors.blackGray,
         width: '60%'
     },
     dropdownSelect: {

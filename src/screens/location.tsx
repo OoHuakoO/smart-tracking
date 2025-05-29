@@ -234,7 +234,7 @@ const LocationScreen: FC<LocationScreenProps> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.location_id.toString()}
+                    keyExtractor={(item) => item.location_id?.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                     onEndReached={handleOnEndReached}

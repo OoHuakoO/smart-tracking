@@ -1,4 +1,4 @@
-import { MOVEMENT_ASSET_NORMAL_TH, REPORT_TYPE } from '@src/constant';
+import { REPORT_TYPE } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -30,7 +30,7 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
             <View style={styles.textContainer}>
                 <View style={styles.rowText}>
                     <Text variant="titleMedium" style={styles.assetCode}>
-                        {assetCode}
+                        {assetCode || '-'}
                     </Text>
                 </View>
                 <View style={styles.rowText}>
@@ -41,8 +41,8 @@ const ReportAssetCard: FC<ReportAssetCardProps> = (props) => {
                 <Text variant="bodyMedium">
                     Status: {}
                     <Text style={styles.additionalText}>
-                        {assetStatus.toString() === 'false'
-                            ? MOVEMENT_ASSET_NORMAL_TH
+                        {assetStatus?.toString() === 'false'
+                            ? '-'
                             : assetStatus || '-'}
                     </Text>
                 </Text>

@@ -9,6 +9,7 @@ export interface AssetData {
     serial_no?: string;
     brand_name?: string;
     quantity?: number;
+    quantityInput?: string;
     location_id?: number;
     location?: string;
     image?: string;

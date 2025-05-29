@@ -7,8 +7,8 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             const query = `CREATE TABLE IF NOT EXISTS documentLineOffline(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             tracking_id INTEGER NOT NULL,
-            code TEXT NOT NULL,
-            name TEXT NOT NULL,
+            code TEXT,
+            name TEXT,
             category TEXT,
             category_id INTEGER,
             location_id INTEGER,
@@ -17,8 +17,9 @@ export const createTableDocumentLine = (db: SQLiteDatabase) => {
             state TEXT,
             use_state TEXT,
             use_state_code INTEGER,
+            quantity INTEGER,
             image TEXT,
-            new_img BOOLEAN,
+            new_img BOOLEAN DEFAULT FALSE,
             is_cancel BOOLEAN DEFAULT FALSE,
             is_sync_odoo BOOLEAN DEFAULT FALSE,
             date_check DATETIME NOT NULL DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW', 'localtime'))
@@ -71,6 +72,7 @@ export const insertDocumentLineData = (
           state,
           use_state,
           use_state_code,
+          quantity,
           image,
           new_img,
           is_sync_odoo
@@ -78,25 +80,22 @@ export const insertDocumentLineData = (
         documentLine
             .map(
                 (item) => `(
-                ${item.tracking_id},
-                '${item.code}',
-                '${item.name}',
-                '${item.category}',
-                 ${item.category_id},
-                 ${item.location_id},
-                '${item.location_old}',
-                '${item.location}',
-                '${item.state}',
-                ${
-                    item.use_state === null || item.use_state === undefined
-                        ? null
-                        : `'${item.use_state}'`
-                },
-                 ${item.use_state_code},
-                '${item.image}',
-                 ${item.new_img},
-                 ${item.is_sync_odoo}
-                )`
+                ${item.tracking_id ?? null},
+                ${item.code ? `'${item.code}'` : null},
+                ${item.name ? `'${item.name}'` : null},
+                ${item.category ? `'${item.category}'` : null},
+                ${item.category_id ?? null},
+                ${item.location_id ?? null},
+                ${item.location_old ? `'${item.location_old}'` : null},
+                ${item.location ? `'${item.location}'` : null},
+                ${item.state ? `'${item.state}'` : null},
+                ${item.use_state ? `'${item.use_state}'` : null},
+                ${item.use_state_code ?? null},
+                ${item.quantity ?? null},
+                ${item.image ? `'${item.image}'` : null},
+                ${item.new_img ?? null},
+                ${item.is_sync_odoo ?? null}
+            )`
             )
             .join(',');
     try {
@@ -179,14 +178,33 @@ export const getDocumentLine = async (
 
     if (filters?.state !== undefined) {
         if (Array.isArray(filters.state)) {
-            const statePlaceholders = filters.state.map(() => '?').join(', ');
-            whereConditions.push(
-                `documentLineOffline.state IN (${statePlaceholders})`
-            );
-            queryParams.push(...filters.state);
+            const states = filters.state.filter((s) => s !== null);
+            const includeNull = filters.state.includes(null);
+
+            const stateConditions = [];
+
+            if (states.length > 0) {
+                const placeholders = states.map(() => '?').join(', ');
+                stateConditions.push(
+                    `documentLineOffline.state IN (${placeholders})`
+                );
+                queryParams.push(...states);
+            }
+
+            if (includeNull) {
+                stateConditions.push(`documentLineOffline.state IS NULL`);
+            }
+
+            if (stateConditions.length > 0) {
+                whereConditions.push(`(${stateConditions.join(' OR ')})`);
+            }
         } else {
-            whereConditions.push(`documentLineOffline.state = ?`);
-            queryParams.push(filters.state);
+            if (filters.state === null) {
+                whereConditions.push(`documentLineOffline.state IS NULL`);
+            } else {
+                whereConditions.push(`documentLineOffline.state = ?`);
+                queryParams.push(filters.state);
+            }
         }
     }
 
@@ -258,14 +276,33 @@ export const getTotalDocumentLine = async (
 
     if (filters?.state !== undefined) {
         if (Array.isArray(filters.state)) {
-            const statePlaceholders = filters.state.map(() => '?').join(', ');
-            whereConditions.push(
-                `documentLineOffline.state IN (${statePlaceholders})`
-            );
-            queryParams.push(...filters.state);
+            const states = filters.state.filter((s) => s !== null);
+            const includeNull = filters.state.includes(null);
+
+            const stateConditions = [];
+
+            if (states.length > 0) {
+                const placeholders = states.map(() => '?').join(', ');
+                stateConditions.push(
+                    `documentLineOffline.state IN (${placeholders})`
+                );
+                queryParams.push(...states);
+            }
+
+            if (includeNull) {
+                stateConditions.push(`documentLineOffline.state IS NULL`);
+            }
+
+            if (stateConditions.length > 0) {
+                whereConditions.push(`(${stateConditions.join(' OR ')})`);
+            }
         } else {
-            whereConditions.push(`documentLineOffline.state = ?`);
-            queryParams.push(filters.state);
+            if (filters.state === null) {
+                whereConditions.push(`documentLineOffline.state IS NULL`);
+            } else {
+                whereConditions.push(`documentLineOffline.state = ?`);
+                queryParams.push(filters.state);
+            }
         }
     }
 
@@ -339,6 +376,11 @@ export const updateDocumentLineData = (
     if (documentLine.use_state_code !== undefined) {
         setClauses.push(`use_state_code = ?`);
         queryParams.push(documentLine.use_state_code);
+    }
+
+    if (documentLine.quantity !== undefined) {
+        setClauses.push(`quantity = ?`);
+        queryParams.push(documentLine.quantity);
     }
 
     if (documentLine.image !== undefined) {

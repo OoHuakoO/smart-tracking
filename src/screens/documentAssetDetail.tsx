@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
+import InputText from '@src/components/core/inputText';
 import AssetTagStatus from '@src/components/views/assetTagStatus';
 import PopupDialog from '@src/components/views/popupCameraDialog';
 import {
@@ -63,8 +64,10 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     const [searchUseState, setSearchUseState] = useState<string>(
         route?.params?.assetData?.use_state as string
     );
+    const [quantityInput, setQuantityInput] = useState<string>(
+        route?.params?.assetData?.quantityInput as string
+    );
     const documentValue = useRecoilValue<DocumentState>(documentState);
-
     const toggleDialog = () => {
         setDialogVisible(!dialogVisible);
     };
@@ -165,25 +168,25 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
 
     const getImage = useCallback((): string => {
         if (
-            route?.params?.assetData?.image.toString() !== 'false' &&
+            route?.params?.assetData?.image?.toString() !== 'false' &&
             selectedImage
         ) {
             return selectedImage;
         }
         if (
-            route?.params?.assetData?.image.toString() === 'false' &&
+            route?.params?.assetData?.image?.toString() === 'false' &&
             selectedImage
         ) {
             return selectedImage;
         }
         if (
-            route?.params?.assetData?.image.toString() !== 'false' &&
+            route?.params?.assetData?.image?.toString() !== 'false' &&
             !selectedImage
         ) {
             return route?.params?.assetData?.image;
         }
         if (
-            route?.params?.assetData?.image.toString() === 'false' &&
+            route?.params?.assetData?.image?.toString() === 'false' &&
             !selectedImage
         ) {
             return 'false';
@@ -216,7 +219,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                                 new_img: selectedImage ? true : false,
                                 date_check: parseDateStringTime(
                                     new Date(Date.now()).toISOString()
-                                )
+                                ),
+                                quantity: parseInt(quantityInput, 10)
                             }
                         ]
                     });
@@ -245,7 +249,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                             image: getImage()
                         }),
                         new_img: selectedImage ? true : false,
-                        tracking_id: documentValue?.id
+                        tracking_id: documentValue?.id,
+                        quantity: parseInt(quantityInput, 10)
                     };
 
                     await updateDocumentLineData(db, documentLine);
@@ -261,7 +266,8 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                     state: route?.params?.assetData?.state,
                     image: getImage() !== 'false' ? getImage() : false,
                     new_img: selectedImage ? true : false,
-                    location: documentValue?.location
+                    location: documentValue?.location,
+                    quantityInput: quantityInput
                 });
                 navigation.goBack();
             }
@@ -277,6 +283,7 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
         getImage,
         listUseState,
         navigation,
+        quantityInput,
         route?.params,
         searchUseState,
         selectedImage
@@ -402,34 +409,60 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
 
                 <View style={styles.assetDetail}>
                     {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
-                        <View style={styles.rowText}>
-                            <Text
-                                variant="titleMedium"
-                                style={styles.assetTitle}
-                            >
-                                Use Status
-                            </Text>
-                            <Dropdown
-                                style={[
-                                    styles.dropdown,
-                                    isFocusUseState && styles.dropdownSelect
-                                ]}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                data={listUseState}
-                                maxHeight={300}
-                                labelField="name"
-                                valueField="name"
-                                value={searchUseState}
-                                onFocus={() => setIsFocusUseState(true)}
-                                onBlur={() => setIsFocusUseState(false)}
-                                onChange={(item) => {
-                                    setSearchUseState(item?.name);
-                                }}
-                                renderItem={renderItemUseState}
-                            />
-                        </View>
+                        <>
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    Use Status
+                                </Text>
+                                <Dropdown
+                                    style={[
+                                        styles.dropdown,
+                                        isFocusUseState && styles.dropdownSelect
+                                    ]}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    data={listUseState}
+                                    maxHeight={300}
+                                    labelField="name"
+                                    valueField="name"
+                                    value={searchUseState}
+                                    onFocus={() => setIsFocusUseState(true)}
+                                    onBlur={() => setIsFocusUseState(false)}
+                                    onChange={(item) => {
+                                        setSearchUseState(item?.name);
+                                    }}
+                                    renderItem={renderItemUseState}
+                                />
+                            </View>
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    Quantity
+                                </Text>
+
+                                <InputText
+                                    style={styles.inputQuantity}
+                                    borderColor="#828282"
+                                    alignItems="flex-start"
+                                    value={quantityInput}
+                                    onChangeText={(value) => {
+                                        const trimmed = value;
+                                        const isOnlyDigits = /^\d*$/.test(
+                                            trimmed
+                                        );
+                                        if (isOnlyDigits) {
+                                            setQuantityInput(trimmed);
+                                        }
+                                    }}
+                                />
+                            </View>
+                        </>
                     )}
 
                     <View style={styles.rowText}>
@@ -475,10 +508,14 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
                 </View>
                 {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
                     <TouchableOpacity
+                        disabled={listUseState.length === 0}
                         style={[
                             styles.saveButton,
                             {
-                                backgroundColor: theme.colors.primary
+                                backgroundColor:
+                                    listUseState.length === 0
+                                        ? theme.colors.borderAutocomplete
+                                        : theme.colors.primary
                             }
                         ]}
                         onPress={() => handleSaveEditAsset()}
@@ -596,6 +633,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: theme.colors.blackGray,
         marginBottom: 11,
+        width: '60%'
+    },
+    inputQuantity: {
+        height: 35,
+        borderColor: theme.colors.borderAutocomplete,
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        color: theme.colors.blackGray,
         width: '60%'
     },
     dropdownSelect: {

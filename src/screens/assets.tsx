@@ -314,7 +314,7 @@ const AssetsScreen: FC<AssetsScreenProps> = (props) => {
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.asset_id.toString()}
+                    keyExtractor={(item) => item?.asset_id?.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                     onEndReached={handleOnEndReached}

@@ -39,7 +39,7 @@ export const handleMapMovementStateValue = (state: string): string => {
         case MOVEMENT_ASSET_EN.New:
             return MOVEMENT_ASSET.New;
         default:
-            return MOVEMENT_ASSET.Normal;
+            return '';
     }
 };
 
@@ -68,14 +68,11 @@ export const handleMapReportStateValue = (
             return [
                 MOVEMENT_ASSET.Normal,
                 MOVEMENT_ASSET.New,
-                MOVEMENT_ASSET.Transfer
+                MOVEMENT_ASSET.Transfer,
+                null
             ];
         default:
-            return [
-                MOVEMENT_ASSET.Normal,
-                MOVEMENT_ASSET.New,
-                MOVEMENT_ASSET.Transfer
-            ];
+            return null;
     }
 };
 

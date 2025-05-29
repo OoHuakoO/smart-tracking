@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { theme } from '@src/theme';
 import React, { forwardRef, memo } from 'react';
 import {
+    FlexAlignType,
     StyleSheet,
     Text,
     TextInput,
@@ -17,6 +18,7 @@ interface InputTextProps extends TextInputProps {
     width?: number;
     borderColor?: string;
     backgroundColor?: string;
+    alignItems?: FlexAlignType;
     secureText?: boolean;
     isPasswordVisible?: boolean;
     handleVisiblePassword?: () => void;
@@ -29,12 +31,15 @@ const InputText = forwardRef<TextInput, InputTextProps>((props, ref) => {
         width,
         borderColor,
         backgroundColor,
+        alignItems,
         secureText,
         isPasswordVisible,
         handleVisiblePassword
     } = props;
     return (
-        <View style={styles.container}>
+        <View
+            style={[styles.container, { alignItems: alignItems || 'center' }]}
+        >
             <TextInput
                 style={[
                     styles.input,
@@ -87,7 +92,6 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         justifyContent: 'center',
-        alignItems: 'center',
         marginBottom: 20
     },
     input: {

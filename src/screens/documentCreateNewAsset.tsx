@@ -65,6 +65,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
     const [dialogVisible, setDialogVisible] = useState(false);
     const [listUseState, setListUseState] = useState<UseStatusData[]>([]);
     const [searchUseState, setSearchUseState] = useState<string>('');
+    const [quantityInput, setQuantityInput] = useState<string>('');
     const [listCategory, setListCategory] = useState<CategoryData[]>([]);
     const [searchCategory, setSearchCategory] =
         useState<CategoryData>(undefined);
@@ -203,7 +204,8 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                           }),
                     location: documentValue?.location,
                     category_id: searchCategory?.category_id,
-                    category: searchCategory?.category_name
+                    category: searchCategory?.category_name,
+                    quantityInput: quantityInput
                 });
                 navigation.goBack();
             } catch (err) {
@@ -215,6 +217,7 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
         [
             documentValue?.location,
             navigation,
+            quantityInput,
             route?.params,
             searchCategory?.category_id,
             searchCategory?.category_name,
@@ -228,12 +231,13 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
             form.watch('default_code') === '' ||
             form.watch('name') === '' ||
             searchUseState === '' ||
-            !searchCategory
+            !searchCategory ||
+            !quantityInput
         ) {
             return true;
         }
         return false;
-    }, [form, searchCategory, searchUseState]);
+    }, [form, quantityInput, searchCategory, searchUseState]);
 
     const handleInitFetch = useCallback(async () => {
         try {
@@ -408,10 +412,31 @@ const DocumentCreateNewAsset: FC<DocumentCreateNewAssetProps> = (props) => {
                             <InputText
                                 {...field}
                                 borderColor="#828282"
-                                onChangeText={(value) => field?.onChange(value)}
+                                onChangeText={(value) =>
+                                    field?.onChange(value.trim())
+                                }
                             />
                         )}
                     />
+                    <Text
+                        variant="bodyLarge"
+                        style={{ fontFamily: 'DMSans-Bold' }}
+                    >
+                        Quantity
+                    </Text>
+
+                    <InputText
+                        borderColor="#828282"
+                        value={quantityInput}
+                        onChangeText={(value) => {
+                            const trimmed = value;
+                            const isOnlyDigits = /^\d*$/.test(trimmed);
+                            if (isOnlyDigits) {
+                                setQuantityInput(trimmed);
+                            }
+                        }}
+                    />
+
                     <Text
                         variant="bodyLarge"
                         style={{ fontFamily: 'DMSans-Bold' }}

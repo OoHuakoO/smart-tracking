@@ -10,6 +10,7 @@ export interface AssetDataForPassParamsDocumentCreate {
     new_img?: boolean;
     category_id?: number;
     category?: string;
+    quantityInput?: string;
 }
 
 export interface GetAssetData {

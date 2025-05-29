@@ -20,6 +20,7 @@ import { useIsFocused } from '@react-navigation/native';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
 import {
+    CONFIRM,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     RESPONSE_PUT_DOCUMENT_SUCCESS,
     STATE_DOCUMENT_NAME,
@@ -127,8 +128,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                     setContentDialog('Something went wrong fetch document');
                 }
                 response?.result?.data?.asset?.assets?.map((item) => {
-                    item.state = handleMapMovementStateEN(item?.state);
-                    item.date_check = parseDateString(item?.date_check);
+                    item.state = item?.state
+                        ? handleMapMovementStateEN(item?.state)
+                        : '';
+                    item.date_check = item?.date_check
+                        ? parseDateString(item?.date_check)
+                        : '';
                 });
                 setTotalAssetDocument(
                     response?.result?.data?.asset?.assets?.length
@@ -147,8 +152,12 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                 };
                 const listDocumentDB = await getDocumentLine(db, filter, sort);
                 listDocumentDB?.map((item) => {
-                    item.state = handleMapMovementStateEN(item?.state);
-                    item.date_check = parseDateString(item?.date_check);
+                    item.state = item?.state
+                        ? handleMapMovementStateEN(item?.state)
+                        : '';
+                    item.date_check = item?.date_check
+                        ? parseDateString(item?.date_check)
+                        : '';
                 });
                 const totalDocumentLine = await getTotalDocumentLine(
                     db,
@@ -170,7 +179,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
         (code: string) => {
             clearStateDialog();
             setVisibleDialog(true);
-            setTitleDialog('Confirm');
+            setTitleDialog(CONFIRM);
             setContentDialog('Do you want to remove this asset ?');
             setShowCancelDialog(true);
             setCodeAsset(code);
@@ -301,7 +310,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
 
     const handleConfirmDialog = useCallback(async () => {
         switch (titleDialog) {
-            case 'Confirm':
+            case CONFIRM:
                 await handleRemoveAsset();
                 break;
             case 'Confirm Cancel':
@@ -447,7 +456,11 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                                 activeOpacity={0.9}
                                 onPress={() =>
                                     navigation.navigate('DocumentAssetDetail', {
-                                        assetData: item,
+                                        assetData: {
+                                            ...item,
+                                            quantityInput:
+                                                item?.quantity?.toString()
+                                        },
                                         routeBefore: route?.name
                                     })
                                 }
@@ -468,7 +481,7 @@ const DocumentAssetStatusScreen: FC<DocumentAssetStatusScreenProps> = (
                             </TouchableOpacity>
                         </View>
                     )}
-                    keyExtractor={(item) => item.code.toString()}
+                    keyExtractor={(item) => item?.code?.toString()}
                     onRefresh={() => console.log('refreshing')}
                     refreshing={loading}
                 />

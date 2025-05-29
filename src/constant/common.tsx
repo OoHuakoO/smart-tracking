@@ -72,3 +72,8 @@ export const SETTING_INCORRECT =
 export const USER_NON_ACTIVE = 'This user is not active yet.';
 
 export const DRAFT_TRACKING = 'Draft Tracking';
+
+export const WARNING_DIALOG_DOCUMENT_DONE =
+    "Documents are done / check can't be edited anymore.";
+
+export const CONFIRM = 'Confirm';

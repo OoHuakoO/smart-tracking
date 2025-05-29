@@ -1,4 +1,4 @@
-import { SOMETHING_WENT_WRONG, WARNING } from '@src/constant';
+import { CONFIRM, SOMETHING_WENT_WRONG, WARNING } from '@src/constant';
 import { theme } from '@src/theme';
 import React, { FC, memo } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
@@ -77,7 +77,7 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                         <TouchableOpacity onPress={handleConfirm}>
                             <Button style={styles.dialogActionConfirm}>
                                 <Text style={styles.text} variant="bodyLarge">
-                                    Confirm
+                                    {CONFIRM}
                                 </Text>
                             </Button>
                         </TouchableOpacity>

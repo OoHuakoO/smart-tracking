@@ -4,8 +4,11 @@ export interface DocumentAssetData {
     asset_id?: number;
     code?: string;
     name?: string;
+    asset_name?: string;
     category?: string;
     category_id?: number;
+    quantityInput?: string;
+    quantity?: number;
     serial_no?: string;
     location_id?: number;
     location_old?: string;

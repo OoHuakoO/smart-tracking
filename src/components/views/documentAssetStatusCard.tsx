@@ -65,7 +65,7 @@ const DocumentAssetStatusCard: FC<DocumentAssetStatusProps> = (props) => {
                     </Text>
                 </View>
                 <View style={styles.rowText}>
-                    <Text variant="bodyLarge">{assetName}</Text>
+                    <Text variant="bodyLarge">{assetName || '-'}</Text>
                 </View>
                 <Text variant="bodyMedium">
                     Status : {}

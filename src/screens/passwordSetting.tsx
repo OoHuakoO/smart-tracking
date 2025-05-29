@@ -145,7 +145,7 @@ const PasswordSettingScreen: FC<PasswordSettingScreenProps> = (props) => {
             <FlatList
                 data={dialPadContent}
                 numColumns={3}
-                keyExtractor={(_, index) => index.toString()}
+                keyExtractor={(_, index) => index?.toString()}
                 renderItem={({ item }) => {
                     return (
                         <TouchableOpacity
