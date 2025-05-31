@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ActionButton from '@src/components/core/actionButton';
 import AlertDialog from '@src/components/core/alertDialog';
@@ -27,6 +28,7 @@ import {
     Image,
     PermissionsAndroid,
     Platform,
+    ScrollView,
     StyleSheet,
     TouchableOpacity,
     View
@@ -328,216 +330,242 @@ const DocumentAssetDetail: FC<DocumentAssetDetailProps> = (props) => {
     }, [navigation]);
 
     return (
-        <SafeAreaView style={{ marginTop: top }}>
-            <AlertDialog
-                textContent={contentDialog}
-                visible={visibleDialog}
-                handleClose={handleCloseDialog}
-                handleConfirm={handleCloseDialog}
-            />
-            <View style={styles.topSectionList}>
-                <View style={styles.containerButton}>
-                    <View style={styles.button}>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => navigation.goBack()}
-                        >
-                            <ActionButton
-                                icon={'chevron-left'}
-                                size="small"
-                                backgroundColor={theme.colors.white}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                    {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
-                        <View style={styles.buttonCamera}>
+        <SafeAreaView style={{ marginTop: top, flex: 1 }}>
+            <ScrollView>
+                <AlertDialog
+                    textContent={contentDialog}
+                    visible={visibleDialog}
+                    handleClose={handleCloseDialog}
+                    handleConfirm={handleCloseDialog}
+                />
+                <View style={styles.topSectionList}>
+                    <View style={styles.containerButton}>
+                        <View style={styles.button}>
                             <TouchableOpacity
                                 activeOpacity={0.5}
-                                onPress={toggleDialog}
+                                onPress={() => navigation.goBack()}
                             >
                                 <ActionButton
-                                    icon={'camera'}
+                                    icon={'chevron-left'}
                                     size="small"
-                                    backgroundColor={theme.colors.actionButton}
-                                    color={theme.colors.white}
+                                    backgroundColor={theme.colors.white}
                                 />
                             </TouchableOpacity>
                         </View>
-                    )}
-                </View>
+                        {documentValue?.state ===
+                            STATE_DOCUMENT_NAME?.Draft && (
+                            <View style={styles.buttonCamera}>
+                                <TouchableOpacity
+                                    activeOpacity={0.5}
+                                    onPress={toggleDialog}
+                                >
+                                    <ActionButton
+                                        icon={'camera'}
+                                        size="small"
+                                        backgroundColor={
+                                            theme.colors.actionButton
+                                        }
+                                        color={theme.colors.white}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </View>
 
-                <View style={styles.imagesContainer}>
-                    <Image
-                        style={styles.image}
-                        source={
-                            route?.params?.assetData?.image?.toString() !==
-                                'false' || selectedImage
-                                ? {
-                                      uri: `data:image/png;base64,${
-                                          selectedImage
-                                              ? selectedImage
-                                              : route?.params?.assetData?.image
-                                      }`
-                                  }
-                                : require('../../assets/images/default_image.jpg')
-                        }
-                        resizeMode="cover"
-                    />
-                </View>
-            </View>
-            <View style={styles.assetDetailSection}>
-                <View style={styles.assetName}>
-                    <Text variant="headlineMedium" style={styles.textAssetName}>
-                        {route?.params?.assetData?.name || '-'}
-                    </Text>
-                    <Text variant="headlineSmall">
-                        {route?.params?.assetData?.code || '-'}
-                    </Text>
-                </View>
-                {documentValue?.state !== STATE_DOCUMENT_NAME?.Draft && (
-                    <View style={styles.assetStatus}>
-                        <AssetTagStatus
-                            status={
-                                route?.params?.assetData?.use_state?.toString() !==
-                                'false'
-                                    ? route?.params?.assetData?.use_state
-                                    : USE_STATE_ASSET_TH.Normal
+                    <View style={styles.imagesContainer}>
+                        <Image
+                            style={styles.image}
+                            source={
+                                route?.params?.assetData?.image?.toString() !==
+                                    'false' || selectedImage
+                                    ? {
+                                          uri: `data:image/png;base64,${
+                                              selectedImage
+                                                  ? selectedImage
+                                                  : route?.params?.assetData
+                                                        ?.image
+                                          }`
+                                      }
+                                    : require('../../assets/images/default_image.jpg')
                             }
+                            resizeMode="cover"
                         />
                     </View>
-                )}
-
-                <View style={styles.assetDetail}>
-                    {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
-                        <>
-                            <View style={styles.rowText}>
-                                <Text
-                                    variant="titleMedium"
-                                    style={styles.assetTitle}
-                                >
-                                    Use Status
-                                </Text>
-                                <Dropdown
-                                    style={[
-                                        styles.dropdown,
-                                        isFocusUseState && styles.dropdownSelect
-                                    ]}
-                                    placeholderStyle={styles.placeholderStyle}
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    inputSearchStyle={styles.inputSearchStyle}
-                                    data={listUseState}
-                                    maxHeight={300}
-                                    labelField="name"
-                                    valueField="name"
-                                    value={searchUseState}
-                                    onFocus={() => setIsFocusUseState(true)}
-                                    onBlur={() => setIsFocusUseState(false)}
-                                    onChange={(item) => {
-                                        setSearchUseState(item?.name);
-                                    }}
-                                    renderItem={renderItemUseState}
-                                />
-                            </View>
-                            <View style={styles.rowText}>
-                                <Text
-                                    variant="titleMedium"
-                                    style={styles.assetTitle}
-                                >
-                                    Quantity
-                                </Text>
-
-                                <InputText
-                                    style={styles.inputQuantity}
-                                    borderColor="#828282"
-                                    alignItems="flex-start"
-                                    value={quantityInput}
-                                    onChangeText={(value) => {
-                                        const trimmed = value;
-                                        const isOnlyDigits = /^\d*$/.test(
-                                            trimmed
-                                        );
-                                        if (isOnlyDigits) {
-                                            setQuantityInput(trimmed);
-                                        }
-                                    }}
-                                />
-                            </View>
-                        </>
+                </View>
+                <View style={styles.assetDetailSection}>
+                    <View style={styles.assetName}>
+                        <Text
+                            variant="headlineMedium"
+                            style={styles.textAssetName}
+                        >
+                            {route?.params?.assetData?.name || '-'}
+                        </Text>
+                        <Text variant="headlineSmall">
+                            {route?.params?.assetData?.code || '-'}
+                        </Text>
+                    </View>
+                    {documentValue?.state !== STATE_DOCUMENT_NAME?.Draft && (
+                        <View style={styles.assetStatus}>
+                            <AssetTagStatus
+                                status={
+                                    route?.params?.assetData?.use_state?.toString() !==
+                                    'false'
+                                        ? route?.params?.assetData?.use_state
+                                        : USE_STATE_ASSET_TH.Normal
+                                }
+                            />
+                        </View>
                     )}
 
-                    <View style={styles.rowText}>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Category
-                        </Text>
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.category || '-'}
-                        </Text>
-                    </View>
-                    <View style={styles.rowText}>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Movement
-                        </Text>
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.state || '-'}
-                        </Text>
-                    </View>
-                    <View style={styles.rowText}>
-                        <Text variant="titleMedium" style={styles.assetTitle}>
-                            Location
-                        </Text>
-                        <Text variant="bodyLarge" style={styles.assetDes}>
-                            {route?.params?.assetData?.location_old ||
-                                route?.params?.assetData?.location ||
-                                '-'}
-                        </Text>
-                    </View>
-                    {route?.params?.assetData?.state ===
-                        MOVEMENT_ASSET_EN.Transfer && (
+                    <View style={styles.assetDetail}>
+                        {documentValue?.state ===
+                            STATE_DOCUMENT_NAME?.Draft && (
+                            <>
+                                <View style={styles.rowText}>
+                                    <Text
+                                        variant="titleMedium"
+                                        style={styles.assetTitle}
+                                    >
+                                        Use Status
+                                    </Text>
+                                    <Dropdown
+                                        style={[
+                                            styles.dropdown,
+                                            isFocusUseState &&
+                                                styles.dropdownSelect
+                                        ]}
+                                        placeholderStyle={
+                                            styles.placeholderStyle
+                                        }
+                                        selectedTextStyle={
+                                            styles.selectedTextStyle
+                                        }
+                                        inputSearchStyle={
+                                            styles.inputSearchStyle
+                                        }
+                                        data={listUseState}
+                                        maxHeight={300}
+                                        labelField="name"
+                                        valueField="name"
+                                        value={searchUseState}
+                                        onFocus={() => setIsFocusUseState(true)}
+                                        onBlur={() => setIsFocusUseState(false)}
+                                        onChange={(item) => {
+                                            setSearchUseState(item?.name);
+                                        }}
+                                        renderItem={renderItemUseState}
+                                    />
+                                </View>
+                                <View style={styles.rowText}>
+                                    <Text
+                                        variant="titleMedium"
+                                        style={styles.assetTitle}
+                                    >
+                                        Quantity
+                                    </Text>
+
+                                    <InputText
+                                        style={styles.inputQuantity}
+                                        borderColor="#828282"
+                                        alignItems="flex-start"
+                                        value={quantityInput}
+                                        onChangeText={(value) => {
+                                            const trimmed = value;
+                                            const isOnlyDigits = /^\d*$/.test(
+                                                trimmed
+                                            );
+                                            if (isOnlyDigits) {
+                                                setQuantityInput(trimmed);
+                                            }
+                                        }}
+                                    />
+                                </View>
+                            </>
+                        )}
+
                         <View style={styles.rowText}>
                             <Text
                                 variant="titleMedium"
                                 style={styles.assetTitle}
                             >
-                                New Location
+                                Category
                             </Text>
                             <Text variant="bodyLarge" style={styles.assetDes}>
-                                {documentValue?.location || '-'}
+                                {route?.params?.assetData?.category || '-'}
                             </Text>
                         </View>
+                        <View style={styles.rowText}>
+                            <Text
+                                variant="titleMedium"
+                                style={styles.assetTitle}
+                            >
+                                Movement
+                            </Text>
+                            <Text variant="bodyLarge" style={styles.assetDes}>
+                                {route?.params?.assetData?.state || '-'}
+                            </Text>
+                        </View>
+                        <View style={styles.rowText}>
+                            <Text
+                                variant="titleMedium"
+                                style={styles.assetTitle}
+                            >
+                                Location
+                            </Text>
+                            <Text variant="bodyLarge" style={styles.assetDes}>
+                                {route?.params?.assetData?.location_old ||
+                                    route?.params?.assetData?.location ||
+                                    '-'}
+                            </Text>
+                        </View>
+                        {route?.params?.assetData?.state ===
+                            MOVEMENT_ASSET_EN.Transfer && (
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    New Location
+                                </Text>
+                                <Text
+                                    variant="bodyLarge"
+                                    style={styles.assetDes}
+                                >
+                                    {documentValue?.location || '-'}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                    {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
+                        <TouchableOpacity
+                            disabled={listUseState.length === 0}
+                            style={[
+                                styles.saveButton,
+                                {
+                                    backgroundColor:
+                                        listUseState.length === 0
+                                            ? theme.colors.borderAutocomplete
+                                            : theme.colors.primary
+                                }
+                            ]}
+                            onPress={() => handleSaveEditAsset()}
+                        >
+                            <Text style={styles.buttonText}>Save</Text>
+                        </TouchableOpacity>
                     )}
                 </View>
-                {documentValue?.state === STATE_DOCUMENT_NAME?.Draft && (
-                    <TouchableOpacity
-                        disabled={listUseState.length === 0}
-                        style={[
-                            styles.saveButton,
-                            {
-                                backgroundColor:
-                                    listUseState.length === 0
-                                        ? theme.colors.borderAutocomplete
-                                        : theme.colors.primary
-                            }
-                        ]}
-                        onPress={() => handleSaveEditAsset()}
-                    >
-                        <Text style={styles.buttonText}>Save</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-            <PopupDialog
-                visible={dialogVisible}
-                onClose={toggleDialog}
-                openImagePicker={openImagePicker}
-                handleCameraLaunch={handleCameraLaunch}
-            />
+                <PopupDialog
+                    visible={dialogVisible}
+                    onClose={toggleDialog}
+                    openImagePicker={openImagePicker}
+                    handleCameraLaunch={handleCameraLaunch}
+                />
+            </ScrollView>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
     topSectionList: {
         height: '35%',
         width: wp('100%'),

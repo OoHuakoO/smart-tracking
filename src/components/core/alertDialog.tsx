@@ -62,6 +62,13 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                     />
                 ) : (
                     <Dialog.Actions>
+                        <TouchableOpacity onPress={handleConfirm}>
+                            <Button style={styles.dialogActionConfirm}>
+                                <Text style={styles.text} variant="bodyLarge">
+                                    {CONFIRM}
+                                </Text>
+                            </Button>
+                        </TouchableOpacity>
                         {showCloseDialog && (
                             <TouchableOpacity onPress={handleClose}>
                                 <Button style={styles.dialogActionCancel}>
@@ -74,13 +81,6 @@ const AlertDialog: FC<AlertDialogProps> = (props) => {
                                 </Button>
                             </TouchableOpacity>
                         )}
-                        <TouchableOpacity onPress={handleConfirm}>
-                            <Button style={styles.dialogActionConfirm}>
-                                <Text style={styles.text} variant="bodyLarge">
-                                    {CONFIRM}
-                                </Text>
-                            </Button>
-                        </TouchableOpacity>
                     </Dialog.Actions>
                 )}
             </Dialog>

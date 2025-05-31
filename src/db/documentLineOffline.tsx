@@ -119,6 +119,7 @@ export const getDocumentLine = async (
         location?: string;
         state?: string | string[];
         use_state?: string;
+        is_null_use_state?: boolean;
         name?: string;
         'category_id.name'?: string;
         is_cancel?: boolean;
@@ -143,6 +144,10 @@ export const getDocumentLine = async (
     if (filters?.use_state !== undefined) {
         whereConditions.push(`documentLineOffline.use_state = ?`);
         queryParams.push(filters.use_state);
+    }
+
+    if (filters?.is_null_use_state !== undefined) {
+        whereConditions.push(`documentLineOffline.use_state IS NULL`);
     }
 
     if (filters?.is_cancel !== undefined) {

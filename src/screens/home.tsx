@@ -740,6 +740,27 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         return false;
     }, []);
 
+    const checkIsEmptyUseStateInDocumentLine = useCallback(
+        async (db): Promise<boolean> => {
+            const listDocumentLine = await getDocumentLine(
+                db,
+                {
+                    is_null_use_state: true
+                },
+                null,
+                1,
+                1000
+            );
+
+            if (listDocumentLine.length > 0) {
+                return true;
+            }
+
+            return false;
+        },
+        []
+    );
+
     const uploadNewDocuments = useCallback(
         async (db, isDocumentDone) => {
             const filterDocument = {
@@ -1222,7 +1243,6 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
     const handleUpload = useCallback(async () => {
         try {
             setShowProgressBar(true);
-
             const foundMacAddress = await handleCheckMacAddress();
             if (!foundMacAddress) {
                 return showDialogWarning(
@@ -1236,6 +1256,12 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
             if (await checkIsEmptyDocument(db)) {
                 showDialogWarning(
                     'Some documents have no assets. Please cancel or add assets.'
+                );
+                return;
+            }
+            if (await checkIsEmptyUseStateInDocumentLine(db)) {
+                showDialogWarning(
+                    'Some documents are missing an asset use state. Please specify the use state.'
                 );
                 return;
             }
@@ -1260,6 +1286,7 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         }
     }, [
         checkIsEmptyDocument,
+        checkIsEmptyUseStateInDocumentLine,
         clearStateDialog,
         handleCheckMacAddress,
         handleDownloadDocument,
@@ -1268,6 +1295,35 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
         updateExistingDocuments,
         uploadNewDocuments
     ]);
+
+    const haveDocumentDraft = useCallback(async (): Promise<boolean> => {
+        if (onlineValue) {
+            return false;
+        }
+        const db = await getDBConnection();
+
+        const listDraftDocumentOdoo = (
+            await getDocumentOffline(db, null, null, 1, 1000)
+        ).filter((doc) => doc?.is_sync_odoo);
+
+        const filterDocument = {
+            state: STATE_DOCUMENT_NAME?.Draft
+        };
+
+        const listDocumentDraftNew = (
+            await getDocumentOffline(db, filterDocument, null, 1, 1000)
+        ).filter((doc) => {
+            return !doc?.is_sync_odoo;
+        });
+
+        if (
+            listDraftDocumentOdoo?.length > 0 ||
+            listDocumentDraftNew?.length > 0
+        ) {
+            return true;
+        }
+        return false;
+    }, [onlineValue]);
 
     const handleSelectBranch = useCallback(() => {
         navigation.navigate('BranchSelectScreen');
@@ -1482,7 +1538,11 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     textTitle={titleDialog}
                     textContent={contentDialog}
                     visible={visibleDialog}
-                    handleClose={handleCloseDialog}
+                    handleClose={() =>
+                        typeDialog === 'logout'
+                            ? handleLogout(false)
+                            : handleCloseDialog()
+                    }
                     disableClose={disableCloseDialog}
                     showCloseDialog={showCancelDialog}
                     handleConfirm={handleConfirmDialog}
@@ -1507,7 +1567,21 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
 
                 <TouchableOpacity
                     activeOpacity={0.5}
-                    onPress={() => handleLogout(false)}
+                    onPress={async () => {
+                        if (await haveDocumentDraft()) {
+                            clearStateDialog();
+                            setDisableCloseDialog(true);
+                            setTypeDialog('logout');
+                            setVisibleDialog(true);
+                            setContentDialog(
+                                "There are documents that haven't been uploaded yet. Would you like to upload before logout?"
+                            );
+                            setTypeDialog('logout');
+                            setShowCancelDialog(true);
+                        } else {
+                            handleLogout(false);
+                        }
+                    }}
                 >
                     <View>
                         <FontAwesomeIcon

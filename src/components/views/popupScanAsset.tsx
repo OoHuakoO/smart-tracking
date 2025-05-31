@@ -1,17 +1,23 @@
+/* eslint-disable react-native/no-inline-styles */
 import InputText from '@src/components/core/inputText';
 import { MOVEMENT_ASSET_EN } from '@src/constant';
 import { theme } from '@src/theme';
 import { AssetData, UseStatusData } from '@src/typings/downloadDB';
 import React, { FC } from 'react';
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+    Image,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import { isTablet } from 'react-native-device-info';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Modal, Text } from 'react-native-paper';
+import { Modal, Portal, Text } from 'react-native-paper';
 import {
     heightPercentageToDP as hp,
     widthPercentageToDP as wp
 } from 'react-native-responsive-screen';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import ActionButton from '../core/actionButton';
 import PopUpDialog from './popupCameraDialog';
 
@@ -71,207 +77,226 @@ const PopupScanAsset: FC<PopupScanAssetProp> = (props) => {
     };
 
     return (
-        <Modal
-            visible={visiblePopupScanAsset}
-            onDismiss={onClosePopupScanAsset}
-        >
-            <SafeAreaView>
-                <View style={styles.topSectionList}>
-                    <View style={styles.containerButton}>
-                        <View style={styles.button}>
-                            <TouchableOpacity
-                                activeOpacity={0.5}
-                                onPress={onClosePopupScanAsset}
-                            >
-                                <ActionButton
-                                    icon={'close'}
-                                    size="small"
-                                    backgroundColor={theme.colors.white}
-                                />
-                            </TouchableOpacity>
+        <Portal>
+            <Modal
+                visible={visiblePopupScanAsset}
+                onDismiss={onClosePopupScanAsset}
+                contentContainerStyle={{
+                    flex: 1
+                }}
+            >
+                <ScrollView>
+                    <View style={styles.topSectionList}>
+                        <View style={styles.containerButton}>
+                            <View style={styles.button}>
+                                <TouchableOpacity
+                                    activeOpacity={0.5}
+                                    onPress={onClosePopupScanAsset}
+                                >
+                                    <ActionButton
+                                        icon={'close'}
+                                        size="small"
+                                        backgroundColor={theme.colors.white}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.buttonCamera}>
+                                <TouchableOpacity
+                                    activeOpacity={0.5}
+                                    onPress={toggleDialogCamera}
+                                >
+                                    <ActionButton
+                                        icon={'camera'}
+                                        size="small"
+                                        backgroundColor={
+                                            theme.colors.actionButton
+                                        }
+                                        color={theme.colors.white}
+                                    />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={styles.buttonCamera}>
-                            <TouchableOpacity
-                                activeOpacity={0.5}
-                                onPress={toggleDialogCamera}
-                            >
-                                <ActionButton
-                                    icon={'camera'}
-                                    size="small"
-                                    backgroundColor={theme.colors.actionButton}
-                                    color={theme.colors.white}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
 
-                    <View style={styles.imagesContainer}>
-                        <Image
-                            style={styles.image}
-                            source={
-                                scanAssetData?.image?.toString() !== 'false' ||
-                                selectedImage
-                                    ? {
-                                          uri: `data:image/png;base64,${
-                                              selectedImage
-                                                  ? selectedImage
-                                                  : scanAssetData?.image
-                                          }`
-                                      }
-                                    : require('../../../assets/images/default_image.jpg')
-                            }
-                            resizeMode="cover"
-                        />
-                    </View>
-                </View>
-                <View style={styles.assetDetailSection}>
-                    <View style={styles.assetName}>
-                        <Text
-                            variant="headlineMedium"
-                            style={styles.textAssetName}
-                        >
-                            {scanAssetData?.name || '-'}
-                        </Text>
-                        <Text variant="headlineSmall">
-                            {scanAssetData?.default_code || '-'}
-                        </Text>
-                    </View>
-                    <View style={styles.assetDetail}>
-                        <View style={styles.rowText}>
-                            <Text
-                                variant="titleMedium"
-                                style={styles.assetTitle}
-                            >
-                                Use Status
-                            </Text>
-                            <Dropdown
-                                style={[
-                                    styles.dropdown,
-                                    isFocusUseState && styles.dropdownSelect
-                                ]}
-                                placeholderStyle={styles.placeholderStyle}
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                data={listUseState}
-                                maxHeight={300}
-                                labelField="name"
-                                valueField="name"
-                                value={searchUseState}
-                                onFocus={() => handleSetTrueIsFocusUseState()}
-                                onBlur={() => handleSetFalseIsFocusUseState()}
-                                onChange={(item) => {
-                                    handleSetSearchUseState(item?.name);
-                                }}
-                                renderItem={renderItemUseState}
+                        <View style={styles.imagesContainer}>
+                            <Image
+                                style={styles.image}
+                                source={
+                                    scanAssetData?.image?.toString() !==
+                                        'false' || selectedImage
+                                        ? {
+                                              uri: `data:image/png;base64,${
+                                                  selectedImage
+                                                      ? selectedImage
+                                                      : scanAssetData?.image
+                                              }`
+                                          }
+                                        : require('../../../assets/images/default_image.jpg')
+                                }
+                                resizeMode="cover"
                             />
                         </View>
-                        <View style={styles.rowText}>
+                    </View>
+                    <View style={styles.assetDetailSection}>
+                        <View style={styles.assetName}>
                             <Text
-                                variant="titleMedium"
-                                style={styles.assetTitle}
+                                variant="headlineMedium"
+                                style={styles.textAssetName}
                             >
-                                Quantity
+                                {scanAssetData?.name || '-'}
                             </Text>
-                            <InputText
-                                style={styles.inputQuantity}
-                                borderColor="#828282"
-                                alignItems="flex-start"
-                                value={quantityInput}
-                                onChangeText={(value) => {
-                                    const trimmed = value;
-                                    const isOnlyDigits = /^\d*$/.test(trimmed);
-                                    if (isOnlyDigits) {
-                                        handleSetQuantityInput(trimmed);
-                                    }
-                                }}
-                            />
-                        </View>
-                        <View style={styles.rowText}>
-                            <Text
-                                variant="titleMedium"
-                                style={styles.assetTitle}
-                            >
-                                Category
-                            </Text>
-                            <Text variant="bodyLarge" style={styles.assetDes}>
-                                {scanAssetData?.category || '-'}
+                            <Text variant="headlineSmall">
+                                {scanAssetData?.default_code || '-'}
                             </Text>
                         </View>
-                        <View style={styles.rowText}>
-                            <Text
-                                variant="titleMedium"
-                                style={[
-                                    styles.assetTitle,
-                                    scanAssetData?.state ===
-                                        MOVEMENT_ASSET_EN.Transfer && {
-                                        color: theme.colors.documentCancel
-                                    }
-                                ]}
-                            >
-                                Movement
-                            </Text>
-                            <Text
-                                variant="bodyLarge"
-                                style={[
-                                    styles.assetDes,
-                                    scanAssetData?.state ===
-                                        MOVEMENT_ASSET_EN.Transfer && {
-                                        color: theme.colors.documentCancel
-                                    }
-                                ]}
-                            >
-                                {scanAssetData?.state || '-'}
-                            </Text>
-                        </View>
-                        <View style={styles.rowText}>
-                            <Text
-                                variant="titleMedium"
-                                style={styles.assetTitle}
-                            >
-                                Location
-                            </Text>
-                            <Text variant="bodyLarge" style={styles.assetDes}>
-                                {scanAssetData?.location || '-'}
-                            </Text>
-                        </View>
-                        {scanAssetData?.state ===
-                            MOVEMENT_ASSET_EN.Transfer && (
+                        <View style={styles.assetDetail}>
                             <View style={styles.rowText}>
                                 <Text
                                     variant="titleMedium"
-                                    style={styles.assetNewLocation}
+                                    style={styles.assetTitle}
                                 >
-                                    New Location
+                                    Use Status
+                                </Text>
+                                <Dropdown
+                                    style={[
+                                        styles.dropdown,
+                                        isFocusUseState && styles.dropdownSelect
+                                    ]}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    data={listUseState}
+                                    maxHeight={300}
+                                    labelField="name"
+                                    valueField="name"
+                                    value={searchUseState}
+                                    onFocus={() =>
+                                        handleSetTrueIsFocusUseState()
+                                    }
+                                    onBlur={() =>
+                                        handleSetFalseIsFocusUseState()
+                                    }
+                                    onChange={(item) => {
+                                        handleSetSearchUseState(item?.name);
+                                    }}
+                                    renderItem={renderItemUseState}
+                                />
+                            </View>
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    Quantity
+                                </Text>
+                                <InputText
+                                    style={styles.inputQuantity}
+                                    borderColor="#828282"
+                                    alignItems="flex-start"
+                                    value={quantityInput}
+                                    onChangeText={(value) => {
+                                        const trimmed = value;
+                                        const isOnlyDigits = /^\d*$/.test(
+                                            trimmed
+                                        );
+                                        if (isOnlyDigits) {
+                                            handleSetQuantityInput(trimmed);
+                                        }
+                                    }}
+                                />
+                            </View>
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    Category
                                 </Text>
                                 <Text
                                     variant="bodyLarge"
-                                    style={styles.assetDesNewLocation}
+                                    style={styles.assetDes}
                                 >
-                                    {locationNew || '-'}
+                                    {scanAssetData?.category || '-'}
                                 </Text>
                             </View>
-                        )}
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={[
+                                        styles.assetTitle,
+                                        scanAssetData?.state ===
+                                            MOVEMENT_ASSET_EN.Transfer && {
+                                            color: theme.colors.documentCancel
+                                        }
+                                    ]}
+                                >
+                                    Movement
+                                </Text>
+                                <Text
+                                    variant="bodyLarge"
+                                    style={[
+                                        styles.assetDes,
+                                        scanAssetData?.state ===
+                                            MOVEMENT_ASSET_EN.Transfer && {
+                                            color: theme.colors.documentCancel
+                                        }
+                                    ]}
+                                >
+                                    {scanAssetData?.state || '-'}
+                                </Text>
+                            </View>
+                            <View style={styles.rowText}>
+                                <Text
+                                    variant="titleMedium"
+                                    style={styles.assetTitle}
+                                >
+                                    Location
+                                </Text>
+                                <Text
+                                    variant="bodyLarge"
+                                    style={styles.assetDes}
+                                >
+                                    {scanAssetData?.location || '-'}
+                                </Text>
+                            </View>
+                            {scanAssetData?.state ===
+                                MOVEMENT_ASSET_EN.Transfer && (
+                                <View style={styles.rowText}>
+                                    <Text
+                                        variant="titleMedium"
+                                        style={styles.assetNewLocation}
+                                    >
+                                        New Location
+                                    </Text>
+                                    <Text
+                                        variant="bodyLarge"
+                                        style={styles.assetDesNewLocation}
+                                    >
+                                        {locationNew || '-'}
+                                    </Text>
+                                </View>
+                            )}
+                        </View>
+                        <TouchableOpacity
+                            style={[
+                                styles.saveButton,
+                                {
+                                    backgroundColor: theme.colors.primary
+                                }
+                            ]}
+                            onPress={() => handleSaveEditAsset()}
+                        >
+                            <Text style={styles.buttonText}>Save</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                        style={[
-                            styles.saveButton,
-                            {
-                                backgroundColor: theme.colors.primary
-                            }
-                        ]}
-                        onPress={() => handleSaveEditAsset()}
-                    >
-                        <Text style={styles.buttonText}>Save</Text>
-                    </TouchableOpacity>
-                </View>
-                <PopUpDialog
-                    visible={visibleDialogCamera}
-                    onClose={onCloseDialogCamera}
-                    openImagePicker={openImagePicker}
-                    handleCameraLaunch={handleCameraLaunch}
-                />
-            </SafeAreaView>
-        </Modal>
+                    <PopUpDialog
+                        visible={visibleDialogCamera}
+                        onClose={onCloseDialogCamera}
+                        openImagePicker={openImagePicker}
+                        handleCameraLaunch={handleCameraLaunch}
+                    />
+                </ScrollView>
+            </Modal>
+        </Portal>
     );
 };
 
@@ -316,7 +341,7 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     assetDetailSection: {
-        height: isTablet() ? '90%' : '100%',
+        height: isTablet() ? '90%' : '70%',
         width: wp('90%'),
         backgroundColor: theme.colors.background,
         shadowColor: theme.colors.black,
