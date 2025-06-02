@@ -11,6 +11,7 @@ import ToastComponent from '@src/components/core/toast';
 import PopupDocumentDoneOdoo from '@src/components/views/popupDocumentDoneOdoo';
 import ShortcutMenu from '@src/components/views/shortcutMenu';
 import {
+    MOVEMENT_ASSET_EN,
     RESPONSE_DELETE_DOCUMENT_LINE_ASSET_NOT_FOUND,
     RESPONSE_PUT_DOCUMENT_SUCCESS,
     SOMETHING_WENT_WRONG,
@@ -21,6 +22,7 @@ import {
 } from '@src/constant';
 import {
     createTableAsset,
+    getAsset,
     getTotalAssets,
     insertAssetData
 } from '@src/db/asset';
@@ -95,6 +97,7 @@ import {
     handleMapDocumentStateValue
 } from '@src/utils/common';
 import { parseDateStringTime } from '@src/utils/time-manager';
+import moment from 'moment';
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
@@ -633,18 +636,50 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                     );
                 }
                 if (listDocumentLine?.length > 0) {
-                    const newListDocumentLine = listDocumentLine?.map(
-                        (documentLine) => {
+                    const newListDocumentLine = await Promise.all(
+                        listDocumentLine.map(async (documentLine) => {
+                            const filter = {
+                                default_code: documentLine?.code
+                            };
+
+                            const asset = await getAsset(db, filter);
+
+                            let state: string;
+
+                            if (asset.length === 0) {
+                                state = MOVEMENT_ASSET_EN.New;
+                            } else {
+                                const isToday = asset?.[0]?.create_date
+                                    ? moment(asset?.[0]?.create_date).isBetween(
+                                          moment().startOf('day'),
+                                          moment().endOf('day'),
+                                          null,
+                                          '[]'
+                                      )
+                                    : false;
+
+                                state = isToday
+                                    ? MOVEMENT_ASSET_EN.New
+                                    : documentLine.location !==
+                                      documentLine.location_old
+                                    ? MOVEMENT_ASSET_EN.Transfer
+                                    : MOVEMENT_ASSET_EN.Normal;
+                            }
+
                             const filterUseStatus = listUseStatus.filter(
                                 (item) => documentLine.use_state === item?.name
                             );
+
                             return {
                                 ...documentLine,
                                 is_sync_odoo: true,
                                 name: documentLine?.asset_name,
-                                use_state_code: filterUseStatus[0]?.id
+                                use_state_code: filterUseStatus[0]?.id,
+                                state: documentLine?.state
+                                    ? documentLine?.state
+                                    : state
                             };
-                        }
+                        })
                     );
                     await insertDocumentLineData(db, newListDocumentLine);
                 }
@@ -1201,18 +1236,50 @@ const HomeScreen: FC<HomeScreenProps> = (props) => {
                 await insertListDocumentOfflineData(db, newListDocumentLine);
             }
             if (listDocumentLine?.length > 0) {
-                const newListDocumentLine = listDocumentLine?.map(
-                    (documentLine) => {
+                const newListDocumentLine = await Promise.all(
+                    listDocumentLine.map(async (documentLine) => {
+                        const filter = {
+                            default_code: documentLine?.code
+                        };
+
+                        const asset = await getAsset(db, filter);
+
+                        let state: string;
+
+                        if (asset.length === 0) {
+                            state = MOVEMENT_ASSET_EN.New;
+                        } else {
+                            const isToday = asset?.[0]?.create_date
+                                ? moment(asset?.[0]?.create_date).isBetween(
+                                      moment().startOf('day'),
+                                      moment().endOf('day'),
+                                      null,
+                                      '[]'
+                                  )
+                                : false;
+
+                            state = isToday
+                                ? MOVEMENT_ASSET_EN.New
+                                : documentLine.location !==
+                                  documentLine.location_old
+                                ? MOVEMENT_ASSET_EN.Transfer
+                                : MOVEMENT_ASSET_EN.Normal;
+                        }
+
                         const filterUseStatus = listUseStatus.filter(
                             (item) => documentLine.use_state === item?.name
                         );
+
                         return {
                             ...documentLine,
-                            name: documentLine?.asset_name,
                             is_sync_odoo: true,
-                            use_state_code: filterUseStatus[0]?.id
+                            name: documentLine?.asset_name,
+                            use_state_code: filterUseStatus[0]?.id,
+                            state: documentLine?.state
+                                ? documentLine?.state
+                                : state
                         };
-                    }
+                    })
                 );
                 await insertDocumentLineData(db, newListDocumentLine);
             }

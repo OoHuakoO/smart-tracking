@@ -44,10 +44,7 @@ import {
 } from 'react-native-image-picker';
 import LinearGradient from 'react-native-linear-gradient';
 import { Text } from 'react-native-paper';
-import {
-    heightPercentageToDP as hp,
-    widthPercentageToDP as wp
-} from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type DocumentCreateNewAssetProps = NativeStackScreenProps<
@@ -536,10 +533,9 @@ const styles = StyleSheet.create({
         flex: 1
     },
     topSectionList: {
-        height: '37%',
         width: wp('100%'),
-        position: 'absolute',
-        display: 'flex'
+        display: 'flex',
+        paddingBottom: 10
     },
     backToPrevious: {
         marginVertical: isTablet() ? 0 : 15,
@@ -564,12 +560,8 @@ const styles = StyleSheet.create({
     },
     listSection: {
         flex: 1,
-        height: hp('30%'),
         width: wp('100%'),
         backgroundColor: theme.colors.background,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        marginTop: isTablet() ? '30%' : '50%',
         marginBottom: 2
     },
     containerMenu: {
