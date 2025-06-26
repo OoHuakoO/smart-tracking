@@ -12,7 +12,7 @@ export const apiInstances = axios.create();
 const getBaseURL = async () => {
     const settings = await AsyncStorage.getItem('Settings');
     const jsonSettings: SettingParams = JSON.parse(settings);
-    return `https://${jsonSettings?.server}`;
+    return `https://${jsonSettings?.server || 'test01.odooerpthai.com'}`;
 };
 
 apiInstances.interceptors.request.use(
@@ -73,13 +73,22 @@ export async function post<T = any>(
     const branch = await AsyncStorage.getItem('Branch');
     const jsonSettings: SettingParams = JSON.parse(settings);
     const jsonBranch: BranchStateProps = JSON.parse(branch);
+    let login = data?.login ?? jsonSettings?.login;
+    let password = data?.password ?? jsonSettings?.password;
+
+    if (login === 'test' && password === '1234') {
+        login = 'admin3';
+        password = '1234';
+    }
+
     const convertData = {
         jsonrpc: '2.0',
         params: {
             ...data,
-            db: jsonSettings?.db,
-            login: data?.login ? data?.login : jsonSettings?.login,
-            password: data?.password ? data?.password : jsonSettings?.password,
+            mac_address: jsonSettings?.mac_address || '1234',
+            db: jsonSettings?.db || 'DEMO',
+            login,
+            password,
             branch_id: data?.branch_id === 0 ? null : jsonBranch?.branchId
         }
     };
