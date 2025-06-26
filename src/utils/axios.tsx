@@ -75,18 +75,32 @@ export async function post<T = any>(
     const jsonBranch: BranchStateProps = JSON.parse(branch);
     let login = data?.login ?? jsonSettings?.login;
     let password = data?.password ?? jsonSettings?.password;
+    let mac_address = jsonSettings?.mac_address;
+    let db = jsonSettings?.db;
 
     if (login === 'test' && password === '1234') {
         login = 'admin3';
         password = '1234';
+        mac_address = '1234';
+        db = 'DEMO';
+        await AsyncStorage.setItem(
+            'Settings',
+            JSON.stringify({
+                login: 'admin3',
+                password: '1234',
+                mac_address: '1234',
+                server: 'test01.odooerpthai.com',
+                db: 'DEMO'
+            })
+        );
     }
 
     const convertData = {
         jsonrpc: '2.0',
         params: {
             ...data,
-            mac_address: jsonSettings?.mac_address || '1234',
-            db: jsonSettings?.db || 'DEMO',
+            mac_address,
+            db,
             login,
             password,
             branch_id: data?.branch_id === 0 ? null : jsonBranch?.branchId
