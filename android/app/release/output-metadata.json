@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.smarttracking",
+  "applicationId": "com.smarttrack",
   "variantName": "release",
   "elements": [
     {
