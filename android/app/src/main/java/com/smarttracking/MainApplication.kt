@@ -1,4 +1,4 @@
-package com.smarttrack
+package com.smart_track
 
 import android.app.Application
 import com.facebook.react.PackageList

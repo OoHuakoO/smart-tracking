@@ -1,4 +1,4 @@
-package com.smarttrack
+package com.smart_track
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
